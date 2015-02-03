@@ -1,0 +1,69 @@
+# MANAGED BY PUPPET
+#
+[mysqld]
+bind-address                    = <%= @bind_address %>
+default_storage_engine          = innodb
+collation_server                = utf8_general_ci
+init_connect                    = 'SET NAMES utf8'
+character_set_server            = utf8
+max_connections                 = 1000
+skip_name_resolve               = 1
+connect_timeout                 = 5
+wait_timeout                    = 600
+max_allowed_packet              = 64M
+thread_cache_size               = 128
+sort_buffer_size                = 4M
+bulk_insert_buffer_size         = 16M
+tmp_table_size                  = 512M
+max_heap_table_size             = 128M
+query_cache_type                = 0
+myisam_recover                  = BACKUP
+key_buffer_size                 = 16M
+open_files_limit                = 65535
+table_open_cache                = 1024
+table_definition_cache          = 500
+myisam_sort_buffer_size         = 512M
+concurrent_insert               = 2
+read_buffer_size                = 2M
+read_rnd_buffer_size            = 1M
+slow_query_log                  = 1
+slow_query_log_file             = /var/log/mysql/slow.log
+log_error                       = /var/log/mysql/error.log
+long_query_time                 = 1
+log_slow_verbosity              = query_plan
+innodb_buffer_pool_size         = 512M
+innodb_flush_log_at_trx_commit  = 1
+innodb_lock_wait_timeout        = 50
+innodb_thread_concurrency       = 48
+innodb_file_per_table           = 1
+innodb_open_files               = 65535
+innodb_io_capacity              = 1000
+innodb_file_format              = Barracuda
+innodb_file_format_max          = Barracuda
+innodb_max_dirty_pages_pct      = 50
+binlog_format                   = ROW
+innodb_autoinc_lock_mode        = 2
+innodb_locks_unsafe_for_binlog  = 1
+wsrep_provider                  = "<%= @wsrep_provider %>"
+wsrep_cluster_name              = "galera_cluster"
+wsrep_cluster_address           = "gcomm://<%= @gcomm_definition %>"
+wsrep_sst_auth                  = root:<%= @mysql_root_password %>
+wsrep_drupal_282555_workaround  = 0
+wsrep_sst_method                = rsync
+wsrep_node_address              = "<%= @bind_address %>"
+wsrep_node_incoming_address     = "<%= @bind_address %>"
+# This is the minimal value (proc*2)
+wsrep_slave_threads             = "<%= @processorcount.to_i * 2 %>"
+
+# Thoses TWEAK assume that the galera cluster is used in master/slave mode
+wsrep_provider_options          = "gcache.size=<%= @galera_gcache %>;gcs.fc_master_slave=1;gcs.fc_limit=256;gcs.fc_factor=0.9"
+
+# this value here are used by /usr/bin/innobackupex
+# and wsrep_sst_xtrabackup take only one configuration file and use the last one
+# (/etc/mysql/my.cnf is not used)
+datadir                         = /var/lib/mysql
+tmpdir                          = /tmp/
+innodb_flush_method             = O_DIRECT
+innodb_log_buffer_size          = 32M
+innodb_log_file_size            = 256M
+innodb_log_files_in_group       = 2
