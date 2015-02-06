@@ -16,6 +16,106 @@
 # == Class: tripleo::loadbalancer
 #
 # Configure an HAProxy/keepalived loadbalancer for TripleO.
+#
+# === Parameters:
+#
+# [*controller_host*]
+#  (optional) Host or group of hosts to load-balance the services
+#  Can be a string or an array.
+#  Defaults to undef
+#
+# [*controller_virtual_ip*]
+#  (optional) Control IP or group of IPs to bind the pools
+#  Can be a string or an array.
+#  Defaults to undef
+#
+# [*control_virtual_interface*]
+#  (optional) Interface to bind the control VIP
+#  Can be a string or an array.
+#  Defaults to undef
+#
+# [*public_virtual_interface*]
+#  (optional) Interface to bind the public VIP
+#  Can be a string or an array.
+#  Defaults to undef
+#
+# [*public_virtual_ip*]
+#  (optional) Public IP or group of IPs to bind the pools
+#  Can be a string or an array.
+#  Defaults to undef
+#
+# [*keystone_admin*]
+#  (optional) Enable or not Keystone Admin API binding
+#  Defaults to false
+#
+# [*keystone_public*]
+#  (optional) Enable or not Keystone Public API binding
+#  Defaults to false
+#
+# [*neutron*]
+#  (optional) Enable or not Neutron API binding
+#  Defaults to false
+#
+# [*cinder*]
+#  (optional) Enable or not Cinder API binding
+#  Defaults to false
+#
+# [*glance_api*]
+#  (optional) Enable or not Glance API binding
+#  Defaults to false
+#
+# [*glance_registry*]
+#  (optional) Enable or not Glance registry binding
+#  Defaults to false
+#
+# [*nova_ec2*]
+#  (optional) Enable or not Nova EC2 API binding
+#  Defaults to false
+#
+# [*nova_osapi*]
+#  (optional) Enable or not Nova API binding
+#  Defaults to false
+#
+# [*nova_metadata*]
+#  (optional) Enable or not Nova metadata binding
+#  Defaults to false
+#
+# [*nova_novncproxy*]
+#  (optional) Enable or not Nova novncproxy binding
+#  Defaults to false
+#
+# [*ceilometer*]
+#  (optional) Enable or not Ceilometer API binding
+#  Defaults to false
+#
+# [*swift_proxy_server*]
+#  (optional) Enable or not Swift API binding
+#  Defaults to false
+#
+# [*heat_api*]
+#  (optional) Enable or not Heat API binding
+#  Defaults to false
+#
+# [*heat_cloudwatch*]
+#  (optional) Enable or not Heat Cloudwatch API binding
+#  Defaults to false
+#
+# [*heat_cfn*]
+#  (optional) Enable or not Heat CFN API binding
+#  Defaults to false
+#
+# [*horizon*]
+#  (optional) Enable or not Horizon dashboard binding
+#  Defaults to false
+#
+# [*mysql*]
+#  (optional) Enable or not MySQL Galera binding
+#  Defaults to false
+#
+# [*rabbitmq*]
+#  (optional) Enable or not RabbitMQ binding
+#  Defaults to false
+#
 class tripleo::loadbalancer (
   $controller_host           = undef,
   $controller_virtual_ip     = undef,
