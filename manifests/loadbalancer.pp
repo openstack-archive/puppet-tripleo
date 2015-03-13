@@ -20,27 +20,27 @@
 # === Parameters:
 #
 # [*controller_host*]
-#  (optional) Host or group of hosts to load-balance the services
+#  Host or group of hosts to load-balance the services
 #  Can be a string or an array.
 #  Defaults to undef
 #
 # [*controller_virtual_ip*]
-#  (optional) Control IP or group of IPs to bind the pools
+#  Control IP or group of IPs to bind the pools
 #  Can be a string or an array.
 #  Defaults to undef
 #
 # [*control_virtual_interface*]
-#  (optional) Interface to bind the control VIP
+#  Interface to bind the control VIP
 #  Can be a string or an array.
 #  Defaults to undef
 #
 # [*public_virtual_interface*]
-#  (optional) Interface to bind the public VIP
+#  Interface to bind the public VIP
 #  Can be a string or an array.
 #  Defaults to undef
 #
 # [*public_virtual_ip*]
-#  (optional) Public IP or group of IPs to bind the pools
+#  Public IP or group of IPs to bind the pools
 #  Can be a string or an array.
 #  Defaults to undef
 #
