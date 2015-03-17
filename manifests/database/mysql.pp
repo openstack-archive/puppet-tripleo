@@ -132,12 +132,12 @@ class tripleo::database::mysql (
         ensure  => 'present',
         charset => 'utf8',
         collate => 'utf8_unicode_ci',
-        require => File['/root/.my.cnf']
+        require => File['/root/.my.cnf'],
       }
       mysql_user { "${galera_clustercheck_dbuser}@localhost":
         ensure        => 'present',
         password_hash => mysql_password($galera_clustercheck_dbpassword),
-        require       => File['/root/.my.cnf']
+        require       => File['/root/.my.cnf'],
       }
       mysql_grant { "${galera_clustercheck_dbuser}@localhost/monitoring":
         ensure     => 'present',
@@ -181,7 +181,7 @@ class tripleo::database::mysql (
           command => '/usr/bin/mysql_install_db --rpm --user=mysql',
           unless  => 'test -d /var/lib/mysql/mysql',
           before  => Service['mysqld'],
-          require => [Package[$mysql_server_package_name], File[$mysql_server_config_file]]
+          require => [Package[$mysql_server_package_name], File[$mysql_server_config_file]],
         }
 
       }
@@ -201,7 +201,7 @@ class tripleo::database::mysql (
         mysql_user { 'debian-sys-maint@localhost':
           ensure        => 'present',
           password_hash => mysql_password($mysql_sys_maint_password),
-          require       => File['/root/.my.cnf']
+          require       => File['/root/.my.cnf'],
         }
 
         file{'/etc/mysql/debian.cnf':
@@ -227,7 +227,7 @@ class tripleo::database::mysql (
       before  => Package[$mysql_server_package_name],
     }
 
-    class { 'mysql::server':
+    class { '::mysql::server':
       manage_config_file => false,
       config_file        => $mysql_server_config_file,
       package_name       => $mysql_server_package_name,
@@ -235,7 +235,7 @@ class tripleo::database::mysql (
       override_options   => {
         'mysqld' => {
           'bind-address' => $bind_address,
-        }
+        },
       },
       root_password      => $mysql_root_password,
       notify             => Service['xinetd'],
@@ -250,7 +250,7 @@ class tripleo::database::mysql (
       require => Package[$mysql_server_package_name],
     }
 
-    class { 'mysql::client':
+    class { '::mysql::client':
       package_name => $mysql_client_package_name,
     }
 
@@ -264,7 +264,7 @@ class tripleo::database::mysql (
         'set service-name[. = "mysqlchk"]/protocol tcp',
       ],
       onlyif  => 'match service-name[. = "mysqlchk"] size == 0',
-      notify  => [ Service['xinetd'], Exec['reload_xinetd'] ]
+      notify  => [ Service['xinetd'], Exec['reload_xinetd'] ],
     }
     file {
       '/etc/xinetd.d/mysqlchk':
@@ -292,11 +292,11 @@ class tripleo::database::mysql (
     }
   } else {
     # When HA is disabled
-    class { 'mysql::server':
+    class { '::mysql::server':
       override_options => {
         'mysqld' => {
           'bind-address' => $bind_address,
-        }
+        },
       },
       root_password    => $mysql_root_password,
     }
@@ -307,7 +307,7 @@ class tripleo::database::mysql (
     # Create all the database schemas
     $allowed_hosts = ['%',$controller_host]
     $keystone_dsn = split($keystone_database_connection, '[@:/?]')
-    class { 'keystone::db::mysql':
+    class { '::keystone::db::mysql':
       user          => $keystone_dsn[3],
       password      => $keystone_dsn[4],
       host          => $keystone_dsn[5],
@@ -315,7 +315,7 @@ class tripleo::database::mysql (
       allowed_hosts => $allowed_hosts,
     }
     $glance_dsn = split($glance_database_connection, '[@:/?]')
-    class { 'glance::db::mysql':
+    class { '::glance::db::mysql':
       user          => $glance_dsn[3],
       password      => $glance_dsn[4],
       host          => $glance_dsn[5],
@@ -323,7 +323,7 @@ class tripleo::database::mysql (
       allowed_hosts => $allowed_hosts,
     }
     $nova_dsn = split($nova_database_connection, '[@:/?]')
-    class { 'nova::db::mysql':
+    class { '::nova::db::mysql':
       user          => $nova_dsn[3],
       password      => $nova_dsn[4],
       host          => $nova_dsn[5],
@@ -331,7 +331,7 @@ class tripleo::database::mysql (
       allowed_hosts => $allowed_hosts,
     }
     $neutron_dsn = split($neutron_database_connection, '[@:/?]')
-    class { 'neutron::db::mysql':
+    class { '::neutron::db::mysql':
       user          => $neutron_dsn[3],
       password      => $neutron_dsn[4],
       host          => $neutron_dsn[5],
@@ -339,7 +339,7 @@ class tripleo::database::mysql (
       allowed_hosts => $allowed_hosts,
     }
     $cinder_dsn = split($cinder_database_connection, '[@:/?]')
-    class { 'cinder::db::mysql':
+    class { '::cinder::db::mysql':
       user          => $cinder_dsn[3],
       password      => $cinder_dsn[4],
       host          => $cinder_dsn[5],
@@ -347,7 +347,7 @@ class tripleo::database::mysql (
       allowed_hosts => $allowed_hosts,
     }
     $heat_dsn = split($heat_database_connection, '[@:/?]')
-    class { 'heat::db::mysql':
+    class { '::heat::db::mysql':
       user          => $heat_dsn[3],
       password      => $heat_dsn[4],
       host          => $heat_dsn[5],
@@ -355,7 +355,7 @@ class tripleo::database::mysql (
       allowed_hosts => $allowed_hosts,
     }
     $ceilometer_dsn = split($ceilometer_database_connection, '[@:/?]')
-    class { 'ceilometer::db::mysql':
+    class { '::ceilometer::db::mysql':
       user          => $ceilometer_dsn[3],
       password      => $ceilometer_dsn[4],
       host          => $ceilometer_dsn[5],
