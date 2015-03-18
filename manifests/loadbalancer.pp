@@ -117,11 +117,11 @@
 #  Defaults to false
 #
 class tripleo::loadbalancer (
-  $controller_host           = undef,
-  $controller_virtual_ip     = undef,
-  $control_virtual_interface = undef,
-  $public_virtual_interface  = undef,
-  $public_virtual_ip         = undef,
+  $controller_host,
+  $controller_virtual_ip,
+  $control_virtual_interface,
+  $public_virtual_interface,
+  $public_virtual_ip,
   $keystone_admin            = false,
   $keystone_public           = false,
   $neutron                   = false,
