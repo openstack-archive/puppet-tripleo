@@ -44,6 +44,10 @@
 #  Can be a string or an array.
 #  Defaults to undef
 #
+# [*galera_master_hostname*]
+#  FQDN of the Galera master node
+#  Defaults to undef
+#
 # [*keystone_admin*]
 #  (optional) Enable or not Keystone Admin API binding
 #  Defaults to false
@@ -122,6 +126,7 @@ class tripleo::loadbalancer (
   $control_virtual_interface,
   $public_virtual_interface,
   $public_virtual_ip,
+  $galera_master_hostname    = undef,
   $keystone_admin            = false,
   $keystone_public           = false,
   $neutron                   = false,
@@ -491,11 +496,16 @@ class tripleo::loadbalancer (
       },
       collect_exported => false,
     }
+    if downcase($galera_master_hostname) == $::hostname or !$galera_master_hostname {
+      $options_real = ['check', 'inter 2000', 'rise 2', 'fall 5']
+    } else {
+      $options_real = ['check', 'inter 2000', 'rise 2', 'fall 5', 'backup']
+    }
     haproxy::balancermember { 'mysql':
       listening_service => 'mysql',
       ports             => '3306',
       ipaddresses       => $controller_host,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $options_real,
     }
   }
 
