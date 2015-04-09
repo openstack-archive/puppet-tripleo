@@ -242,11 +242,11 @@ class tripleo::loadbalancer (
   }
 
   haproxy::listen { 'haproxy.stats':
-    ipaddress        => '*',
+    ipaddress        => $controller_virtual_ip,
     ports            => '1993',
     mode             => 'http',
     options          => {
-      'stats' => 'enable',
+      'stats' => ['enable', 'uri /'],
     },
     collect_exported => false,
   }
