@@ -134,6 +134,10 @@
 #  (optional) Enable or not RabbitMQ binding
 #  Defaults to false
 #
+# [*redis*]
+#  (optional) Enable or not Redis binding
+#  Defaults to false
+#
 class tripleo::loadbalancer (
   $controller_virtual_ip,
   $control_virtual_interface,
@@ -162,6 +166,7 @@ class tripleo::loadbalancer (
   $horizon                   = false,
   $mysql                     = false,
   $rabbitmq                  = false,
+  $redis                     = false,
 ) {
 
   if !$controller_host and !$controller_hosts {
@@ -577,6 +582,28 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'rabbitmq':
       listening_service => 'rabbitmq',
       ports             => '5672',
+      ipaddresses       => $controller_hosts_real,
+      server_names      => $controller_hosts_names_real,
+      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+    }
+  }
+
+  if $redis {
+    haproxy::listen { 'redis':
+      ipaddress        => [$controller_virtual_ip],
+      ports            => 6379,
+      options          => {
+        'timeout'   => [ 'client 0', 'server 0' ],
+        'mode'      => 'tcp',
+        'balance'   => 'first',
+        'option'    => ['tcp-check',],
+        'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
+      },
+      collect_exported => false,
+    }
+    haproxy::balancermember { 'redis':
+      listening_service => 'redis',
+      ports             => '6379',
       ipaddresses       => $controller_hosts_real,
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
