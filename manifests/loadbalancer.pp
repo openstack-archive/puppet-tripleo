@@ -572,7 +572,7 @@ class tripleo::loadbalancer (
 
   if $rabbitmq {
     haproxy::listen { 'rabbitmq':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
+      ipaddress        => [$controller_virtual_ip],
       ports            => 5672,
       options          => {
         'timeout' => [ 'client 0', 'server 0' ],
