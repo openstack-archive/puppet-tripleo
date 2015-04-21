@@ -66,6 +66,57 @@
 #  Can be a string or an array.
 #  Defaults to undef
 #
+# [*service_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the public API endpoints using the specified file.
+#  Any service-specific certificates take precedence over this one.
+#  Defaults to undef
+#
+# [*keystone_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Keystone public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*neutron_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Neutron public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*cinder_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Cinder public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*glance_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Glance public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*nova_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Nova public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*ceilometer_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Ceilometer public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*swift_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Swift public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*heat_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Heat public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*horizon_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Horizon public API endpoint using the specified file.
+#  Defaults to undef
+#
 # [*galera_master_hostname*]
 #  FQDN of the Galera master node
 #  Defaults to undef
@@ -161,6 +212,16 @@ class tripleo::loadbalancer (
   $controller_host           = undef,
   $controller_hosts          = undef,
   $controller_hosts_names    = undef,
+  $service_certificate       = undef,
+  $keystone_certificate      = undef,
+  $neutron_certificate       = undef,
+  $cinder_certificate        = undef,
+  $glance_certificate        = undef,
+  $nova_certificate          = undef,
+  $ceilometer_certificate    = undef,
+  $swift_certificate         = undef,
+  $heat_certificate          = undef,
+  $horizon_certificate       = undef,
   $galera_master_hostname    = undef,
   $galera_master_ip          = undef,
   $keystone_admin            = false,
@@ -242,6 +303,192 @@ class tripleo::loadbalancer (
     }
   }
 
+  if $keystone_certificate {
+    $keystone_bind_certificate = $keystone_certificate
+  } else {
+    $keystone_bind_certificate = $service_certificate
+  }
+  if $neutron_certificate {
+    $neutron_bind_certificate = $neutron_certificate
+  } else {
+    $neutron_bind_certificate = $service_certificate
+  }
+  if $cinder_certificate {
+    $cinder_bind_certificate = $cinder_certificate
+  } else {
+    $cinder_bind_certificate = $service_certificate
+  }
+  if $glance_certificate {
+    $glance_bind_certificate = $glance_certificate
+  } else {
+    $glance_bind_certificate = $service_certificate
+  }
+  if $nova_certificate {
+    $nova_bind_certificate = $nova_certificate
+  } else {
+    $nova_bind_certificate = $service_certificate
+  }
+  if $ceilometer_certificate {
+    $ceilometer_bind_certificate = $ceilometer_certificate
+  } else {
+    $ceilometer_bind_certificate = $service_certificate
+  }
+  if $swift_certificate {
+    $swift_bind_certificate = $swift_certificate
+  } else {
+    $swift_bind_certificate = $service_certificate
+  }
+  if $heat_certificate {
+    $heat_bind_certificate = $heat_certificate
+  } else {
+    $heat_bind_certificate = $service_certificate
+  }
+  if $horizon_certificate {
+    $horizon_bind_certificate = $horizon_certificate
+  } else {
+    $horizon_bind_certificate = $service_certificate
+  }
+
+  if $keystone_bind_certificate {
+    $keystone_public_bind_opts = {
+      "${controller_virtual_ip}:5000" => [],
+      "${public_virtual_ip}:13000" => ['ssl', 'crt', $keystone_bind_certificate],
+    }
+    $keystone_admin_bind_opts = {
+      "${controller_virtual_ip}:35357" => [],
+      "${public_virtual_ip}:13357" => ['ssl', 'crt', $keystone_bind_certificate],
+    }
+  } else {
+    $keystone_public_bind_opts = {
+      "${controller_virtual_ip}:5000" => [],
+      "${public_virtual_ip}:5000" => [],
+    }
+    $keystone_admin_bind_opts = {
+      "${controller_virtual_ip}:35357" => [],
+      "${public_virtual_ip}:35357" => [],
+    }
+  }
+  if $neutron_bind_certificate {
+    $neutron_bind_opts = {
+      "${controller_virtual_ip}:9696" => [],
+      "${public_virtual_ip}:13696" => ['ssl', 'crt', $neutron_bind_certificate],
+    }
+  } else {
+    $neutron_bind_opts = {
+      "${controller_virtual_ip}:9696" => [],
+      "${public_virtual_ip}:9696" => [],
+    }
+  }
+  if $cinder_bind_certificate {
+    $cinder_bind_opts = {
+      "${controller_virtual_ip}:8776" => [],
+      "${public_virtual_ip}:13776" => ['ssl', 'crt', $cinder_bind_certificate],
+    }
+  } else {
+    $cinder_bind_opts = {
+      "${controller_virtual_ip}:8776" => [],
+      "${public_virtual_ip}:8776" => [],
+    }
+  }
+  if $glance_bind_certificate {
+    $glance_bind_opts = {
+      "${controller_virtual_ip}:9292" => [],
+      "${public_virtual_ip}:13292" => ['ssl', 'crt', $glance_bind_certificate],
+    }
+  } else {
+    $glance_bind_opts = {
+      "${controller_virtual_ip}:9292" => [],
+      "${public_virtual_ip}:9292" => [],
+    }
+  }
+  if $nova_bind_certificate {
+    $nova_osapi_bind_opts = {
+      "${controller_virtual_ip}:8774" => [],
+      "${public_virtual_ip}:13774" => ['ssl', 'crt', $nova_bind_certificate],
+    }
+    $nova_ec2_bind_opts = {
+      "${controller_virtual_ip}:8773" => [],
+      "${public_virtual_ip}:13773" => ['ssl', 'crt', $nova_bind_certificate],
+    }
+    $nova_novnc_bind_opts = {
+      "${controller_virtual_ip}:6080" => [],
+      "${public_virtual_ip}:13080" => ['ssl', 'crt', $nova_bind_certificate],
+    }
+  } else {
+    $nova_osapi_bind_opts = {
+      "${controller_virtual_ip}:8774" => [],
+      "${public_virtual_ip}:8774" => [],
+    }
+    $nova_ec2_bind_opts = {
+      "${controller_virtual_ip}:8773" => [],
+      "${public_virtual_ip}:8773" => [],
+    }
+    $nova_novnc_bind_opts = {
+      "${controller_virtual_ip}:6080" => [],
+      "${public_virtual_ip}:6080" => [],
+    }
+  }
+  if $ceilometer_bind_certificate {
+    $ceilometer_bind_opts = {
+      "${controller_virtual_ip}:8777" => [],
+      "${public_virtual_ip}:13777" => ['ssl', 'crt', $ceilometer_bind_certificate],
+    }
+  } else {
+    $ceilometer_bind_opts = {
+      "${controller_virtual_ip}:8777" => [],
+      "${public_virtual_ip}:8777" => [],
+    }
+  }
+  if $swift_bind_certificate {
+    $swift_bind_opts = {
+      "${controller_virtual_ip}:8080" => [],
+      "${public_virtual_ip}:13080" => ['ssl', 'crt', $swift_bind_certificate],
+    }
+  } else {
+    $swift_bind_opts = {
+      "${controller_virtual_ip}:8080" => [],
+      "${public_virtual_ip}:8080" => [],
+    }
+  }
+  if $heat_bind_certificate {
+    $heat_bind_opts = {
+      "${controller_virtual_ip}:8004" => [],
+      "${public_virtual_ip}:13004" => ['ssl', 'crt', $heat_bind_certificate],
+    }
+    $heat_cw_bind_opts = {
+      "${controller_virtual_ip}:8003" => [],
+      "${public_virtual_ip}:13003" => ['ssl', 'crt', $heat_bind_certificate],
+    }
+    $heat_cfn_bind_opts = {
+      "${controller_virtual_ip}:8000" => [],
+      "${public_virtual_ip}:13000" => ['ssl', 'crt', $heat_bind_certificate],
+    }
+  } else {
+    $heat_bind_opts = {
+      "${controller_virtual_ip}:8004" => [],
+      "${public_virtual_ip}:8004" => [],
+    }
+    $heat_cw_bind_opts = {
+      "${controller_virtual_ip}:8003" => [],
+      "${public_virtual_ip}:8003" => [],
+    }
+    $heat_cfn_bind_opts = {
+      "${controller_virtual_ip}:8000" => [],
+      "${public_virtual_ip}:8000" => [],
+    }
+  }
+  if $horizon_bind_certificate {
+    $horizon_bind_opts = {
+      "${controller_virtual_ip}:80" => [],
+      "${public_virtual_ip}:443" => ['ssl', 'crt', $horizon_bind_certificate],
+    }
+  } else {
+    $horizon_bind_opts = {
+      "${controller_virtual_ip}:80" => [],
+      "${public_virtual_ip}:80" => [],
+    }
+  }
+
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
 
   class { '::haproxy':
@@ -275,8 +522,7 @@ class tripleo::loadbalancer (
 
   if $keystone_admin {
     haproxy::listen { 'keystone_admin':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 35357,
+      bind             => $keystone_admin_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -293,8 +539,7 @@ class tripleo::loadbalancer (
 
   if $keystone_public {
     haproxy::listen { 'keystone_public':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 5000,
+      bind             => $keystone_public_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -311,8 +556,7 @@ class tripleo::loadbalancer (
 
   if $neutron {
     haproxy::listen { 'neutron':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 9696,
+      bind             => $neutron_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -329,8 +573,7 @@ class tripleo::loadbalancer (
 
   if $cinder {
     haproxy::listen { 'cinder':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8776,
+      bind             => $cinder_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -347,8 +590,7 @@ class tripleo::loadbalancer (
 
   if $glance_api {
     haproxy::listen { 'glance_api':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 9292,
+      bind             => $glance_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -383,8 +625,7 @@ class tripleo::loadbalancer (
 
   if $nova_ec2 {
     haproxy::listen { 'nova_ec2':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8773,
+      bind             => $nova_ec2_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -401,8 +642,7 @@ class tripleo::loadbalancer (
 
   if $nova_osapi {
     haproxy::listen { 'nova_osapi':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8774,
+      bind             => $nova_osapi_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -437,8 +677,7 @@ class tripleo::loadbalancer (
 
   if $nova_novncproxy {
     haproxy::listen { 'nova_novncproxy':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 6080,
+      bind             => $nova_novnc_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -455,8 +694,7 @@ class tripleo::loadbalancer (
 
   if $ceilometer {
     haproxy::listen { 'ceilometer':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8777,
+      bind             => $ceilometer_bind_opts,
       collect_exported => false,
     }
     haproxy::balancermember { 'ceilometer':
@@ -470,8 +708,7 @@ class tripleo::loadbalancer (
 
   if $swift_proxy_server {
     haproxy::listen { 'swift_proxy_server':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8080,
+      bind             => $swift_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /info' ],
       },
@@ -488,8 +725,7 @@ class tripleo::loadbalancer (
 
   if $heat_api {
     haproxy::listen { 'heat_api':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8004,
+      bind             => $heat_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -506,8 +742,7 @@ class tripleo::loadbalancer (
 
   if $heat_cloudwatch {
     haproxy::listen { 'heat_cloudwatch':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8003,
+      bind             => $heat_cw_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -524,8 +759,7 @@ class tripleo::loadbalancer (
 
   if $heat_cfn {
     haproxy::listen { 'heat_cfn':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 8000,
+      bind             => $heat_cfn_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
@@ -542,8 +776,7 @@ class tripleo::loadbalancer (
 
   if $horizon {
     haproxy::listen { 'horizon':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
-      ports            => 80,
+      bind             => $horizon_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
       },
