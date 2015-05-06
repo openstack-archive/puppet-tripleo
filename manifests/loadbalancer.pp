@@ -20,7 +20,11 @@
 # === Parameters:
 #
 # [*manage_vip*]
-#  Whether to enable keepalived to manage the VIPs or not
+#  Whether to configure keepalived to manage the VIPs or not.
+#  Defaults to true
+#
+# [*haproxy_service_manage*]
+#  Will be passed as value for service_manage to haproxy module.
 #  Defaults to true
 #
 # [*controller_host*]
@@ -148,6 +152,7 @@ class tripleo::loadbalancer (
   $public_virtual_interface,
   $public_virtual_ip,
   $manage_vip                = true,
+  $haproxy_service_manage    = true,
   $controller_host           = undef,
   $controller_hosts          = undef,
   $controller_hosts_names    = undef,
@@ -235,6 +240,7 @@ class tripleo::loadbalancer (
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
 
   class { '::haproxy':
+    service_manage   => $haproxy_service_manage,
     global_options   => {
       'log'     => '/dev/log local0',
       'pidfile' => '/var/run/haproxy.pid',
