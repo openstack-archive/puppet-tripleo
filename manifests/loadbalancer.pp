@@ -27,6 +27,10 @@
 #  Will be passed as value for service_manage to haproxy module.
 #  Defaults to true
 #
+# [*haproxy_global_maxconn*]
+#  The value to use as maxconn in the haproxy global config section.
+#  Defaults to 10000
+#
 # [*controller_host*]
 #  (Deprecated)Host or group of hosts to load-balance the services
 #  Can be a string or an array.
@@ -153,6 +157,7 @@ class tripleo::loadbalancer (
   $public_virtual_ip,
   $manage_vip                = true,
   $haproxy_service_manage    = true,
+  $haproxy_global_maxconn    = 10000,
   $controller_host           = undef,
   $controller_hosts          = undef,
   $controller_hosts_names    = undef,
@@ -247,13 +252,12 @@ class tripleo::loadbalancer (
       'user'    => 'haproxy',
       'group'   => 'haproxy',
       'daemon'  => '',
-      'maxconn' => '4000',
+      'maxconn' => $haproxy_global_maxconn,
     },
     defaults_options => {
       'mode'    => 'tcp',
       'log'     => 'global',
       'retries' => '3',
-      'maxconn' => '150',
       'option'  => [ 'tcpka', 'tcplog' ],
       'timeout' => [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
     },
