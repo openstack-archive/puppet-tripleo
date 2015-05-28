@@ -531,7 +531,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'keystone_admin':
       listening_service => 'keystone_admin',
       ports             => '35357',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('keystone_admin_api_node_ips',$controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -548,7 +548,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'keystone_public':
       listening_service => 'keystone_public',
       ports             => '5000',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('keystone_public_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -565,7 +565,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'neutron':
       listening_service => 'neutron',
       ports             => '9696',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -582,7 +582,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'cinder':
       listening_service => 'cinder',
       ports             => '8776',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('cinder_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -599,7 +599,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'glance_api':
       listening_service => 'glance_api',
       ports             => '9292',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('glance_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -617,7 +617,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'glance_registry':
       listening_service => 'glance_registry',
       ports             => '9191',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('glance_registry_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -634,7 +634,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'nova_ec2':
       listening_service => 'nova_ec2',
       ports             => '8773',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -651,7 +651,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'nova_osapi':
       listening_service => 'nova_osapi',
       ports             => '8774',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -669,7 +669,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'nova_metadata':
       listening_service => 'nova_metadata',
       ports             => '8775',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('nova_metadata_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -686,7 +686,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'nova_novncproxy':
       listening_service => 'nova_novncproxy',
       ports             => '6080',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -700,7 +700,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'ceilometer':
       listening_service => 'ceilometer',
       ports             => '8777',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('ceilometer_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => [],
     }
@@ -717,7 +717,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'swift_proxy_server':
       listening_service => 'swift_proxy_server',
       ports             => '8080',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('swift_proxy_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -734,7 +734,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'heat_api':
       listening_service => 'heat_api',
       ports             => '8004',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('heat_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -751,7 +751,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'heat_cloudwatch':
       listening_service => 'heat_cloudwatch',
       ports             => '8003',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('heat_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -768,7 +768,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'heat_cfn':
       listening_service => 'heat_cfn',
       ports             => '8000',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('heat_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -785,7 +785,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'horizon':
       listening_service => 'horizon',
       ports             => '80',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -809,7 +809,7 @@ class tripleo::loadbalancer (
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
 
-    $controller_hosts_without_galera_master = delete($controller_hosts_real, $galera_master_ip)
+    $controller_hosts_without_galera_master = delete(hiera('mysql_node_ips', $controller_hosts_real), $galera_master_ip)
     $controller_hosts_names_without_galera_master = delete($controller_hosts_names_real, downcase($galera_master_hostname))
     haproxy::balancermember { 'mysql-backup':
       listening_service => 'mysql',
@@ -832,7 +832,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'rabbitmq':
       listening_service => 'rabbitmq',
       ports             => '5672',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('rabbitmq_network', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
@@ -854,7 +854,7 @@ class tripleo::loadbalancer (
     haproxy::balancermember { 'redis':
       listening_service => 'redis',
       ports             => '6379',
-      ipaddresses       => $controller_hosts_real,
+      ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
