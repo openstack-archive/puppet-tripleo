@@ -607,7 +607,7 @@ class tripleo::loadbalancer (
 
   if $glance_registry {
     haproxy::listen { 'glance_registry':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
+      ipaddress        => $controller_virtual_ip,
       ports            => 9191,
       options          => {
         'option' => [ 'httpchk GET /' ],
@@ -659,7 +659,7 @@ class tripleo::loadbalancer (
 
   if $nova_metadata {
     haproxy::listen { 'nova_metadata':
-      ipaddress        => [$controller_virtual_ip, $public_virtual_ip],
+      ipaddress        => $controller_virtual_ip,
       ports            => 8775,
       options          => {
         'option' => [ 'httpchk GET /' ],
