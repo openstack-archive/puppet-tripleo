@@ -200,6 +200,10 @@
 #  (optional) Enable or not MySQL Galera binding
 #  Defaults to false
 #
+# [*mysql_clustercheck*]
+#  (optional) Enable check via clustercheck for mysql
+#  Defaults to false
+#
 # [*rabbitmq*]
 #  (optional) Enable or not RabbitMQ binding
 #  Defaults to false
@@ -249,6 +253,7 @@ class tripleo::loadbalancer (
   $heat_cfn                  = false,
   $horizon                   = false,
   $mysql                     = false,
+  $mysql_clustercheck        = false,
   $rabbitmq                  = false,
   $redis                     = false,
 ) {
@@ -855,13 +860,25 @@ class tripleo::loadbalancer (
     }
   }
 
+  if $mysql_clustercheck {
+    $mysql_listen_options = {
+        'option'      => [ 'httpchk' ],
+        'timeout'     => [ 'client 0', 'server 0' ],
+        'stick-table' => 'type ip size 1000',
+        'stick'       => 'on dst',
+    }
+    $mysql_member_options = ['check', 'inter 2000', 'rise 2', 'fall 5', 'backup', 'port 9200', 'on-marked-down shutdown-sessions']
+  } else {
+    $mysql_listen_options = {
+        'timeout'     => [ 'client 0', 'server 0' ],
+    }
+    $mysql_member_options = ['check', 'inter 2000', 'rise 2', 'fall 5', 'backup']
+  }
   if $mysql {
     haproxy::listen { 'mysql':
       ipaddress        => [hiera('mysql_vip', $controller_virtual_ip)],
       ports            => 3306,
-      options          => {
-        'timeout' => [ 'client 0', 'server 0' ],
-      },
+      options          => $mysql_listen_options,
       collect_exported => false,
     }
     haproxy::balancermember { 'mysql-backup':
@@ -869,7 +886,7 @@ class tripleo::loadbalancer (
       ports             => '3306',
       ipaddresses       => hiera('mysql_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5', 'backup'],
+      options           => $mysql_member_options,
     }
   }
 
