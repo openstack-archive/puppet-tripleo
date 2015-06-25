@@ -674,7 +674,7 @@ class tripleo::loadbalancer (
       ipaddress        => hiera('glance_registry_vip', $controller_virtual_ip),
       ports            => 9191,
       options          => {
-        'option' => [ 'httpchk GET /' ],
+        'mode' => 'tcp',
       },
       collect_exported => false,
     }
