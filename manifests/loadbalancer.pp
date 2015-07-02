@@ -573,7 +573,6 @@ class tripleo::loadbalancer (
       "${public_virtual_ip}:13004" => ['ssl', 'crt', $heat_bind_certificate],
     }
     $heat_options = {
-      'option' => [ 'httpchk GET /' ],
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
     }
     $heat_cw_bind_opts = {
@@ -589,9 +588,7 @@ class tripleo::loadbalancer (
       "${heat_api_vip}:8004" => [],
       "${public_virtual_ip}:8004" => [],
     }
-    $heat_options = {
-      'option' => [ 'httpchk GET /' ],
-    }
+    $heat_options = {}
     $heat_cw_bind_opts = {
       "${heat_api_vip}:8003" => [],
       "${public_virtual_ip}:8003" => [],
@@ -644,10 +641,15 @@ class tripleo::loadbalancer (
       'mode'    => 'tcp',
       'log'     => 'global',
       'retries' => '3',
-      'option'  => [ 'tcpka', 'tcplog' ],
       'timeout' => [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
       'maxconn' => $haproxy_default_maxconn,
     },
+  }
+
+  Haproxy::Listen {
+    options => {
+      'option' => [],
+    }
   }
 
   haproxy::listen { 'haproxy.stats':
@@ -663,9 +665,6 @@ class tripleo::loadbalancer (
   if $keystone_admin {
     haproxy::listen { 'keystone_admin':
       bind             => $keystone_admin_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'keystone_admin':
@@ -680,9 +679,6 @@ class tripleo::loadbalancer (
   if $keystone_public {
     haproxy::listen { 'keystone_public':
       bind             => $keystone_public_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'keystone_public':
@@ -697,9 +693,6 @@ class tripleo::loadbalancer (
   if $neutron {
     haproxy::listen { 'neutron':
       bind             => $neutron_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'neutron':
@@ -714,9 +707,6 @@ class tripleo::loadbalancer (
   if $cinder {
     haproxy::listen { 'cinder':
       bind             => $cinder_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'cinder':
@@ -731,9 +721,6 @@ class tripleo::loadbalancer (
   if manila {
     haproxy::listen { 'manila':
       bind             => $manila_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'manila':
@@ -748,9 +735,6 @@ class tripleo::loadbalancer (
   if $glance_api {
     haproxy::listen { 'glance_api':
       bind             => $glance_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'glance_api':
@@ -765,9 +749,6 @@ class tripleo::loadbalancer (
   if $glance_registry {
     haproxy::listen { 'glance_registry':
       ipaddress        => hiera('glance_registry_vip', $controller_virtual_ip),
-      options          => {
-        'option' => [ ],
-      },
       ports            => 9191,
       collect_exported => false,
     }
@@ -783,9 +764,6 @@ class tripleo::loadbalancer (
   if $nova_ec2 {
     haproxy::listen { 'nova_ec2':
       bind             => $nova_ec2_bind_opts,
-      options          => {
-        'option' => [ ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'nova_ec2':
@@ -800,9 +778,6 @@ class tripleo::loadbalancer (
   if $nova_osapi {
     haproxy::listen { 'nova_osapi':
       bind             => $nova_osapi_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'nova_osapi':
@@ -818,9 +793,6 @@ class tripleo::loadbalancer (
     haproxy::listen { 'nova_metadata':
       ipaddress        => hiera('nova_metadata_vip', $controller_virtual_ip),
       ports            => 8775,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'nova_metadata':
@@ -835,9 +807,6 @@ class tripleo::loadbalancer (
   if $nova_novncproxy {
     haproxy::listen { 'nova_novncproxy':
       bind             => $nova_novnc_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'nova_novncproxy':
@@ -852,9 +821,6 @@ class tripleo::loadbalancer (
   if $ceilometer {
     haproxy::listen { 'ceilometer':
       bind             => $ceilometer_bind_opts,
-      options          => {
-        'option' => [ ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'ceilometer':
@@ -869,9 +835,6 @@ class tripleo::loadbalancer (
   if $swift_proxy_server {
     haproxy::listen { 'swift_proxy_server':
       bind             => $swift_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /info' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'swift_proxy_server':
@@ -902,9 +865,6 @@ class tripleo::loadbalancer (
   if $heat_cloudwatch {
     haproxy::listen { 'heat_cloudwatch':
       bind             => $heat_cw_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'heat_cloudwatch':
@@ -919,9 +879,6 @@ class tripleo::loadbalancer (
   if $heat_cfn {
     haproxy::listen { 'heat_cfn':
       bind             => $heat_cfn_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'heat_cfn':
@@ -937,7 +894,6 @@ class tripleo::loadbalancer (
     haproxy::listen { 'horizon':
       bind             => $horizon_bind_opts,
       options          => {
-        'option' => [ 'httpchk GET /' ],
         'cookie' => 'SERVERID insert indirect nocache',
       },
       collect_exported => false,
@@ -953,7 +909,7 @@ class tripleo::loadbalancer (
 
   if $mysql_clustercheck {
     $mysql_listen_options = {
-        'option'      => [ 'httpchk' ],
+        'option'      => [ 'tcpka', 'httpchk' ],
         'timeout'     => [ 'client 0', 'server 0' ],
         'stick-table' => 'type ip size 1000',
         'stick'       => 'on dst',
@@ -969,9 +925,6 @@ class tripleo::loadbalancer (
   if $ironic {
     haproxy::listen { 'ironic':
       bind             => $ironic_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'ironic':
@@ -1004,6 +957,7 @@ class tripleo::loadbalancer (
       ipaddress        => [hiera('rabbitmq_vip', $controller_virtual_ip)],
       ports            => 5672,
       options          => {
+        'option'  => [ 'tcpka' ],
         'timeout' => [ 'client 0', 'server 0' ],
       },
       collect_exported => false,
