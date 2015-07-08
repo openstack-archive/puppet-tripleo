@@ -714,9 +714,6 @@ class tripleo::loadbalancer (
     haproxy::listen { 'glance_registry':
       ipaddress        => hiera('glance_registry_vip', $controller_virtual_ip),
       ports            => 9191,
-      options          => {
-        'mode' => 'tcp',
-      },
       collect_exported => false,
     }
     haproxy::balancermember { 'glance_registry':
@@ -964,7 +961,6 @@ class tripleo::loadbalancer (
       ports            => 6379,
       options          => {
         'timeout'   => [ 'client 0', 'server 0' ],
-        'mode'      => 'tcp',
         'balance'   => 'first',
         'option'    => ['tcp-check',],
         'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
