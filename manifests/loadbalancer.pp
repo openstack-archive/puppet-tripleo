@@ -538,6 +538,10 @@ class tripleo::loadbalancer (
       "${heat_api_vip}:8004" => [],
       "${public_virtual_ip}:13004" => ['ssl', 'crt', $heat_bind_certificate],
     }
+    $heat_options = {
+      'option' => [ 'httpchk GET /' ],
+      'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
+    }
     $heat_cw_bind_opts = {
       "${heat_api_vip}:8003" => [],
       "${public_virtual_ip}:13003" => ['ssl', 'crt', $heat_bind_certificate],
@@ -550,6 +554,9 @@ class tripleo::loadbalancer (
     $heat_bind_opts = {
       "${heat_api_vip}:8004" => [],
       "${public_virtual_ip}:8004" => [],
+    }
+    $heat_options = {
+      'option' => [ 'httpchk GET /' ],
     }
     $heat_cw_bind_opts = {
       "${heat_api_vip}:8003" => [],
@@ -824,10 +831,9 @@ class tripleo::loadbalancer (
   if $heat_api {
     haproxy::listen { 'heat_api':
       bind             => $heat_bind_opts,
-      options          => {
-        'option' => [ 'httpchk GET /' ],
-      },
+      options          => $heat_options,
       collect_exported => false,
+      mode             => 'http',
     }
     haproxy::balancermember { 'heat_api':
       listening_service => 'heat_api',
