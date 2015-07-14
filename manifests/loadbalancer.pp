@@ -804,7 +804,7 @@ class tripleo::loadbalancer (
       ports             => '8777',
       ipaddresses       => hiera('ceilometer_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => [],
+      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
   }
 
@@ -880,6 +880,7 @@ class tripleo::loadbalancer (
       bind             => $horizon_bind_opts,
       options          => {
         'option' => [ 'httpchk GET /' ],
+        'cookie' => 'SERVERID insert indirect nocache',
       },
       collect_exported => false,
     }
@@ -917,7 +918,7 @@ class tripleo::loadbalancer (
       ports             => '6385',
       ipaddresses       => hiera('ironic_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => [],
+      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
   }
 
