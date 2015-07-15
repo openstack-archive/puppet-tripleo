@@ -17,75 +17,7 @@
 #
 # Installs the system requirements
 #
-# === Parameters:
-#
-# [*manage_firewall*]
-#  (optional) Completely enable or disable firewall settings
-#  (false means disabled, and true means enabled)
-#  Defaults to false
-#
-# [*firewall_rules*]
-#   (optional) Allow to add custom firewall rules
-#   Should be an hash.
-#   Default to {}
-#
-# [*purge_firewall_rules*]
-#   (optional) Boolean, purge all firewall resources
-#   Defaults to false
-#
-# [*firewall_pre_extras*]
-#   (optional) Allow to add custom parameters to firewall rules (pre stage)
-#   Should be an hash.
-#   Default to {}
-#
-# [*firewall_post_extras*]
-#   (optional) Allow to add custom parameters to firewall rules (post stage)
-#   Should be an hash.
-#   Default to {}
-#
-class tripleo(
-  $manage_firewall      = false,
-  $firewall_rules       = {},
-  $purge_firewall_rules = false,
-  $firewall_pre_extras  = {},
-  $firewall_post_extras = {},
-) {
 
-  include ::stdlib
-
-  if $manage_firewall {
-
-    # Only purges IPv4 rules
-    if $purge_firewall_rules {
-      resources { 'firewall':
-        purge => true
-      }
-    }
-
-    # anyone can add your own rules
-    # example with Hiera:
-    #
-    # tripleo::firewall::rules:
-    #   '300 allow custom application 1':
-    #     port: 999
-    #     proto: udp
-    #     action: accept
-    #   '301 allow custom application 2':
-    #     port: 8081
-    #     proto: tcp
-    #     action: accept
-    #
-    create_resources('tripleo::firewall::rule', $firewall_rules)
-
-    ensure_resource('class', 'tripleo::firewall::pre', {
-      'firewall_settings' => $firewall_pre_extras,
-      'stage'             => 'setup',
-    })
-
-    ensure_resource('class', 'tripleo::firewall::post', {
-      'stage'             => 'runtime',
-      'firewall_settings' => $firewall_post_extras,
-    })
-  }
+class tripleo{
 
 }
