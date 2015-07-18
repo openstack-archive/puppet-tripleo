@@ -719,6 +719,9 @@ class tripleo::loadbalancer (
   if $glance_registry {
     haproxy::listen { 'glance_registry':
       ipaddress        => hiera('glance_registry_vip', $controller_virtual_ip),
+      options          => {
+        'option' => [ ],
+      },
       ports            => 9191,
       collect_exported => false,
     }
@@ -803,6 +806,9 @@ class tripleo::loadbalancer (
   if $ceilometer {
     haproxy::listen { 'ceilometer':
       bind             => $ceilometer_bind_opts,
+      options          => {
+        'option' => [ ],
+      },
       collect_exported => false,
     }
     haproxy::balancermember { 'ceilometer':
@@ -917,6 +923,9 @@ class tripleo::loadbalancer (
   if $ironic {
     haproxy::listen { 'ironic':
       bind             => $ironic_bind_opts,
+      options          => {
+        'option' => [ 'httpchk GET /' ],
+      },
       collect_exported => false,
     }
     haproxy::balancermember { 'ironic':
