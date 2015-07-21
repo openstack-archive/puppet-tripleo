@@ -106,6 +106,11 @@
 #  When set, enables SSL on the Cinder public API endpoint using the specified file.
 #  Defaults to undef
 #
+# [*manila_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Manila public API endpoint using the specified file.
+#  Defaults to undef
+#
 # [*glance_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the Glance public API endpoint using the specified file.
@@ -155,6 +160,10 @@
 #
 # [*cinder*]
 #  (optional) Enable or not Cinder API binding
+#  Defaults to false
+#
+# [*manila*]
+#  (optional) Enable or not Manila API binding
 #  Defaults to false
 #
 # [*glance_api*]
@@ -244,6 +253,7 @@ class tripleo::loadbalancer (
   $keystone_certificate      = undef,
   $neutron_certificate       = undef,
   $cinder_certificate        = undef,
+  $manila_certificate        = undef,
   $glance_certificate        = undef,
   $nova_certificate          = undef,
   $ceilometer_certificate    = undef,
@@ -255,6 +265,7 @@ class tripleo::loadbalancer (
   $keystone_public           = false,
   $neutron                   = false,
   $cinder                    = false,
+  $manila                    = false,
   $glance_api                = false,
   $glance_registry           = false,
   $nova_ec2                  = false,
@@ -385,6 +396,11 @@ class tripleo::loadbalancer (
   } else {
     $cinder_bind_certificate = $service_certificate
   }
+  if $manila_certificate {
+    $manila_bind_certificate = $manila_certificate
+  } else {
+    $manila_bind_certificate = $service_certificate
+  }
   if $glance_certificate {
     $glance_bind_certificate = $glance_certificate
   } else {
@@ -466,6 +482,19 @@ class tripleo::loadbalancer (
     $cinder_bind_opts = {
       "${cinder_api_vip}:8776" => [],
       "${public_virtual_ip}:8776" => [],
+    }
+  }
+
+  $manila_api_vip = hiera('manila_api_vip', $controller_virtual_ip)
+  if $manila_bind_certificate {
+    $manila_bind_opts = {
+      "${manila_api_vip}:8786" => [],
+      "${public_virtual_ip}:13786" => ['ssl', 'crt', $manila_bind_certificate],
+    }
+  } else {
+    $manila_bind_opts = {
+      "${manila_api_vip}:8786" => [],
+      "${public_virtual_ip}:8786" => [],
     }
   }
 
@@ -694,6 +723,23 @@ class tripleo::loadbalancer (
       listening_service => 'cinder',
       ports             => '8776',
       ipaddresses       => hiera('cinder_api_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+    }
+  }
+
+  if manila {
+    haproxy::listen { 'manila':
+      bind             => $manila_bind_opts,
+      options          => {
+        'option' => [ 'httpchk GET /' ],
+      },
+      collect_exported => false,
+    }
+    haproxy::balancermember { 'manila':
+      listening_service => 'manila',
+      ports             => '8786',
+      ipaddresses       => hiera('manila_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
