@@ -738,7 +738,7 @@ class tripleo::loadbalancer (
     haproxy::listen { 'nova_ec2':
       bind             => $nova_ec2_bind_opts,
       options          => {
-        'option' => [ 'httpchk GET /' ],
+        'option' => [ ],
       },
       collect_exported => false,
     }
