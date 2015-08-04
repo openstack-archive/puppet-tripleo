@@ -1,5 +1,6 @@
 require 'puppetlabs_spec_helper/module_spec_helper'
 require 'shared_examples'
+require 'webmock/rspec'
 
 RSpec.configure do |c|
   c.alias_it_should_behave_like_to :it_configures, 'configures'
@@ -14,3 +15,5 @@ RSpec.configure do |c|
     :uniqueid       => '123'
   }
 end
+
+at_exit { RSpec::Puppet::Coverage.report! }
