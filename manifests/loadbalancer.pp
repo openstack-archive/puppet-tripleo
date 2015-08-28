@@ -899,6 +899,7 @@ class tripleo::loadbalancer (
       options          => {
         'cookie' => 'SERVERID insert indirect nocache',
       },
+      mode             => 'http',
       collect_exported => false,
     }
     haproxy::balancermember { 'horizon':
