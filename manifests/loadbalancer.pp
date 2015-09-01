@@ -807,6 +807,9 @@ class tripleo::loadbalancer (
   if $nova_novncproxy {
     haproxy::listen { 'nova_novncproxy':
       bind             => $nova_novnc_bind_opts,
+      options          => {
+        'balance' => 'source',
+      },
       collect_exported => false,
     }
     haproxy::balancermember { 'nova_novncproxy':
