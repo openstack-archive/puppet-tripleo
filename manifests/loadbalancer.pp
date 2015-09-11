@@ -35,6 +35,10 @@
 #  The value to use as maxconn in the haproxy default config section.
 #  Defaults to 4096
 #
+# [*haproxy_log_address*]
+#  The IPv4, IPv6 or filesystem socket path of the syslog server.
+#  Defaults to '/dev/log'
+#
 # [*controller_host*]
 #  (Deprecated)Host or group of hosts to load-balance the services
 #  Can be a string or an array.
@@ -246,6 +250,7 @@ class tripleo::loadbalancer (
   $haproxy_service_manage    = true,
   $haproxy_global_maxconn    = 20480,
   $haproxy_default_maxconn   = 4096,
+  $haproxy_log_address       = '/dev/log',
   $controller_host           = undef,
   $controller_hosts          = undef,
   $controller_hosts_names    = undef,
@@ -630,7 +635,7 @@ class tripleo::loadbalancer (
   class { '::haproxy':
     service_manage   => $haproxy_service_manage,
     global_options   => {
-      'log'     => '/dev/log local0',
+      'log'     => "${haproxy_log_address} local0",
       'pidfile' => '/var/run/haproxy.pid',
       'user'    => 'haproxy',
       'group'   => 'haproxy',
