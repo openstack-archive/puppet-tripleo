@@ -996,15 +996,17 @@ class tripleo::loadbalancer (
 
   if $mysql_clustercheck {
     $mysql_listen_options = {
-        'option'      => [ 'tcpka', 'httpchk' ],
-        'timeout'     => [ 'client 0', 'server 0' ],
-        'stick-table' => 'type ip size 1000',
-        'stick'       => 'on dst',
+      'option'         => [ 'tcpka', 'httpchk' ],
+      'timeout client' => '90m',
+      'timeout server' => '90m',
+      'stick-table'    => 'type ip size 1000',
+      'stick'          => 'on dst',
     }
     $mysql_member_options = union($haproxy_member_options, ['backup', 'port 9200', 'on-marked-down shutdown-sessions'])
   } else {
     $mysql_listen_options = {
-        'timeout'     => [ 'client 0', 'server 0' ],
+      'timeout client' => '90m',
+      'timeout server' => '90m',
     }
     $mysql_member_options = union($haproxy_member_options, ['backup'])
   }
