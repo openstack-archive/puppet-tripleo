@@ -32,7 +32,7 @@ class tripleo::packages (
   $enable_upgrade = false,
 ) {
 
-  if !$enable_install {
+  if !$enable_install and !$enable_upgrade {
     case $::osfamily {
       'RedHat': {
         Package <| |> { provider => 'norpm' }
@@ -44,9 +44,6 @@ class tripleo::packages (
   }
 
   if $enable_upgrade {
-    if !$enable_install {
-      fail('Package upgrades require that enable_install be set to true')
-    }
     Package <| |> { ensure => 'latest' }
   }
 
