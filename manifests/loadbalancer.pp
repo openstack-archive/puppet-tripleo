@@ -723,7 +723,7 @@ class tripleo::loadbalancer (
     }
   }
 
-  if manila {
+  if $manila {
     haproxy::listen { 'manila':
       bind             => $manila_bind_opts,
       collect_exported => false,
