@@ -8,25 +8,31 @@ module Puppet::Parser::Functions
   newfunction(:interface_for_ip, :type => :rvalue, :doc => "Find the bind IP address for the provided subnet.") do |arg|
     if arg[0].class == String
       begin
-        ip_to_find = arg[0]
+        ip1 = IPAddr.new(arg[0])
         Dir.foreach('/sys/class/net/') do |interface|
-          next if interface == '.' or interface == '..'
+          next if interface == '.' || interface == '..'
           iface_no_dash = interface.gsub('-', '_')
-          interface_ip = lookupvar("ipaddress_#{iface_no_dash}")
-          netmask = lookupvar("netmask_#{iface_no_dash}")
-          if not interface_ip.nil? then
-            ip1=IPAddr.new(interface_ip)
-            ip2=IPAddr.new(ip_to_find)
-            if ip1.mask(netmask) == ip2.mask(netmask) then
-              return interface
-            end
+
+          if ip1.ipv4?
+            ipaddress_name = "ipaddress_#{iface_no_dash}"
+            netmask_name   = "netmask_#{iface_no_dash}"
+          else
+            ipaddress_name = "ipaddress6_#{iface_no_dash}"
+            netmask_name   = "netmask6_#{iface_no_dash}"
+          end
+
+          interface_ip = lookupvar(ipaddress_name)
+          netmask = lookupvar(netmask_name)
+          unless interface_ip.nil? then
+            ip2 = IPAddr.new(interface_ip)
+            return interface if ip1.mask(netmask) == ip2.mask(netmask)
           end
         end
-      rescue JSON::ParserError
-        raise Puppet::ParseError, "Syntax error: #{arg[0]} is invalid"
+      rescue IPAddr::InvalidAddressError => e
+        raise Puppet::ParseError, "#{e}: #{arg[0]}"
       end
     else
-      raise Puppet::ParseError, "Syntax error: #{arg[0]} is not a String"
+      raise Puppet::ParseError, "Syntax error: #{arg[0]} must be a String"
     end
     return ''
   end
