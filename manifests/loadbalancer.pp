@@ -247,6 +247,10 @@
 #  (optional) Enable or not Redis binding
 #  Defaults to false
 #
+# [*midonet_api*]
+#  (optional) Enable or not MidoNet API binding
+#  Defaults to false
+#
 class tripleo::loadbalancer (
   $controller_virtual_ip,
   $control_virtual_interface,
@@ -299,6 +303,7 @@ class tripleo::loadbalancer (
   $mysql_clustercheck        = false,
   $rabbitmq                  = false,
   $redis                     = false,
+  $midonet_api               = false,
 ) {
 
   if !$controller_host and !$controller_hosts {
@@ -1045,4 +1050,23 @@ class tripleo::loadbalancer (
     }
   }
 
+  $midonet_api_vip = hiera('midonet_api_vip', $controller_virtual_ip)
+  $midonet_bind_opts = {
+    "${midonet_api_vip}:8081" => [],
+    "${public_virtual_ip}:8081" => [],
+  }
+
+  if $midonet_api {
+    haproxy::listen { 'midonet_api':
+      bind             => $midonet_bind_opts,
+      collect_exported => false,
+    }
+    haproxy::balancermember { 'midonet_api':
+      listening_service => 'midonet_api',
+      ports             => '8081',
+      ipaddresses       => hiera('midonet_api_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+    }
+  }
 }
