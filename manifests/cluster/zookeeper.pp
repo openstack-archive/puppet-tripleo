@@ -39,9 +39,13 @@ class tripleo::cluster::zookeeper(
   $zookeeper_hostnames
 )
 {
-  validate_array($zookeeper_server_ips)
+  # TODO: Remove comments below once we can guarantee that all the distros
+  # deploying TripleO use Puppet > 3.7 because of this bug:
+  # https://tickets.puppetlabs.com/browse/PUP-1299
+
+  # validate_array($zookeeper_server_ips)
   validate_ipv4_address($zookeeper_client_ip)
-  validate_array($zookeeper_hostnames)
+  # validate_array($zookeeper_hostnames)
 
   # TODO(devvesa) Zookeeper package should provide these paths,
   # remove this lines as soon as it will.

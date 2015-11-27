@@ -52,7 +52,12 @@ class tripleo::cluster::cassandra(
   $client_port_thrift = '9160'
 )
 {
-  validate_array($cassandra_servers)
+
+  # TODO: Remove this comment once we can guarantee that all the distros
+  # deploying TripleO use Puppet > 3.7 because of this bug:
+  # https://tickets.puppetlabs.com/browse/PUP-1299
+  #
+  # validate_array($cassandra_servers)
   validate_ipv4_address($cassandra_ip)
 
   class {'::cassandra::run':
