@@ -12,8 +12,8 @@ fixtures:
       repo: 'git://github.com/puppetlabs/puppetlabs-inifile.git'
       ref: '1.4.2'
     'cassandra':
-      repo: 'git://github.com/midonet/puppet-cassandra.git'
-      ref: 'v1.1.1'
+      repo: 'git://github.com/locp/cassandra.git'
+      ref: '1.9.2'
     'zookeeper':
       repo: 'git://github.com/deric/puppet-zookeeper.git'
       ref: 'v0.3.9'
