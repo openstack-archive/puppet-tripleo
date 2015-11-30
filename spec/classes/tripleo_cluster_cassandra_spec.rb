@@ -21,6 +21,14 @@ describe 'tripleo::cluster::cassandra' do
 
   shared_examples_for 'cassandra cluster service' do
 
+    let :facts do
+      {
+        :hostname                  => 'host1.midonet',
+        :osfamily                  => 'RedHat',
+        :operatingsystemmajrelease => 7,
+      }
+    end
+
     let :params do
       {
         :cassandra_servers => ['192.168.2.2', '192.168.2.3'],
@@ -29,14 +37,15 @@ describe 'tripleo::cluster::cassandra' do
     end
 
     it 'should configure cassandra' do
-      is_expected.to contain_class('cassandra::run').with(
-        :seeds              => ['192.168.2.2', '192.168.2.3'],
-        :seed_address       => '192.168.2.2',
-        :storage_port       => '7000',
-        :ssl_storage_port   => '7001',
-        :client_port        => '9042',
-        :client_port_thrift => '9160'
+      is_expected.to contain_class('cassandra').with(
+        :seeds                      => ['192.168.2.2', '192.168.2.3'],
+        :listen_address             => '192.168.2.2',
+        :storage_port               => 7000,
+        :ssl_storage_port           => 7001,
+        :native_transport_port      => 9042,
+        :rpc_port                   => 9160
       )
+
     end
   end
 

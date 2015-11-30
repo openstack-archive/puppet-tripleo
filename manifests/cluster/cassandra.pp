@@ -60,15 +60,14 @@ class tripleo::cluster::cassandra(
   # validate_array($cassandra_servers)
   validate_ipv4_address($cassandra_ip)
 
-  class {'::cassandra::run':
-    seeds              => $cassandra_servers,
-    seed_address       => $cassandra_ip,
-    conf_dir           => '/etc/cassandra/default.conf',
-    pid_dir            => '/var/run/cassandra',
-    service_path       => '/sbin',
-    storage_port       => $storage_port,
-    ssl_storage_port   => $ssl_storage_port,
-    client_port        => $client_port,
-    client_port_thrift => $client_port_thrift
+  class {'::cassandra':
+    cluster_name          => 'TripleO',
+    seeds                 => $cassandra_servers,
+    listen_address        => $cassandra_ip,
+    storage_port          => $storage_port,
+    ssl_storage_port      => $ssl_storage_port,
+    native_transport_port => $client_port,
+    rpc_port              => $client_port_thrift
   }
+
 }
