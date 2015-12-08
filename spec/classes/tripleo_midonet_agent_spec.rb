@@ -24,6 +24,7 @@ describe 'tripleo::network::midonet::agent' do
       :hostname                  => 'host2.midonet',
       :osfamily                  => 'RedHat',
       :operatingsystem           => 'CentOS',
+      :operatingsystemrelease    => '7.1',
       :operatingsystemmajrelease => 7,
     }
   end
