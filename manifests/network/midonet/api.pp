@@ -78,7 +78,12 @@ class tripleo::network::midonet::api(
   $admin_tenant_name     = 'admin'
 )
 {
-  validate_array($zookeeper_servers)
+
+  # TODO: Remove this comment once we can guarantee that all the distros
+  # deploying TripleO use Puppet > 3.7 because of this bug:
+  # https://tickets.puppetlabs.com/browse/PUP-1299
+
+  # validate_array($zookeeper_servers)
   validate_ip_address($vip)
   validate_ip_address($keystone_ip)
   validate_ip_address($bind_address)
