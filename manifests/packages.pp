@@ -45,7 +45,26 @@ class tripleo::packages (
 
   if $enable_upgrade {
     Package <| |> { ensure => 'latest' }
+
+    case $::osfamily {
+      'RedHat': {
+        $pkg_upgrade_cmd = 'yum -y update'
+      }
+      default: {
+        warning('Please specify a package upgrade command for distribution.')
+      }
+    }
+
+    exec { 'package-upgrade':
+      command => $pkg_upgrade_cmd,
+      path    => '/usr/bin',
+    }
+    # A resource chain to ensure the upgrade ordering we want:
+    # 1) upgrade puppet managed packages (will trigger puppet dependencies)
+    # 2) then upgrade all packages via exec
+    # 3) then restart services
+    Package <| |> -> Exec['package-upgrade'] -> Service <| |>
+
   }
 
 }
-
