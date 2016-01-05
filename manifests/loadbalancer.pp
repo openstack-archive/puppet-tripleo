@@ -724,6 +724,10 @@ class tripleo::loadbalancer (
     haproxy::listen { 'keystone_public':
       bind             => $keystone_public_bind_opts,
       collect_exported => false,
+      mode             => 'http', # Needed for http-request option
+      options          => {
+          'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+      },
     }
     haproxy::balancermember { 'keystone_public':
       listening_service => 'keystone_public',
