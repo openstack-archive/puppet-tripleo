@@ -143,6 +143,11 @@
 #  When set, enables SSL on the Sahara public API endpoint using the specified file.
 #  Defaults to undef
 #
+# [*trove_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Trove public API endpoint using the specified file.
+#  Defaults to undef
+#
 # [*swift_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the Swift public API endpoint using the specified file.
@@ -185,6 +190,10 @@
 #
 # [*sahara*]
 #  (optional) Enable or not Sahara API binding
+#  defaults to false
+#
+# [*trove*]
+#  (optional) Enable or not Trove API binding
 #  defaults to false
 #
 # [*glance_api*]
@@ -285,6 +294,7 @@ class tripleo::loadbalancer (
   $neutron_certificate       = undef,
   $cinder_certificate        = undef,
   $sahara_certificate        = undef,
+  $trove_certificate         = undef,
   $manila_certificate        = undef,
   $glance_certificate        = undef,
   $nova_certificate          = undef,
@@ -299,6 +309,7 @@ class tripleo::loadbalancer (
   $neutron                   = false,
   $cinder                    = false,
   $sahara                    = false,
+  $trove                     = false,
   $manila                    = false,
   $glance_api                = false,
   $glance_registry           = false,
@@ -437,6 +448,11 @@ class tripleo::loadbalancer (
   } else {
     $sahara_bind_certificate = $service_certificate
   }
+  if $trove_certificate {
+    $trove_bind_certificate = $trove_certificate
+  } else {
+    $trove_bind_certificate = $trove_certificate
+  }
   if $manila_certificate {
     $manila_bind_certificate = $manila_certificate
   } else {
@@ -567,6 +583,19 @@ class tripleo::loadbalancer (
     $sahara_bind_opts = {
       "${sahara_api_vip}:8386" => [],
       "${public_virtual_ip}:8386" => [],
+    }
+  }
+
+  $trove_api_vip = hiera('$trove_api_vip', $controller_virtual_ip)
+  if $trove_bind_certificate {
+    $trove_bind_opts = {
+      "${trove_api_vip}:8779" => [],
+      "${public_virtual_ip}:13779" => ['ssl', 'crt', $trove_bind_certificate],
+    }
+  } else {
+    $trove_bind_opts = {
+      "${trove_api_vip}:8779" => [],
+      "${public_virtual_ip}:8779" => [],
     }
   }
 
@@ -818,6 +847,20 @@ class tripleo::loadbalancer (
       listening_service => 'sahara',
       ports             => '8386',
       ipaddresses       => hiera('sahara_api_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+    }
+  }
+
+  if $trove {
+    haproxy::listen { 'trove':
+      bind             => $trove_bind_opts,
+      collect_exported => false,
+    }
+    haproxy::balancermember { 'trove':
+      listening_service => 'trove',
+      ports             => '8779',
+      ipaddresses       => hiera('trove_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
