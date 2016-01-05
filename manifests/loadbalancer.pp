@@ -618,6 +618,7 @@ class tripleo::loadbalancer (
     }
     $heat_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
+      'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
     }
     $heat_cw_bind_opts = {
       "${heat_api_vip}:8003" => [],
@@ -827,6 +828,10 @@ class tripleo::loadbalancer (
     haproxy::listen { 'nova_osapi':
       bind             => $nova_osapi_bind_opts,
       collect_exported => false,
+      mode             => 'http',
+      options          => {
+          'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+      },
     }
     haproxy::balancermember { 'nova_osapi':
       listening_service => 'nova_osapi',
