@@ -1060,7 +1060,7 @@ class tripleo::loadbalancer (
       ports             => '80',
       ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => ["cookie ${::hostname}", 'check', 'inter 2000', 'rise 2', 'fall 5'],
     }
   }
 
