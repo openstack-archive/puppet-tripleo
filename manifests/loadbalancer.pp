@@ -814,6 +814,10 @@ class tripleo::loadbalancer (
     haproxy::listen { 'cinder':
       bind             => $cinder_bind_opts,
       collect_exported => false,
+      mode             => 'http', # Needed for http-request option
+      options          => {
+          'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+      },
     }
     haproxy::balancermember { 'cinder':
       listening_service => 'cinder',
