@@ -764,8 +764,6 @@ class tripleo::loadbalancer (
     "${redis_vip}:6379" => $haproxy_listen_bind_param,
   }
 
-  sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
-
   class { '::haproxy':
     service_manage   => $haproxy_service_manage,
     global_options   => {
