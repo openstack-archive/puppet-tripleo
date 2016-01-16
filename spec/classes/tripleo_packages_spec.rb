@@ -20,10 +20,7 @@ describe 'tripleo::packages' do
   shared_examples_for 'Red Hat distributions' do
 
     let :pre_condition do
-      "
-      package{'nova-compute': ensure => present}
-      service{'nova-compute': ensure => 'running'}
-      "
+      "service{'nova-compute': ensure => 'running'}"
     end
 
     let :facts do
@@ -40,7 +37,6 @@ describe 'tripleo::packages' do
     end
 
     it 'should contain correct upgrade ordering' do
-        is_expected.to contain_package('nova-compute').that_comes_before('Exec[package-upgrade]')
         is_expected.to contain_exec('package-upgrade').that_comes_before('Service[nova-compute]')
         is_expected.to contain_exec('package-upgrade').with(:command     => 'yum -y update')
     end
