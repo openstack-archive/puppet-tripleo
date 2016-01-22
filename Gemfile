@@ -13,7 +13,6 @@ group :development, :test do
   gem 'puppet-lint-variable_contains_upcase', :require => 'false'
   gem 'puppet-lint-numericvariable',          :require => 'false'
   gem 'json',                                 :require => 'false'
-  gem 'webmock',                              :require => 'false'
   # adding 'psych' explicitly
   # https://github.com/bundler/bundler/issues/2068
   # TODO: drop it in a future release of 'bundle'.
