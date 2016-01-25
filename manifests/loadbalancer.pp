@@ -148,6 +148,11 @@
 #  When set, enables SSL on the Trove public API endpoint using the specified file.
 #  Defaults to undef
 #
+# [*gnocchi_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the Gnocchi public API endpoint using the specified file.
+#  Defaults to undef
+#
 # [*swift_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the Swift public API endpoint using the specified file.
@@ -228,6 +233,10 @@
 #  (optional) Enable or not Aodh API binding
 #  Defaults to false
 #
+# [*gnocchi*]
+#  (optional) Enable or not Gnocchi API binding
+#  Defaults to false
+#
 # [*swift_proxy_server*]
 #  (optional) Enable or not Swift API binding
 #  Defaults to false
@@ -300,6 +309,7 @@ class tripleo::loadbalancer (
   $nova_certificate          = undef,
   $ceilometer_certificate    = undef,
   $aodh_certificate          = undef,
+  $gnocchi_certificate       = undef,
   $swift_certificate         = undef,
   $heat_certificate          = undef,
   $horizon_certificate       = undef,
@@ -319,6 +329,7 @@ class tripleo::loadbalancer (
   $nova_novncproxy           = false,
   $ceilometer                = false,
   $aodh                      = false,
+  $gnocchi                   = false,
   $swift_proxy_server        = false,
   $heat_api                  = false,
   $heat_cloudwatch           = false,
@@ -477,6 +488,11 @@ class tripleo::loadbalancer (
     $aodh_bind_certificate = $aodh_certificate
   } else {
     $aodh_bind_certificate = $service_certificate
+  }
+  if $gnocchi_certificate {
+    $gnocchi_bind_certificate = $gnocchi_certificate
+  } else {
+    $gnocchi_bind_certificate = $service_certificate
   }
   if $swift_certificate {
     $swift_bind_certificate = $swift_certificate
@@ -651,6 +667,19 @@ class tripleo::loadbalancer (
     $aodh_bind_opts = {
       "${aodh_api_vip}:8042" => [],
       "${public_virtual_ip}:8042" => [],
+    }
+  }
+
+  $gnocchi_api_vip = hiera('gnocchi_api_vip', $controller_virtual_ip)
+  if $gnocchi_bind_certificate {
+    $gnocchi_bind_opts = {
+      "${gnocchi_api_vip}:8041" => [],
+      "${public_virtual_ip}:13041" => ['ssl', 'crt', $gnocchi_bind_certificate],
+    }
+  } else {
+    $gnocchi_bind_opts = {
+      "${gnocchi_api_vip}:8041" => [],
+      "${public_virtual_ip}:8041" => [],
     }
   }
 
@@ -987,6 +1016,20 @@ class tripleo::loadbalancer (
       listening_service => 'aodh',
       ports             => '8042',
       ipaddresses       => hiera('aodh_api_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+    }
+  }
+
+  if $gnocchi {
+    haproxy::listen { 'gnocchi':
+      bind             => $gnocchi_bind_opts,
+      collect_exported => false,
+    }
+    haproxy::balancermember { 'gnocchi':
+      listening_service => 'gnocchi',
+      ports             => '8041',
+      ipaddresses       => hiera('gnocchi_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
