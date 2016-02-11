@@ -39,6 +39,10 @@
 #  The value to use as timeout in the haproxy default config section.
 #  Defaults to [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ]
 #
+# [*haproxy_member_options*]
+#  The default options to use for the haproxy balancer members.
+#  Defaults to [ 'check', 'inter 2000', 'rise 2', 'fall 5' ]
+#
 # [*haproxy_log_address*]
 #  The IPv4, IPv6 or filesystem socket path of the syslog server.
 #  Defaults to '/dev/log'
@@ -294,6 +298,7 @@ class tripleo::loadbalancer (
   $haproxy_global_maxconn    = 20480,
   $haproxy_default_maxconn   = 4096,
   $haproxy_default_timeout   = [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
+  $haproxy_member_options    = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address       = '/dev/log',
   $controller_host           = undef,
   $controller_hosts          = undef,
@@ -803,7 +808,7 @@ class tripleo::loadbalancer (
       ports             => '35357',
       ipaddresses       => hiera('keystone_admin_api_node_ips',$controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -821,7 +826,7 @@ class tripleo::loadbalancer (
       ports             => '5000',
       ipaddresses       => hiera('keystone_public_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -835,7 +840,7 @@ class tripleo::loadbalancer (
       ports             => '9696',
       ipaddresses       => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -853,7 +858,7 @@ class tripleo::loadbalancer (
       ports             => '8776',
       ipaddresses       => hiera('cinder_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -867,7 +872,7 @@ class tripleo::loadbalancer (
       ports             => '8786',
       ipaddresses       => hiera('manila_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -881,7 +886,7 @@ class tripleo::loadbalancer (
       ports             => '8386',
       ipaddresses       => hiera('sahara_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -895,7 +900,7 @@ class tripleo::loadbalancer (
       ports             => '8779',
       ipaddresses       => hiera('trove_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -909,7 +914,7 @@ class tripleo::loadbalancer (
       ports             => '9292',
       ipaddresses       => hiera('glance_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -924,7 +929,7 @@ class tripleo::loadbalancer (
       ports             => '9191',
       ipaddresses       => hiera('glance_registry_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -938,7 +943,7 @@ class tripleo::loadbalancer (
       ports             => '8773',
       ipaddresses       => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -956,7 +961,7 @@ class tripleo::loadbalancer (
       ports             => '8774',
       ipaddresses       => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -971,7 +976,7 @@ class tripleo::loadbalancer (
       ports             => '8775',
       ipaddresses       => hiera('nova_metadata_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -989,7 +994,7 @@ class tripleo::loadbalancer (
       ports             => '6080',
       ipaddresses       => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1003,7 +1008,7 @@ class tripleo::loadbalancer (
       ports             => '8777',
       ipaddresses       => hiera('ceilometer_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1017,7 +1022,7 @@ class tripleo::loadbalancer (
       ports             => '8042',
       ipaddresses       => hiera('aodh_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1045,7 +1050,7 @@ class tripleo::loadbalancer (
       ports             => '8080',
       ipaddresses       => hiera('swift_proxy_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1061,7 +1066,7 @@ class tripleo::loadbalancer (
       ports             => '8004',
       ipaddresses       => hiera('heat_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1075,7 +1080,7 @@ class tripleo::loadbalancer (
       ports             => '8003',
       ipaddresses       => hiera('heat_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1089,7 +1094,7 @@ class tripleo::loadbalancer (
       ports             => '8000',
       ipaddresses       => hiera('heat_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1107,7 +1112,7 @@ class tripleo::loadbalancer (
       ports             => '80',
       ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ["cookie ${::hostname}", 'check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => union($haproxy_member_options, ["cookie ${::hostname}"]),
     }
   }
 
@@ -1119,13 +1124,13 @@ class tripleo::loadbalancer (
       'stick-table'    => 'type ip size 1000',
       'stick'          => 'on dst',
     }
-    $mysql_member_options = ['check', 'inter 2000', 'rise 2', 'fall 5', 'backup', 'port 9200', 'on-marked-down shutdown-sessions']
+    $mysql_member_options = union($haproxy_member_options, ['backup', 'port 9200', 'on-marked-down shutdown-sessions'])
   } else {
     $mysql_listen_options = {
       'timeout client' => '90m',
       'timeout server' => '90m',
     }
-    $mysql_member_options = ['check', 'inter 2000', 'rise 2', 'fall 5', 'backup']
+    $mysql_member_options = union($haproxy_member_options, ['backup'])
   }
 
   if $ironic {
@@ -1138,7 +1143,7 @@ class tripleo::loadbalancer (
       ports             => '6385',
       ipaddresses       => hiera('ironic_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1173,7 +1178,7 @@ class tripleo::loadbalancer (
       ports             => '5672',
       ipaddresses       => hiera('rabbitmq_network', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1194,7 +1199,7 @@ class tripleo::loadbalancer (
       ports             => '6379',
       ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 
@@ -1214,7 +1219,7 @@ class tripleo::loadbalancer (
       ports             => '8081',
       ipaddresses       => hiera('midonet_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+      options           => $haproxy_member_options,
     }
   }
 }
