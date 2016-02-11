@@ -24,23 +24,29 @@
 #  Defaults to true
 #
 # [*haproxy_service_manage*]
-#  Will be passed as value for service_manage to haproxy module.
+#  Will be passed as value for service_manage to HAProxy module.
 #  Defaults to true
 #
 # [*haproxy_global_maxconn*]
-#  The value to use as maxconn in the haproxy global config section.
+#  The value to use as maxconn in the HAProxy global config section.
 #  Defaults to 20480
 #
 # [*haproxy_default_maxconn*]
-#  The value to use as maxconn in the haproxy default config section.
+#  The value to use as maxconn in the HAProxy default config section.
 #  Defaults to 4096
 #
 # [*haproxy_default_timeout*]
-#  The value to use as timeout in the haproxy default config section.
+#  The value to use as timeout in the HAProxy default config section.
 #  Defaults to [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ]
 #
+# [*haproxy_listen_bind_param*]
+#  A list of params to be added to the HAProxy listener bind directive. By
+#  default the 'transparent' param is added but it should be cleared if
+#  one of the *_virtual_ip addresses is a wildcard, eg. 0.0.0.0
+#  Defaults to [ 'transparent' ]
+#
 # [*haproxy_member_options*]
-#  The default options to use for the haproxy balancer members.
+#  The default options to use for the HAProxy balancer members.
 #  Defaults to [ 'check', 'inter 2000', 'rise 2', 'fall 5' ]
 #
 # [*haproxy_log_address*]
@@ -298,6 +304,7 @@ class tripleo::loadbalancer (
   $haproxy_global_maxconn    = 20480,
   $haproxy_default_maxconn   = 4096,
   $haproxy_default_timeout   = [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
+  $haproxy_listen_bind_param = [ 'transparent' ],
   $haproxy_member_options    = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address       = '/dev/log',
   $controller_host           = undef,
@@ -524,154 +531,164 @@ class tripleo::loadbalancer (
   $keystone_admin_api_vip = hiera('keystone_admin_api_vip', $controller_virtual_ip)
   if $keystone_bind_certificate {
     $keystone_public_bind_opts = {
-      "${keystone_public_api_vip}:5000" => [],
-      "${public_virtual_ip}:13000" => ['ssl', 'crt', $keystone_bind_certificate],
+      "${keystone_public_api_vip}:5000" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13000" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
     }
     $keystone_admin_bind_opts = {
-      "${keystone_admin_api_vip}:35357" => [],
-      "${public_virtual_ip}:13357" => ['ssl', 'crt', $keystone_bind_certificate],
+      "${keystone_admin_api_vip}:35357" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13357" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
     }
   } else {
     $keystone_public_bind_opts = {
-      "${keystone_public_api_vip}:5000" => [],
-      "${public_virtual_ip}:5000" => [],
+      "${keystone_public_api_vip}:5000" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:5000" => $haproxy_listen_bind_param,
     }
     $keystone_admin_bind_opts = {
-      "${keystone_admin_api_vip}:35357" => [],
-      "${public_virtual_ip}:35357" => [],
+      "${keystone_admin_api_vip}:35357" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:35357" => $haproxy_listen_bind_param,
     }
   }
 
   $neutron_api_vip = hiera('neutron_api_vip', $controller_virtual_ip)
   if $neutron_bind_certificate {
     $neutron_bind_opts = {
-      "${neutron_api_vip}:9696" => [],
-      "${public_virtual_ip}:13696" => ['ssl', 'crt', $neutron_bind_certificate],
+      "${neutron_api_vip}:9696" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13696" => union($haproxy_listen_bind_param, ['ssl', 'crt', $neutron_bind_certificate]),
     }
   } else {
     $neutron_bind_opts = {
-      "${neutron_api_vip}:9696" => [],
-      "${public_virtual_ip}:9696" => [],
+      "${neutron_api_vip}:9696" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:9696" => $haproxy_listen_bind_param,
     }
   }
 
   $cinder_api_vip = hiera('cinder_api_vip', $controller_virtual_ip)
   if $cinder_bind_certificate {
     $cinder_bind_opts = {
-      "${cinder_api_vip}:8776" => [],
-      "${public_virtual_ip}:13776" => ['ssl', 'crt', $cinder_bind_certificate],
+      "${cinder_api_vip}:8776" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13776" => union($haproxy_listen_bind_param, ['ssl', 'crt', $cinder_bind_certificate]),
     }
   } else {
     $cinder_bind_opts = {
-      "${cinder_api_vip}:8776" => [],
-      "${public_virtual_ip}:8776" => [],
+      "${cinder_api_vip}:8776" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8776" => $haproxy_listen_bind_param,
     }
   }
 
   $manila_api_vip = hiera('manila_api_vip', $controller_virtual_ip)
   if $manila_bind_certificate {
     $manila_bind_opts = {
-      "${manila_api_vip}:8786" => [],
-      "${public_virtual_ip}:13786" => ['ssl', 'crt', $manila_bind_certificate],
+      "${manila_api_vip}:8786" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13786" => union($haproxy_listen_bind_param, ['ssl', 'crt', $manila_bind_certificate]),
     }
   } else {
     $manila_bind_opts = {
-      "${manila_api_vip}:8786" => [],
-      "${public_virtual_ip}:8786" => [],
+      "${manila_api_vip}:8786" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8786" => $haproxy_listen_bind_param,
     }
   }
 
   $glance_api_vip = hiera('glance_api_vip', $controller_virtual_ip)
   if $glance_bind_certificate {
     $glance_bind_opts = {
-      "${glance_api_vip}:9292" => [],
-      "${public_virtual_ip}:13292" => ['ssl', 'crt', $glance_bind_certificate],
+      "${glance_api_vip}:9292" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13292" => union($haproxy_listen_bind_param, ['ssl', 'crt', $glance_bind_certificate]),
     }
   } else {
     $glance_bind_opts = {
-      "${glance_api_vip}:9292" => [],
-      "${public_virtual_ip}:9292" => [],
+      "${glance_api_vip}:9292" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:9292" => $haproxy_listen_bind_param,
     }
+  }
+
+  $glance_registry_vip = hiera('glance_registry_vip', $controller_virtual_ip)
+  $glance_registry_bind_opts = {
+    "${glance_registry_vip}:9191" => $haproxy_listen_bind_param,
   }
 
   $sahara_api_vip = hiera('sahara_api_vip', $controller_virtual_ip)
   if $sahara_bind_certificate {
     $sahara_bind_opts = {
-      "${sahara_api_vip}:8386" => [],
-      "${public_virtual_ip}:13786" => ['ssl', 'crt', $sahara_bind_certificate],
+      "${sahara_api_vip}:8386" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13786" => union($haproxy_listen_bind_param, ['ssl', 'crt', $sahara_bind_certificate]),
     }
   } else {
     $sahara_bind_opts = {
-      "${sahara_api_vip}:8386" => [],
-      "${public_virtual_ip}:8386" => [],
+      "${sahara_api_vip}:8386" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8386" => $haproxy_listen_bind_param,
     }
   }
 
   $trove_api_vip = hiera('$trove_api_vip', $controller_virtual_ip)
   if $trove_bind_certificate {
     $trove_bind_opts = {
-      "${trove_api_vip}:8779" => [],
-      "${public_virtual_ip}:13779" => ['ssl', 'crt', $trove_bind_certificate],
+      "${trove_api_vip}:8779" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13779" => union($haproxy_listen_bind_param, ['ssl', 'crt', $trove_bind_certificate]),
     }
   } else {
     $trove_bind_opts = {
-      "${trove_api_vip}:8779" => [],
-      "${public_virtual_ip}:8779" => [],
+      "${trove_api_vip}:8779" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8779" => $haproxy_listen_bind_param,
     }
   }
 
   $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
   if $nova_bind_certificate {
     $nova_osapi_bind_opts = {
-      "${nova_api_vip}:8774" => [],
-      "${public_virtual_ip}:13774" => ['ssl', 'crt', $nova_bind_certificate],
+      "${nova_api_vip}:8774" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13774" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
     }
     $nova_ec2_bind_opts = {
-      "${nova_api_vip}:8773" => [],
-      "${public_virtual_ip}:13773" => ['ssl', 'crt', $nova_bind_certificate],
+      "${nova_api_vip}:8773" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13773" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
     }
     $nova_novnc_bind_opts = {
-      "${nova_api_vip}:6080" => [],
-      "${public_virtual_ip}:13080" => ['ssl', 'crt', $nova_bind_certificate],
+      "${nova_api_vip}:6080" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13080" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
     }
   } else {
     $nova_osapi_bind_opts = {
-      "${nova_api_vip}:8774" => [],
-      "${public_virtual_ip}:8774" => [],
+      "${nova_api_vip}:8774" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8774" => $haproxy_listen_bind_param,
     }
     $nova_ec2_bind_opts = {
-      "${nova_api_vip}:8773" => [],
-      "${public_virtual_ip}:8773" => [],
+      "${nova_api_vip}:8773" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8773" => $haproxy_listen_bind_param,
     }
     $nova_novnc_bind_opts = {
-      "${nova_api_vip}:6080" => [],
-      "${public_virtual_ip}:6080" => [],
+      "${nova_api_vip}:6080" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:6080" => $haproxy_listen_bind_param,
     }
+  }
+
+  $nova_metadata_vip = hiera('nova_metadata_vip', $controller_virtual_ip)
+  $nova_metadata_bind_opts = {
+    "${nova_metadata_vip}:8775" => $haproxy_listen_bind_param,
   }
 
   $ceilometer_api_vip = hiera('ceilometer_api_vip', $controller_virtual_ip)
   if $ceilometer_bind_certificate {
     $ceilometer_bind_opts = {
-      "${ceilometer_api_vip}:8777" => [],
-      "${public_virtual_ip}:13777" => ['ssl', 'crt', $ceilometer_bind_certificate],
+      "${ceilometer_api_vip}:8777" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13777" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ceilometer_bind_certificate]),
     }
   } else {
     $ceilometer_bind_opts = {
-      "${ceilometer_api_vip}:8777" => [],
-      "${public_virtual_ip}:8777" => [],
+      "${ceilometer_api_vip}:8777" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8777" => $haproxy_listen_bind_param,
     }
   }
 
   $aodh_api_vip = hiera('aodh_api_vip', $controller_virtual_ip)
   if $aodh_bind_certificate {
     $aodh_bind_opts = {
-      "${aodh_api_vip}:8042" => [],
-      "${public_virtual_ip}:13042" => ['ssl', 'crt', $aodh_bind_certificate],
+      "${aodh_api_vip}:8042" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13042" => union($haproxy_listen_bind_param, ['ssl', 'crt', $aodh_bind_certificate]),
     }
   } else {
     $aodh_bind_opts = {
-      "${aodh_api_vip}:8042" => [],
-      "${public_virtual_ip}:8042" => [],
+      "${aodh_api_vip}:8042" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8042" => $haproxy_listen_bind_param,
     }
   }
 
@@ -691,74 +708,89 @@ class tripleo::loadbalancer (
   $swift_proxy_vip = hiera('swift_proxy_vip', $controller_virtual_ip)
   if $swift_bind_certificate {
     $swift_bind_opts = {
-      "${swift_proxy_vip}:8080" => [],
-      "${public_virtual_ip}:13808" => ['ssl', 'crt', $swift_bind_certificate],
+      "${swift_proxy_vip}:8080" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13808" => union($haproxy_listen_bind_param, ['ssl', 'crt', $swift_bind_certificate]),
     }
   } else {
     $swift_bind_opts = {
-      "${swift_proxy_vip}:8080" => [],
-      "${public_virtual_ip}:8080" => [],
+      "${swift_proxy_vip}:8080" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8080" => $haproxy_listen_bind_param,
     }
   }
 
   $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
   if $heat_bind_certificate {
     $heat_bind_opts = {
-      "${heat_api_vip}:8004" => [],
-      "${public_virtual_ip}:13004" => ['ssl', 'crt', $heat_bind_certificate],
+      "${heat_api_vip}:8004" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13004" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
     }
     $heat_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
       'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
     }
     $heat_cw_bind_opts = {
-      "${heat_api_vip}:8003" => [],
-      "${public_virtual_ip}:13003" => ['ssl', 'crt', $heat_bind_certificate],
+      "${heat_api_vip}:8003" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13003" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
     }
     $heat_cfn_bind_opts = {
-      "${heat_api_vip}:8000" => [],
-      "${public_virtual_ip}:13800" => ['ssl', 'crt', $heat_bind_certificate],
+      "${heat_api_vip}:8000" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13800" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
     }
   } else {
     $heat_bind_opts = {
-      "${heat_api_vip}:8004" => [],
-      "${public_virtual_ip}:8004" => [],
+      "${heat_api_vip}:8004" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8004" => $haproxy_listen_bind_param,
     }
     $heat_options = {}
     $heat_cw_bind_opts = {
-      "${heat_api_vip}:8003" => [],
-      "${public_virtual_ip}:8003" => [],
+      "${heat_api_vip}:8003" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8003" => $haproxy_listen_bind_param,
     }
     $heat_cfn_bind_opts = {
-      "${heat_api_vip}:8000" => [],
-      "${public_virtual_ip}:8000" => [],
+      "${heat_api_vip}:8000" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8000" => $haproxy_listen_bind_param,
     }
   }
 
   $horizon_vip = hiera('horizon_vip', $controller_virtual_ip)
   if $horizon_bind_certificate {
     $horizon_bind_opts = {
-      "${horizon_vip}:80" => [],
-      "${public_virtual_ip}:443" => ['ssl', 'crt', $horizon_bind_certificate],
+      "${horizon_vip}:80" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $horizon_bind_certificate]),
     }
   } else {
     $horizon_bind_opts = {
-      "${horizon_vip}:80" => [],
-      "${public_virtual_ip}:80" => [],
+      "${horizon_vip}:80" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:80" => $haproxy_listen_bind_param,
     }
   }
 
   $ironic_api_vip = hiera('ironic_api_vip', $controller_virtual_ip)
   if $ironic_bind_certificate {
     $ironic_bind_opts = {
-      "${ironic_api_vip}:6385" => [],
-      "${public_virtual_ip}:13385" => ['ssl', 'crt', $ironic_bind_certificate],
+      "${ironic_api_vip}:6385" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13385" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ironic_bind_certificate]),
     }
   } else {
     $ironic_bind_opts = {
-      "${ironic_api_vip}:6385" => [],
-      "${public_virtual_ip}:6385" => [],
+      "${ironic_api_vip}:6385" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:6385" => $haproxy_listen_bind_param,
     }
+  }
+
+  $mysql_vip = hiera('mysql_vip', $controller_virtual_ip)
+  $mysql_bind_opts = {
+    "${mysql_vip}:3306" => $haproxy_listen_bind_param,
+  }
+
+  $rabbitmq_vip = hiera('rabbitmq_vip', $controller_virtual_ip)
+  $rabbitmq_bind_opts = {
+    "${rabbitmq_vip}:5672" => $haproxy_listen_bind_param,
+  }
+
+  $redis_vip = hiera('redis_vip', $controller_virtual_ip)
+  $redis_bind_opts = {
+    "${redis_vip}:6379" => $haproxy_listen_bind_param,
   }
 
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
@@ -920,8 +952,7 @@ class tripleo::loadbalancer (
 
   if $glance_registry {
     haproxy::listen { 'glance_registry':
-      ipaddress        => hiera('glance_registry_vip', $controller_virtual_ip),
-      ports            => 9191,
+      bind             => $glance_registry_bind_opts,
       collect_exported => false,
     }
     haproxy::balancermember { 'glance_registry':
@@ -967,8 +998,7 @@ class tripleo::loadbalancer (
 
   if $nova_metadata {
     haproxy::listen { 'nova_metadata':
-      ipaddress        => hiera('nova_metadata_vip', $controller_virtual_ip),
-      ports            => 8775,
+      bind             => $nova_metadata_bind_opts,
       collect_exported => false,
     }
     haproxy::balancermember { 'nova_metadata':
@@ -1149,8 +1179,7 @@ class tripleo::loadbalancer (
 
   if $mysql {
     haproxy::listen { 'mysql':
-      ipaddress        => [hiera('mysql_vip', $controller_virtual_ip)],
-      ports            => 3306,
+      bind             => $mysql_bind_opts,
       options          => $mysql_listen_options,
       collect_exported => false,
     }
@@ -1165,8 +1194,7 @@ class tripleo::loadbalancer (
 
   if $rabbitmq {
     haproxy::listen { 'rabbitmq':
-      ipaddress        => [hiera('rabbitmq_vip', $controller_virtual_ip)],
-      ports            => 5672,
+      bind             => $rabbitmq_bind_opts,
       options          => {
         'option'  => [ 'tcpka' ],
         'timeout' => [ 'client 0', 'server 0' ],
@@ -1184,8 +1212,7 @@ class tripleo::loadbalancer (
 
   if $redis {
     haproxy::listen { 'redis':
-      ipaddress        => [hiera('redis_vip', $controller_virtual_ip)],
-      ports            => 6379,
+      bind             => $redis_bind_opts,
       options          => {
         'timeout'   => [ 'client 0', 'server 0' ],
         'balance'   => 'first',
