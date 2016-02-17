@@ -758,10 +758,17 @@ class tripleo::loadbalancer (
       "${horizon_vip}:80" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $horizon_bind_certificate]),
     }
+    $horizon_options = {
+      'cookie' => 'SERVERID insert indirect nocache',
+      'rsprep' => '^Location:\ http://(.*) Location:\ https://\1',
+    }
   } else {
     $horizon_bind_opts = {
       "${horizon_vip}:80" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:80" => $haproxy_listen_bind_param,
+    }
+    $horizon_options = {
+      'cookie' => 'SERVERID insert indirect nocache',
     }
   }
 
@@ -1135,9 +1142,7 @@ class tripleo::loadbalancer (
   if $horizon {
     haproxy::listen { 'horizon':
       bind             => $horizon_bind_opts,
-      options          => {
-        'cookie' => 'SERVERID insert indirect nocache',
-      },
+      options          => $horizon_options,
       mode             => 'http',
       collect_exported => false,
     }
