@@ -35,6 +35,10 @@
 #  The value to use as maxconn in the haproxy default config section.
 #  Defaults to 4096
 #
+# [*haproxy_default_timeout*]
+#  The value to use as timeout in the haproxy default config section.
+#  Defaults to [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ]
+#
 # [*haproxy_log_address*]
 #  The IPv4, IPv6 or filesystem socket path of the syslog server.
 #  Defaults to '/dev/log'
@@ -254,6 +258,7 @@ class tripleo::loadbalancer (
   $haproxy_service_manage    = true,
   $haproxy_global_maxconn    = 20480,
   $haproxy_default_maxconn   = 4096,
+  $haproxy_default_timeout   = [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
   $haproxy_log_address       = '/dev/log',
   $controller_host           = undef,
   $controller_hosts          = undef,
@@ -651,7 +656,7 @@ class tripleo::loadbalancer (
       'mode'    => 'tcp',
       'log'     => 'global',
       'retries' => '3',
-      'timeout' => [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
+      'timeout' => $haproxy_default_timeout,
       'maxconn' => $haproxy_default_maxconn,
     },
   }
