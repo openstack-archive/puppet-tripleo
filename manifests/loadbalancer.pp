@@ -726,7 +726,9 @@ class tripleo::loadbalancer (
     }
     $heat_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
-      'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+      'http-request' => [
+        'set-header X-Forwarded-Proto https if { ssl_fc }',
+        'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
     }
     $heat_cw_bind_opts = {
       "${heat_api_vip}:8003" => $haproxy_listen_bind_param,
@@ -843,7 +845,9 @@ class tripleo::loadbalancer (
       collect_exported => false,
       mode             => 'http', # Needed for http-request option
       options          => {
-          'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
     }
     haproxy::balancermember { 'keystone_admin':
@@ -861,7 +865,9 @@ class tripleo::loadbalancer (
       collect_exported => false,
       mode             => 'http', # Needed for http-request option
       options          => {
-          'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
     }
     haproxy::balancermember { 'keystone_public':
@@ -893,7 +899,9 @@ class tripleo::loadbalancer (
       collect_exported => false,
       mode             => 'http', # Needed for http-request option
       options          => {
-          'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
     }
     haproxy::balancermember { 'cinder':
@@ -995,7 +1003,9 @@ class tripleo::loadbalancer (
       collect_exported => false,
       mode             => 'http',
       options          => {
-          'http-request' => ['set-header X-Forwarded-Proto https if { ssl_fc }'],
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
     }
     haproxy::balancermember { 'nova_osapi':
