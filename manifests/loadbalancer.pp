@@ -1064,7 +1064,6 @@ class tripleo::loadbalancer (
     haproxy::listen { 'redis':
       bind             => $redis_bind_opts,
       options          => {
-        'timeout'   => [ 'client 0', 'server 0' ],
         'balance'   => 'first',
         'option'    => ['tcp-check',],
         'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
