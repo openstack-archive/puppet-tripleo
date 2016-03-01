@@ -88,13 +88,9 @@ define tripleo::loadbalancer::endpoint (
     # service exposed to the public network
 
     if $public_certificate {
-      $public_bind_opts = {
-        "${public_virtual_ip}:${public_ssl_port}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]),
-      }
+      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${public_ssl_port}"), union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
     } else {
-      $public_bind_opts = {
-        "${public_virtual_ip}:${service_port}" => $haproxy_listen_bind_param,
-      }
+      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${service_port}"), $haproxy_listen_bind_param)
     }
   } else {
     # internal service only
@@ -102,13 +98,9 @@ define tripleo::loadbalancer::endpoint (
   }
 
   if $internal_certificate {
-    $internal_bind_opts = {
-      "${internal_ip}:${service_port}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]),
-    }
+    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
   } else {
-    $internal_bind_opts = {
-      "${internal_ip}:${service_port}" => $haproxy_listen_bind_param,
-    }
+    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
   }
   $bind_opts = merge($internal_bind_opts, $public_bind_opts)
 
