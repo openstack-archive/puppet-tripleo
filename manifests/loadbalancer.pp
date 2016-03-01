@@ -719,17 +719,19 @@ class tripleo::loadbalancer (
   }
 
   $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
+  $heat_base_options = {
+    'http-request' => [
+      'set-header X-Forwarded-Proto https if { ssl_fc }',
+      'set-header X-Forwarded-Proto http if !{ ssl_fc }']}
   if $heat_bind_certificate {
     $heat_bind_opts = {
       "${heat_api_vip}:8004" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:13004" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
     }
-    $heat_options = {
+    $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
-      'http-request' => [
-        'set-header X-Forwarded-Proto https if { ssl_fc }',
-        'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
     }
+    $heat_options = merge($heat_base_options, $heat_ssl_options)
     $heat_cw_bind_opts = {
       "${heat_api_vip}:8003" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:13003" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
@@ -743,7 +745,7 @@ class tripleo::loadbalancer (
       "${heat_api_vip}:8004" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:8004" => $haproxy_listen_bind_param,
     }
-    $heat_options = {}
+    $heat_options = $heat_base_options
     $heat_cw_bind_opts = {
       "${heat_api_vip}:8003" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:8003" => $haproxy_listen_bind_param,
