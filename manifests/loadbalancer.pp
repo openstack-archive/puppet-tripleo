@@ -291,6 +291,43 @@
 #  (optional) Enable or not MidoNet API binding
 #  Defaults to false
 #
+# [*service_ports*]
+#  (optional) Hash that contains the values to override from the service ports
+#  The available keys to modify the services' ports are:
+#    'ceilometer_api_port' (Defaults to 8777)
+#    'ceilometer_api_ssl_port' (Defaults to 13777)
+#    'cinder_api_port' (Defaults to 8776)
+#    'cinder_api_ssl_port' (Defaults to 13776)
+#    'glance_api_port' (Defaults to 9292)
+#    'glance_api_ssl_port' (Defaults to 13292)
+#    'glance_registry_port' (Defaults to 9191)
+#    'heat_api_port' (Defaults to 8004)
+#    'heat_api_ssl_port' (Defaults to 13004)
+#    'heat_cfn_port' (Defaults to 8000)
+#    'heat_cfn_ssl_port' (Defaults to 13800)
+#    'heat_cw_port' (Defaults to 8003)
+#    'heat_cw_ssl_port' (Defaults to 13003)
+#    'ironic_api_port' (Defaults to 6385)
+#    'ironic_api_ssl_port' (Defaults to 13385)
+#    'keystone_admin_api_port' (Defaults to 35357)
+#    'keystone_admin_api_ssl_port' (Defaults to 13357)
+#    'keystone_public_api_port' (Defaults to 5000)
+#    'keystone_public_api_ssl_port' (Defaults to 13000)
+#    'manila_api_port' (Defaults to 8786)
+#    'manila_api_ssl_port' (Defaults to 13786)
+#    'neutron_api_port' (Defaults to 9696)
+#    'neutron_api_ssl_port' (Defaults to 13696)
+#    'nova_api_port' (Defaults to 8774)
+#    'nova_api_ssl_port' (Defaults to 13774)
+#    'nova_ec2_port' (Defaults to 8773)
+#    'nova_ec2_ssl_port' (Defaults to 13773)
+#    'nova_metadata_port' (Defaults to 8775)
+#    'nova_novnc_port' (Defaults to 6080)
+#    'nova_novnc_ssl_port' (Defaults to 13080)
+#    'swift_proxy_port' (Defaults to 8080)
+#    'swift_proxy_ssl_port' (Defaults to 13808)
+#  Defaults to {}
+#
 class tripleo::loadbalancer (
   $controller_virtual_ip,
   $control_virtual_interface,
@@ -353,7 +390,43 @@ class tripleo::loadbalancer (
   $rabbitmq                  = false,
   $redis                     = false,
   $midonet_api               = false,
+  $service_ports             = {}
 ) {
+  $default_service_ports = {
+    ceilometer_api_port => 8777,
+    ceilometer_api_ssl_port => 13777,
+    cinder_api_port => 8776,
+    cinder_api_ssl_port => 13776,
+    glance_api_port => 9292,
+    glance_api_ssl_port => 13292,
+    glance_registry_port => 9191,
+    heat_api_port => 8004,
+    heat_api_ssl_port => 13004,
+    heat_cfn_port => 8000,
+    heat_cfn_ssl_port => 13800,
+    heat_cw_port => 8003,
+    heat_cw_ssl_port => 13003,
+    ironic_api_port => 6385,
+    ironic_api_ssl_port => 13385,
+    keystone_admin_api_port => 35357,
+    keystone_admin_api_ssl_port => 13357,
+    keystone_public_api_port => 5000,
+    keystone_public_api_ssl_port => 13000,
+    manila_api_port => 8786,
+    manila_api_ssl_port => 13786,
+    neutron_api_port => 9696,
+    neutron_api_ssl_port => 13696,
+    nova_api_port => 8774,
+    nova_api_ssl_port => 13774,
+    nova_ec2_port => 8773,
+    nova_ec2_ssl_port => 13773,
+    nova_metadata_port => 8775,
+    nova_novnc_port => 6080,
+    nova_novnc_ssl_port => 13080,
+    swift_proxy_port => 8080,
+    swift_proxy_ssl_port => 13808,
+  }
+  $ports = merge($default_service_ports, $service_ports)
 
   if !$controller_host and !$controller_hosts {
     fail('$controller_hosts or $controller_host (now deprecated) is a mandatory parameter')
@@ -531,79 +604,79 @@ class tripleo::loadbalancer (
   $keystone_admin_api_vip = hiera('keystone_admin_api_vip', $controller_virtual_ip)
   if $keystone_bind_certificate {
     $keystone_public_bind_opts = {
-      "${keystone_public_api_vip}:5000" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13000" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
+      "${keystone_public_api_vip}:${ports[keystone_public_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[keystone_public_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
     }
     $keystone_admin_bind_opts = {
-      "${keystone_admin_api_vip}:35357" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13357" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
+      "${keystone_admin_api_vip}:${ports[keystone_admin_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[keystone_admin_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
     }
   } else {
     $keystone_public_bind_opts = {
-      "${keystone_public_api_vip}:5000" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:5000" => $haproxy_listen_bind_param,
+      "${keystone_public_api_vip}:${ports[keystone_public_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[keystone_public_api_port]}" => $haproxy_listen_bind_param,
     }
     $keystone_admin_bind_opts = {
-      "${keystone_admin_api_vip}:35357" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:35357" => $haproxy_listen_bind_param,
+      "${keystone_admin_api_vip}:${ports[keystone_admin_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[keystone_admin_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $neutron_api_vip = hiera('neutron_api_vip', $controller_virtual_ip)
   if $neutron_bind_certificate {
     $neutron_bind_opts = {
-      "${neutron_api_vip}:9696" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13696" => union($haproxy_listen_bind_param, ['ssl', 'crt', $neutron_bind_certificate]),
+      "${neutron_api_vip}:${ports[neutron_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[neutron_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $neutron_bind_certificate]),
     }
   } else {
     $neutron_bind_opts = {
-      "${neutron_api_vip}:9696" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:9696" => $haproxy_listen_bind_param,
+      "${neutron_api_vip}:${ports[neutron_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[neutron_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $cinder_api_vip = hiera('cinder_api_vip', $controller_virtual_ip)
   if $cinder_bind_certificate {
     $cinder_bind_opts = {
-      "${cinder_api_vip}:8776" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13776" => union($haproxy_listen_bind_param, ['ssl', 'crt', $cinder_bind_certificate]),
+      "${cinder_api_vip}:${ports[cinder_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[cinder_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $cinder_bind_certificate]),
     }
   } else {
     $cinder_bind_opts = {
-      "${cinder_api_vip}:8776" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8776" => $haproxy_listen_bind_param,
+      "${cinder_api_vip}:${ports[cinder_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[cinder_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $manila_api_vip = hiera('manila_api_vip', $controller_virtual_ip)
   if $manila_bind_certificate {
     $manila_bind_opts = {
-      "${manila_api_vip}:8786" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13786" => union($haproxy_listen_bind_param, ['ssl', 'crt', $manila_bind_certificate]),
+      "${manila_api_vip}:${ports[manila_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[manila_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $manila_bind_certificate]),
     }
   } else {
     $manila_bind_opts = {
-      "${manila_api_vip}:8786" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8786" => $haproxy_listen_bind_param,
+      "${manila_api_vip}:${ports[manila_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[manila_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $glance_api_vip = hiera('glance_api_vip', $controller_virtual_ip)
   if $glance_bind_certificate {
     $glance_bind_opts = {
-      "${glance_api_vip}:9292" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13292" => union($haproxy_listen_bind_param, ['ssl', 'crt', $glance_bind_certificate]),
+      "${glance_api_vip}:${ports[glance_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[glance_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $glance_bind_certificate]),
     }
   } else {
     $glance_bind_opts = {
-      "${glance_api_vip}:9292" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:9292" => $haproxy_listen_bind_param,
+      "${glance_api_vip}:${ports[glance_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[glance_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $glance_registry_vip = hiera('glance_registry_vip', $controller_virtual_ip)
   $glance_registry_bind_opts = {
-    "${glance_registry_vip}:9191" => $haproxy_listen_bind_param,
+    "${glance_registry_vip}:${ports[glance_registry_port]}" => $haproxy_listen_bind_param,
   }
 
   $sahara_api_vip = hiera('sahara_api_vip', $controller_virtual_ip)
@@ -635,47 +708,47 @@ class tripleo::loadbalancer (
   $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
   if $nova_bind_certificate {
     $nova_osapi_bind_opts = {
-      "${nova_api_vip}:8774" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13774" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
+      "${nova_api_vip}:${ports[nova_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[nova_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
     }
     $nova_ec2_bind_opts = {
-      "${nova_api_vip}:8773" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13773" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
+      "${nova_api_vip}:${ports[nova_ec2_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[nova_ec2_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
     }
     $nova_novnc_bind_opts = {
-      "${nova_api_vip}:6080" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13080" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
+      "${nova_api_vip}:${ports[nova_novnc_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[nova_novnc_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
     }
   } else {
     $nova_osapi_bind_opts = {
-      "${nova_api_vip}:8774" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8774" => $haproxy_listen_bind_param,
+      "${nova_api_vip}:${ports[nova_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[nova_api_port]}" => $haproxy_listen_bind_param,
     }
     $nova_ec2_bind_opts = {
-      "${nova_api_vip}:8773" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8773" => $haproxy_listen_bind_param,
+      "${nova_api_vip}:${ports[nova_ec2_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[nova_ec2_port]}" => $haproxy_listen_bind_param,
     }
     $nova_novnc_bind_opts = {
-      "${nova_api_vip}:6080" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:6080" => $haproxy_listen_bind_param,
+      "${nova_api_vip}:${ports[nova_novnc_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[nova_novnc_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $nova_metadata_vip = hiera('nova_metadata_vip', $controller_virtual_ip)
   $nova_metadata_bind_opts = {
-    "${nova_metadata_vip}:8775" => $haproxy_listen_bind_param,
+    "${nova_metadata_vip}:${ports[nova_metadata_port]}" => $haproxy_listen_bind_param,
   }
 
   $ceilometer_api_vip = hiera('ceilometer_api_vip', $controller_virtual_ip)
   if $ceilometer_bind_certificate {
     $ceilometer_bind_opts = {
-      "${ceilometer_api_vip}:8777" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13777" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ceilometer_bind_certificate]),
+      "${ceilometer_api_vip}:${ports[ceilometer_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[ceilometer_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ceilometer_bind_certificate]),
     }
   } else {
     $ceilometer_bind_opts = {
-      "${ceilometer_api_vip}:8777" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8777" => $haproxy_listen_bind_param,
+      "${ceilometer_api_vip}:${ports[ceilometer_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[ceilometer_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
@@ -708,13 +781,13 @@ class tripleo::loadbalancer (
   $swift_proxy_vip = hiera('swift_proxy_vip', $controller_virtual_ip)
   if $swift_bind_certificate {
     $swift_bind_opts = {
-      "${swift_proxy_vip}:8080" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13808" => union($haproxy_listen_bind_param, ['ssl', 'crt', $swift_bind_certificate]),
+      "${swift_proxy_vip}:${ports[swift_proxy_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[swift_proxy_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $swift_bind_certificate]),
     }
   } else {
     $swift_bind_opts = {
-      "${swift_proxy_vip}:8080" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8080" => $haproxy_listen_bind_param,
+      "${swift_proxy_vip}:${ports[swift_proxy_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[swift_proxy_port]}" => $haproxy_listen_bind_param,
     }
   }
 
@@ -725,34 +798,34 @@ class tripleo::loadbalancer (
       'set-header X-Forwarded-Proto http if !{ ssl_fc }']}
   if $heat_bind_certificate {
     $heat_bind_opts = {
-      "${heat_api_vip}:8004" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13004" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
+      "${heat_api_vip}:${ports[heat_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[heat_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
     }
     $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
     }
     $heat_options = merge($heat_base_options, $heat_ssl_options)
     $heat_cw_bind_opts = {
-      "${heat_api_vip}:8003" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13003" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
+      "${heat_api_vip}:${ports[heat_cw_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[heat_cw_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
     }
     $heat_cfn_bind_opts = {
-      "${heat_api_vip}:8000" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13800" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
+      "${heat_api_vip}:${ports[heat_cfn_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[heat_cfn_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
     }
   } else {
     $heat_bind_opts = {
-      "${heat_api_vip}:8004" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8004" => $haproxy_listen_bind_param,
+      "${heat_api_vip}:${ports[heat_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[heat_api_port]}" => $haproxy_listen_bind_param,
     }
     $heat_options = $heat_base_options
     $heat_cw_bind_opts = {
-      "${heat_api_vip}:8003" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8003" => $haproxy_listen_bind_param,
+      "${heat_api_vip}:${ports[heat_cw_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[heat_cw_port]}" => $haproxy_listen_bind_param,
     }
     $heat_cfn_bind_opts = {
-      "${heat_api_vip}:8000" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8000" => $haproxy_listen_bind_param,
+      "${heat_api_vip}:${ports[heat_cfn_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[heat_cfn_port]}" => $haproxy_listen_bind_param,
     }
   }
 
@@ -779,13 +852,13 @@ class tripleo::loadbalancer (
   $ironic_api_vip = hiera('ironic_api_vip', $controller_virtual_ip)
   if $ironic_bind_certificate {
     $ironic_bind_opts = {
-      "${ironic_api_vip}:6385" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13385" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ironic_bind_certificate]),
+      "${ironic_api_vip}:${ports[ironic_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[ironic_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ironic_bind_certificate]),
     }
   } else {
     $ironic_bind_opts = {
-      "${ironic_api_vip}:6385" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:6385" => $haproxy_listen_bind_param,
+      "${ironic_api_vip}:${ports[ironic_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[ironic_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
