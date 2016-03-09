@@ -103,6 +103,17 @@
 #  A string.
 #  Defaults to false
 #
+# [*haproxy_stats_user*]
+#  Username for haproxy stats authentication.
+#  A string.
+#  Defaults to 'admin'
+#
+# [*haproxy_stats_password*]
+#  Password for haproxy stats authentication.  When set, authentication is
+#  enabled on the haproxy stats endpoint.
+#  A string.
+#  Defaults to undef
+#
 # [*service_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the public API endpoints using the specified file.
@@ -181,6 +192,11 @@
 # [*ironic_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the Ironic public API endpoint using the specified file.
+#  Defaults to undef
+#
+# [*haproxy_stats_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the haproxy stats endpoint using the specified file.
 #  Defaults to undef
 #
 # [*keystone_admin*]
@@ -344,6 +360,8 @@ class tripleo::loadbalancer (
   $haproxy_listen_bind_param = [ 'transparent' ],
   $haproxy_member_options    = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address       = '/dev/log',
+  $haproxy_stats_user        = 'admin',
+  $haproxy_stats_password    = undef,
   $controller_host           = undef,
   $controller_hosts          = undef,
   $controller_hosts_names    = undef,
@@ -363,6 +381,7 @@ class tripleo::loadbalancer (
   $heat_certificate          = undef,
   $horizon_certificate       = undef,
   $ironic_certificate        = undef,
+  $haproxy_stats_certificate = undef,
   $keystone_admin            = false,
   $keystone_public           = false,
   $neutron                   = false,
@@ -598,6 +617,11 @@ class tripleo::loadbalancer (
     $ironic_bind_certificate = $ironic_certificate
   } else {
     $ironic_bind_certificate = $service_certificate
+  }
+  # TODO(bnemec): When we have support for SSL on private and admin endpoints,
+  # have the haproxy stats endpoint use that certificate by default.
+  if $haproxy_stats_certificate {
+    $haproxy_stats_bind_certificate = $haproxy_stats_certificate
   }
 
   $keystone_public_api_vip = hiera('keystone_public_api_vip', $controller_virtual_ip)
@@ -862,6 +886,16 @@ class tripleo::loadbalancer (
     }
   }
 
+  if $haproxy_stats_bind_certificate {
+    $haproxy_stats_bind_opts = {
+      "${controller_virtual_ip}:1993" => union($haproxy_listen_bind_param, ['ssl', 'crt', $haproxy_stats_bind_certificate]),
+    }
+  } else {
+    $haproxy_stats_bind_opts = {
+      "${controller_virtual_ip}:1993" => $haproxy_listen_bind_param,
+    }
+  }
+
   $mysql_vip = hiera('mysql_vip', $controller_virtual_ip)
   $mysql_bind_opts = {
     "${mysql_vip}:3306" => $haproxy_listen_bind_param,
@@ -904,12 +938,17 @@ class tripleo::loadbalancer (
     }
   }
 
+  $stats_base = ['enable', 'uri /']
+  if $haproxy_stats_password {
+    $stats_config = union($stats_base, ["auth ${haproxy_stats_user}:${haproxy_stats_password}"])
+  } else {
+    $stats_config = $stats_base
+  }
   haproxy::listen { 'haproxy.stats':
-    ipaddress        => $controller_virtual_ip,
-    ports            => '1993',
+    bind             => $haproxy_stats_bind_opts,
     mode             => 'http',
     options          => {
-      'stats' => ['enable', 'uri /'],
+      'stats' => $stats_config,
     },
     collect_exported => false,
   }
