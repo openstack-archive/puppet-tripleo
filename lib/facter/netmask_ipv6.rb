@@ -8,6 +8,8 @@ def netmask6(value)
 end
 
 if Facter.value('facterversion')[0].to_i < 3
+  Facter::Util::IP::REGEX_MAP[:linux][:ipaddress6] =
+    /inet6 (?:addr: )?((?!(?:fe80|::1))(?>[0-9,a-f,A-F]*\:{1,2})+[0-9,a-f,A-F]{0,4})/
   Facter::Util::IP.get_interfaces.each do |interface|
     Facter.add('netmask6_' + Facter::Util::IP.alphafy(interface)) do
       setcode do
