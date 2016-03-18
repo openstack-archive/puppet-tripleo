@@ -746,13 +746,25 @@ class tripleo::loadbalancer (
 
   $horizon_vip = hiera('horizon_vip', $controller_virtual_ip)
   if $horizon_bind_certificate {
+    # NOTE(jaosorior): If the horizon_vip and the public_virtual_ip are the
+    # same, the first option takes precedence. Which is the case when network
+    # isolation is not enabled. This is not a problem as both options are
+    # identical. If network isolation is enabled, this works correctly and
+    # will add a TLS binding to both the horizon_vip and the
+    # public_virtual_ip.
+    # Even though for the public_virtual_ip the port 80 is listening, we
+    # redirect to https in the horizon_options below.
     $horizon_bind_opts = {
-      "${horizon_vip}:80" => $haproxy_listen_bind_param,
+      "${horizon_vip}:80"        => $haproxy_listen_bind_param,
+      "${horizon_vip}:443"       => union($haproxy_listen_bind_param, ['ssl', 'crt', $horizon_bind_certificate]),
+      "${public_virtual_ip}:80"  => $haproxy_listen_bind_param,
       "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $horizon_bind_certificate]),
     }
     $horizon_options = {
-      'cookie' => 'SERVERID insert indirect nocache',
-      'rsprep' => '^Location:\ http://(.*) Location:\ https://\1',
+      'cookie'   => 'SERVERID insert indirect nocache',
+      'rsprep'   => '^Location:\ http://(.*) Location:\ https://\1',
+      # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
+      'redirect' => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
     }
   } else {
     $horizon_bind_opts = {
