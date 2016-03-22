@@ -268,6 +268,11 @@
 #  (optional) Enable or not Redis binding
 #  Defaults to false
 #
+# [*redis_password*]
+#  (optional) Password for Redis authentication, eventually needed by the
+#  specific monitoring we do from HAProxy for Redis
+#  Defaults to undef
+#
 # [*midonet_api*]
 #  (optional) Enable or not MidoNet API binding
 #  Defaults to false
@@ -365,6 +370,7 @@ class tripleo::loadbalancer (
   $mysql_clustercheck        = false,
   $rabbitmq                  = false,
   $redis                     = false,
+  $redis_password            = undef,
   $midonet_api               = false,
   $service_ports             = {}
 ) {
@@ -1173,12 +1179,17 @@ class tripleo::loadbalancer (
   }
 
   if $redis {
+    if $redis_password {
+      $redis_tcp_check_options = ["send AUTH\\ ${redis_password}\\r\\n"]
+    } else {
+      $redis_tcp_check_options = []
+    }
     haproxy::listen { 'redis':
       bind             => $redis_bind_opts,
       options          => {
         'balance'   => 'first',
         'option'    => ['tcp-check',],
-        'tcp-check' => ['send info\ replication\r\n','expect string role:master'],
+        'tcp-check' => union($redis_tcp_check_options, ['send PING\r\n','expect string +PONG','send info\ replication\r\n','expect string role:master','send QUIT\r\n','expect string +OK']),
       },
       collect_exported => false,
     }
