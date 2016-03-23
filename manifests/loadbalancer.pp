@@ -520,6 +520,7 @@ class tripleo::loadbalancer (
       'rsprep'   => '^Location:\ http://(.*) Location:\ https://\1',
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
       'redirect' => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
+      'option'   => 'forwardfor',
     }
   } else {
     $horizon_bind_opts = {
@@ -528,6 +529,7 @@ class tripleo::loadbalancer (
     }
     $horizon_options = {
       'cookie' => 'SERVERID insert indirect nocache',
+      'option' => 'forwardfor',
     }
   }
 
