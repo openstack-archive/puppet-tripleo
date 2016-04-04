@@ -523,7 +523,7 @@ class tripleo::loadbalancer (
     }
 
 
-    if $internal_api_virtual_ip and $internal_api_virtual_ip != $control_virtual_interface {
+    if $internal_api_virtual_ip and $internal_api_virtual_ip != $controller_virtual_ip {
       $internal_api_virtual_interface = interface_for_ip($internal_api_virtual_ip)
       # KEEPALIVE INTERNAL API NETWORK
       keepalived::instance { '53':
@@ -535,7 +535,7 @@ class tripleo::loadbalancer (
       }
     }
 
-    if $storage_virtual_ip and $storage_virtual_ip != $control_virtual_interface {
+    if $storage_virtual_ip and $storage_virtual_ip != $controller_virtual_ip {
       $storage_virtual_interface = interface_for_ip($storage_virtual_ip)
       # KEEPALIVE STORAGE NETWORK
       keepalived::instance { '54':
@@ -547,7 +547,7 @@ class tripleo::loadbalancer (
       }
     }
 
-    if $storage_mgmt_virtual_ip and $storage_mgmt_virtual_ip != $control_virtual_interface {
+    if $storage_mgmt_virtual_ip and $storage_mgmt_virtual_ip != $controller_virtual_ip {
       $storage_mgmt_virtual_interface = interface_for_ip($storage_mgmt_virtual_ip)
       # KEEPALIVE STORAGE MANAGEMENT NETWORK
       keepalived::instance { '55':
