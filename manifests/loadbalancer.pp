@@ -661,13 +661,13 @@ class tripleo::loadbalancer (
   $gnocchi_api_vip = hiera('gnocchi_api_vip', $controller_virtual_ip)
   if $service_certificate {
     $gnocchi_bind_opts = {
-      "${gnocchi_api_vip}:${ports[gnocchi_api_port]}" => [],
-      "${public_virtual_ip}:${ports[gnocchi_api_ssl_port]}" => ['ssl', 'crt', $service_certificate],
+      "${gnocchi_api_vip}:${ports[gnocchi_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[gnocchi_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $gnocchi_bind_opts = {
-      "${gnocchi_api_vip}:${ports[gnocchi_api_port]}" => [],
-      "${public_virtual_ip}:${ports[gnocchi_api_port]}" => [],
+      "${gnocchi_api_vip}:${ports[gnocchi_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[gnocchi_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
