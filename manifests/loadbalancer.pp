@@ -117,7 +117,6 @@
 # [*service_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the public API endpoints using the specified file.
-#  Any service-specific certificates take precedence over this one.
 #  Defaults to undef
 #
 # [*ssl_cipher_suite*]
@@ -129,80 +128,6 @@
 # [*ssl_options*]
 #  String that sets the default ssl options to force on all "bind" lines.
 #  Defaults to 'no-sslv3'
-#
-# [*keystone_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Keystone public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*neutron_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Neutron public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*cinder_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Cinder public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*manila_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Manila public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*glance_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Glance public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*nova_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Nova public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*ceilometer_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Ceilometer public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*aodh_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Aodh public API endpoint using the specified file.
-#
-# [*sahara_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Sahara public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*trove_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Trove public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*gnocchi_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Gnocchi public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*swift_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Swift public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*heat_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Heat public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*horizon_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Horizon public API endpoint using the specified file.
-#  Defaults to undef
-#
-# [*ironic_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the Ironic public API endpoint using the specified file.
-#  Defaults to undef
 #
 # [*haproxy_stats_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
@@ -391,21 +316,6 @@ class tripleo::loadbalancer (
   $service_certificate       = undef,
   $ssl_cipher_suite          = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
   $ssl_options               = 'no-sslv3',
-  $keystone_certificate      = undef,
-  $neutron_certificate       = undef,
-  $cinder_certificate        = undef,
-  $sahara_certificate        = undef,
-  $trove_certificate         = undef,
-  $manila_certificate        = undef,
-  $glance_certificate        = undef,
-  $nova_certificate          = undef,
-  $ceilometer_certificate    = undef,
-  $aodh_certificate          = undef,
-  $gnocchi_certificate       = undef,
-  $swift_certificate         = undef,
-  $heat_certificate          = undef,
-  $horizon_certificate       = undef,
-  $ironic_certificate        = undef,
   $haproxy_stats_certificate = undef,
   $keystone_admin            = false,
   $keystone_public           = false,
@@ -577,81 +487,6 @@ class tripleo::loadbalancer (
 
   }
 
-  if $keystone_certificate {
-    $keystone_bind_certificate = $keystone_certificate
-  } else {
-    $keystone_bind_certificate = $service_certificate
-  }
-  if $neutron_certificate {
-    $neutron_bind_certificate = $neutron_certificate
-  } else {
-    $neutron_bind_certificate = $service_certificate
-  }
-  if $cinder_certificate {
-    $cinder_bind_certificate = $cinder_certificate
-  } else {
-    $cinder_bind_certificate = $service_certificate
-  }
-  if $sahara_certificate {
-    $sahara_bind_certificate = $sahara_certificate
-  } else {
-    $sahara_bind_certificate = $service_certificate
-  }
-  if $trove_certificate {
-    $trove_bind_certificate = $trove_certificate
-  } else {
-    $trove_bind_certificate = $trove_certificate
-  }
-  if $manila_certificate {
-    $manila_bind_certificate = $manila_certificate
-  } else {
-    $manila_bind_certificate = $service_certificate
-  }
-  if $glance_certificate {
-    $glance_bind_certificate = $glance_certificate
-  } else {
-    $glance_bind_certificate = $service_certificate
-  }
-  if $nova_certificate {
-    $nova_bind_certificate = $nova_certificate
-  } else {
-    $nova_bind_certificate = $service_certificate
-  }
-  if $ceilometer_certificate {
-    $ceilometer_bind_certificate = $ceilometer_certificate
-  } else {
-    $ceilometer_bind_certificate = $service_certificate
-  }
-  if $aodh_certificate {
-    $aodh_bind_certificate = $aodh_certificate
-  } else {
-    $aodh_bind_certificate = $service_certificate
-  }
-  if $gnocchi_certificate {
-    $gnocchi_bind_certificate = $gnocchi_certificate
-  } else {
-    $gnocchi_bind_certificate = $service_certificate
-  }
-  if $swift_certificate {
-    $swift_bind_certificate = $swift_certificate
-  } else {
-    $swift_bind_certificate = $service_certificate
-  }
-  if $heat_certificate {
-    $heat_bind_certificate = $heat_certificate
-  } else {
-    $heat_bind_certificate = $service_certificate
-  }
-  if $horizon_certificate {
-    $horizon_bind_certificate = $horizon_certificate
-  } else {
-    $horizon_bind_certificate = $service_certificate
-  }
-  if $ironic_certificate {
-    $ironic_bind_certificate = $ironic_certificate
-  } else {
-    $ironic_bind_certificate = $service_certificate
-  }
   # TODO(bnemec): When we have support for SSL on private and admin endpoints,
   # have the haproxy stats endpoint use that certificate by default.
   if $haproxy_stats_certificate {
@@ -660,14 +495,14 @@ class tripleo::loadbalancer (
 
   $keystone_public_api_vip = hiera('keystone_public_api_vip', $controller_virtual_ip)
   $keystone_admin_api_vip = hiera('keystone_admin_api_vip', $controller_virtual_ip)
-  if $keystone_bind_certificate {
+  if $service_certificate {
     $keystone_public_bind_opts = {
       "${keystone_public_api_vip}:${ports[keystone_public_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[keystone_public_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
+      "${public_virtual_ip}:${ports[keystone_public_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
     $keystone_admin_bind_opts = {
       "${keystone_admin_api_vip}:${ports[keystone_admin_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[keystone_admin_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $keystone_bind_certificate]),
+      "${public_virtual_ip}:${ports[keystone_admin_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $keystone_public_bind_opts = {
@@ -681,10 +516,10 @@ class tripleo::loadbalancer (
   }
 
   $neutron_api_vip = hiera('neutron_api_vip', $controller_virtual_ip)
-  if $neutron_bind_certificate {
+  if $service_certificate {
     $neutron_bind_opts = {
       "${neutron_api_vip}:${ports[neutron_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[neutron_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $neutron_bind_certificate]),
+      "${public_virtual_ip}:${ports[neutron_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $neutron_bind_opts = {
@@ -694,10 +529,10 @@ class tripleo::loadbalancer (
   }
 
   $cinder_api_vip = hiera('cinder_api_vip', $controller_virtual_ip)
-  if $cinder_bind_certificate {
+  if $service_certificate {
     $cinder_bind_opts = {
       "${cinder_api_vip}:${ports[cinder_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[cinder_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $cinder_bind_certificate]),
+      "${public_virtual_ip}:${ports[cinder_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $cinder_bind_opts = {
@@ -707,10 +542,10 @@ class tripleo::loadbalancer (
   }
 
   $manila_api_vip = hiera('manila_api_vip', $controller_virtual_ip)
-  if $manila_bind_certificate {
+  if $service_certificate {
     $manila_bind_opts = {
       "${manila_api_vip}:${ports[manila_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[manila_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $manila_bind_certificate]),
+      "${public_virtual_ip}:${ports[manila_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $manila_bind_opts = {
@@ -720,10 +555,10 @@ class tripleo::loadbalancer (
   }
 
   $glance_api_vip = hiera('glance_api_vip', $controller_virtual_ip)
-  if $glance_bind_certificate {
+  if $service_certificate {
     $glance_bind_opts = {
       "${glance_api_vip}:${ports[glance_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[glance_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $glance_bind_certificate]),
+      "${public_virtual_ip}:${ports[glance_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $glance_bind_opts = {
@@ -738,10 +573,10 @@ class tripleo::loadbalancer (
   }
 
   $sahara_api_vip = hiera('sahara_api_vip', $controller_virtual_ip)
-  if $sahara_bind_certificate {
+  if $service_certificate {
     $sahara_bind_opts = {
       "${sahara_api_vip}:${ports[sahara_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[sahara_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $sahara_bind_certificate]),
+      "${public_virtual_ip}:${ports[sahara_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $sahara_bind_opts = {
@@ -751,10 +586,10 @@ class tripleo::loadbalancer (
   }
 
   $trove_api_vip = hiera('$trove_api_vip', $controller_virtual_ip)
-  if $trove_bind_certificate {
+  if $service_certificate {
     $trove_bind_opts = {
       "${trove_api_vip}:${ports[trove_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[trove_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $trove_bind_certificate]),
+      "${public_virtual_ip}:${ports[trove_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $trove_bind_opts = {
@@ -764,18 +599,18 @@ class tripleo::loadbalancer (
   }
 
   $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
-  if $nova_bind_certificate {
+  if $service_certificate {
     $nova_osapi_bind_opts = {
       "${nova_api_vip}:${ports[nova_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[nova_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
+      "${public_virtual_ip}:${ports[nova_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
     $nova_ec2_bind_opts = {
       "${nova_api_vip}:${ports[nova_ec2_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[nova_ec2_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
+      "${public_virtual_ip}:${ports[nova_ec2_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
     $nova_novnc_bind_opts = {
       "${nova_api_vip}:${ports[nova_novnc_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[nova_novnc_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $nova_bind_certificate]),
+      "${public_virtual_ip}:${ports[nova_novnc_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $nova_osapi_bind_opts = {
@@ -798,10 +633,10 @@ class tripleo::loadbalancer (
   }
 
   $ceilometer_api_vip = hiera('ceilometer_api_vip', $controller_virtual_ip)
-  if $ceilometer_bind_certificate {
+  if $service_certificate {
     $ceilometer_bind_opts = {
       "${ceilometer_api_vip}:${ports[ceilometer_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[ceilometer_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ceilometer_bind_certificate]),
+      "${public_virtual_ip}:${ports[ceilometer_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $ceilometer_bind_opts = {
@@ -811,10 +646,10 @@ class tripleo::loadbalancer (
   }
 
   $aodh_api_vip = hiera('aodh_api_vip', $controller_virtual_ip)
-  if $aodh_bind_certificate {
+  if $service_certificate {
     $aodh_bind_opts = {
       "${aodh_api_vip}:${ports[aodh_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[aodh_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $aodh_bind_certificate]),
+      "${public_virtual_ip}:${ports[aodh_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $aodh_bind_opts = {
@@ -824,10 +659,10 @@ class tripleo::loadbalancer (
   }
 
   $gnocchi_api_vip = hiera('gnocchi_api_vip', $controller_virtual_ip)
-  if $gnocchi_bind_certificate {
+  if $service_certificate {
     $gnocchi_bind_opts = {
       "${gnocchi_api_vip}:${ports[gnocchi_api_port]}" => [],
-      "${public_virtual_ip}:${ports[gnocchi_api_ssl_port]}" => ['ssl', 'crt', $gnocchi_bind_certificate],
+      "${public_virtual_ip}:${ports[gnocchi_api_ssl_port]}" => ['ssl', 'crt', $service_certificate],
     }
   } else {
     $gnocchi_bind_opts = {
@@ -837,10 +672,10 @@ class tripleo::loadbalancer (
   }
 
   $swift_proxy_vip = hiera('swift_proxy_vip', $controller_virtual_ip)
-  if $swift_bind_certificate {
+  if $service_certificate {
     $swift_bind_opts = {
       "${swift_proxy_vip}:${ports[swift_proxy_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[swift_proxy_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $swift_bind_certificate]),
+      "${public_virtual_ip}:${ports[swift_proxy_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $swift_bind_opts = {
@@ -854,10 +689,10 @@ class tripleo::loadbalancer (
     'http-request' => [
       'set-header X-Forwarded-Proto https if { ssl_fc }',
       'set-header X-Forwarded-Proto http if !{ ssl_fc }']}
-  if $heat_bind_certificate {
+  if $service_certificate {
     $heat_bind_opts = {
       "${heat_api_vip}:${ports[heat_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[heat_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
+      "${public_virtual_ip}:${ports[heat_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
     $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
@@ -865,11 +700,11 @@ class tripleo::loadbalancer (
     $heat_options = merge($heat_base_options, $heat_ssl_options)
     $heat_cw_bind_opts = {
       "${heat_api_vip}:${ports[heat_cw_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[heat_cw_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
+      "${public_virtual_ip}:${ports[heat_cw_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
     $heat_cfn_bind_opts = {
       "${heat_api_vip}:${ports[heat_cfn_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[heat_cfn_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $heat_bind_certificate]),
+      "${public_virtual_ip}:${ports[heat_cfn_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $heat_bind_opts = {
@@ -888,7 +723,7 @@ class tripleo::loadbalancer (
   }
 
   $horizon_vip = hiera('horizon_vip', $controller_virtual_ip)
-  if $horizon_bind_certificate {
+  if $service_certificate {
     # NOTE(jaosorior): If the horizon_vip and the public_virtual_ip are the
     # same, the first option takes precedence. Which is the case when network
     # isolation is not enabled. This is not a problem as both options are
@@ -899,9 +734,9 @@ class tripleo::loadbalancer (
     # redirect to https in the horizon_options below.
     $horizon_bind_opts = {
       "${horizon_vip}:80"        => $haproxy_listen_bind_param,
-      "${horizon_vip}:443"       => union($haproxy_listen_bind_param, ['ssl', 'crt', $horizon_bind_certificate]),
+      "${horizon_vip}:443"       => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
       "${public_virtual_ip}:80"  => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $horizon_bind_certificate]),
+      "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
     $horizon_options = {
       'cookie'   => 'SERVERID insert indirect nocache',
@@ -920,10 +755,10 @@ class tripleo::loadbalancer (
   }
 
   $ironic_api_vip = hiera('ironic_api_vip', $controller_virtual_ip)
-  if $ironic_bind_certificate {
+  if $service_certificate {
     $ironic_bind_opts = {
       "${ironic_api_vip}:${ports[ironic_api_port]}" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:${ports[ironic_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ironic_bind_certificate]),
+      "${public_virtual_ip}:${ports[ironic_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
   } else {
     $ironic_bind_opts = {
