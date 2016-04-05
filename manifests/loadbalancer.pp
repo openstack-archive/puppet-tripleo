@@ -810,13 +810,13 @@ class tripleo::loadbalancer (
   $gnocchi_api_vip = hiera('gnocchi_api_vip', $controller_virtual_ip)
   if $gnocchi_bind_certificate {
     $gnocchi_bind_opts = {
-      "${gnocchi_api_vip}:8041" => [],
-      "${public_virtual_ip}:13041" => ['ssl', 'crt', $gnocchi_bind_certificate],
+      "${gnocchi_api_vip}:8041" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:13041" => union($haproxy_listen_bind_param, ['ssl', 'crt', $gnocchi_bind_certificate]),
     }
   } else {
     $gnocchi_bind_opts = {
-      "${gnocchi_api_vip}:8041" => [],
-      "${public_virtual_ip}:8041" => [],
+      "${gnocchi_api_vip}:8041" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:8041" => $haproxy_listen_bind_param,
     }
   }
 
