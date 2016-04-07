@@ -325,6 +325,8 @@
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
+#    'aodh_api_port' (Defaults to 8042)
+#    'aodh_api_ssl_port' (Defaults to 13042)
 #    'ceilometer_api_port' (Defaults to 8777)
 #    'ceilometer_api_ssl_port' (Defaults to 13777)
 #    'cinder_api_port' (Defaults to 8776)
@@ -332,6 +334,8 @@
 #    'glance_api_port' (Defaults to 9292)
 #    'glance_api_ssl_port' (Defaults to 13292)
 #    'glance_registry_port' (Defaults to 9191)
+#    'gnocchi_api_port' (Defaults to 8041)
+#    'gnocchi_api_ssl_port' (Defaults to 13041)
 #    'heat_api_port' (Defaults to 8004)
 #    'heat_api_ssl_port' (Defaults to 13004)
 #    'heat_cfn_port' (Defaults to 8000)
@@ -355,8 +359,12 @@
 #    'nova_metadata_port' (Defaults to 8775)
 #    'nova_novnc_port' (Defaults to 6080)
 #    'nova_novnc_ssl_port' (Defaults to 13080)
+#    'sahara_api_port' (Defaults to 8386)
+#    'sahara_api_ssl_port' (Defaults to 13779)
 #    'swift_proxy_port' (Defaults to 8080)
 #    'swift_proxy_ssl_port' (Defaults to 13808)
+#    'trove_api_port' (Defaults to 8779)
+#    'trove_api_ssl_port' (Defaults to 13779)
 #  Defaults to {}
 #
 class tripleo::loadbalancer (
@@ -430,6 +438,8 @@ class tripleo::loadbalancer (
   $service_ports             = {}
 ) {
   $default_service_ports = {
+    aodh_api_port => 8042,
+    aodh_api_ssl_port => 13042,
     ceilometer_api_port => 8777,
     ceilometer_api_ssl_port => 13777,
     cinder_api_port => 8776,
@@ -437,6 +447,8 @@ class tripleo::loadbalancer (
     glance_api_port => 9292,
     glance_api_ssl_port => 13292,
     glance_registry_port => 9191,
+    gnocchi_api_port => 8041,
+    gnocchi_api_ssl_port => 13041,
     heat_api_port => 8004,
     heat_api_ssl_port => 13004,
     heat_cfn_port => 8000,
@@ -460,8 +472,12 @@ class tripleo::loadbalancer (
     nova_metadata_port => 8775,
     nova_novnc_port => 6080,
     nova_novnc_ssl_port => 13080,
+    sahara_api_port => 8386,
+    sahara_api_ssl_port => 13786,
     swift_proxy_port => 8080,
     swift_proxy_ssl_port => 13808,
+    trove_api_port => 8779,
+    trove_api_ssl_port => 13779,
   }
   $ports = merge($default_service_ports, $service_ports)
 
@@ -724,26 +740,26 @@ class tripleo::loadbalancer (
   $sahara_api_vip = hiera('sahara_api_vip', $controller_virtual_ip)
   if $sahara_bind_certificate {
     $sahara_bind_opts = {
-      "${sahara_api_vip}:8386" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13786" => union($haproxy_listen_bind_param, ['ssl', 'crt', $sahara_bind_certificate]),
+      "${sahara_api_vip}:${ports[sahara_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[sahara_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $sahara_bind_certificate]),
     }
   } else {
     $sahara_bind_opts = {
-      "${sahara_api_vip}:8386" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8386" => $haproxy_listen_bind_param,
+      "${sahara_api_vip}:${ports[sahara_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[sahara_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $trove_api_vip = hiera('$trove_api_vip', $controller_virtual_ip)
   if $trove_bind_certificate {
     $trove_bind_opts = {
-      "${trove_api_vip}:8779" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13779" => union($haproxy_listen_bind_param, ['ssl', 'crt', $trove_bind_certificate]),
+      "${trove_api_vip}:${ports[trove_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[trove_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $trove_bind_certificate]),
     }
   } else {
     $trove_bind_opts = {
-      "${trove_api_vip}:8779" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8779" => $haproxy_listen_bind_param,
+      "${trove_api_vip}:${ports[trove_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[trove_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
@@ -797,26 +813,26 @@ class tripleo::loadbalancer (
   $aodh_api_vip = hiera('aodh_api_vip', $controller_virtual_ip)
   if $aodh_bind_certificate {
     $aodh_bind_opts = {
-      "${aodh_api_vip}:8042" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:13042" => union($haproxy_listen_bind_param, ['ssl', 'crt', $aodh_bind_certificate]),
+      "${aodh_api_vip}:${ports[aodh_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[aodh_api_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $aodh_bind_certificate]),
     }
   } else {
     $aodh_bind_opts = {
-      "${aodh_api_vip}:8042" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:8042" => $haproxy_listen_bind_param,
+      "${aodh_api_vip}:${ports[aodh_api_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[aodh_api_port]}" => $haproxy_listen_bind_param,
     }
   }
 
   $gnocchi_api_vip = hiera('gnocchi_api_vip', $controller_virtual_ip)
   if $gnocchi_bind_certificate {
     $gnocchi_bind_opts = {
-      "${gnocchi_api_vip}:8041" => [],
-      "${public_virtual_ip}:13041" => ['ssl', 'crt', $gnocchi_bind_certificate],
+      "${gnocchi_api_vip}:${ports[gnocchi_api_port]}" => [],
+      "${public_virtual_ip}:${ports[gnocchi_api_ssl_port]}" => ['ssl', 'crt', $gnocchi_bind_certificate],
     }
   } else {
     $gnocchi_bind_opts = {
-      "${gnocchi_api_vip}:8041" => [],
-      "${public_virtual_ip}:8041" => [],
+      "${gnocchi_api_vip}:${ports[gnocchi_api_port]}" => [],
+      "${public_virtual_ip}:${ports[gnocchi_api_port]}" => [],
     }
   }
 
