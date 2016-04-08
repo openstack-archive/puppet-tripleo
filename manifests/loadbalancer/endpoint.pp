@@ -64,6 +64,10 @@
 #  Certificate path used to enable TLS for the public proxy endpoint.
 #  Defaults to undef.
 #
+# [*internal_certificate*]
+#  Certificate path used to enable TLS for the internal proxy endpoint.
+#  Defaults to undef.
+#
 define tripleo::loadbalancer::endpoint (
   $internal_ip,
   $service_port,
@@ -78,6 +82,7 @@ define tripleo::loadbalancer::endpoint (
   },
   $public_ssl_port           = undef,
   $public_certificate        = undef,
+  $internal_certificate      = undef,
 ) {
   if $public_virtual_ip {
     # service exposed to the public network
@@ -96,8 +101,14 @@ define tripleo::loadbalancer::endpoint (
     $public_bind_opts = {}
   }
 
-  $internal_bind_opts = {
-    "${internal_ip}:${service_port}" => $haproxy_listen_bind_param,
+  if $internal_certificate {
+    $internal_bind_opts = {
+      "${internal_ip}:${service_port}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]),
+    }
+  } else {
+    $internal_bind_opts = {
+      "${internal_ip}:${service_port}" => $haproxy_listen_bind_param,
+    }
   }
   $bind_opts = merge($internal_bind_opts, $public_bind_opts)
 

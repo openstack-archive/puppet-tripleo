@@ -119,6 +119,11 @@
 #  When set, enables SSL on the public API endpoints using the specified file.
 #  Defaults to undef
 #
+# [*internal_certificate*]
+#  Filename of an HAProxy-compatible certificate and key file
+#  When set, enables SSL on the internal API endpoints using the specified file.
+#  Defaults to undef
+#
 # [*ssl_cipher_suite*]
 #  The default string describing the list of cipher algorithms ("cipher suite")
 #  that are negotiated during the SSL/TLS handshake for all "bind" lines. This
@@ -314,6 +319,7 @@ class tripleo::loadbalancer (
   $controller_hosts          = undef,
   $controller_hosts_names    = undef,
   $service_certificate       = undef,
+  $internal_certificate      = undef,
   $ssl_cipher_suite          = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
   $ssl_options               = 'no-sslv3',
   $haproxy_stats_certificate = undef,
@@ -577,6 +583,7 @@ class tripleo::loadbalancer (
     haproxy_listen_bind_param => $haproxy_listen_bind_param,
     member_options            => $haproxy_member_options,
     public_certificate        => $service_certificate,
+    internal_certificate      => $internal_certificate,
   }
 
   $stats_base = ['enable', 'uri /']
