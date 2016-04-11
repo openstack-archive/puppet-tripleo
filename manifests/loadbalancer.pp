@@ -285,7 +285,7 @@
 #    'nova_novnc_port' (Defaults to 6080)
 #    'nova_novnc_ssl_port' (Defaults to 13080)
 #    'sahara_api_port' (Defaults to 8386)
-#    'sahara_api_ssl_port' (Defaults to 13779)
+#    'sahara_api_ssl_port' (Defaults to 13386)
 #    'swift_proxy_port' (Defaults to 8080)
 #    'swift_proxy_ssl_port' (Defaults to 13808)
 #    'trove_api_port' (Defaults to 8779)
@@ -383,7 +383,7 @@ class tripleo::loadbalancer (
     nova_novnc_port => 6080,
     nova_novnc_ssl_port => 13080,
     sahara_api_port => 8386,
-    sahara_api_ssl_port => 13786,
+    sahara_api_ssl_port => 13386,
     swift_proxy_port => 8080,
     swift_proxy_ssl_port => 13808,
     trove_api_port => 8779,
