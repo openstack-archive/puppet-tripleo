@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*step*]
+#   (Optional) The current deployment step
+#   Defaults to hiera('step')
+#
 # [*ceilometer_backend*]
 #   (Optional) Name of the backend for ceilometer storage
 #   Defaults to hiera('ceilometer_backend')
@@ -55,6 +59,7 @@
 #   Defaults to true
 #
 class tripleo::profile::base::database::schemas (
+  $step               = hiera('step'),
   $ceilometer_backend = hiera('ceilometer_backend'),
   $enable_ceilometer  = true,
   $enable_cinder      = true,
@@ -65,37 +70,38 @@ class tripleo::profile::base::database::schemas (
   $enable_neutron     = true,
   $enable_sahara      = true
 ) {
-  if $enable_ceilometer and downcase($ceilometer_backend) == 'mysql' {
-    include ::ceilometer::db::mysql
-  }
+  if $step >= 2 {
+    if $enable_ceilometer and downcase($ceilometer_backend) == 'mysql' {
+      include ::ceilometer::db::mysql
+    }
 
-  if $enable_cinder {
-    include ::cinder::db::mysql
-  }
+    if $enable_cinder {
+      include ::cinder::db::mysql
+    }
 
-  if $enable_keystone {
-    include ::keystone::db::mysql
-  }
+    if $enable_keystone {
+      include ::keystone::db::mysql
+    }
 
-  if $enable_glance {
-    include ::glance::db::mysql
-  }
+    if $enable_glance {
+      include ::glance::db::mysql
+    }
 
-  if $enable_nova {
-    include ::nova::db::mysql
-    include ::nova::db::mysql_api
-  }
+    if $enable_nova {
+      include ::nova::db::mysql
+      include ::nova::db::mysql_api
+    }
 
-  if $enable_neutron {
-    include ::neutron::db::mysql
-  }
+    if $enable_neutron {
+      include ::neutron::db::mysql
+    }
 
-  if $enable_heat {
-    include ::heat::db::mysql
-  }
+    if $enable_heat {
+      include ::heat::db::mysql
+    }
 
-  if $enable_sahara {
-    include ::sahara::db::mysql
+    if $enable_sahara {
+      include ::sahara::db::mysql
+    }
   }
-
 }

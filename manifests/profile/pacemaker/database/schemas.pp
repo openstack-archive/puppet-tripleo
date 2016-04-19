@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*step*]
+#   (Optional) The current deployment step
+#   Defaults to hiera('step')
+#
 # [*ceilometer_backend*]
 #   (Optional) The backend used by ceilometer, usually either 'mysql'
 #   or 'mongodb'
@@ -28,10 +32,11 @@
 #   Defaults to hiera('bootstrap_nodeid')
 #
 class tripleo::profile::pacemaker::database::schemas (
+  $step               = hiera('step'),
   $ceilometer_backend = hiera('ceilometer_backend'),
   $pacemaker_master   = hiera('bootstrap_nodeid')
 ) {
-  if downcase($pacemaker_master) == $::hostname {
+  if downcase($pacemaker_master) == $::hostname and $step >= 2 {
     include ::tripleo::profile::base::database::schemas
 
     if downcase($ceilometer_backend) == 'mysql' {
