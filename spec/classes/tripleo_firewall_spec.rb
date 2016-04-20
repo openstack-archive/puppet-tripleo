@@ -51,7 +51,7 @@ describe 'tripleo::firewall' do
           :state   => ['NEW'],
         )
         is_expected.to contain_firewall('003 accept ssh').with(
-          :port   => '22',
+          :dport   => '22',
           :proto  => 'tcp',
           :action => 'accept',
           :state  => ['NEW'],
@@ -74,7 +74,9 @@ describe 'tripleo::firewall' do
           :firewall_rules => {
             '300 add custom application 1' => {'port' => '999', 'proto' => 'udp', 'action' => 'accept'},
             '301 add custom application 2' => {'port' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
-            '302 fwd custom cidr 1'        => {'chain' => 'FORWARD', 'destination' => '192.0.2.0/24'}
+            '302 fwd custom cidr 1'        => {'chain' => 'FORWARD', 'destination' => '192.0.2.0/24'},
+            '303 add custom application 3' => {'dport' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
+            '304 add custom application 4' => {'sport' => '1000', 'proto' => 'tcp', 'action' => 'accept'}
           }
         )
       end
@@ -94,6 +96,18 @@ describe 'tripleo::firewall' do
         is_expected.to contain_firewall('302 fwd custom cidr 1').with(
           :chain   => 'FORWARD',
           :destination  => '192.0.2.0/24',
+        )
+        is_expected.to contain_firewall('303 add custom application 3').with(
+          :dport   => '8081',
+          :proto  => 'tcp',
+          :action => 'accept',
+          :state  => ['NEW'],
+        )
+        is_expected.to contain_firewall('304 add custom application 4').with(
+          :sport   => '1000',
+          :proto  => 'tcp',
+          :action => 'accept',
+          :state  => ['NEW'],
         )
       end
     end

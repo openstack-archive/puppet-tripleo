@@ -23,6 +23,14 @@
 #  (optional) The port associated to the rule.
 #  Defaults to undef
 #
+# [*dport*]
+#  (optional) The destination port associated to the rule.
+#  Defaults to undef
+#
+# [*sport*]
+#  (optional) The source port associated to the rule.
+#  Defaults to undef
+#
 # [*proto*]
 #  (optional) The protocol associated to the rule.
 #  Defaults to 'tcp'
@@ -57,6 +65,8 @@
 #
 define tripleo::firewall::rule (
   $port        = undef,
+  $dport       = undef,
+  $sport       = undef,
   $proto       = 'tcp',
   $action      = 'accept',
   $state       = ['NEW'],
@@ -69,6 +79,8 @@ define tripleo::firewall::rule (
 
   $basic = {
     'port'        => $port,
+    'dport'       => $dport,
+    'sport'       => $sport,
     'proto'       => $proto,
     'action'      => $action,
     'state'       => $state,

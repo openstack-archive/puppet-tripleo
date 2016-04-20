@@ -50,7 +50,7 @@ class tripleo::firewall::pre(
   }
 
   tripleo::firewall::rule{ '003 accept ssh':
-    port   => '22',
+    dport  => '22',
     extras => $firewall_settings,
   }
 
