@@ -47,29 +47,35 @@
 #  (optional) The chain associated to the rule.
 #  Defaults to 'INPUT'
 #
-# [*extras*]
+# [*destination*]
+#  (optional) The destination cidr associated to the rule.
+#  Defaults to undef
+#
+#  [*extras*]
 #  (optional) Hash of any puppetlabs-firewall supported parameters.
 #  Defaults to {}
 #
 define tripleo::firewall::rule (
-  $port    = undef,
-  $proto   = 'tcp',
-  $action  = 'accept',
-  $state   = ['NEW'],
-  $source  = '0.0.0.0/0',
-  $iniface = undef,
-  $chain   = 'INPUT',
-  $extras  = {},
+  $port        = undef,
+  $proto       = 'tcp',
+  $action      = 'accept',
+  $state       = ['NEW'],
+  $source      = '0.0.0.0/0',
+  $iniface     = undef,
+  $chain       = 'INPUT',
+  $destination = undef,
+  $extras      = {},
 ) {
 
   $basic = {
-    'port'    => $port,
-    'proto'   => $proto,
-    'action'  => $action,
-    'state'   => $state,
-    'source'  => $source,
-    'iniface' => $iniface,
-    'chain'   => $chain,
+    'port'        => $port,
+    'proto'       => $proto,
+    'action'      => $action,
+    'state'       => $state,
+    'source'      => $source,
+    'iniface'     => $iniface,
+    'chain'       => $chain,
+    'destination' => $destination,
   }
 
   $rule = merge($basic, $extras)

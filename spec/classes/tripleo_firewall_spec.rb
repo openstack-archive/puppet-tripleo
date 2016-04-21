@@ -73,7 +73,8 @@ describe 'tripleo::firewall' do
           :manage_firewall     => true,
           :firewall_rules => {
             '300 add custom application 1' => {'port' => '999', 'proto' => 'udp', 'action' => 'accept'},
-            '301 add custom application 2' => {'port' => '8081', 'proto' => 'tcp', 'action' => 'accept'}
+            '301 add custom application 2' => {'port' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
+            '302 fwd custom cidr 1'        => {'chain' => 'FORWARD', 'destination' => '192.0.2.0/24'}
           }
         )
       end
@@ -89,6 +90,10 @@ describe 'tripleo::firewall' do
           :proto  => 'tcp',
           :action => 'accept',
           :state  => ['NEW'],
+        )
+        is_expected.to contain_firewall('302 fwd custom cidr 1').with(
+          :chain   => 'FORWARD',
+          :destination  => '192.0.2.0/24',
         )
       end
     end
