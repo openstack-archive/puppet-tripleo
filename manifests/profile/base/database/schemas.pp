@@ -23,8 +23,13 @@
 #   Defaults to hiera('step')
 #
 # [*ceilometer_backend*]
-#   (Optional) Name of the backend for ceilometer storage
+#   (Optional) The backend used by ceilometer, usually either 'mysql'
+#   or 'mongodb'
 #   Defaults to hiera('ceilometer_backend')
+#
+# [*enable_aodh*]
+#   (Optional) Whether to create schemas for Aodh
+#   Defaults to true
 #
 # [*enable_ceilometer*]
 #   (Optional) Whether to create schemas for Ceilometer
@@ -46,6 +51,10 @@
 #   (Optional) Whether to create schemas for Glance
 #   Defaults to true
 #
+# [*enable_gnocchi*]
+#   (Optional) Whether to create schemas for Gnocchi
+#   Defaults to true
+#
 # [*enable_nova*]
 #   (Optional) Whether to create schemas for Nova
 #   Defaults to true
@@ -58,21 +67,37 @@
 #   (Optional) Whether to create schemas for Sahara
 #   Defaults to true
 #
+# [*gnocchi_indexer_backend*]
+#   (Optional) Type of backend used as Gnocchi indexer
+#   Defaults to hiera('gnocchi_indexer_backend')
+#
 class tripleo::profile::base::database::schemas (
-  $step               = hiera('step'),
-  $ceilometer_backend = hiera('ceilometer_backend'),
-  $enable_ceilometer  = true,
-  $enable_cinder      = true,
-  $enable_heat        = true,
-  $enable_keystone    = true,
-  $enable_glance      = true,
-  $enable_nova        = true,
-  $enable_neutron     = true,
-  $enable_sahara      = true
+  $step                    = hiera('step'),
+  $ceilometer_backend      = hiera('ceilometer_backend'),
+  $enable_aodh             = true,
+  $enable_ceilometer       = true,
+  $enable_cinder           = true,
+  $enable_heat             = true,
+  $enable_keystone         = true,
+  $enable_glance           = true,
+  $enable_gnocchi          = true,
+  $enable_nova             = true,
+  $enable_neutron          = true,
+  $enable_sahara           = true,
+  $gnocchi_indexer_backend = hiera('gnocchi_indexer_backend'),
 ) {
   if $step >= 2 {
-    if $enable_ceilometer and downcase($ceilometer_backend) == 'mysql' {
-      include ::ceilometer::db::mysql
+    if downcase($ceilometer_backend) == 'mysql' {
+      if $enable_ceilometer {
+        include ::ceilometer::db::mysql
+      }
+      if $enable_aodh {
+        include ::aodh::db::mysql
+      }
+    }
+
+    if $enable_gnocchi and downcase($gnocchi_indexer_backend) == 'mysql' {
+      include ::gnocchi::db::mysql
     }
 
     if $enable_cinder {

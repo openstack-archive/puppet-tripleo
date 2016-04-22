@@ -27,20 +27,30 @@
 #   or 'mongodb'
 #   Defaults to hiera('ceilometer_backend')
 #
+# [*gnocchi_indexer_backend*]
+#   (Optional) Type of backend used as Gnocchi indexer
+#   Defaults to hiera('gnocchi_indexer_backend')
+#
 # [*pacemaker_master*]
 #   (Optional) The hostname of the pacemaker master in this cluster
 #   Defaults to hiera('bootstrap_nodeid')
 #
 class tripleo::profile::pacemaker::database::schemas (
-  $step               = hiera('step'),
-  $ceilometer_backend = hiera('ceilometer_backend'),
-  $pacemaker_master   = hiera('bootstrap_nodeid')
+  $step                    = hiera('step'),
+  $ceilometer_backend      = hiera('ceilometer_backend'),
+  $gnocchi_indexer_backend = hiera('gnocchi_indexer_backend'),
+  $pacemaker_master        = hiera('bootstrap_nodeid')
 ) {
   if downcase($pacemaker_master) == $::hostname and $step >= 2 {
     include ::tripleo::profile::base::database::schemas
 
     if downcase($ceilometer_backend) == 'mysql' {
       Exec['galera-ready'] -> Class['::ceilometer::db::mysql']
+      Exec['galera-ready'] -> Class['::aodh::db::mysql']
+    }
+
+    if downcase($gnocchi_indexer_backend) == 'mysql' {
+      Exec['galera-ready'] -> Class['::gnocchi::db::mysql']
     }
 
     Exec['galera-ready'] -> Class['::cinder::db::mysql']
