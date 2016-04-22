@@ -51,15 +51,13 @@ class tripleo::profile::pacemaker::keystone (
     $manage_roles = false
   }
 
-  if $step >= 4 {
-    class { '::tripleo::profile::base::keystone':
-      sync_db          => $pacemaker_master,
-      manage_service   => false,
-      enabled          => false,
-      bootstrap_master => $pacemaker_master,
-      manage_roles     => $manage_roles,
-      manage_endpoint  => $manage_roles
-    }
+  class { '::tripleo::profile::base::keystone':
+    sync_db          => $pacemaker_master,
+    manage_service   => false,
+    enabled          => false,
+    bootstrap_master => $pacemaker_master,
+    manage_roles     => $manage_roles,
+    manage_endpoint  => $manage_roles
   }
 
   if $step >= 5 and $pacemaker_master and $enable_load_balancer {
@@ -85,4 +83,5 @@ class tripleo::profile::pacemaker::keystone (
                           Pacemaker::Resource::Ocf['openstack-core']],
     }
   }
+
 }

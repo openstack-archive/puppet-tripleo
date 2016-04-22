@@ -68,16 +68,17 @@ class tripleo::profile::pacemaker::glance (
     $pacemaker_master = false
   }
 
+  class { '::tripleo::profile::base::glance::api':
+    manage_service => false,
+    enabled        => false,
+  }
+  class { '::tripleo::profile::base::glance::registry':
+    sync_db        => $pacemaker_master,
+    manage_service => false,
+    enabled        => false,
+  }
+
   if $step >= 4 {
-    class { '::tripleo::profile::base::glance::api':
-      manage_service => false,
-      enabled        => false,
-    }
-    class { '::tripleo::profile::base::glance::registry':
-      sync_db        => $pacemaker_master,
-      manage_service => false,
-      enabled        => false,
-    }
     if $glance_backend == 'file' and $glance_file_pcmk_manage {
       $secontext = 'context="system_u:object_r:glance_var_lib_t:s0"'
       pacemaker::resource::filesystem { 'glance-fs':

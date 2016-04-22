@@ -20,7 +20,7 @@
 #
 # [*sync_db*]
 #   (Optional) Whether to run db sync
-#   Defaults to undef
+#   Defaults to true
 #
 # [*manage_service*]
 #   (Optional) Whether to manage the glance service
@@ -40,14 +40,18 @@
 #   Defaults to downcase(hiera('glance_backend', 'swift'))
 #
 class tripleo::profile::base::glance::registry (
-  $sync_db        = undef,
+  $sync_db        = true,
   $manage_service = undef,
   $enabled        = undef,
   $step           = hiera('step'),
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
 ) {
 
-  if $step >= 4 {
+  if $step >= 2 and $sync_db {
+    include ::glance::db::mysql
+  }
+
+  if $step >= 4 or ( $step >= 3 and $sync_db ) {
     # TODO: notifications, scrubber, etc.
     include ::glance
     include ::glance::config

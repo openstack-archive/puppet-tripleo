@@ -20,7 +20,7 @@
 #
 # [*sync_db*]
 #   (Optional) Whether to run db sync
-#   Defaults to undef
+#   Defaults to true
 #
 # [*manage_service*]
 #   (Optional) Whether to manage the keystone service
@@ -52,7 +52,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::keystone (
-  $sync_db          = undef,
+  $sync_db          = true,
   $manage_service   = undef,
   $enabled          = undef,
   $bootstrap_master = undef,
@@ -62,7 +62,11 @@ class tripleo::profile::base::keystone (
   $step             = hiera('step'),
 ) {
 
-  if $step >= 4 {
+  if $step >= 2 and $sync_db {
+    include ::keystone::db::mysql
+  }
+
+  if $step >= 4 or ( $step >= 3 and $sync_db ) {
     class { '::keystone':
       sync_db          => $sync_db,
       manage_service   => $manage_service,
