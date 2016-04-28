@@ -65,4 +65,3 @@ class tripleo::profile::base::glance::registry (
   }
 
 }
-
