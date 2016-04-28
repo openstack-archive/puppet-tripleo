@@ -1,4 +1,4 @@
-# Copyright 2015 Red Hat, Inc.
+# Copyright 2017 Red Hat, Inc.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -12,33 +12,17 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-require 'puppet/provider/package'
+#
+# == Class: tripleo::profile::base::ntp
+#
+# Enable NTP via composable services.
+#
 
-Puppet::Type.type(:package).provide :norpm, :source => :rpm, :parent => :rpm do
-  desc "RPM packaging provider that does not install anything."
-
-  def latest
-    @resource.fail "'latest' is unsupported by this provider."
-  end
-
-  def install
-    true
-  end
-
-  def uninstall
-    true
-  end
-
-  def update
-    true
-  end
-
-  def purge
-    true
-  end
-
-  def self.instances
-    return []
-  end
-
-end
+class tripleo::profile::base::time::ntp {
+  # if installed, we don't want chrony to conflict with ntp.
+  package { 'chrony':
+    ensure => 'purged',
+    before => Service['ntp'],
+  }
+  include ::ntp
+}
