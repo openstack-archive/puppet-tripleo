@@ -37,6 +37,13 @@ class tripleo::profile::pacemaker::keystone (
   $enable_load_balancer = hiera('enable_load_balancer', true)
 ) {
 
+  Service <| tag == 'keystone-service' |> {
+    hasrestart => true,
+    restart    => '/bin/true',
+    start      => '/bin/true',
+    stop       => '/bin/true',
+  }
+
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {

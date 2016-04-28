@@ -62,6 +62,13 @@ class tripleo::profile::pacemaker::glance (
   $glance_file_pcmk_options   = hiera('glance_file_pcmk_options', ''),
 ) {
 
+  Service <| tag == 'glance-service' |> {
+    hasrestart => true,
+    restart    => '/bin/true',
+    start      => '/bin/true',
+    stop       => '/bin/true',
+  }
+
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
