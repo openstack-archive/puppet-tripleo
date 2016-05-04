@@ -62,7 +62,7 @@ class tripleo::profile::base::keystone (
   $step             = hiera('step'),
 ) {
 
-  if $step >= 2 and $sync_db {
+  if $step >= 3 and $sync_db {
     include ::keystone::db::mysql
   }
 

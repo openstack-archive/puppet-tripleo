@@ -47,7 +47,7 @@ class tripleo::profile::base::glance::registry (
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
 ) {
 
-  if $step >= 2 and $sync_db {
+  if $step >= 3 and $sync_db {
     include ::glance::db::mysql
   }
 
