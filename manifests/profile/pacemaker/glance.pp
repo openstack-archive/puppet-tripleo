@@ -75,14 +75,9 @@ class tripleo::profile::pacemaker::glance (
     $pacemaker_master = false
   }
 
-  class { '::tripleo::profile::base::glance::api':
-    manage_service => false,
-    enabled        => false,
-  }
+  include ::tripleo::profile::base::glance::api
   class { '::tripleo::profile::base::glance::registry':
     sync_db        => $pacemaker_master,
-    manage_service => false,
-    enabled        => false,
   }
 
   if $step >= 4 {

@@ -18,14 +18,6 @@
 #
 # === Parameters
 #
-# [*manage_service*]
-#   (Optional) Whether to manage the glance service
-#   Defaults to undef
-#
-# [*enabled*]
-#   (Optional) Whether to enable the glance service
-#   Defaults to undef
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -36,8 +28,6 @@
 #   Defaults to downcase(hiera('glance_backend', 'swift'))
 #
 class tripleo::profile::base::glance::api (
-  $manage_service = undef,
-  $enabled        = undef,
   $step           = hiera('step'),
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
 ) {
@@ -57,12 +47,9 @@ class tripleo::profile::base::glance::api (
     include ::glance::config
     class { '::glance::api':
       known_stores   => $glance_store,
-      manage_service => $manage_service,
-      enabled        => $enabled,
     }
     include ::glance::notify::rabbitmq
     include join(['::glance::backend::', $glance_backend])
   }
 
 }
-

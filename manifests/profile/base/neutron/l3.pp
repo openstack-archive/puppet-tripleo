@@ -22,30 +22,17 @@
 #   (Optional) Whether to set ovs_use_veth (for older kernel support)
 #   Defaults to hiera('neutron_ovs_use_veth', false)
 #
-# [*enabled*]
-#   (Optional) Whether to enable the Neutron L3 Agent service
-#   Defaults to undef
-#
-# [*manage_service*]
-#   (Optional) Whether to manage the Neutron L3 Agent service
-#   Defaults to undef
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::l3 (
-  $enabled        = undef,
-  $manage_service = undef,
   $step           = hiera('step'),
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::neutron
-    class { '::neutron::agents::l3':
-      manage_service => $manage_service,
-      enabled        => $enabled
-    }
+    include ::neutron::agents::l3
 
     Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-l3' |>
   }

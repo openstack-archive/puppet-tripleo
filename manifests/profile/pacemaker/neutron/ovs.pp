@@ -34,11 +34,7 @@ class tripleo::profile::pacemaker::neutron::ovs (
 
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
-
-  class { '::tripleo::profile::base::neutron::ovs':
-    manage_service => false,
-    enabled        => false,
-  }
+  include ::tripleo::profile::base::neutron::ovs
 
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
 

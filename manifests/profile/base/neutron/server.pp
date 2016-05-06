@@ -22,14 +22,6 @@
 #   (Optional) Whether to run Neutron DB sync operations
 #   Defaults to undef
 #
-# [*manage_service*]
-#   (Optional) Whether to manage the Neutron Server service
-#   Defaults to undef
-#
-# [*enabled*]
-#   (Optional) Whether to enable the Neutron Server service
-#   Defaults to undef
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -37,8 +29,6 @@
 #
 class tripleo::profile::base::neutron::server (
   $sync_db          = true,
-  $manage_service   = undef,
-  $enabled          = undef,
   $step             = hiera('step'),
 ) {
 
@@ -53,8 +43,6 @@ class tripleo::profile::base::neutron::server (
 
     class { '::neutron::server':
       sync_db        => $sync_db,
-      manage_service => $manage_service,
-      enabled        => $enabled
     }
   }
 }

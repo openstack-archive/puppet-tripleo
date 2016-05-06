@@ -22,14 +22,6 @@
 #   (Optional) Whether to run db sync
 #   Defaults to true
 #
-# [*manage_service*]
-#   (Optional) Whether to manage the keystone service
-#   Defaults to undef
-#
-# [*enabled*]
-#   (Optional) Whether to enable the keystone service
-#   Defaults to undef
-#
 # [*bootstrap_master*]
 #   (Optional) The hostname of the node responsible for bootstrapping
 #   Defaults to hiera('bootstrap_nodeid')
@@ -53,8 +45,6 @@
 #
 class tripleo::profile::base::keystone (
   $sync_db          = true,
-  $manage_service   = undef,
-  $enabled          = undef,
   $bootstrap_master = undef,
   $manage_roles     = true,
   $manage_endpoint  = true,
@@ -69,8 +59,6 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     class { '::keystone':
       sync_db          => $sync_db,
-      manage_service   => $manage_service,
-      enabled          => $enabled,
       enable_bootstrap => $bootstrap_master,
     }
 
