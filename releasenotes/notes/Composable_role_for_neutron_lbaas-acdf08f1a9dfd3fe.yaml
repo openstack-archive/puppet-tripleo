@@ -1,0 +1,3 @@
+---
+features:
+  - Adds composable service interface for Neutron LBaaSv2 service. 
