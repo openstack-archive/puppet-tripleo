@@ -50,7 +50,7 @@ class tripleo::profile::pacemaker::keystone (
     $pacemaker_master = false
   }
 
-  if $step >= 6 and $pacemaker_master {
+  if $step >= 5 and $pacemaker_master {
     $manage_roles = true
     Pacemaker::Resource::Service[$::apache::params::service_name] -> Class['::keystone::roles::admin']
     Pacemaker::Resource::Service[$::apache::params::service_name] -> Class['::keystone::endpoint']
@@ -74,6 +74,7 @@ class tripleo::profile::pacemaker::keystone (
       second_resource => 'openstack-core-clone',
       first_action    => 'start',
       second_action   => 'start',
+      before          => Pacemaker::Resource::Service[$::apache::params::service_name],
       require         => [Pacemaker::Resource::Service['haproxy'],
                           Pacemaker::Resource::Ocf['openstack-core']],
     }
@@ -86,6 +87,7 @@ class tripleo::profile::pacemaker::keystone (
       second_resource => 'openstack-core-clone',
       first_action    => 'start',
       second_action   => 'start',
+      before          => Pacemaker::Resource::Service[$::apache::params::service_name],
       require         => [Pacemaker::Resource::Ocf['rabbitmq'],
                           Pacemaker::Resource::Ocf['openstack-core']],
     }
