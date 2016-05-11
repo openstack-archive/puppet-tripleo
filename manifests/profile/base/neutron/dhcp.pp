@@ -48,6 +48,14 @@ class tripleo::profile::base::neutron::dhcp (
       enabled        => $enabled
     }
 
+    file { '/etc/neutron/dnsmasq-neutron.conf':
+      content => $neutron_dnsmasq_options,
+      owner   => 'neutron',
+      group   => 'neutron',
+      notify  => Service['neutron-dhcp-service'],
+      require => Package['neutron'],
+    }
+
     Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-dhcp' |>
   }
 }
