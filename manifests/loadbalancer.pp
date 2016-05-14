@@ -175,10 +175,6 @@
 #  (optional) Enable or not Glance registry binding
 #  Defaults to false
 #
-# [*nova_ec2*]
-#  (optional) Enable or not Nova EC2 API binding
-#  Defaults to false
-#
 # [*nova_osapi*]
 #  (optional) Enable or not Nova API binding
 #  Defaults to false
@@ -284,8 +280,6 @@
 #    'neutron_api_ssl_port' (Defaults to 13696)
 #    'nova_api_port' (Defaults to 8774)
 #    'nova_api_ssl_port' (Defaults to 13774)
-#    'nova_ec2_port' (Defaults to 8773)
-#    'nova_ec2_ssl_port' (Defaults to 13773)
 #    'nova_metadata_port' (Defaults to 8775)
 #    'nova_novnc_port' (Defaults to 6080)
 #    'nova_novnc_ssl_port' (Defaults to 13080)
@@ -332,7 +326,6 @@ class tripleo::loadbalancer (
   $manila                    = false,
   $glance_api                = false,
   $glance_registry           = false,
-  $nova_ec2                  = false,
   $nova_osapi                = false,
   $nova_metadata             = false,
   $nova_novncproxy           = false,
@@ -383,8 +376,6 @@ class tripleo::loadbalancer (
     neutron_api_ssl_port => 13696,
     nova_api_port => 8774,
     nova_api_ssl_port => 13774,
-    nova_ec2_port => 8773,
-    nova_ec2_ssl_port => 13773,
     nova_metadata_port => 8775,
     nova_novnc_port => 6080,
     nova_novnc_ssl_port => 13080,
@@ -717,17 +708,6 @@ class tripleo::loadbalancer (
   }
 
   $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
-  if $nova_ec2 {
-    ::tripleo::loadbalancer::endpoint { 'nova_ec2':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $nova_api_vip,
-      service_port      => $ports[nova_ec2_port],
-      ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[nova_ec2_ssl_port],
-    }
-  }
-
   if $nova_osapi {
     ::tripleo::loadbalancer::endpoint { 'nova_osapi':
       public_virtual_ip => $public_virtual_ip,
