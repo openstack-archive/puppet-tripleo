@@ -38,8 +38,6 @@ class tripleo::profile::pacemaker::neutron::server (
 
     class { '::tripleo::profile::base::neutron::server':
       sync_db        => ($::hostname == downcase($pacemaker_master)),
-      manage_service => false,
-      enabled        => false,
     }
 
     if ($::hostname == downcase($pacemaker_master)) {

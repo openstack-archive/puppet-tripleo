@@ -34,11 +34,8 @@ class tripleo::profile::pacemaker::neutron::dhcp (
 
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
+  include ::tripleo::profile::base::neutron::dhcp
 
-  class { '::tripleo::profile::base::neutron::dhcp':
-    manage_service => false,
-    enabled        => false,
-  }
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::neutron::params::dhcp_agent_service:
       clone_params => 'interleave=true',

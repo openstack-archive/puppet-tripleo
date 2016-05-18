@@ -60,8 +60,6 @@ class tripleo::profile::pacemaker::keystone (
 
   class { '::tripleo::profile::base::keystone':
     sync_db          => $pacemaker_master,
-    manage_service   => false,
-    enabled          => false,
     bootstrap_master => $pacemaker_master,
     manage_roles     => $manage_roles,
     manage_endpoint  => $manage_roles

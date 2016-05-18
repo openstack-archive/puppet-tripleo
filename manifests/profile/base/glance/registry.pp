@@ -22,14 +22,6 @@
 #   (Optional) Whether to run db sync
 #   Defaults to true
 #
-# [*manage_service*]
-#   (Optional) Whether to manage the glance service
-#   Defaults to undef
-#
-# [*enabled*]
-#   (Optional) Whether to enable the glance service
-#   Defaults to undef
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -41,8 +33,6 @@
 #
 class tripleo::profile::base::glance::registry (
   $sync_db        = true,
-  $manage_service = undef,
-  $enabled        = undef,
   $step           = hiera('step'),
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
 ) {
@@ -57,12 +47,9 @@ class tripleo::profile::base::glance::registry (
     include ::glance::config
     class { '::glance::registry' :
       sync_db        => $sync_db,
-      manage_service => $manage_service,
-      enabled        => $enabled,
     }
     include ::glance::notify::rabbitmq
     include join(['::glance::backend::', $glance_backend])
   }
 
 }
-

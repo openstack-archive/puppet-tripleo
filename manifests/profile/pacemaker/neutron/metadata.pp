@@ -34,11 +34,8 @@ class tripleo::profile::pacemaker::neutron::metadata (
 
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
+  include ::tripleo::profile::base::neutron::metadata
 
-  class { '::tripleo::profile::base::neutron::metadata':
-    manage_service => false,
-    enabled        => false,
-  }
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::neutron::params::metadata_agent_service:
       clone_params => 'interleave=true',

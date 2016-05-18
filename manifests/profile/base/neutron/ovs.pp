@@ -18,32 +18,19 @@
 #
 # === Parameters
 #
-# [*manage_service*]
-#   (Optional) Whether to manage the Neutron OVS Agent service
-#   Defaults to undef
-#
-# [*enabled*]
-#   (Optional) Whether to enable the Neutron OVS Agent service
-#   Defaults to undef
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::ovs(
-  $manage_service = undef,
-  $enabled        = undef,
   $step           = hiera('step'),
 ) {
 
   include ::tripleo::profile::base::neutron
 
   if $step >= 4 {
-    class { '::neutron::agents::ml2::ovs':
-      manage_service => $manage_service,
-      enabled        => $enabled
-    }
+    include ::neutron::agents::ml2::ovs
 
     # Optional since manage_service may be false and neutron server may not be colocated.
     Service<| title == 'neutron-server' |> -> Service<| title == 'neutron-ovs-agent-service' |>

@@ -34,11 +34,8 @@ class tripleo::profile::pacemaker::neutron::l3 (
 
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
+  include ::tripleo::profile::base::neutron::l3
 
-  class { '::tripleo::profile::base::neutron::l3':
-    manage_service => false,
-    enabled        => false,
-  }
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::neutron::params::l3_agent_service:
       clone_params => 'interleave=true',
