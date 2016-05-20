@@ -265,7 +265,7 @@
 #    'heat_api_port' (Defaults to 8004)
 #    'heat_api_ssl_port' (Defaults to 13004)
 #    'heat_cfn_port' (Defaults to 8000)
-#    'heat_cfn_ssl_port' (Defaults to 13800)
+#    'heat_cfn_ssl_port' (Defaults to 13005)
 #    'heat_cw_port' (Defaults to 8003)
 #    'heat_cw_ssl_port' (Defaults to 13003)
 #    'ironic_api_port' (Defaults to 6385)
@@ -361,7 +361,7 @@ class tripleo::loadbalancer (
     heat_api_port => 8004,
     heat_api_ssl_port => 13004,
     heat_cfn_port => 8000,
-    heat_cfn_ssl_port => 13800,
+    heat_cfn_ssl_port => 13005,
     heat_cw_port => 8003,
     heat_cw_ssl_port => 13003,
     ironic_api_port => 6385,
