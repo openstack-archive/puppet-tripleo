@@ -392,16 +392,16 @@ class tripleo::loadbalancer (
     fail('$controller_hosts or $controller_host (now deprecated) is a mandatory parameter')
   }
   if $controller_hosts {
-    $controller_hosts_real = $controller_hosts
+    $controller_hosts_real = any2array($controller_hosts)
   } else {
     warning('$controller_host has been deprecated in favor of $controller_hosts')
-    $controller_hosts_real = $controller_host
+    $controller_hosts_real = any2array($controller_host)
   }
 
   if !$controller_hosts_names {
-    $controller_hosts_names_real = $controller_hosts_real
+    $controller_hosts_names_real = any2array($controller_hosts_real)
   } else {
-    $controller_hosts_names_real = $controller_hosts_names
+    $controller_hosts_names_real = any2array($controller_hosts_names)
   }
 
   if $manage_vip {
