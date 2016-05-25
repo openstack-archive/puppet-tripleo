@@ -46,7 +46,7 @@ class tripleo::profile::pacemaker::loadbalancer (
   }
 
   if $step >= 2 and $pacemaker_master and $enable_load_balancer {
-      # FIXME: we should not have to access tripleo::loadbalancer class
+      # FIXME: we should not have to access tripleo::haproxy class
       # parameters here to configure pacemaker VIPs. The configuration
       # of pacemaker VIPs could move into puppet-tripleo or we should
       # make use of less specific hiera parameters here for the settings.
@@ -54,45 +54,67 @@ class tripleo::profile::pacemaker::loadbalancer (
         clone_params => true,
       }
 
-      $control_vip = hiera('tripleo::loadbalancer::controller_virtual_ip')
+      # TODO(emilien): clean-up old parameter references when
+      # https://review.openstack.org/#/c/320411/ is merged.
+      if hiera('tripleo::loadbalancer::controller_virtual_ip', undef) {
+        $control_vip_real = hiera('tripleo::loadbalancer::controller_virtual_ip')
+      } else {
+        $control_vip_real = hiera('controller_virtual_ip')
+      }
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_control_vip':
         vip_name   => 'control',
-        ip_address => $control_vip,
+        ip_address => $control_vip_real,
       }
 
-      $public_vip = hiera('tripleo::loadbalancer::public_virtual_ip')
+      if hiera('tripleo::loadbalancer::public_virtual_ip', undef) {
+        $public_vip_real = hiera('tripleo::loadbalancer::public_virtual_ip')
+      } else {
+        $public_vip_real = hiera('public_virtual_ip')
+      }
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_public_vip':
-        ensure     => $public_vip and $public_vip != $control_vip,
+        ensure     => $public_vip_real and $public_vip_real != $control_vip_real,
         vip_name   => 'public',
-        ip_address => $public_vip,
+        ip_address => $public_vip_real,
       }
 
       $redis_vip = hiera('redis_vip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_redis_vip':
-        ensure     => $redis_vip and $redis_vip != $control_vip,
+        ensure     => $redis_vip and $redis_vip != $control_vip_real,
         vip_name   => 'redis',
         ip_address => $redis_vip,
       }
 
-      $internal_api_vip = hiera('tripleo::loadbalancer::internal_api_virtual_ip')
+      if hiera('tripleo::loadbalancer::internal_api_virtual_ip', undef) {
+        $internal_api_vip_real = hiera('tripleo::loadbalancer::internal_api_virtual_ip')
+      } else {
+        $internal_api_vip_real = hiera('internal_api_virtual_ip')
+      }
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_internal_api_vip':
-        ensure     => $internal_api_vip and $internal_api_vip != $control_vip,
+        ensure     => $internal_api_vip_real and $internal_api_vip_real != $control_vip_real,
         vip_name   => 'internal_api',
-        ip_address => $internal_api_vip,
+        ip_address => $internal_api_vip_real,
       }
 
-      $storage_vip = hiera('tripleo::loadbalancer::storage_virtual_ip')
+      if hiera('tripleo::loadbalancer::storage_virtual_ip', undef) {
+        $storage_vip_real = hiera('tripleo::loadbalancer::storage_virtual_ip')
+      } else {
+        $storage_vip_real = hiera('storage_virtual_ip')
+      }
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_vip':
-        ensure     => $storage_vip and $storage_vip != $control_vip,
+        ensure     => $storage_vip_real and $storage_vip_real != $control_vip_real,
         vip_name   => 'storage',
-        ip_address => $storage_vip,
+        ip_address => $storage_vip_real,
       }
 
-      $storage_mgmt_vip = hiera('tripleo::loadbalancer::storage_mgmt_virtual_ip')
+      if hiera('tripleo::loadbalancer::storage_mgmt_virtual_ip', undef) {
+        $storage_mgmt_vip_real = hiera('tripleo::loadbalancer::storage_mgmt_virtual_ip')
+      } else {
+        $storage_mgmt_vip_real = hiera('storage_mgmt_virtual_ip')
+      }
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_mgmt_vip':
-        ensure     => $storage_mgmt_vip and $storage_mgmt_vip != $control_vip,
+        ensure     => $storage_mgmt_vip_real and $storage_mgmt_vip_real != $control_vip_real,
         vip_name   => 'storage_mgmt',
-        ip_address => $storage_mgmt_vip,
+        ip_address => $storage_mgmt_vip_real,
       }
   }
 

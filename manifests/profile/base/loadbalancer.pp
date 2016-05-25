@@ -44,9 +44,18 @@ class tripleo::profile::base::loadbalancer (
 
   if $step >= 1 {
     if $enable_load_balancer {
-      class { '::tripleo::loadbalancer':
-        controller_hosts       => $controller_node_ips,
-        controller_hosts_names => $controller_node_names,
+      # TODO(emilien): remove this conditional once
+      # https://review.openstack.org/#/c/320411/ is merged.
+      if hiera('tripleo::loadbalancer::keystone_admin', undef) {
+        class { '::tripleo::loadbalancer':
+          controller_hosts       => $controller_node_ips,
+          controller_hosts_names => $controller_node_names,
+        }
+      } else {
+        class { '::tripleo::haproxy':
+          controller_hosts       => $controller_node_ips,
+          controller_hosts_names => $controller_node_names,
+        }
       }
     }
   }
