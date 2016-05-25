@@ -346,625 +346,69 @@ class tripleo::loadbalancer (
   $midonet_api               = false,
   $service_ports             = {}
 ) {
-  $default_service_ports = {
-    aodh_api_port => 8042,
-    aodh_api_ssl_port => 13042,
-    ceilometer_api_port => 8777,
-    ceilometer_api_ssl_port => 13777,
-    cinder_api_port => 8776,
-    cinder_api_ssl_port => 13776,
-    glance_api_port => 9292,
-    glance_api_ssl_port => 13292,
-    glance_registry_port => 9191,
-    gnocchi_api_port => 8041,
-    gnocchi_api_ssl_port => 13041,
-    heat_api_port => 8004,
-    heat_api_ssl_port => 13004,
-    heat_cfn_port => 8000,
-    heat_cfn_ssl_port => 13005,
-    heat_cw_port => 8003,
-    heat_cw_ssl_port => 13003,
-    ironic_api_port => 6385,
-    ironic_api_ssl_port => 13385,
-    keystone_admin_api_port => 35357,
-    keystone_admin_api_ssl_port => 13357,
-    keystone_public_api_port => 5000,
-    keystone_public_api_ssl_port => 13000,
-    manila_api_port => 8786,
-    manila_api_ssl_port => 13786,
-    neutron_api_port => 9696,
-    neutron_api_ssl_port => 13696,
-    nova_api_port => 8774,
-    nova_api_ssl_port => 13774,
-    nova_metadata_port => 8775,
-    nova_novnc_port => 6080,
-    nova_novnc_ssl_port => 13080,
-    sahara_api_port => 8386,
-    sahara_api_ssl_port => 13386,
-    swift_proxy_port => 8080,
-    swift_proxy_ssl_port => 13808,
-    trove_api_port => 8779,
-    trove_api_ssl_port => 13779,
-  }
-  $ports = merge($default_service_ports, $service_ports)
-
-  if !$controller_host and !$controller_hosts {
-    fail('$controller_hosts or $controller_host (now deprecated) is a mandatory parameter')
-  }
-  if $controller_hosts {
-    $controller_hosts_real = any2array($controller_hosts)
-  } else {
-    warning('$controller_host has been deprecated in favor of $controller_hosts')
-    $controller_hosts_real = any2array($controller_host)
-  }
-
-  if !$controller_hosts_names {
-    $controller_hosts_names_real = any2array($controller_hosts_real)
-  } else {
-    $controller_hosts_names_real = any2array($controller_hosts_names)
+  warning('This class is going to be dropped during Newton cycle, replaced by tripleo::haproxy and tripleo::keepalived.')
+  class { '::tripleo::haproxy':
+    controller_virtual_ip     => $controller_virtual_ip,
+    public_virtual_ip         => $public_virtual_ip,
+    # Force to false because we already declare ::tripleo::keepalived later in this manifest to kep
+    # old hieradata binding.
+    keepalived                => false,
+    haproxy_service_manage    => $haproxy_service_manage,
+    haproxy_global_maxconn    => $haproxy_global_maxconn,
+    haproxy_default_maxconn   => $haproxy_default_maxconn,
+    haproxy_default_timeout   => $haproxy_default_timeout,
+    haproxy_listen_bind_param => $haproxy_listen_bind_param,
+    haproxy_member_options    => $haproxy_member_options,
+    haproxy_log_address       => $haproxy_log_address,
+    haproxy_stats_user        => $haproxy_stats_user,
+    haproxy_stats_password    => $haproxy_stats_password,
+    controller_host           => $controller_host,
+    controller_hosts          => $controller_hosts,
+    controller_hosts_names    => $controller_hosts_names,
+    service_certificate       => $service_certificate,
+    internal_certificate      => $internal_certificate,
+    ssl_cipher_suite          => $ssl_cipher_suite,
+    ssl_options               => $ssl_options,
+    haproxy_stats_certificate => $haproxy_stats_certificate,
+    keystone_admin            => $keystone_admin,
+    keystone_public           => $keystone_public,
+    neutron                   => $neutron,
+    cinder                    => $cinder,
+    sahara                    => $sahara,
+    trove                     => $trove,
+    manila                    => $manila,
+    glance_api                => $glance_api,
+    glance_registry           => $glance_registry,
+    nova_osapi                => $nova_osapi,
+    nova_metadata             => $nova_metadata,
+    nova_novncproxy           => $nova_novncproxy,
+    ceilometer                => $ceilometer,
+    aodh                      => $aodh,
+    gnocchi                   => $gnocchi,
+    swift_proxy_server        => $swift_proxy_server,
+    heat_api                  => $heat_api,
+    heat_cloudwatch           => $heat_cloudwatch,
+    heat_cfn                  => $heat_cfn,
+    horizon                   => $horizon,
+    ironic                    => $ironic,
+    mysql                     => $mysql,
+    mysql_clustercheck        => $mysql_clustercheck,
+    rabbitmq                  => $rabbitmq,
+    redis                     => $redis,
+    redis_password            => $redis_password,
+    midonet_api               => $midonet_api,
+    service_ports             => $service_ports,
   }
 
   if $manage_vip {
-    case $::osfamily {
-      'RedHat': {
-        $keepalived_name_is_process = false
-        $keepalived_vrrp_script     = 'systemctl status haproxy.service'
-      } # RedHat
-      'Debian': {
-        $keepalived_name_is_process = true
-        $keepalived_vrrp_script     = undef
-      }
-      default: {
-        warning('Please configure keepalived defaults in tripleo::loadbalancer.')
-        $keepalived_name_is_process = undef
-        $keepalived_vrrp_script     = undef
-      }
-    }
-
-    class { '::keepalived': }
-    keepalived::vrrp_script { 'haproxy':
-      name_is_process => $keepalived_name_is_process,
-      script          => $keepalived_vrrp_script,
-    }
-
-    # KEEPALIVE INSTANCE CONTROL
-    keepalived::instance { '51':
-      interface    => $control_virtual_interface,
-      virtual_ips  => [join([$controller_virtual_ip, ' dev ', $control_virtual_interface])],
-      state        => 'MASTER',
-      track_script => ['haproxy'],
-      priority     => 101,
-    }
-
-    # KEEPALIVE INSTANCE PUBLIC
-    keepalived::instance { '52':
-      interface    => $public_virtual_interface,
-      virtual_ips  => [join([$public_virtual_ip, ' dev ', $public_virtual_interface])],
-      state        => 'MASTER',
-      track_script => ['haproxy'],
-      priority     => 101,
-    }
-
-
-    if $internal_api_virtual_ip and $internal_api_virtual_ip != $controller_virtual_ip {
-      $internal_api_virtual_interface = interface_for_ip($internal_api_virtual_ip)
-      # KEEPALIVE INTERNAL API NETWORK
-      keepalived::instance { '53':
-        interface    => $internal_api_virtual_interface,
-        virtual_ips  => [join([$internal_api_virtual_ip, ' dev ', $internal_api_virtual_interface])],
-        state        => 'MASTER',
-        track_script => ['haproxy'],
-        priority     => 101,
-      }
-    }
-
-    if $storage_virtual_ip and $storage_virtual_ip != $controller_virtual_ip {
-      $storage_virtual_interface = interface_for_ip($storage_virtual_ip)
-      # KEEPALIVE STORAGE NETWORK
-      keepalived::instance { '54':
-        interface    => $storage_virtual_interface,
-        virtual_ips  => [join([$storage_virtual_ip, ' dev ', $storage_virtual_interface])],
-        state        => 'MASTER',
-        track_script => ['haproxy'],
-        priority     => 101,
-      }
-    }
-
-    if $storage_mgmt_virtual_ip and $storage_mgmt_virtual_ip != $controller_virtual_ip {
-      $storage_mgmt_virtual_interface = interface_for_ip($storage_mgmt_virtual_ip)
-      # KEEPALIVE STORAGE MANAGEMENT NETWORK
-      keepalived::instance { '55':
-        interface    => $storage_mgmt_virtual_interface,
-        virtual_ips  => [join([$storage_mgmt_virtual_ip, ' dev ', $storage_mgmt_virtual_interface])],
-        state        => 'MASTER',
-        track_script => ['haproxy'],
-        priority     => 101,
-      }
-    }
-
-  }
-
-  # TODO(bnemec): When we have support for SSL on private and admin endpoints,
-  # have the haproxy stats endpoint use that certificate by default.
-  if $haproxy_stats_certificate {
-    $haproxy_stats_bind_certificate = $haproxy_stats_certificate
-  }
-
-  $horizon_vip = hiera('horizon_vip', $controller_virtual_ip)
-  if $service_certificate {
-    # NOTE(jaosorior): If the horizon_vip and the public_virtual_ip are the
-    # same, the first option takes precedence. Which is the case when network
-    # isolation is not enabled. This is not a problem as both options are
-    # identical. If network isolation is enabled, this works correctly and
-    # will add a TLS binding to both the horizon_vip and the
-    # public_virtual_ip.
-    # Even though for the public_virtual_ip the port 80 is listening, we
-    # redirect to https in the horizon_options below.
-    $horizon_bind_opts = {
-      "${horizon_vip}:80"        => $haproxy_listen_bind_param,
-      "${horizon_vip}:443"       => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
-      "${public_virtual_ip}:80"  => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
-    }
-    $horizon_options = {
-      'cookie'   => 'SERVERID insert indirect nocache',
-      'rsprep'   => '^Location:\ http://(.*) Location:\ https://\1',
-      # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
-      'redirect' => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
-      'option'   => 'forwardfor',
-    }
-  } else {
-    $horizon_bind_opts = {
-      "${horizon_vip}:80" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:80" => $haproxy_listen_bind_param,
-    }
-    $horizon_options = {
-      'cookie' => 'SERVERID insert indirect nocache',
-      'option' => 'forwardfor',
-    }
-  }
-
-  if $haproxy_stats_bind_certificate {
-    $haproxy_stats_bind_opts = {
-      "${controller_virtual_ip}:1993" => union($haproxy_listen_bind_param, ['ssl', 'crt', $haproxy_stats_bind_certificate]),
-    }
-  } else {
-    $haproxy_stats_bind_opts = {
-      "${controller_virtual_ip}:1993" => $haproxy_listen_bind_param,
-    }
-  }
-
-  $mysql_vip = hiera('mysql_vip', $controller_virtual_ip)
-  $mysql_bind_opts = {
-    "${mysql_vip}:3306" => $haproxy_listen_bind_param,
-  }
-
-  $rabbitmq_vip = hiera('rabbitmq_vip', $controller_virtual_ip)
-  $rabbitmq_bind_opts = {
-    "${rabbitmq_vip}:5672" => $haproxy_listen_bind_param,
-  }
-
-  $redis_vip = hiera('redis_vip', $controller_virtual_ip)
-  $redis_bind_opts = {
-    "${redis_vip}:6379" => $haproxy_listen_bind_param,
-  }
-
-  class { '::haproxy':
-    service_manage   => $haproxy_service_manage,
-    global_options   => {
-      'log'                      => "${haproxy_log_address} local0",
-      'pidfile'                  => '/var/run/haproxy.pid',
-      'user'                     => 'haproxy',
-      'group'                    => 'haproxy',
-      'daemon'                   => '',
-      'maxconn'                  => $haproxy_global_maxconn,
-      'ssl-default-bind-ciphers' => $ssl_cipher_suite,
-      'ssl-default-bind-options' => $ssl_options,
-    },
-    defaults_options => {
-      'mode'    => 'tcp',
-      'log'     => 'global',
-      'retries' => '3',
-      'timeout' => $haproxy_default_timeout,
-      'maxconn' => $haproxy_default_maxconn,
-    },
-  }
-
-  Tripleo::Loadbalancer::Endpoint {
-    haproxy_listen_bind_param => $haproxy_listen_bind_param,
-    member_options            => $haproxy_member_options,
-    public_certificate        => $service_certificate,
-    internal_certificate      => $internal_certificate,
-  }
-
-  $stats_base = ['enable', 'uri /']
-  if $haproxy_stats_password {
-    $stats_config = union($stats_base, ["auth ${haproxy_stats_user}:${haproxy_stats_password}"])
-  } else {
-    $stats_config = $stats_base
-  }
-  haproxy::listen { 'haproxy.stats':
-    bind             => $haproxy_stats_bind_opts,
-    mode             => 'http',
-    options          => {
-      'stats' => $stats_config,
-    },
-    collect_exported => false,
-  }
-
-  if $keystone_admin {
-    ::tripleo::loadbalancer::endpoint { 'keystone_admin':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('keystone_admin_api_vip', $controller_virtual_ip),
-      service_port      => $ports[keystone_admin_api_port],
-      ip_addresses      => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
-      public_ssl_port   => $ports[keystone_admin_api_ssl_port],
-    }
-  }
-
-  if $keystone_public {
-    ::tripleo::loadbalancer::endpoint { 'keystone_public':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('keystone_public_api_vip', $controller_virtual_ip),
-      service_port      => $ports[keystone_public_api_port],
-      ip_addresses      => hiera('keystone_public_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
-      public_ssl_port   => $ports[keystone_public_api_ssl_port],
-    }
-  }
-
-  if $neutron {
-    ::tripleo::loadbalancer::endpoint { 'neutron':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('neutron_api_vip', $controller_virtual_ip),
-      service_port      => $ports[neutron_api_port],
-      ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[neutron_api_ssl_port],
-    }
-  }
-
-  if $cinder {
-    ::tripleo::loadbalancer::endpoint { 'cinder':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('cinder_api_vip', $controller_virtual_ip),
-      service_port      => $ports[cinder_api_port],
-      ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
-      public_ssl_port   => $ports[cinder_api_ssl_port],
-    }
-  }
-
-  if $manila {
-    ::tripleo::loadbalancer::endpoint { 'manila':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('manila_api_vip', $controller_virtual_ip),
-      service_port      => $ports[manila_api_port],
-      ip_addresses      => hiera('manila_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[manila_api_ssl_port],
-    }
-  }
-
-  if $sahara {
-    ::tripleo::loadbalancer::endpoint { 'sahara':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('sahara_api_vip', $controller_virtual_ip),
-      service_port      => $ports[sahara_api_port],
-      ip_addresses      => hiera('sahara_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[sahara_api_ssl_port],
-    }
-  }
-
-  if $trove {
-    ::tripleo::loadbalancer::endpoint { 'trove':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('trove_api_vip', $controller_virtual_ip),
-      service_port      => $ports[trove_api_port],
-      ip_addresses      => hiera('trove_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[trove_api_ssl_port],
-    }
-  }
-
-  if $glance_api {
-    ::tripleo::loadbalancer::endpoint { 'glance_api':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('glance_api_vip', $controller_virtual_ip),
-      service_port      => $ports[glance_api_port],
-      ip_addresses      => hiera('glance_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[glance_api_ssl_port],
-    }
-  }
-
-  if $glance_registry {
-    ::tripleo::loadbalancer::endpoint { 'glance_registry':
-      internal_ip  => hiera('glance_registry_vip', $controller_virtual_ip),
-      service_port => $ports[glance_registry_port],
-      ip_addresses => hiera('glance_registry_node_ips', $controller_hosts_real),
-      server_names => $controller_hosts_names_real,
-    }
-  }
-
-  $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
-  if $nova_osapi {
-    ::tripleo::loadbalancer::endpoint { 'nova_osapi':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $nova_api_vip,
-      service_port      => $ports[nova_api_port],
-      ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
-      public_ssl_port   => $ports[nova_api_ssl_port],
-    }
-  }
-
-  if $nova_metadata {
-    ::tripleo::loadbalancer::endpoint { 'nova_metadata':
-      internal_ip  => hiera('nova_metadata_vip', $controller_virtual_ip),
-      service_port => $ports[nova_metadata_port],
-      ip_addresses => hiera('nova_metadata_node_ips', $controller_hosts_real),
-      server_names => $controller_hosts_names_real,
-    }
-  }
-
-  if $nova_novncproxy {
-    ::tripleo::loadbalancer::endpoint { 'nova_novncproxy':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $nova_api_vip,
-      service_port      => $ports[nova_novnc_port],
-      ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      listen_options    => {
-        'balance' => 'source',
-        'timeout' => [ 'tunnel 1h' ],
-      },
-      public_ssl_port   => $ports[nova_novnc_ssl_port],
-    }
-  }
-
-  if $ceilometer {
-    ::tripleo::loadbalancer::endpoint { 'ceilometer':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ceilometer_api_vip', $controller_virtual_ip),
-      service_port      => $ports[ceilometer_api_port],
-      ip_addresses      => hiera('ceilometer_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[ceilometer_api_ssl_port],
-    }
-  }
-
-  if $aodh {
-    ::tripleo::loadbalancer::endpoint { 'aodh':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('aodh_api_vip', $controller_virtual_ip),
-      service_port      => $ports[aodh_api_port],
-      ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[aodh_api_ssl_port],
-    }
-  }
-
-  if $gnocchi {
-    ::tripleo::loadbalancer::endpoint { 'gnocchi':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('gnocchi_api_vip', $controller_virtual_ip),
-      service_port      => $ports[gnocchi_api_port],
-      ip_addresses      => hiera('gnocchi_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[gnocchi_api_ssl_port],
-    }
-  }
-
-  if $swift_proxy_server {
-    ::tripleo::loadbalancer::endpoint { 'swift_proxy_server':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('swift_proxy_vip', $controller_virtual_ip),
-      service_port      => $ports[swift_proxy_port],
-      ip_addresses      => hiera('swift_proxy_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[swift_proxy_ssl_port],
-    }
-  }
-
-  $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
-  $heat_ip_addresses = hiera('heat_api_node_ips', $controller_hosts_real)
-  $heat_base_options = {
-    'http-request' => [
-      'set-header X-Forwarded-Proto https if { ssl_fc }',
-      'set-header X-Forwarded-Proto http if !{ ssl_fc }']}
-  if $service_certificate {
-    $heat_ssl_options = {
-      'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
-    }
-    $heat_options = merge($heat_base_options, $heat_ssl_options)
-  } else {
-    $heat_options = $heat_base_options
-  }
-
-  if $heat_api {
-    ::tripleo::loadbalancer::endpoint { 'heat_api':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $heat_api_vip,
-      service_port      => $ports[heat_api_port],
-      ip_addresses      => $heat_ip_addresses,
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      listen_options    => $heat_options,
-      public_ssl_port   => $ports[heat_api_ssl_port],
-    }
-  }
-
-  if $heat_cloudwatch {
-    ::tripleo::loadbalancer::endpoint { 'heat_cloudwatch':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $heat_api_vip,
-      service_port      => $ports[heat_cw_port],
-      ip_addresses      => $heat_ip_addresses,
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      listen_options    => $heat_options,
-      public_ssl_port   => $ports[heat_cw_ssl_port],
-    }
-  }
-
-  if $heat_cfn {
-    ::tripleo::loadbalancer::endpoint { 'heat_cfn':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $heat_api_vip,
-      service_port      => $ports[heat_cfn_port],
-      ip_addresses      => $heat_ip_addresses,
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      listen_options    => $heat_options,
-      public_ssl_port   => $ports[heat_cfn_ssl_port],
-    }
-  }
-
-  if $horizon {
-    haproxy::listen { 'horizon':
-      bind             => $horizon_bind_opts,
-      options          => $horizon_options,
-      mode             => 'http',
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'horizon':
-      listening_service => 'horizon',
-      ports             => '80',
-      ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      options           => union($haproxy_member_options, ["cookie ${::hostname}"]),
-    }
-  }
-
-  if $ironic {
-    ::tripleo::loadbalancer::endpoint { 'ironic':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ironic_api_vip', $controller_virtual_ip),
-      service_port      => $ports[ironic_api_port],
-      ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[ironic_api_ssl_port],
-    }
-  }
-
-  if $mysql_clustercheck {
-    $mysql_listen_options = {
-      'option'         => [ 'tcpka', 'httpchk' ],
-      'timeout client' => '90m',
-      'timeout server' => '90m',
-      'stick-table'    => 'type ip size 1000',
-      'stick'          => 'on dst',
-    }
-    $mysql_member_options = union($haproxy_member_options, ['backup', 'port 9200', 'on-marked-down shutdown-sessions'])
-  } else {
-    $mysql_listen_options = {
-      'timeout client' => '90m',
-      'timeout server' => '90m',
-    }
-    $mysql_member_options = union($haproxy_member_options, ['backup'])
-  }
-
-  if $mysql {
-    haproxy::listen { 'mysql':
-      bind             => $mysql_bind_opts,
-      options          => $mysql_listen_options,
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'mysql-backup':
-      listening_service => 'mysql',
-      ports             => '3306',
-      ipaddresses       => hiera('mysql_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      options           => $mysql_member_options,
-    }
-  }
-
-  if $rabbitmq {
-    haproxy::listen { 'rabbitmq':
-      bind             => $rabbitmq_bind_opts,
-      options          => {
-        'option'  => [ 'tcpka' ],
-        'timeout' => [ 'client 0', 'server 0' ],
-      },
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'rabbitmq':
-      listening_service => 'rabbitmq',
-      ports             => '5672',
-      ipaddresses       => hiera('rabbitmq_network', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      options           => $haproxy_member_options,
-    }
-  }
-
-  if $redis {
-    if $redis_password {
-      $redis_tcp_check_options = ["send AUTH\\ ${redis_password}\\r\\n"]
-    } else {
-      $redis_tcp_check_options = []
-    }
-    haproxy::listen { 'redis':
-      bind             => $redis_bind_opts,
-      options          => {
-        'balance'   => 'first',
-        'option'    => ['tcp-check',],
-        'tcp-check' => union($redis_tcp_check_options, ['send PING\r\n','expect string +PONG','send info\ replication\r\n','expect string role:master','send QUIT\r\n','expect string +OK']),
-      },
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'redis':
-      listening_service => 'redis',
-      ports             => '6379',
-      ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      options           => $haproxy_member_options,
-    }
-  }
-
-  $midonet_api_vip = hiera('midonet_api_vip', $controller_virtual_ip)
-  $midonet_bind_opts = {
-    "${midonet_api_vip}:8081" => [],
-    "${public_virtual_ip}:8081" => [],
-  }
-
-  if $midonet_api {
-    haproxy::listen { 'midonet_api':
-      bind             => $midonet_bind_opts,
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'midonet_api':
-      listening_service => 'midonet_api',
-      ports             => '8081',
-      ipaddresses       => hiera('midonet_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      options           => $haproxy_member_options,
+    class { '::tripleo::keepalived':
+      controller_virtual_ip     => $controller_virtual_ip,
+      control_virtual_interface => $public_virtual_interface,
+      public_virtual_interface  => $public_virtual_interface,
+      public_virtual_ip         => $public_virtual_ip,
+      internal_api_virtual_ip   => $internal_api_virtual_ip,
+      storage_virtual_ip        => $storage_virtual_ip,
+      storage_mgmt_virtual_ip   => $storage_mgmt_virtual_ip,
     }
   }
 }

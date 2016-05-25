@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-# == Class: tripleo::loadbalancer::endpoint
+# == Class: tripleo::haproxy::endpoint
 #
 # Configure a HAProxy listen endpoint
 #
@@ -68,7 +68,7 @@
 #  Certificate path used to enable TLS for the internal proxy endpoint.
 #  Defaults to undef.
 #
-define tripleo::loadbalancer::endpoint (
+define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
   $ip_addresses,
@@ -84,18 +84,37 @@ define tripleo::loadbalancer::endpoint (
   $public_certificate        = undef,
   $internal_certificate      = undef,
 ) {
-  ::tripleo::haproxy::endpoint { $name:
-    internal_ip               => $internal_ip,
-    service_port              => $service_port,
-    ip_addresses              => $ip_addresses,
-    server_names              => $server_names,
-    member_options            => $member_options,
-    public_virtual_ip         => $public_virtual_ip,
-    mode                      => $mode,
-    haproxy_listen_bind_param => $haproxy_listen_bind_param,
-    listen_options            => $listen_options,
-    public_ssl_port           => $public_ssl_port,
-    public_certificate        => $public_certificate,
-    internal_certificate      => $internal_certificate
+  if $public_virtual_ip {
+    # service exposed to the public network
+
+    if $public_certificate {
+      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${public_ssl_port}"), union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+    } else {
+      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${service_port}"), $haproxy_listen_bind_param)
+    }
+  } else {
+    # internal service only
+    $public_bind_opts = {}
+  }
+
+  if $internal_certificate {
+    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+  } else {
+    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
+  }
+  $bind_opts = merge($internal_bind_opts, $public_bind_opts)
+
+  haproxy::listen { "${name}":
+    bind             => $bind_opts,
+    collect_exported => false,
+    mode             => $mode,
+    options          => $listen_options,
+  }
+  haproxy::balancermember { "${name}":
+    listening_service => $name,
+    ports             => $service_port,
+    ipaddresses       => $ip_addresses,
+    server_names      => $server_names,
+    options           => $member_options,
   }
 }
