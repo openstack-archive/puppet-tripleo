@@ -46,7 +46,7 @@ class tripleo::profile::base::glance::api (
     include ::glance
     include ::glance::config
     class { '::glance::api':
-      known_stores   => $glance_store,
+      stores => $glance_store,
     }
     include ::glance::notify::rabbitmq
     include join(['::glance::backend::', $glance_backend])
