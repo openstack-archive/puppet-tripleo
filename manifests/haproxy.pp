@@ -169,6 +169,10 @@
 #  (optional) Enable or not Gnocchi API binding
 #  Defaults to false
 #
+# [*mistral*]
+#  (optional) Enable or not Mistral API binding
+#  Defaults to false
+#
 # [*swift_proxy_server*]
 #  (optional) Enable or not Swift API binding
 #  Defaults to false
@@ -236,6 +240,8 @@
 #    'glance_registry_port' (Defaults to 9191)
 #    'gnocchi_api_port' (Defaults to 8041)
 #    'gnocchi_api_ssl_port' (Defaults to 13041)
+#    'mistral_api_port' (Defaults to 8989)
+#    'mistral_api_ssl_port' (Defaults to 13989)
 #    'heat_api_port' (Defaults to 8004)
 #    'heat_api_ssl_port' (Defaults to 13004)
 #    'heat_cfn_port' (Defaults to 8000)
@@ -302,6 +308,7 @@ class tripleo::haproxy (
   $ceilometer                = false,
   $aodh                      = false,
   $gnocchi                   = false,
+  $mistral                   = false,
   $swift_proxy_server        = false,
   $heat_api                  = false,
   $heat_cloudwatch           = false,
@@ -329,6 +336,8 @@ class tripleo::haproxy (
     glance_registry_port => 9191,
     gnocchi_api_port => 8041,
     gnocchi_api_ssl_port => 13041,
+    mistral_api_port => 8989,
+    mistral_api_ssl_port => 13989,
     heat_api_port => 8004,
     heat_api_ssl_port => 13004,
     heat_cfn_port => 8000,
@@ -668,6 +677,17 @@ class tripleo::haproxy (
       ip_addresses      => hiera('gnocchi_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
+    }
+  }
+
+  if $mistral {
+    ::tripleo::haproxy::endpoint { 'mistral':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('mistral_api_vip', $controller_virtual_ip),
+      service_port      => $ports[mistral_api_port],
+      ip_addresses      => hiera('mistral_api_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      public_ssl_port   => $ports[mistral_api_ssl_port],
     }
   }
 
