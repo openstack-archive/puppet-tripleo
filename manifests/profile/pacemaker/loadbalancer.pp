@@ -54,67 +54,45 @@ class tripleo::profile::pacemaker::loadbalancer (
         clone_params => true,
       }
 
-      # TODO(emilien): clean-up old parameter references when
-      # https://review.openstack.org/#/c/320411/ is merged.
-      if hiera('tripleo::loadbalancer::controller_virtual_ip', undef) {
-        $control_vip_real = hiera('tripleo::loadbalancer::controller_virtual_ip')
-      } else {
-        $control_vip_real = hiera('controller_virtual_ip')
-      }
+      $control_vip = hiera('controller_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_control_vip':
         vip_name   => 'control',
-        ip_address => $control_vip_real,
+        ip_address => $control_vip,
       }
 
-      if hiera('tripleo::loadbalancer::public_virtual_ip', undef) {
-        $public_vip_real = hiera('tripleo::loadbalancer::public_virtual_ip')
-      } else {
-        $public_vip_real = hiera('public_virtual_ip')
-      }
+      $public_vip = hiera('public_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_public_vip':
-        ensure     => $public_vip_real and $public_vip_real != $control_vip_real,
+        ensure     => $public_vip and $public_vip != $control_vip,
         vip_name   => 'public',
-        ip_address => $public_vip_real,
+        ip_address => $public_vip,
       }
 
       $redis_vip = hiera('redis_vip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_redis_vip':
-        ensure     => $redis_vip and $redis_vip != $control_vip_real,
+        ensure     => $redis_vip and $redis_vip != $control_vip,
         vip_name   => 'redis',
         ip_address => $redis_vip,
       }
 
-      if hiera('tripleo::loadbalancer::internal_api_virtual_ip', undef) {
-        $internal_api_vip_real = hiera('tripleo::loadbalancer::internal_api_virtual_ip')
-      } else {
-        $internal_api_vip_real = hiera('internal_api_virtual_ip')
-      }
+      $internal_api_vip = hiera('internal_api_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_internal_api_vip':
-        ensure     => $internal_api_vip_real and $internal_api_vip_real != $control_vip_real,
+        ensure     => $internal_api_vip and $internal_api_vip != $control_vip,
         vip_name   => 'internal_api',
-        ip_address => $internal_api_vip_real,
+        ip_address => $internal_api_vip,
       }
 
-      if hiera('tripleo::loadbalancer::storage_virtual_ip', undef) {
-        $storage_vip_real = hiera('tripleo::loadbalancer::storage_virtual_ip')
-      } else {
-        $storage_vip_real = hiera('storage_virtual_ip')
-      }
+      $storage_vip = hiera('storage_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_vip':
-        ensure     => $storage_vip_real and $storage_vip_real != $control_vip_real,
+        ensure     => $storage_vip and $storage_vip != $control_vip,
         vip_name   => 'storage',
-        ip_address => $storage_vip_real,
+        ip_address => $storage_vip,
       }
 
-      if hiera('tripleo::loadbalancer::storage_mgmt_virtual_ip', undef) {
-        $storage_mgmt_vip_real = hiera('tripleo::loadbalancer::storage_mgmt_virtual_ip')
-      } else {
-        $storage_mgmt_vip_real = hiera('storage_mgmt_virtual_ip')
-      }
+      $storage_mgmt_vip = hiera('storage_mgmt_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_mgmt_vip':
-        ensure     => $storage_mgmt_vip_real and $storage_mgmt_vip_real != $control_vip_real,
+        ensure     => $storage_mgmt_vip and $storage_mgmt_vip != $control_vip,
         vip_name   => 'storage_mgmt',
-        ip_address => $storage_mgmt_vip_real,
+        ip_address => $storage_mgmt_vip,
       }
   }
 

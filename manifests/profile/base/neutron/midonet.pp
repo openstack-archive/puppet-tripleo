@@ -68,7 +68,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::midonet (
-  $vip                   = hiera('public_virtual_ip', 'tripleo::loadbalancer::public_virtual_ip'),
+  $vip                   = hiera('public_virtual_ip'),
   $keystone_admin_token  = hiera('keystone::admin_token', ''),
   $zookeeper_client_ip   = hiera('neutron::bind_host', ''),
   $zookeeper_hostnames   = hiera('controller_node_names', ''),

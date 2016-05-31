@@ -54,13 +54,14 @@
 #  Defaults to '/dev/log'
 #
 # [*controller_hosts*]
-#  (Required) IPs of host or group of hosts to load-balance the services
+#  IPs of host or group of hosts to load-balance the services
 #  Can be a string or an array.
+#  Defaults tohiera('controller_node_ips')
 #
 # [*controller_hosts_names*]
 #  Names of host or group of hosts to load-balance the services
 #  Can be a string or an array.
-#  Defaults to undef
+#  Defaults to hiera('controller_node_names', undef)
 #
 # [*controller_virtual_ip*]
 #  Control IP or group of IPs to bind the pools
@@ -263,7 +264,6 @@
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
-  $controller_hosts,
   $keepalived                = true,
   $haproxy_service_manage    = true,
   $haproxy_global_maxconn    = 20480,
@@ -274,7 +274,8 @@ class tripleo::haproxy (
   $haproxy_log_address       = '/dev/log',
   $haproxy_stats_user        = 'admin',
   $haproxy_stats_password    = undef,
-  $controller_hosts_names    = undef,
+  $controller_hosts          = hiera('controller_node_ips'),
+  $controller_hosts_names    = hiera('controller_node_names', undef),
   $service_certificate       = undef,
   $internal_certificate      = undef,
   $ssl_cipher_suite          = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
@@ -351,11 +352,11 @@ class tripleo::haproxy (
   }
   $ports = merge($default_service_ports, $service_ports)
 
-  $controller_hosts_real = any2array($controller_hosts)
-  if !$controller_hosts_names {
+  $controller_hosts_real = any2array(split($controller_hosts, ','))
+  if ! $controller_hosts_names {
     $controller_hosts_names_real = $controller_hosts_real
   } else {
-    $controller_hosts_names_real = any2array($controller_hosts_names)
+    $controller_hosts_names_real = downcase(any2array(split($controller_hosts_names, ',')))
   }
 
   # This code will be removed once we switch undercloud and overcloud to use both haproxy & keepalived roles.
