@@ -12,9 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::pacemaker::loadbalancer
+# == Class: tripleo::profile::pacemaker::haproxy
 #
-# Loadbalancer Pacemaker HA profile for tripleo
+# HAproxy with Pacemaker HA profile for tripleo
 #
 # === Parameters
 #
@@ -31,14 +31,11 @@
 #   (Optional) Whether load balancing is enabled for this cluster
 #   Defaults to hiera('enable_load_balancer', true)
 #
-class tripleo::profile::pacemaker::loadbalancer (
+class tripleo::profile::pacemaker::haproxy (
   $bootstrap_node       = hiera('bootstrap_nodeid'),
   $step                 = hiera('step'),
   $enable_load_balancer = hiera('enable_load_balancer', true)
 ) {
-
-  # TODO(emilien): remove this class once THT does not use it anymore
-  warning('tripleo::profile::pacemaker::loadbalancer is deprecated and will be removed very soon.')
 
   include ::tripleo::profile::base::loadbalancer
 
