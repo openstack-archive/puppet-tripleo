@@ -53,15 +53,9 @@
 #  The IPv4, IPv6 or filesystem socket path of the syslog server.
 #  Defaults to '/dev/log'
 #
-# [*controller_host*]
-#  (Deprecated)Host or group of hosts to load-balance the services
-#  Can be a string or an array.
-#  Defaults to undef
-#
 # [*controller_hosts*]
-#  IPs of host or group of hosts to load-balance the services
+#  (Required) IPs of host or group of hosts to load-balance the services
 #  Can be a string or an array.
-#  Defaults to undef
 #
 # [*controller_hosts_names*]
 #  Names of host or group of hosts to load-balance the services
@@ -269,6 +263,7 @@
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
+  $controller_hosts,
   $keepalived                = true,
   $haproxy_service_manage    = true,
   $haproxy_global_maxconn    = 20480,
@@ -279,8 +274,6 @@ class tripleo::haproxy (
   $haproxy_log_address       = '/dev/log',
   $haproxy_stats_user        = 'admin',
   $haproxy_stats_password    = undef,
-  $controller_host           = undef,
-  $controller_hosts          = undef,
   $controller_hosts_names    = undef,
   $service_certificate       = undef,
   $internal_certificate      = undef,
@@ -358,18 +351,9 @@ class tripleo::haproxy (
   }
   $ports = merge($default_service_ports, $service_ports)
 
-  if !$controller_host and !$controller_hosts {
-    fail('$controller_hosts or $controller_host (now deprecated) is a mandatory parameter')
-  }
-  if $controller_hosts {
-    $controller_hosts_real = any2array($controller_hosts)
-  } else {
-    warning('$controller_host has been deprecated in favor of $controller_hosts')
-    $controller_hosts_real = any2array($controller_host)
-  }
-
+  $controller_hosts_real = any2array($controller_hosts)
   if !$controller_hosts_names {
-    $controller_hosts_names_real = any2array($controller_hosts_real)
+    $controller_hosts_names_real = $controller_hosts_real
   } else {
     $controller_hosts_names_real = any2array($controller_hosts_names)
   }
