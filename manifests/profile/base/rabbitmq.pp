@@ -84,7 +84,12 @@ class tripleo::profile::base::rabbitmq (
       }
     } else {
       # Standard configuration
-      include ::rabbitmq
+      class { '::rabbitmq':
+        tcp_keepalive           => false,
+        config_kernel_variables => $kernel_variables,
+        config_variables        => $config_variables,
+        environment_variables   => $rabbit_env,
+      }
     }
   }
 
