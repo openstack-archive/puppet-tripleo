@@ -37,7 +37,7 @@ class tripleo::profile::pacemaker::haproxy (
   $enable_load_balancer = hiera('enable_load_balancer', true)
 ) {
 
-  include ::tripleo::profile::base::loadbalancer
+  include ::tripleo::profile::base::haproxy
 
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
