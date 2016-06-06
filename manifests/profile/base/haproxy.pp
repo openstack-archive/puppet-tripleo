@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::loadbalancer
+# == Class: tripleo::profile::base::haproxy
 #
 # Loadbalancer profile for tripleo
 #
@@ -27,13 +27,11 @@
 #   (Optional) Whether or not loadbalancer is enabled.
 #   Defaults to hiera('enable_load_balancer', true).
 #
-class tripleo::profile::base::loadbalancer (
+class tripleo::profile::base::haproxy (
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
 ) {
 
-  # TODO(emilien): remove this class once THT does not use it anymore
-  warning('tripleo::profile::base::loadbalancer is deprecated and will be removed very soon.')
   if $step >= 1 {
     if $enable_load_balancer {
       include ::tripleo::haproxy
