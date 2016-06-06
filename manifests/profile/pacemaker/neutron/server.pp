@@ -35,22 +35,9 @@ class tripleo::profile::pacemaker::neutron::server (
   include ::tripleo::profile::pacemaker::neutron
 
   if $step >= 5 {
-
     class { '::tripleo::profile::base::neutron::server':
       sync_db        => ($::hostname == downcase($pacemaker_master)),
     }
-
-    if ($::hostname == downcase($pacemaker_master)) {
-      pacemaker::constraint::base { 'keystone-to-neutron-server-constraint':
-        constraint_type => 'order',
-        first_resource  => 'openstack-core-clone',
-        second_resource => "${::neutron::params::server_service}-clone",
-        first_action    => 'start',
-        second_action   => 'start',
-        require         => [Pacemaker::Resource::Ocf['openstack-core'],
-                            Pacemaker::Resource::Service[$::neutron::params::server_service]],
-      }
-    }
-
   }
+
 }
