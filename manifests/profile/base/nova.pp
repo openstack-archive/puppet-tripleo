@@ -25,8 +25,20 @@
 class tripleo::profile::base::nova (
   $step = hiera('step'),
 ) {
-  if $step >= 4 {
+
+  if hiera('nova::use_ipv6', false) {
+    $memcached_servers = suffix(hiera('memcache_node_ips_v6'), ':11211')
+  } else {
+    $memcached_servers = suffix(hiera('memcache_node_ips'), ':11211')
+  }
+  if $step >= 3 {
     include ::nova
+    # TODO(emilien): once we merge https://review.openstack.org/#/c/325983/
+    # let's override the value this way.
+    warning('Overriding memcached_servers from puppet-tripleo until 325983 lands.')
+    Nova {
+      memcached_servers => $memcached_servers,
+    }
     include ::nova::config
   }
 }
