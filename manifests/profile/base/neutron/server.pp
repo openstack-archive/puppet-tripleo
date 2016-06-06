@@ -18,31 +18,24 @@
 #
 # === Parameters
 #
-# [*sync_db*]
-#   (Optional) Whether to run Neutron DB sync operations
-#   Defaults to undef
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::server (
-  $sync_db          = true,
   $step             = hiera('step'),
 ) {
 
   include ::tripleo::profile::base::neutron
 
-  if $step >= 3 and $sync_db {
+  if $step >= 2 {
     include ::neutron::db::mysql
   }
 
-  if $step >= 4 or ($step >=3 and $sync_db) {
+  if $step >= 4 {
     include ::neutron::server::notifications
-
-    class { '::neutron::server':
-      sync_db        => $sync_db,
-    }
+    include ::neutron::server
   }
+
 }

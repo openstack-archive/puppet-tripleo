@@ -22,6 +22,10 @@
 #   (Optional) The mechanism drivers to use with the Ml2 plugin
 #   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
 #
+# [*sync_db*]
+# (Optional) Whether to run Neutron DB sync operations
+# Defaults to undef
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -29,10 +33,11 @@
 #
 class tripleo::profile::base::neutron::ml2 (
   $mechanism_drivers  = hiera('neutron::plugins::ml2::mechanism_drivers'),
+  $sync_db            = true,
   $step               = hiera('step'),
 ) {
 
-  if $step >= 4 {
+  if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include ::neutron::plugins::ml2
     include ::tripleo::profile::base::neutron
 
