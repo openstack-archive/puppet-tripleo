@@ -40,5 +40,6 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::catch_errors
     include ::swift::proxy::tempurl
     include ::swift::proxy::formpost
+    include ::swift::proxy::bulk
   }
 }
