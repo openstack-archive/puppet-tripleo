@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::profile::pacemaker::heat
 #
-# Heat Pacemaker HA profile for tripleo
+# Heat API Pacemaker HA profile for tripleo
 #
 # === Parameters
 #
@@ -27,20 +27,24 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::pacemaker::heat (
+class tripleo::profile::pacemaker::heat::api (
   $bootstrap_node             = hiera('bootstrap_nodeid'),
   $step                       = hiera('step'),
 ) {
 
-  Service <| tag == 'heat-service' |> {
-    hasrestart => true,
-    restart    => '/bin/true',
-    start      => '/bin/true',
-    stop       => '/bin/true',
+  if $::hostname == downcase($bootstrap_node) {
+    $pacemaker_master = true
+  } else {
+    $pacemaker_master = false
   }
 
-  class { '::tripleo::profile::base::heat':
-    bootstrap_master         => $bootstrap_node,
+  include ::tripleo::profile::pacemaker::heat
+  include ::tripleo::profile::base::heat::api
+
+  if $step >= 5 and $pacemaker_master {
+    pacemaker::resource::service { $::heat::params::api_service_name :
+      clone_params => 'interleave=true',
+    }
   }
 
 }
