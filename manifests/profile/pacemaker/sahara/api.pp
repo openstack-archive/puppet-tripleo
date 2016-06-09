@@ -12,9 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::pacemaker::sahara
+# == Class: tripleo::profile::pacemaker::sahara::api
 #
-# Sahara Pacemaker HA profile for tripleo
+# Sahara API Pacemaker HA profile for tripleo
 #
 # === Parameters
 #
@@ -27,17 +27,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::pacemaker::sahara (
+class tripleo::profile::pacemaker::sahara::api (
   $bootstrap_node       = hiera('bootstrap_nodeid'),
   $step                 = hiera('step'),
 ) {
-
-  Service <| tag == 'sahara-service' |> {
-    hasrestart => true,
-    restart    => '/bin/true',
-    start      => '/bin/true',
-    stop       => '/bin/true',
-  }
 
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -45,5 +38,13 @@ class tripleo::profile::pacemaker::sahara (
     $pacemaker_master = false
   }
 
-  include ::tripleo::profile::base::sahara
+  include ::tripleo::profile::pacemaker::sahara
+  include ::tripleo::profile::base::sahara::api
+
+  if $step >= 5 and $pacemaker_master {
+    # Sahara
+    pacemaker::resource::service { $::sahara::params::api_service_name :
+      clone_params => 'interleave=true',
+    }
+  }
 }
