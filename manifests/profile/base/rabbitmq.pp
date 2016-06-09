@@ -18,13 +18,40 @@
 #
 # === Parameters
 #
+# [*certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate
+#   it will create. Note that the certificate nickname must be 'mysql' in
+#   the case of this service.
+#   Example with hiera:
+#     tripleo::profile::base::database::mysql::certificate_specs:
+#       hostname: <overcloud controller fqdn>
+#       service_certificate: <service certificate path>
+#       service_key: <service key path>
+#       principal: "mysql/<overcloud controller fqdn>"
+#   Defaults to {}.
+#
 # [*config_variables*]
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_config_variables').
 #
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to undef
+#
 # [*environment*]
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
+#
+# [*generate_service_certificates*]
+#   (Optional) Whether or not certmonger will generate certificates for
+#   MySQL. This could be as many as specified by the $certificates_specs
+#   variable.
+#   Defaults to hiera('generate_service_certificate', false).
+#
+# [*inet_dist_interface*]
+#   (Optional) Address to bind the inter-cluster interface
+#   to. It is the inet_dist_use_interface option in the kernel variables
+#   Defaults to hiera('rabbitmq::interface', undef).
 #
 # [*ipv6*]
 #   (Optional) Whether to deploy RabbitMQ on IPv6 network.
@@ -33,11 +60,6 @@
 # [*kernel_variables*]
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
-#
-# [*inet_dist_interface*]
-#   (Optional) Address to bind the inter-cluster interface
-#   to. It is the inet_dist_use_interface option in the kernel variables
-#   Defaults to hiera('rabbitmq::interface', undef).
 #
 # [*nodes*]
 #   (Optional) Array of host(s) for RabbitMQ nodes.
@@ -61,17 +83,31 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::rabbitmq (
-  $config_variables    = hiera('rabbitmq_config_variables'),
-  $environment         = hiera('rabbitmq_environment'),
-  $ipv6                = str2bool(hiera('rabbit_ipv6', false)),
-  $kernel_variables    = hiera('rabbitmq_kernel_variables'),
-  $inet_dist_interface = hiera('rabbitmq::interface', undef),
-  $nodes               = hiera('rabbitmq_node_names', []),
-  $rabbitmq_pass       = hiera('rabbitmq::default_pass'),
-  $rabbitmq_user       = hiera('rabbitmq::default_user'),
-  $stack_action        = hiera('stack_action'),
-  $step                = hiera('step'),
+  $certificate_specs             = {},
+  $config_variables              = hiera('rabbitmq_config_variables'),
+  $enable_internal_tls           = undef,  # TODO(jaosorior): pass this via t-h-t
+  $environment                   = hiera('rabbitmq_environment'),
+  $generate_service_certificates = hiera('generate_service_certificates', false),
+  $inet_dist_interface           = hiera('rabbitmq::interface', undef),
+  $ipv6                          = str2bool(hiera('rabbit_ipv6', false)),
+  $kernel_variables              = hiera('rabbitmq_kernel_variables'),
+  $nodes                         = hiera('rabbitmq_node_names', []),
+  $rabbitmq_pass                 = hiera('rabbitmq::default_pass'),
+  $rabbitmq_user                 = hiera('rabbitmq::default_user'),
+  $stack_action                  = hiera('stack_action'),
+  $step                          = hiera('step'),
 ) {
+  if $enable_internal_tls {
+    if $generate_service_certificates {
+      ensure_resource('class', 'tripleo::certmonger::rabbitmq', $certificate_specs)
+    }
+    $tls_certfile = $certificate_specs['service_certificate']
+    $tls_keyfile = $certificate_specs['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
+  }
+
   # IPv6 environment, necessary for RabbitMQ.
   if $ipv6 {
     $rabbit_env = merge($environment, {
@@ -100,6 +136,9 @@ class tripleo::profile::base::rabbitmq (
         config_kernel_variables => $real_kernel_variables,
         config_variables        => $config_variables,
         environment_variables   => $rabbit_env,
+        # TLS options
+        ssl_cert                => $tls_certfile,
+        ssl_key                 => $tls_keyfile,
       }
       # when running multi-nodes without Pacemaker
       if $manage_service {
@@ -116,6 +155,9 @@ class tripleo::profile::base::rabbitmq (
         config_kernel_variables => $kernel_variables,
         config_variables        => $config_variables,
         environment_variables   => $rabbit_env,
+        # TLS options
+        ssl_cert                => $tls_certfile,
+        ssl_key                 => $tls_keyfile,
       }
     }
     # In case of HA, starting of rabbitmq-server is managed by pacemaker, because of which, a dependency
