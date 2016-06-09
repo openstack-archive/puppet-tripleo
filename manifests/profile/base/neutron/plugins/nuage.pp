@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::neutron:nuage:
+# == Class: tripleo::profile::base::neutron::plugins::nuage
 #
 # Nuage Neutron profile for tripleo
 #
@@ -21,11 +21,15 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::base::neutron::nuage (
-  $step = hiera('step'),
+# [*sync_db*]
+#   (Optional) Whether to run Neutron DB sync operations
+#   Defaults to undef
+#
+class tripleo::profile::base::neutron::plugins::nuage (
+  $step    = hiera('step'),
+  $sync_db = true,
 ) {
-  include ::tripleo::profile::base::neutron::server
-  if $step >= 4 {
+  if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include ::neutron::plugins::nuage
   }
 }
