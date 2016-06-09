@@ -18,14 +18,19 @@
 #
 # === Parameters
 #
+# [*sync_db*]
+#   (Optional) Whether to run db sync
+#   Defaults to true
+#
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron (
-  $step = hiera('step'),
+  $sync_db = true,
+  $step    = hiera('step'),
 ) {
-  if $step >= 4 {
+  if hiera('step') >= 4 or ( hiera('step') >= 3 and $sync_db ) {
     include ::neutron
     include ::neutron::config
   }

@@ -61,9 +61,12 @@ class tripleo::profile::pacemaker::neutron (
     stop       => '/bin/true',
   }
 
+  class { '::tripleo::profile::base::neutron':
+    sync_db => ($::hostname == downcase($pacemaker_master)),
+  }
+
   if $step >= 4 {
     include ::neutron::params
-    include ::tripleo::profile::base::neutron
 
     # To be removed when puppet-oslo comes into service
     neutron_config {
