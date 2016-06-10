@@ -35,8 +35,6 @@ class tripleo::profile::pacemaker::nova (
     stop       => '/bin/true',
   }
 
-  if $step >= 4 {
-    include ::tripleo::profile::base::nova
-  }
+  include ::tripleo::profile::base::nova
 
 }
