@@ -23,21 +23,27 @@
 #   Defaults to hiera('bootstrap_nodeid')
 #
 # [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
+#  (Optional) The current step in deployment. See tripleo-heat-templates
+#  for more details.
+#  Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::neutron::server (
   $pacemaker_master = hiera('bootstrap_nodeid'),
-  $step = hiera('step'),
+  $step             = hiera('step'),
 ) {
+
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
 
-  if $step >= 5 {
-    class { '::tripleo::profile::base::neutron::server':
-      sync_db        => ($::hostname == downcase($pacemaker_master)),
-    }
+  if $step >= 2 {
+    include ::neutron::db::mysql
+    Exec<| title == 'galera-ready'|> -> Class['neutron::db::mysql']
+  }
+
+  $sync_db = ($::hostname == downcase($pacemaker_master))
+  if $step >= 4 or ( $step >= 3 and $sync_db ) {
+    include ::neutron::server::notifications
+    include ::neutron::server
   }
 
 }

@@ -18,8 +18,19 @@
 #
 # === Parameters
 #
-class tripleo::profile::pacemaker::neutron::ml2 {
+# [*pacemaker_master*]
+#   (Optional) The hostname of the pacemaker master
+#   Defaults to hiera('bootstrap_nodeid')
+#
+class tripleo::profile::pacemaker::neutron::ml2 (
+  $pacemaker_master = hiera('bootstrap_nodeid'),
+) {
+
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
-  include ::tripleo::profile::base::neutron::ml2
+
+  class { '::tripleo::profile::base::neutron::ml2':
+    sync_db => ($::hostname == downcase($pacemaker_master))
+  }
+
 }
