@@ -35,12 +35,12 @@ class tripleo::profile::pacemaker::neutron::server (
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
 
-  if $step >= 2 {
+  $sync_db = ($::hostname == downcase($pacemaker_master))
+  if $step >= 2 and $sync_db {
     include ::neutron::db::mysql
     Exec<| title == 'galera-ready'|> -> Class['neutron::db::mysql']
   }
 
-  $sync_db = ($::hostname == downcase($pacemaker_master))
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include ::neutron::server::notifications
     include ::neutron::server
