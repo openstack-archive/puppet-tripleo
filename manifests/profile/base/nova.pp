@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
@@ -35,26 +39,32 @@
 #   Defaults to false
 #
 class tripleo::profile::base::nova (
+  $bootstrap_node       = hiera('bootstrap_nodeid', undef),
   $step                 = hiera('step'),
   $manage_migration     = false,
   $libvirt_enabled      = false,
   $nova_compute_enabled = false,
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
 
   if hiera('nova::use_ipv6', false) {
-    $memcached_servers = suffix(hiera('memcache_node_ips_v6'), ':11211')
+    $memcache_servers = suffix(hiera('memcache_node_ips_v6'), ':11211')
   } else {
-    $memcached_servers = suffix(hiera('memcache_node_ips'), ':11211')
+    $memcache_servers = suffix(hiera('memcache_node_ips'), ':11211')
   }
-  if $step >= 3 {
+
+  if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
     include ::nova
-    # TODO(emilien): once we merge https://review.openstack.org/#/c/325983/
-    # let's override the value this way.
-    warning('Overriding memcached_servers from puppet-tripleo until 325983 lands.')
-    Nova {
-      memcached_servers => $memcached_servers,
-    }
     include ::nova::config
+    class { '::nova::cache':
+      enabled          => true,
+      backend          => 'oslo_cache.memcache_pool',
+      memcache_servers => $memcache_servers,
+    }
   }
 
   if $step >= 4 {
