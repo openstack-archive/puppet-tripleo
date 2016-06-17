@@ -36,6 +36,17 @@ class tripleo::profile::base::nova::compute (
 
     # deploy bits to connect nova compute to neutron
     include ::nova::network::neutron
+
+    # When utilising images for deployment, we need to reset the iSCSI initiator name to make it unique
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1244328
+    exec { 'reset-iscsi-initiator-name':
+      command => '/bin/echo InitiatorName=$(/usr/sbin/iscsi-iname) > /etc/iscsi/initiatorname.iscsi',
+      onlyif  => '/usr/bin/test ! -f /etc/iscsi/.initiator_reset',
+      before  => File['/etc/iscsi/.initiator_reset'],
+    }
+    file { '/etc/iscsi/.initiator_reset':
+      ensure => present,
+    }
   }
 
 }
