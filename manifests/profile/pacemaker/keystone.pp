@@ -59,10 +59,9 @@ class tripleo::profile::pacemaker::keystone (
   }
 
   class { '::tripleo::profile::base::keystone':
-    sync_db          => $pacemaker_master,
-    bootstrap_master => $pacemaker_master,
-    manage_roles     => $manage_roles,
-    manage_endpoint  => $manage_roles
+    sync_db         => $pacemaker_master,
+    manage_roles    => $manage_roles,
+    manage_endpoint => $manage_roles
   }
 
   if $step >= 5 and $pacemaker_master and $enable_load_balancer {

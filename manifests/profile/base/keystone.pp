@@ -22,10 +22,6 @@
 #   (Optional) Whether to run db sync
 #   Defaults to true
 #
-# [*bootstrap_master*]
-#   (Optional) The hostname of the node responsible for bootstrapping
-#   Defaults to hiera('bootstrap_nodeid')
-#
 # [*manage_roles*]
 #   (Optional) whether to create keystone admin role
 #   Defaults to true
@@ -44,12 +40,11 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::keystone (
-  $sync_db          = true,
-  $bootstrap_master = undef,
-  $manage_roles     = true,
-  $manage_endpoint  = true,
-  $manage_db_purge  = hiera('keystone_enable_db_purge', true),
-  $step             = hiera('step'),
+  $sync_db         = true,
+  $manage_roles    = true,
+  $manage_endpoint = true,
+  $manage_db_purge = hiera('keystone_enable_db_purge', true),
+  $step            = hiera('step'),
 ) {
 
   if $step >= 3 and $sync_db {
@@ -59,7 +54,7 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     class { '::keystone':
       sync_db          => $sync_db,
-      enable_bootstrap => $bootstrap_master,
+      enable_bootstrap => $sync_db,
     }
 
     include ::keystone::config
