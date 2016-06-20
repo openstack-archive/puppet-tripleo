@@ -33,6 +33,13 @@ class tripleo::profile::base::nova::api (
 ) {
 
   include ::tripleo::profile::base::nova
+
+  if $step >= 2 and $sync_db {
+    include ::nova::db::mysql
+    include ::nova::db::mysql_api
+    Exec<| title == 'galera-ready'|> -> Anchor['nova::db::begin']
+  }
+
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::nova::api':
       sync_db     => $sync_db,
