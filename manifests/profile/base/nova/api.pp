@@ -38,6 +38,7 @@ class tripleo::profile::base::nova::api (
       sync_db     => $sync_db,
       sync_db_api => $sync_db,
     }
+    include ::nova::network::neutron
   }
 }
 
