@@ -30,20 +30,6 @@ class tripleo::profile::base::nova::compute::libvirt (
   if $step >= 4 {
     include ::tripleo::profile::base::nova::compute
 
-    file { ['/etc/libvirt/qemu/networks/autostart/default.xml',
-      '/etc/libvirt/qemu/networks/default.xml']:
-      ensure => absent,
-      before => Service['libvirt'],
-    }
-
-    # in case libvirt has been already running before the Puppet run, make
-    # sure the default network is destroyed
-    exec { 'libvirt-default-net-destroy':
-      command => '/usr/bin/virsh net-destroy default',
-      onlyif  => '/usr/bin/virsh net-info default | /bin/grep -i "^active:\s*yes"',
-      before  => Service['libvirt'],
-    }
-
     # Ceph + Libvirt
     $rbd_ephemeral_storage = hiera('nova::compute::rbd::ephemeral_storage', false)
     $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
