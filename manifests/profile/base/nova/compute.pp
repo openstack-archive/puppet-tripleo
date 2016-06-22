@@ -23,8 +23,13 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*cinder_nfs_backend*]
+#   (Optional) Whether or not Cinder is backed by NFS.
+#   Defaults to hiera('cinder_enable_nfs_backend', false)
+#
 class tripleo::profile::base::nova::compute (
-  $step = hiera('step'),
+  $step               = hiera('step'),
+  $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
 ) {
 
   if $step >= 4 {
@@ -36,6 +41,19 @@ class tripleo::profile::base::nova::compute (
 
     # deploy bits to connect nova compute to neutron
     include ::nova::network::neutron
+  }
+
+  # If NFS is used as a Cinder backend
+  if $cinder_nfs_backend {
+    ensure_packages('nfs-utils', { ensure => present })
+    Package['nfs-utils'] -> Service['nova-compute']
+    if str2bool($::selinux) {
+      selboolean { 'virt_use_nfs':
+        value      => on,
+        persistent => true,
+      }
+      Selboolean['virt_use_nfs'] -> Package['nfs-utils']
+    }
   }
 
 }
