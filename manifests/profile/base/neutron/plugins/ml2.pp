@@ -12,9 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::neutron::ml2
+# == Class: tripleo::profile::base::neutron::plugins::ml2
 #
-# Neutron ML2 driver profile for tripleo
+# Neutron ML2 plugin profile for tripleo
 #
 # === Parameters
 #
@@ -31,13 +31,11 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::base::neutron::ml2 (
+class tripleo::profile::base::neutron::plugins::ml2 (
   $mechanism_drivers  = hiera('neutron::plugins::ml2::mechanism_drivers'),
   $sync_db            = true,
   $step               = hiera('step'),
 ) {
-
-  warning('This class is going is deprecated and will be removed very soon, replaced by tripleo::profile::base::neutron::plugins::ml2.')
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include ::neutron::plugins::ml2
