@@ -28,8 +28,14 @@ class tripleo::profile::base::nova::compute (
 ) {
 
   if $step >= 4 {
+    # deploy basic bits for nova
     include ::tripleo::profile::base::nova
+
+    # deploy basic bits for nova-compute
     include ::nova::compute
+
+    # deploy bits to connect nova compute to neutron
+    include ::nova::network::neutron
   }
 
 }
