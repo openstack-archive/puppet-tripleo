@@ -20,7 +20,7 @@
 #
 # [*ceph_osd_selinux_permissive*]
 #   (Optional) Wheter to configure SELinux in permissive mode
-#   Default to true
+#   Default to false
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,7 +28,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ceph::osd (
-  $ceph_osd_selinux_permissive = true,
+  $ceph_osd_selinux_permissive = false,
   $step                        = hiera('step'),
 ) {
 
