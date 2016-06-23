@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::pacemaker::neutron::ml2
+# == Class: tripleo::profile::pacemaker::neutron::plugins::ml2
 #
 # Neutron ML2 driver Pacemaker HA profile for tripleo
 #
@@ -22,11 +22,9 @@
 #   (Optional) The hostname of the pacemaker master
 #   Defaults to hiera('bootstrap_nodeid')
 #
-class tripleo::profile::pacemaker::neutron::ml2 (
+class tripleo::profile::pacemaker::neutron::plugins::ml2 (
   $pacemaker_master = hiera('bootstrap_nodeid'),
 ) {
-
-  warning('This class is going is deprecated and will be removed very soon, replaced by tripleo::profile::pacemaker::neutron::plugins::ml2.')
 
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
