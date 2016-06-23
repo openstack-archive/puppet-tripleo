@@ -82,11 +82,9 @@ class tripleo::profile::base::neutron::midonet (
 ) {
 
   include ::tripleo::profile::base::neutron
+  include ::tripleo::profile::base::neutron::agents::midonet
 
   if $step >= 4 {
-    class { '::neutron':
-      service_plugins => []
-    }
 
     # Run zookeeper in the controller if configured
     if zk_on_controller {
@@ -104,11 +102,6 @@ class tripleo::profile::base::neutron::midonet (
         cassandra_servers => $neutron_api_node_ips,
         cassandra_ip      => $bind_address,
       }
-    }
-
-    class {'::tripleo::network::midonet::agent':
-      zookeeper_servers => $neutron_api_node_ips,
-      cassandra_seeds   => $neutron_api_node_ips
     }
 
     class {'::tripleo::network::midonet::api':
