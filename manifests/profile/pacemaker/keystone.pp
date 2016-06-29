@@ -46,15 +46,9 @@ class tripleo::profile::pacemaker::keystone (
 
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
+    $manage_roles = true
   } else {
     $pacemaker_master = false
-  }
-
-  if $step >= 5 and $pacemaker_master {
-    $manage_roles = true
-    Pacemaker::Resource::Service[$::apache::params::service_name] -> Class['::keystone::roles::admin']
-    Pacemaker::Resource::Service[$::apache::params::service_name] -> Class['::keystone::endpoint']
-  } else {
     $manage_roles = false
   }
 
