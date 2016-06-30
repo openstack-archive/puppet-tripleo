@@ -29,7 +29,7 @@ class tripleo::profile::base::neutron::server (
 
   include ::tripleo::profile::base::neutron
 
-  if $step >= 2 {
+  if $step >= 3 {
     include ::neutron::db::mysql
   }
 
