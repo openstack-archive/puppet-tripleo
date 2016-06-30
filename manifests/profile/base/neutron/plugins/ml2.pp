@@ -37,9 +37,10 @@ class tripleo::profile::base::neutron::plugins::ml2 (
   $step               = hiera('step'),
 ) {
 
+  include ::tripleo::profile::base::neutron
+
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include ::neutron::plugins::ml2
-    include ::tripleo::profile::base::neutron
 
     if 'cisco_n1kv' in $mechanism_drivers {
       include ::tripleo::profile::base::neutron::n1k

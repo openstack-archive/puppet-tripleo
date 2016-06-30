@@ -29,6 +29,9 @@ class tripleo::profile::base::neutron::plugins::nuage (
   $step    = hiera('step'),
   $sync_db = true,
 ) {
+
+  include ::tripleo::profile::base::neutron
+
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include ::neutron::plugins::nuage
   }
