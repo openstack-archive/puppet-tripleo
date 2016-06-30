@@ -23,18 +23,16 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*pacemaker_master*]
-#   (Optional) The master node runs some tasks
-#   one step earlier than others; disable to
-#   the node is not the master.
+# [*sync_db*]
+#   (Optional) Whether to run db sync
 #   Defaults to true
-
+#
 class tripleo::profile::base::ceilometer (
   $step             = hiera('step'),
-  $pacemaker_master = true,
+  $sync_db = true,
 ) {
 
-  if $step >= 4 or ($step >= 3 and $pacemaker_master) {
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::ceilometer
     include ::ceilometer::db
     include ::ceilometer::config

@@ -33,9 +33,7 @@ class tripleo::profile::base::ceilometer::collector (
   $sync_db = true,
 ) {
 
-  class { '::tripleo::profile::base::ceilometer':
-    pacemaker_master => $sync_db,
-  }
+  include ::tripleo::profile::base::ceilometer
 
   if $step >= 3 and $sync_db {
     $ceilometer_backend = downcase(hiera('ceilometer_backend', 'mongodb'))
