@@ -35,7 +35,7 @@ class tripleo::profile::base::nova::compute::libvirt (
     $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
     if $rbd_ephemeral_storage or $rbd_persistent_storage {
       $client_keys = hiera('ceph::profile::params::client_keys')
-      $client_user = join(['client.', hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name')])
+      $client_user = join(['client.', hiera('nova::compute::rbd::libvirt_rbd_user')])
       class { '::nova::compute::rbd':
         libvirt_rbd_secret_key => $client_keys[$client_user]['secret'],
       }
