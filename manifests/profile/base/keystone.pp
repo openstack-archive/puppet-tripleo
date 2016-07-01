@@ -255,6 +255,8 @@ class tripleo::profile::base::keystone (
       include ::zaqar::keystone::auth
       include ::zaqar::keystone::auth_websocket
     }
+    if hiera('ec2_api_enabled', false) {
+      include ::ec2api::keystone::auth
+    }
   }
 }
-

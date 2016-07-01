@@ -191,6 +191,9 @@ class tripleo::profile::base::database::mysql (
     if hiera('panko_api_enabled', false) {
       include ::panko::db::mysql
     }
+    if hiera('ec2_api_enabled', false) {
+      include ::ec2api::db::mysql
+    }
   }
 
 }
