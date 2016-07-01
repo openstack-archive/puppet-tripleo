@@ -22,8 +22,23 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*manage_migration*]
+#   (Optional) Whether or not manage Nova Live migration
+#   Defaults to false
+#
+# [*libvirt_enabled*]
+#   (Optional) Whether or not Libvirt is enabled.
+#   Defaults to false
+#
+# [*nova_compute_enabled*]
+#   (Optional) Whether or not nova-compute is enabled.
+#   Defaults to false
+#
 class tripleo::profile::base::nova (
-  $step = hiera('step'),
+  $step                 = hiera('step'),
+  $manage_migration     = false,
+  $libvirt_enabled      = false,
+  $nova_compute_enabled = false,
 ) {
 
   if hiera('nova::use_ipv6', false) {
@@ -41,4 +56,14 @@ class tripleo::profile::base::nova (
     }
     include ::nova::config
   }
+
+  if $step >= 4 {
+    if $manage_migration {
+      class { '::nova::migration::libvirt':
+        configure_libvirt => $libvirt_enabled,
+        configure_nova    => $nova_compute_enabled,
+      }
+    }
+  }
+
 }
