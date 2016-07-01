@@ -23,18 +23,12 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to true
-#
 class tripleo::profile::base::ceilometer (
-  $step             = hiera('step'),
-  $sync_db = true,
+  $step = hiera('step'),
 ) {
 
-  if $step >= 4 or ($step >= 3 and $sync_db) {
+  if $step >= 3 {
     include ::ceilometer
-    include ::ceilometer::db
     include ::ceilometer::config
   }
 
