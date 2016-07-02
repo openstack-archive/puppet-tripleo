@@ -20,7 +20,7 @@
 #
 # [*pacemaker_master*]
 #   (Optional) The hostname of the pacemaker master
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('bootstrap_nodeid', undef)
 #
 # [*step*]
 #  (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,7 +28,7 @@
 #  Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::neutron::server (
-  $pacemaker_master = hiera('bootstrap_nodeid'),
+  $pacemaker_master = hiera('bootstrap_nodeid', undef),
   $step             = hiera('step'),
 ) {
 
