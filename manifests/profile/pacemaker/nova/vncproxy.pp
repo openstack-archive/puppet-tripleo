@@ -36,6 +36,13 @@ class tripleo::profile::pacemaker::nova::vncproxy (
   include ::tripleo::profile::pacemaker::nova
   include ::tripleo::profile::base::nova::vncproxy
 
+  Service<| title == 'nova-vncproxy' |> {
+    hasrestart => true,
+    restart    => '/bin/true',
+    start      => '/bin/true',
+    stop       => '/bin/true',
+  }
+
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::nova::params::vncproxy_service_name:
       clone_params => 'interleave=true',

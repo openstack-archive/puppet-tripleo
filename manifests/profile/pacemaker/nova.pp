@@ -26,15 +26,6 @@ class tripleo::profile::pacemaker::nova (
   $step = hiera('step'),
 ) {
 
-  Service <|
-    tag == 'nova-service'
-  |> {
-    hasrestart => true,
-    restart    => '/bin/true',
-    start      => '/bin/true',
-    stop       => '/bin/true',
-  }
-
   include ::tripleo::profile::base::nova
 
 }
