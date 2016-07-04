@@ -24,7 +24,7 @@
 #
 # [*pacemaker_master*]
 #   (Optional) The hostname of the pacemaker master
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('bootstrap_nodeid', undef)
 #
 # [*enable_l3*]
 #   (Optional) Whether to include the Neutron L3 agent pacemaker profile
@@ -44,7 +44,7 @@
 #
 class tripleo::profile::pacemaker::neutron (
   $step             = hiera('step'),
-  $pacemaker_master = hiera('bootstrap_nodeid'),
+  $pacemaker_master = hiera('bootstrap_nodeid', undef),
   # We can drop the hiera defaults once the neutron roles are decomposed
   $enable_l3        = hiera('neutron::enable_l3_agent', false),
   $enable_dhcp      = hiera('neutron::enable_dhcp_agent', false),
