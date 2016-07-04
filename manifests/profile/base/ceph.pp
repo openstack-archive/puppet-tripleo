@@ -35,6 +35,10 @@
 #   mon_host when ceph_ipv6 is true
 #   Defaults to undef
 #
+# [*enable_ceph_storage*]
+#   (Optional) enable_ceph_storage
+#   Deprecated: defaults to false
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -45,6 +49,7 @@ class tripleo::profile::base::ceph (
   $ceph_mon_initial_members = undef,
   $ceph_mon_host            = undef,
   $ceph_mon_host_v6         = undef,
+  $enable_ceph_storage      = false,
   $step                     = hiera('step'),
 ) {
 
@@ -66,5 +71,10 @@ class tripleo::profile::base::ceph (
     }
 
     include ::ceph::conf
+  }
+
+  # TODO: deprecated boolean
+  if $enable_ceph_storage {
+    include ::tripleo::profile::base::ceph::osd
   }
 }
