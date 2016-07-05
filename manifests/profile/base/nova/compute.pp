@@ -38,6 +38,9 @@ class tripleo::profile::base::nova::compute (
 
     # deploy basic bits for nova-compute
     include ::nova::compute
+    # If Service['nova-conductor'] is in catalog, make sure we start it
+    # before nova-compute.
+    Service<| title == 'nova-conductor' |> -> Service['nova-compute']
 
     # deploy bits to connect nova compute to neutron
     include ::nova::network::neutron
