@@ -57,7 +57,6 @@ class tripleo::profile::base::neutron::plugins::ml2 (
 
     if 'bsn_ml2' in $mechanism_drivers {
       include ::neutron::plugins::ml2::bigswitch::restproxy
-      include ::neutron::agents::bigswitch
     }
   }
 }
