@@ -36,6 +36,13 @@ class tripleo::profile::pacemaker::nova::scheduler (
   include ::tripleo::profile::pacemaker::nova
   include ::tripleo::profile::base::nova::scheduler
 
+  Service<| title == 'nova-scheduler' |> {
+    hasrestart => true,
+    restart    => '/bin/true',
+    start      => '/bin/true',
+    stop       => '/bin/true',
+  }
+
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::nova::params::scheduler_service_name:
       clone_params => 'interleave=true',

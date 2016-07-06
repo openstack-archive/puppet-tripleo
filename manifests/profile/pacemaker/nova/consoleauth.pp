@@ -36,6 +36,13 @@ class tripleo::profile::pacemaker::nova::consoleauth (
   include ::tripleo::profile::pacemaker::nova
   include ::tripleo::profile::base::nova::consoleauth
 
+  Service<| title == 'nova-consoleauth' |> {
+    hasrestart => true,
+    restart    => '/bin/true',
+    start      => '/bin/true',
+    stop       => '/bin/true',
+  }
+
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::nova::params::consoleauth_service_name:
       clone_params => 'interleave=true',

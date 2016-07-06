@@ -35,6 +35,13 @@ class tripleo::profile::pacemaker::nova::api (
   include ::nova::params
   include ::tripleo::profile::pacemaker::nova
 
+  Service<| title == 'nova-api' |> {
+    hasrestart => true,
+    restart    => '/bin/true',
+    start      => '/bin/true',
+    stop       => '/bin/true',
+  }
+
   class { '::tripleo::profile::base::nova::api':
     sync_db => (downcase($::hostname) == $pacemaker_master),
   }
