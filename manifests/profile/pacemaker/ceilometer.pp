@@ -27,47 +27,18 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to undef
-#
 class tripleo::profile::pacemaker::ceilometer (
   $bootstrap_node = hiera('bootstrap_nodeid'),
   $step           = hiera('step'),
-  $sync_db        = true,
 ) {
-
-  if $::hostname == downcase($bootstrap_node) {
-    $pacemaker_master = true
-  } else {
-    $pacemaker_master = false
-  }
 
   include ::tripleo::profile::base::ceilometer
 
-  if $step >= 5 and $pacemaker_master {
-    $ceilometer_backend = downcase(hiera('ceilometer_backend', 'mongodb'))
-    case $ceilometer_backend {
-      /mysql/: {
-        pacemaker::resource::service { $::ceilometer::params::agent_central_service_name:
-          clone_params => 'interleave=true',
-          require      => Pacemaker::Resource::Ocf['openstack-core'],
-        }
-      }
-      default: {
-        pacemaker::resource::service { $::ceilometer::params::agent_central_service_name:
-          clone_params => 'interleave=true',
-          require      => [Pacemaker::Resource::Ocf['openstack-core'],
-            Pacemaker::Resource::Service[$::mongodb::params::service_name]],
-        }
-      }
-    }
-
-    if $sync_db {
-      if $ceilometer_backend == 'mysql' {
-        class { '::ceilometer::db::mysql':
-          require => Exec['galera-ready'],
-        }
+  $ceilometer_backend = downcase(hiera('ceilometer_backend', 'mongodb'))
+  if $step >= 5 and $::hostname == downcase($bootstrap_node) {
+    if $ceilometer_backend == 'mysql' {
+      class { '::ceilometer::db::mysql':
+        require => Exec['galera-ready'],
       }
     }
 

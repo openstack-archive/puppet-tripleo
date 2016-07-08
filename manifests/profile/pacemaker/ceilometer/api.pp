@@ -40,13 +40,6 @@ class tripleo::profile::pacemaker::ceilometer::api (
     pacemaker::resource::service { $::ceilometer::params::api_service_name :
       clone_params => 'interleave=true',
     }
-    pacemaker::constraint::colocation { 'ceilometer-delay-with-ceilometer-api-colocation':
-      source  => 'delay-clone',
-      target  => "${::ceilometer::params::api_service_name}-clone",
-      score   => 'INFINITY',
-      require => [Pacemaker::Resource::Service[$::ceilometer::params::api_service_name],
-        Pacemaker::Resource::Ocf['delay']],
-    }
   }
 
 }
