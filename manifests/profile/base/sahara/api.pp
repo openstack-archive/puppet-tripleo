@@ -28,6 +28,6 @@ class tripleo::profile::base::sahara::api (
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::sahara
-    include ::sahara::api
+    include ::sahara::service::api
   }
 }
