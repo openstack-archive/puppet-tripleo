@@ -34,7 +34,7 @@ class tripleo::profile::base::ceph::osd (
 
   include ::tripleo::profile::base::ceph
 
-  if $step >= 2 {
+  if $step >= 3 {
     if $ceph_osd_selinux_permissive {
       exec { 'set selinux to permissive on boot':
         command => "sed -ie 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config",
