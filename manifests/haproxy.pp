@@ -193,6 +193,10 @@
 #  (optional) Enable or not Ironic API binding
 #  Defaults to false
 #
+# [*ironic_inspector*]
+#  (optional) Enable or not Ironic Inspector API binding
+#  Defaults to false
+#
 # [*mysql*]
 #  (optional) Enable or not MySQL Galera binding
 #  Defaults to false
@@ -240,6 +244,8 @@
 #    'heat_cw_ssl_port' (Defaults to 13003)
 #    'ironic_api_port' (Defaults to 6385)
 #    'ironic_api_ssl_port' (Defaults to 13385)
+#    'ironic_inspector_port' (Defaults to 5050)
+#    'ironic_inspector_ssl_port' (Defaults to 13050)
 #    'keystone_admin_api_port' (Defaults to 35357)
 #    'keystone_admin_api_ssl_port' (Defaults to 13357)
 #    'keystone_public_api_port' (Defaults to 5000)
@@ -302,6 +308,7 @@ class tripleo::haproxy (
   $heat_cfn                  = false,
   $horizon                   = false,
   $ironic                    = false,
+  $ironic_inspector          = false,
   $mysql                     = false,
   $mysql_clustercheck        = false,
   $rabbitmq                  = false,
@@ -330,6 +337,8 @@ class tripleo::haproxy (
     heat_cw_ssl_port => 13003,
     ironic_api_port => 6385,
     ironic_api_ssl_port => 13385,
+    ironic_inspector_port => 5050,
+    ironic_inspector_ssl_port => 13050,
     keystone_admin_api_port => 35357,
     keystone_admin_api_ssl_port => 13357,
     keystone_public_api_port => 5000,
@@ -751,6 +760,17 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       public_ssl_port   => $ports[ironic_api_ssl_port],
+    }
+  }
+
+  if $ironic_inspector {
+    ::tripleo::haproxy::endpoint { 'ironic-inspector':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('ironic_inspector_vip', $controller_virtual_ip),
+      service_port      => $ports[ironic_inspector_port],
+      ip_addresses      => hiera('ironic_inspector_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      public_ssl_port   => $ports[ironic_inspector_ssl_port],
     }
   }
 
