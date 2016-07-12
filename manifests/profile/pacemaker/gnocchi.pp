@@ -56,15 +56,18 @@ class tripleo::profile::pacemaker::gnocchi (
     $pacemaker_master = false
   }
 
-  if $step >= 3 and $sync_db {
-    include ::gnocchi
-    include ::gnocchi::config
-    include ::gnocchi::client
+  if $step >= 2 and $pacemaker_master {
     if $gnocchi_indexer_backend == 'mysql' {
       class { '::gnocchi::db::mysql':
         require => Exec['galera-ready'],
       }
     }
+  }
+
+  if $step >= 3 and $sync_db {
+    include ::gnocchi
+    include ::gnocchi::config
+    include ::gnocchi::client
     include ::gnocchi::db::sync
   }
 
