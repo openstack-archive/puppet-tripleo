@@ -18,30 +18,17 @@
 #
 # === Parameters
 #
-# [*neutron_dnsmasq_options*]
-#   (Optional)
-#   Defaults to hiera('neutron_dnsmasq_options')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::dhcp (
-  $neutron_dnsmasq_options = hiera('neutron_dnsmasq_options', ''),
   $step                    = hiera('step'),
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::neutron
     include ::neutron::agents::dhcp
-
-    file { '/etc/neutron/dnsmasq-neutron.conf':
-      content => $neutron_dnsmasq_options,
-      owner   => 'neutron',
-      group   => 'neutron',
-      notify  => Service['neutron-dhcp-service'],
-      require => Package['neutron'],
-    }
 
     Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-dhcp' |>
   }
