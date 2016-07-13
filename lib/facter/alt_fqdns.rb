@@ -26,7 +26,7 @@
         Facter.value(:hostname),
         network,
         Facter.value(:domain),
-      ].reject { |part| part.empty? }
+      ].reject { |part| part.nil? || part.empty? }
       external_hostname_parts.join(".")
     end
   end
