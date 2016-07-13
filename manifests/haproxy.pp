@@ -106,6 +106,11 @@
 #  flag is set.
 #  Defaults to {}
 #
+# [*enable_internal_tls*]
+#  A flag that indicates if the servers in the internal network are using TLS.
+#  This enables the 'ssl' option for the server members that are proxied.
+#  Defaults to hiera('enable_internal_tls', false)
+#
 # [*ssl_cipher_suite*]
 #  The default string describing the list of cipher algorithms ("cipher suite")
 #  that are negotiated during the SSL/TLS handshake for all "bind" lines. This
@@ -427,6 +432,7 @@ class tripleo::haproxy (
   $service_certificate         = undef,
   $use_internal_certificates   = false,
   $internal_certificates_specs = {},
+  $enable_internal_tls         = hiera('enable_internal_tls', false),
   $ssl_cipher_suite            = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
   $ssl_options                 = 'no-sslv3',
   $haproxy_stats_certificate   = undef,
@@ -540,6 +546,13 @@ class tripleo::haproxy (
     zaqar_ws_ssl_port => 9000,
   }
   $ports = merge($default_service_ports, $service_ports)
+
+  if $enable_internal_tls {
+    # TODO(jaosorior): change verify none to verify required.
+    $internal_tls_member_options = ['ssl', 'verify none']
+  } else {
+    $internal_tls_member_options = []
+  }
 
   $controller_hosts_real = any2array(split($controller_hosts, ','))
   if ! $controller_hosts_names {
@@ -680,6 +693,7 @@ class tripleo::haproxy (
       },
       public_ssl_port   => $ports[keystone_admin_api_ssl_port],
       service_network   => $keystone_admin_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
@@ -709,6 +723,7 @@ class tripleo::haproxy (
       listen_options    => merge($keystone_listen_opts, $keystone_public_tls_listen_opts),
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
       service_network   => $keystone_public_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
