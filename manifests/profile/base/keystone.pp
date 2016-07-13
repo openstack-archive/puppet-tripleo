@@ -18,34 +18,33 @@
 #
 # === Parameters
 #
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to true
-#
-# [*manage_roles*]
-#   (Optional) whether to create keystone admin role
-#   Defaults to true
-#
-# [*manage_endpoint*]
-#   (Optional) Whether to create keystone endpoints
-#   Defaults to true
-#
 # [*manage_db_purge*]
 #   (Optional) Whether keystone token flushing should be enabled
 #   Defaults to hiera('keystone_enable_db_purge', true)
+#
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-#
+
 class tripleo::profile::base::keystone (
-  $sync_db         = true,
-  $manage_roles    = true,
-  $manage_endpoint = true,
   $manage_db_purge = hiera('keystone_enable_db_purge', true),
+  $bootstrap_node  = hiera('bootstrap_nodeid', undef),
   $step            = hiera('step'),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+    $manage_roles = true
+    $manage_endpoint = true
+  } else {
+    $sync_db = false
+    $manage_roles = false
+    $manage_endpoint = false
+  }
 
   if $step >= 3 and $sync_db {
     include ::keystone::db::mysql

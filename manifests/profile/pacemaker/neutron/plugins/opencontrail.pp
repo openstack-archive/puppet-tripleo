@@ -18,16 +18,9 @@
 #
 # === Parameters
 #
-# [*pacemaker_master*]
-#   (Optional) The hostname of the pacemaker master
-#   Defaults to hiera('bootstrap_nodeid', undef)
-#
-class tripleo::profile::pacemaker::neutron::plugins::opencontrail (
-  $pacemaker_master = hiera('bootstrap_nodeid', undef),
-) {
+class tripleo::profile::pacemaker::neutron::plugins::opencontrail
+{
 
-  class { '::tripleo::profile::base::neutron::plugins::opencontrail':
-    sync_db => ($::hostname == downcase($pacemaker_master))
-  }
+  include ::tripleo::profile::base::neutron::plugins::opencontrail
 
 }

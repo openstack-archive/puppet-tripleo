@@ -46,17 +46,11 @@ class tripleo::profile::pacemaker::keystone (
 
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
-    $manage_roles = true
   } else {
     $pacemaker_master = false
-    $manage_roles = false
   }
 
-  class { '::tripleo::profile::base::keystone':
-    sync_db         => $pacemaker_master,
-    manage_roles    => $manage_roles,
-    manage_endpoint => $manage_roles
-  }
+  include ::tripleo::profile::base::keystone
 
   if $step >= 5 and $pacemaker_master and $enable_load_balancer {
     pacemaker::constraint::base { 'haproxy-then-keystone-constraint':

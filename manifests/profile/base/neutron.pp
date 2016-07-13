@@ -23,9 +23,9 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron (
-  $step    = hiera('step'),
+  $step = hiera('step'),
 ) {
-  if hiera('step') >= 3 {
+  if $step >= 3 {
     include ::neutron
     include ::neutron::config
   }

@@ -18,24 +18,46 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::server (
-  $step             = hiera('step'),
+  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $step           = hiera('step'),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
 
   include ::tripleo::profile::base::neutron
 
-  if $step >= 3 {
+  if $step >= 3 and $sync_db {
     include ::neutron::db::mysql
   }
 
-  if $step >= 4 {
+  # We start neutron-server on the bootstrap node first, because
+  # it will try to populate tables and we need to make sure this happens
+  # before it starts on other nodes
+  if $step >= 4 and $sync_db {
     include ::neutron::server::notifications
-    include ::neutron::server
+    # We need to override the hiera value neutron::server::sync_db which is set
+    # to true
+    class { '::neutron::server':
+      sync_db => $sync_db,
+    }
   }
-
+  if $step >= 5 and !$sync_db {
+    include ::neutron::server::notifications
+    class { '::neutron::server':
+      sync_db => $sync_db,
+    }
+  }
 }

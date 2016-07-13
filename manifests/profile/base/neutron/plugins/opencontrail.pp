@@ -16,19 +16,24 @@
 #
 # Opencontrail Neutron profile for tripleo
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-#
-# [*sync_db*]
-#   (Optional) Whether to run Neutron DB sync operations
-#   Defaults to undef
-#
+
 class tripleo::profile::base::neutron::plugins::opencontrail (
-  $step    = hiera('step'),
-  $sync_db = true,
+  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $step           = hiera('step'),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
 
   include ::tripleo::profile::base::neutron
 
