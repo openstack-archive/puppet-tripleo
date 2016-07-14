@@ -42,6 +42,16 @@ class tripleo::profile::base::heat (
   $manage_db_purge = hiera('heat_enable_db_purge', true),
 ) {
 
+  # Domain resources will be created at step5 on the pacemaker_master so we
+  # configure heat.conf at step3 and 4 but actually create the domain later.
+  if hiera('step') == 3 or hiera('step') == 4 {
+    class { '::heat::keystone::domain':
+      manage_domain => false,
+      manage_user   => false,
+      manage_role   => false,
+    }
+  }
+
   if $step >= 4 {
     class { '::heat' :
       notification_driver => $notification_driver,
