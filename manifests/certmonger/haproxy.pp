@@ -36,18 +36,23 @@
 #   The post-save-command that certmonger will use once it renews the
 #   certificate.
 #
+# [*principal*]
+#   The haproxy service principal that is set for HAProxy in kerberos.
+#
 define tripleo::certmonger::haproxy (
   $service_pem,
   $service_certificate,
   $service_key,
   $hostname,
   $postsave_cmd,
+  $principal = undef,
 ){
     certmonger_certificate { "${title}-cert":
       hostname     => $hostname,
       certfile     => $service_certificate,
       keyfile      => $service_key,
       postsave_cmd => $postsave_cmd,
+      principal    => $principal,
     }
     concat { $service_pem :
       ensure => present,
