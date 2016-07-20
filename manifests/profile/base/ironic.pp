@@ -30,19 +30,20 @@ class tripleo::profile::base::ironic (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
 ) {
+  # Database is accessed by both API and conductor, hence it's here.
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false
   }
 
-  if $step >= 3 {
-    include ::ironic
+  if $step >= 3 and $sync_db {
+    include ::ironic::db::mysql
+  }
 
-    # Database is accessed by both API and conductor, hence it's here.
-    if $sync_db {
-      include ::ironic::db::mysql
-      include ::ironic::db::sync
+  if $step >= 4 or ($step >= 3 and $sync_db) {
+    class { '::ironic':
+      sync_db => $sync_db,
     }
   }
 }
