@@ -47,6 +47,11 @@ class tripleo::profile::pacemaker::nova::conductor (
     pacemaker::resource::service { $::nova::params::conductor_service_name:
       clone_params => 'interleave=true',
     }
+    # If Service['nova-compute'] is in catalog, make sure we start it after
+    # nova-conductor pcmk resource.
+    # Also make sure to restart nova-compute if nova-conductor pcmk resource changed
+    # the state, since nova-compute is deployed at a previous step.
+    Pacemaker::Resource::Service[$::nova::params::conductor_service_name] ~> Service<| title == 'nova-compute' |>
   }
 
 }
