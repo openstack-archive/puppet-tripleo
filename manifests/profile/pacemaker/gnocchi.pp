@@ -31,16 +31,11 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to undef
-#
 
 class tripleo::profile::pacemaker::gnocchi (
   $gnocchi_indexer_backend = downcase(hiera('gnocchi_indexer_backend', 'mysql')),
   $bootstrap_node  = hiera('bootstrap_nodeid'),
   $step            = hiera('step'),
-  $sync_db         = true,
 ) {
 
   Service <| tag == 'gnocchi-service' |> {
@@ -64,7 +59,7 @@ class tripleo::profile::pacemaker::gnocchi (
     }
   }
 
-  if $step >= 3 and $sync_db {
+  if $step >= 3 and $pacemaker_master {
     include ::gnocchi
     include ::gnocchi::config
     include ::gnocchi::client
