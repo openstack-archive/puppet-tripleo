@@ -28,6 +28,7 @@ class tripleo::profile::pacemaker::gnocchi::api (
 ) {
 
   include ::tripleo::profile::pacemaker::gnocchi
+  include ::tripleo::profile::pacemaker::apache
 
   class { '::tripleo::profile::base::gnocchi::api':
     step    => $step,
