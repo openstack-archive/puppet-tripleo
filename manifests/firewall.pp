@@ -86,6 +86,24 @@ class tripleo::firewall(
       'stage'             => 'runtime',
       'firewall_settings' => $firewall_post_extras,
     })
+
+    # Allow composable services to load their own custom
+    # example with Hiera.
+    # NOTE(dprince): In the future when we have a better hiera
+    # heat hook we might refactor this to use hiera's merging
+    # capabilities instead. Until then rolling up the flat service
+    # keys and dynamically creating firewall rules for each service
+    # will allow us to compose and should work fine.
+    #
+    # Each service can load its rules by using this form:
+    #
+    # tripleo.<service name with underscores>.firewall_rules:
+    #   '300 allow custom application 1':
+    #     dport: 999
+    #     proto: udp
+    #     action: accept
+    $service_names = reject(hiera('service_names', []), '^$')
+    tripleo::firewall::service_rules { $service_names: }
   }
 
 }
