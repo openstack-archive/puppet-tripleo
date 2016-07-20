@@ -42,9 +42,7 @@ class tripleo::profile::pacemaker::nova::api (
     stop       => '/bin/true',
   }
 
-  class { '::tripleo::profile::base::nova::api':
-    sync_db => (downcase($::hostname) == $pacemaker_master),
-  }
+  include ::tripleo::profile::base::nova::api
 
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::nova::params::api_service_name:

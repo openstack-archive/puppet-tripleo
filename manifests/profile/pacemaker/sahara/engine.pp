@@ -39,9 +39,7 @@ class tripleo::profile::pacemaker::sahara::engine (
   }
 
   include ::tripleo::profile::pacemaker::sahara
-  class { '::tripleo::profile::base::sahara::engine':
-    sync_db => $pacemaker_master
-  }
+  include ::tripleo::profile::base::sahara::engine
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::sahara::params::engine_service_name :

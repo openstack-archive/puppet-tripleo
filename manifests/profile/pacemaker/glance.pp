@@ -76,9 +76,7 @@ class tripleo::profile::pacemaker::glance (
   }
 
   include ::tripleo::profile::base::glance::api
-  class { '::tripleo::profile::base::glance::registry':
-    sync_db        => $pacemaker_master,
-  }
+  include ::tripleo::profile::base::glance::registry
 
   if $step >= 4 {
     if $glance_backend == 'file' and $glance_file_pcmk_manage {

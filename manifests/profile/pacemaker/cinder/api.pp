@@ -45,9 +45,7 @@ class tripleo::profile::pacemaker::cinder::api (
     $pacemaker_master = false
   }
 
-  class { '::tripleo::profile::base::cinder::api':
-    sync_db => $pacemaker_master,
-  }
+  include ::tripleo::profile::base::cinder::api
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::cinder::params::api_service :

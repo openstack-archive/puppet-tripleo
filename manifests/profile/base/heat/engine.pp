@@ -18,19 +18,24 @@
 #
 # === Parameters
 #
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to undef
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-#
+
 class tripleo::profile::base::heat::engine (
-  $sync_db        = true,
+  $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
 
   if $step >= 3 and $sync_db {
     include ::heat::db::mysql

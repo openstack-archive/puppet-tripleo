@@ -18,29 +18,18 @@
 #
 # === Parameters
 #
-# [*pacemaker_master*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-#
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to undef
 
 class tripleo::profile::pacemaker::gnocchi::api (
-  $pacemaker_master = hiera('bootstrap_nodeid'),
   $step             = hiera('step'),
-  $sync_db          = true,
 ) {
 
   include ::tripleo::profile::pacemaker::gnocchi
 
   class { '::tripleo::profile::base::gnocchi::api':
     step    => $step,
-    sync_db => (downcase($::hostname) == $pacemaker_master),
   }
 }

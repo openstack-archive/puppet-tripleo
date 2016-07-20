@@ -40,9 +40,7 @@ class tripleo::profile::pacemaker::ceilometer::collector (
   include ::ceilometer::params
   include ::tripleo::profile::pacemaker::ceilometer
 
-  class { '::tripleo::profile::base::ceilometer::collector':
-    sync_db => (downcase($::hostname) == $pacemaker_master),
-  }
+  include ::tripleo::profile::base::ceilometer::collector
 
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     $ceilometer_backend = downcase(hiera('ceilometer_backend', 'mongodb'))

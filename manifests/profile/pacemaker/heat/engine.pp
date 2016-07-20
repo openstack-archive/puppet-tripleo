@@ -39,9 +39,7 @@ class tripleo::profile::pacemaker::heat::engine (
   }
 
   include ::tripleo::profile::pacemaker::heat
-  class { '::tripleo::profile::base::heat::engine':
-    sync_db        => $pacemaker_master,
-  }
+  include ::tripleo::profile::base::heat::engine
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::heat::params::engine_service_name :
