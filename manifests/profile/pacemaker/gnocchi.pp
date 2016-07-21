@@ -59,11 +59,13 @@ class tripleo::profile::pacemaker::gnocchi (
     }
   }
 
-  if $step >= 3 and $pacemaker_master {
+  if $step >= 3 {
     include ::gnocchi
     include ::gnocchi::config
     include ::gnocchi::client
-    include ::gnocchi::db::sync
+    if $pacemaker_master {
+      include ::gnocchi::db::sync
+    }
   }
 
   if $step >= 5 and $pacemaker_master {
