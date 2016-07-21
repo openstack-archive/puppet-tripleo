@@ -49,5 +49,11 @@ class tripleo::profile::base::nova::api (
     }
     include ::nova::network::neutron
   }
+
+  if $step >= 5 {
+    if hiera('nova_enable_db_purge', true) {
+      include ::nova::cron::archive_deleted_rows
+    }
+  }
 }
 
