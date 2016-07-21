@@ -117,4 +117,16 @@ define tripleo::haproxy::endpoint (
     server_names      => $server_names,
     options           => $member_options,
   }
+  if hiera('manage_firewall', true) {
+    include ::tripleo::firewall
+    $firewall_rules = {
+      "100 ${name}_haproxy"     => {
+        'dport' => $service_port,
+      },
+      "100 ${name}_haproxy_ssl" => {
+        'dport' => $public_ssl_port,
+      },
+    }
+    create_resources('tripleo::firewall::rule', $firewall_rules)
+  }
 }
