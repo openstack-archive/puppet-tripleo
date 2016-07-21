@@ -38,9 +38,9 @@ class tripleo::profile::base::pacemaker (
     $pacemaker_master = false
   }
 
-  $enable_fencing = str2bool(hiera('enable_fencing', false)) and hiera('step') >= 5
+  $enable_fencing = str2bool(hiera('enable_fencing', false)) and $step >= 5
 
-  if hiera('step') >= 1 {
+  if $step >= 1 {
     $pacemaker_cluster_members = downcase(regsubst(hiera('controller_node_names'), ',', ' ', 'G'))
     $corosync_ipv6 = str2bool(hiera('corosync_ipv6', false))
     if $corosync_ipv6 {
@@ -78,7 +78,7 @@ class tripleo::profile::base::pacemaker (
     }
   }
 
-  if hiera('step') >= 2 {
+  if $step >= 2 {
     if $pacemaker_master {
       include ::pacemaker::resource_defaults
 

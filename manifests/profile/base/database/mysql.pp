@@ -52,7 +52,7 @@ class tripleo::profile::base::database::mysql (
   # ha scenario
     $mysql_step = 1
   }
-  if hiera('step') >= $mysql_step {
+  if $step >= $mysql_step {
     if str2bool(hiera('enable_galera', true)) {
       $mysql_config_file = '/etc/my.cnf.d/galera.cnf'
     } else {
