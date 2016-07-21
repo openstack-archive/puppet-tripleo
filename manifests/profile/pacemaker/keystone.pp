@@ -51,6 +51,7 @@ class tripleo::profile::pacemaker::keystone (
   }
 
   include ::tripleo::profile::base::keystone
+  include ::tripleo::profile::pacemaker::apache
 
   if $step >= 5 and $pacemaker_master and $enable_load_balancer {
     pacemaker::constraint::base { 'haproxy-then-keystone-constraint':
