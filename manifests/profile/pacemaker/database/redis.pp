@@ -18,9 +18,6 @@
 #
 # === Parameters
 #
-# [*redis_vip*]
-#   Redis virtual IP
-#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
@@ -36,7 +33,6 @@
 #
 
 class tripleo::profile::pacemaker::database::redis (
-  $redis_vip,
   $bootstrap_node       = hiera('bootstrap_nodeid'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
