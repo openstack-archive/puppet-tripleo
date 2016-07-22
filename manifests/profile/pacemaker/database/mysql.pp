@@ -72,7 +72,7 @@ class tripleo::profile::pacemaker::database::mysql (
     mysql_server_options    => $mysqld_options,
   }
 
-  if hiera('step') >= 2 and $pacemaker_master {
+  if $step >= 2 and $pacemaker_master {
     if $pacemaker_master {
       pacemaker::resource::ocf { 'galera' :
         ocf_agent_name  => 'heartbeat:galera',
@@ -129,7 +129,7 @@ class tripleo::profile::pacemaker::database::mysql (
     }
   }
 
-  if hiera('step') >= 4 or ( hiera('step') >= 3 and $pacemaker_master ) {
+  if $step >= 4 or ( $step >= 3 and $pacemaker_master ) {
     # At this stage we are guaranteed that the clustercheck db user exists
     # so we switch the resource agent to use it.
     $mysql_clustercheck_password = hiera('mysql_clustercheck_password')
@@ -144,7 +144,7 @@ MYSQL_HOST=localhost\n",
     }
   }
 
-  if hiera('step') >= 5 {
+  if $step >= 5 {
     # We now make sure that the root db password is set to a random one
     # At first installation /root/.my.cnf will be empty and we connect without a root
     # password. On second runs or updates /root/.my.cnf will already be populated

@@ -44,7 +44,7 @@ class tripleo::profile::base::heat (
 
   # Domain resources will be created at step5 on the pacemaker_master so we
   # configure heat.conf at step3 and 4 but actually create the domain later.
-  if hiera('step') == 3 or hiera('step') == 4 {
+  if $step == 3 or $step == 4 {
     class { '::heat::keystone::domain':
       manage_domain => false,
       manage_user   => false,
