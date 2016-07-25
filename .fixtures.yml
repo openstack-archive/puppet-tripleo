@@ -2,6 +2,8 @@ fixtures:
   repositories:
     'firewall': 'git://github.com/puppetlabs/puppetlabs-firewall.git'
     'stdlib': 'git://github.com/puppetlabs/puppetlabs-stdlib.git'
+    'haproxy': 'git://github.com/puppetlabs/puppetlabs-haproxy.git'
+    'concat': 'git://github.com/puppetlabs/puppetlabs-concat.git'
     'midonet':
       repo: 'git://github.com/midonet/puppet-midonet.git'
       ref: 'v2015.06.7'
