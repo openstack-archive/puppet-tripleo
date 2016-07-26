@@ -168,17 +168,6 @@ MYSQL_HOST=localhost\n",
   password=\"${mysql_root_password}\"",
       require => Exec['galera-set-root-password'],
     }
-    if $pacemaker_master {
-      pacemaker::constraint::base { 'galera-then-openstack-core-constraint':
-        constraint_type => 'order',
-        first_resource  => 'galera-master',
-        second_resource => 'openstack-core-clone',
-        first_action    => 'promote',
-        second_action   => 'start',
-        require         => [Pacemaker::Resource::Ocf['galera'],
-                            Pacemaker::Resource::Ocf['openstack-core']],
-      }
-    }
   }
 
 }
