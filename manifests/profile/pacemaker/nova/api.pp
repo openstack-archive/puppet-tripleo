@@ -48,6 +48,40 @@ class tripleo::profile::pacemaker::nova::api (
     pacemaker::resource::service { $::nova::params::api_service_name:
       clone_params => 'interleave=true',
     }
+
+    pacemaker::constraint::base { 'nova-vncproxy-then-nova-api-constraint':
+      constraint_type => 'order',
+      first_resource  => "${::nova::params::vncproxy_service_name}-clone",
+      second_resource => "${::nova::params::api_service_name}-clone",
+      first_action    => 'start',
+      second_action   => 'start',
+      require         => [Pacemaker::Resource::Service[$::nova::params::vncproxy_service_name],
+                          Pacemaker::Resource::Service[$::nova::params::api_service_name]],
+    }
+    pacemaker::constraint::colocation { 'nova-api-with-nova-vncproxy-colocation':
+      source  => "${::nova::params::api_service_name}-clone",
+      target  => "${::nova::params::vncproxy_service_name}-clone",
+      score   => 'INFINITY',
+      require => [Pacemaker::Resource::Service[$::nova::params::vncproxy_service_name],
+                  Pacemaker::Resource::Service[$::nova::params::api_service_name]],
+    }
+    pacemaker::constraint::base { 'nova-api-then-nova-scheduler-constraint':
+      constraint_type => 'order',
+      first_resource  => "${::nova::params::api_service_name}-clone",
+      second_resource => "${::nova::params::scheduler_service_name}-clone",
+      first_action    => 'start',
+      second_action   => 'start',
+      require         => [Pacemaker::Resource::Service[$::nova::params::api_service_name],
+                          Pacemaker::Resource::Service[$::nova::params::scheduler_service_name]],
+    }
+    pacemaker::constraint::colocation { 'nova-scheduler-with-nova-api-colocation':
+      source  => "${::nova::params::scheduler_service_name}-clone",
+      target  => "${::nova::params::api_service_name}-clone",
+      score   => 'INFINITY',
+      require => [Pacemaker::Resource::Service[$::nova::params::api_service_name],
+                  Pacemaker::Resource::Service[$::nova::params::scheduler_service_name]],
+    }
+
   }
 
 }

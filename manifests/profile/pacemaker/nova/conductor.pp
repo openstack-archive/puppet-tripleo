@@ -47,6 +47,25 @@ class tripleo::profile::pacemaker::nova::conductor (
     pacemaker::resource::service { $::nova::params::conductor_service_name:
       clone_params => 'interleave=true',
     }
+
+    pacemaker::constraint::base { 'nova-scheduler-then-nova-conductor-constraint':
+      constraint_type => 'order',
+      first_resource  => "${::nova::params::scheduler_service_name}-clone",
+      second_resource => "${::nova::params::conductor_service_name}-clone",
+      first_action    => 'start',
+      second_action   => 'start',
+      require         => [Pacemaker::Resource::Service[$::nova::params::scheduler_service_name],
+                          Pacemaker::Resource::Service[$::nova::params::conductor_service_name]],
+    }
+    pacemaker::constraint::colocation { 'nova-conductor-with-nova-scheduler-colocation':
+      source  => "${::nova::params::conductor_service_name}-clone",
+      target  => "${::nova::params::scheduler_service_name}-clone",
+      score   => 'INFINITY',
+      require => [Pacemaker::Resource::Service[$::nova::params::scheduler_service_name],
+                  Pacemaker::Resource::Service[$::nova::params::conductor_service_name]],
+    }
+
+
     # If Service['nova-compute'] is in catalog, make sure we start it after
     # nova-conductor pcmk resource.
     # Also make sure to restart nova-compute if nova-conductor pcmk resource changed

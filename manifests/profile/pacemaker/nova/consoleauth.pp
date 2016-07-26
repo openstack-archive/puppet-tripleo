@@ -47,6 +47,40 @@ class tripleo::profile::pacemaker::nova::consoleauth (
     pacemaker::resource::service { $::nova::params::consoleauth_service_name:
       clone_params => 'interleave=true',
     }
+
+    pacemaker::constraint::base { 'keystone-then-nova-consoleauth-constraint':
+      constraint_type => 'order',
+      first_resource  => 'openstack-core-clone',
+      second_resource => "${::nova::params::consoleauth_service_name}-clone",
+      first_action    => 'start',
+      second_action   => 'start',
+      require         => [Pacemaker::Resource::Service[$::nova::params::consoleauth_service_name],
+                          Pacemaker::Resource::Ocf['openstack-core']],
+    }
+    pacemaker::constraint::colocation { 'nova-consoleauth-with-openstack-core':
+      source  => "${::nova::params::consoleauth_service_name}-clone",
+      target  => 'openstack-core-clone',
+      score   => 'INFINITY',
+      require => [Pacemaker::Resource::Service[$::nova::params::consoleauth_service_name],
+                  Pacemaker::Resource::Ocf['openstack-core']],
+    }
+    pacemaker::constraint::base { 'nova-consoleauth-then-nova-vncproxy-constraint':
+      constraint_type => 'order',
+      first_resource  => "${::nova::params::consoleauth_service_name}-clone",
+      second_resource => "${::nova::params::vncproxy_service_name}-clone",
+      first_action    => 'start',
+      second_action   => 'start',
+      require         => [Pacemaker::Resource::Service[$::nova::params::consoleauth_service_name],
+                          Pacemaker::Resource::Service[$::nova::params::vncproxy_service_name]],
+    }
+    pacemaker::constraint::colocation { 'nova-vncproxy-with-nova-consoleauth-colocation':
+      source  => "${::nova::params::vncproxy_service_name}-clone",
+      target  => "${::nova::params::consoleauth_service_name}-clone",
+      score   => 'INFINITY',
+      require => [Pacemaker::Resource::Service[$::nova::params::consoleauth_service_name],
+                  Pacemaker::Resource::Service[$::nova::params::vncproxy_service_name]],
+    }
+
   }
 
 }
