@@ -67,6 +67,22 @@ class tripleo::profile::pacemaker::cinder::scheduler (
       require => [Pacemaker::Resource::Service[$::cinder::params::api_service],
                   Pacemaker::Resource::Service[$::cinder::params::scheduler_service]],
     }
+    pacemaker::constraint::base { 'cinder-scheduler-then-cinder-volume-constraint':
+      constraint_type => 'order',
+      first_resource  => "${::cinder::params::scheduler_service}-clone",
+      second_resource => $::cinder::params::volume_service,
+      first_action    => 'start',
+      second_action   => 'start',
+      require         => [Pacemaker::Resource::Service[$::cinder::params::scheduler_service],
+                          Pacemaker::Resource::Service[$::cinder::params::volume_service]],
+    }
+    pacemaker::constraint::colocation { 'cinder-volume-with-cinder-scheduler-colocation':
+      source  => $::cinder::params::volume_service,
+      target  => "${::cinder::params::scheduler_service}-clone",
+      score   => 'INFINITY',
+      require => [Pacemaker::Resource::Service[$::cinder::params::scheduler_service],
+                  Pacemaker::Resource::Service[$::cinder::params::volume_service]],
+    }
   }
 
 }
