@@ -81,12 +81,6 @@ class tripleo::profile::base::pacemaker (
   if $step >= 2 {
     if $pacemaker_master {
       include ::pacemaker::resource_defaults
-
-      # Create an openstack-core dummy resource. See RHBZ 1290121
-      pacemaker::resource::ocf { 'openstack-core':
-        ocf_agent_name => 'heartbeat:Dummy',
-        clone_params   => 'interleave=true',
-      }
     }
   }
 
