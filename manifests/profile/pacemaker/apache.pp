@@ -44,5 +44,15 @@ class tripleo::profile::pacemaker::apache (
       clone_params     => 'interleave=true',
       verify_on_create => true,
     }
+    pacemaker::constraint::base { 'openstack-core-then-httpd-constraint':
+      constraint_type => 'order',
+      first_resource  => 'openstack-core-clone',
+      second_resource => "${::apache::params::service_name}-clone",
+      first_action    => 'start',
+      second_action   => 'start',
+      require         => [Pacemaker::Resource::Service[$::apache::params::service_name],
+                          Pacemaker::Resource::Ocf['openstack-core']],
+    }
   }
+
 }

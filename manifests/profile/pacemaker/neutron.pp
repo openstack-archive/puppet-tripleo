@@ -181,5 +181,31 @@ class tripleo::profile::pacemaker::neutron (
                     Pacemaker::Resource::Service[$::neutron::params::metadata_agent_service]]
       }
     }
+
+    #VSM
+    if 'cisco_n1kv' in hiera('neutron::plugins::ml2::mechanism_drivers') {
+      pacemaker::resource::ocf { 'vsm-p' :
+        ocf_agent_name  => 'heartbeat:VirtualDomain',
+        resource_params => 'force_stop=true config=/var/spool/cisco/vsm/vsm_primary_deploy.xml',
+        require         => Class['n1k_vsm'],
+        meta_params     => 'resource-stickiness=INFINITY',
+      }
+      if str2bool(hiera('n1k_vsm::pacemaker_control', true)) {
+        pacemaker::resource::ocf { 'vsm-s' :
+          ocf_agent_name  => 'heartbeat:VirtualDomain',
+          resource_params => 'force_stop=true config=/var/spool/cisco/vsm/vsm_secondary_deploy.xml',
+          require         => Class['n1k_vsm'],
+          meta_params     => 'resource-stickiness=INFINITY',
+        }
+        pacemaker::constraint::colocation { 'vsm-colocation-contraint':
+          source  => 'vsm-p',
+          target  => 'vsm-s',
+          score   => '-INFINITY',
+          require => [Pacemaker::Resource::Ocf['vsm-p'],
+                      Pacemaker::Resource::Ocf['vsm-s']],
+        }
+      }
+    }
+
   }
 }
