@@ -122,7 +122,6 @@ class tripleo::profile::pacemaker::manila (
     include ::tripleo::profile::base::manila::scheduler
     include ::tripleo::profile::base::manila::share
 
-    $manila_generic_enable = hiera('manila_generic_enable_backend', false)
     if $manila_generic_enable {
       $manila_generic_backend = hiera('manila::backend::generic::title')
       manila::backend::generic { $manila_generic_backend :
