@@ -68,7 +68,9 @@ class tripleo::profile::base::haproxy (
         # This is only needed for certmonger's local CA. For any other CA this
         # operation (trusting the CA) should be done by the deployer.
         if $certmonger_ca == 'local' {
-          include ::tripleo::certmonger::ca::local
+          class { '::tripleo::certmonger::ca::local':
+            notify => Class['::tripleo::haproxy']
+          }
         }
 
         Certmonger_certificate {
