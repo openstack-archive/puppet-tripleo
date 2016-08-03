@@ -18,18 +18,13 @@
 #
 # === Parameters
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::sahara (
-  $bootstrap_node       = hiera('bootstrap_nodeid'),
-  $step                 = hiera('step'),
+  $step = hiera('step'),
 ) {
 
   Service <| tag == 'sahara-service' |> {
@@ -37,12 +32,6 @@ class tripleo::profile::pacemaker::sahara (
     restart    => '/bin/true',
     start      => '/bin/true',
     stop       => '/bin/true',
-  }
-
-  if $::hostname == downcase($bootstrap_node) {
-    $pacemaker_master = true
-  } else {
-    $pacemaker_master = false
   }
 
   include ::tripleo::profile::base::sahara
