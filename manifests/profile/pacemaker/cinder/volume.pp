@@ -32,7 +32,7 @@ class tripleo::profile::pacemaker::cinder::volume (
   $step           = hiera('step'),
 ) {
 
-  Service <| tag == 'cinder-service' |> {
+  Service <| tag == 'cinder::volume' |> {
     hasrestart => true,
     restart    => '/bin/true',
     start      => '/bin/true',
@@ -49,22 +49,6 @@ class tripleo::profile::pacemaker::cinder::volume (
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::cinder::params::volume_service : }
-    pacemaker::constraint::base { 'cinder-scheduler-then-cinder-volume-constraint':
-      constraint_type => 'order',
-      first_resource  => "${::cinder::params::scheduler_service}-clone",
-      second_resource => $::cinder::params::volume_service,
-      first_action    => 'start',
-      second_action   => 'start',
-      require         => [Pacemaker::Resource::Service[$::cinder::params::scheduler_service],
-                          Pacemaker::Resource::Service[$::cinder::params::volume_service]],
-    }
-    pacemaker::constraint::colocation { 'cinder-volume-with-cinder-scheduler-colocation':
-      source  => $::cinder::params::volume_service,
-      target  => "${::cinder::params::scheduler_service}-clone",
-      score   => 'INFINITY',
-      require => [Pacemaker::Resource::Service[$::cinder::params::scheduler_service],
-                  Pacemaker::Resource::Service[$::cinder::params::volume_service]],
-    }
   }
 
 }
