@@ -226,6 +226,10 @@
 #  (optional) Enable or not MidoNet API binding
 #  Defaults to false
 #
+# [*zaqar_api*]
+#  (optional) Enable or not Zaqar Api binding
+#  Defaults to false
+#
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
@@ -271,6 +275,8 @@
 #    'swift_proxy_ssl_port' (Defaults to 13808)
 #    'trove_api_port' (Defaults to 8779)
 #    'trove_api_ssl_port' (Defaults to 13779)
+#    'zaqar_api_port' (Defaults to 8888)
+#    'zaqar_api_ssl_port' (Defaults to 13888)
 #  Defaults to {}
 #
 class tripleo::haproxy (
@@ -322,6 +328,7 @@ class tripleo::haproxy (
   $redis                     = false,
   $redis_password            = undef,
   $midonet_api               = false,
+  $zaqar_api                 = false,
   $service_ports             = {}
 ) {
   $default_service_ports = {
@@ -367,6 +374,8 @@ class tripleo::haproxy (
     swift_proxy_ssl_port => 13808,
     trove_api_port => 8779,
     trove_api_ssl_port => 13779,
+    zaqar_api_port => 8888,
+    zaqar_api_ssl_port => 13888,
   }
   $ports = merge($default_service_ports, $service_ports)
 
@@ -885,6 +894,17 @@ class tripleo::haproxy (
       ipaddresses       => hiera('midonet_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => $haproxy_member_options,
+    }
+  }
+  if $zaqar_api {
+    ::tripleo::haproxy::endpoint { 'zaqar_api':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('zaqar_api_vip', $controller_virtual_ip),
+      service_port      => $ports[zaqar_api_port],
+      ip_addresses      => hiera('zaqar_api_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      mode              => 'http',
+      public_ssl_port   => $ports[zaqar_api_ssl_port],
     }
   }
 }
