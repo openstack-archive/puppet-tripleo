@@ -26,10 +26,8 @@
 class tripleo::profile::base::nova::conductor (
   $step = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::nova
   if $step >= 4 {
     include ::nova::conductor
   }
-
 }

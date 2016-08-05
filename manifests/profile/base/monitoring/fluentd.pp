@@ -25,7 +25,6 @@
 class tripleo::profile::base::monitoring::fluentd (
   $step = hiera('step', undef)
 ) {
-
   if $step == undef or $step >= 3 {
     include ::fluentd
 

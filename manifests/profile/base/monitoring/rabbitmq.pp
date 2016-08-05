@@ -18,22 +18,22 @@
 #
 # === Parameters
 #
-# [*vhost*]
-#   (Optional) String. RabbitMQ vhost to be used by Sensu
-#   Defaults to '/sensu'
+# [*password*]
+#   (Optional) String. Password to connect to RabbitMQ server
+#   Defaults to hiera('rabbit_password', undef)
 #
 # [*user*]
 #   (Optional) String. Username to connect to RabbitMQ server
 #   Defaults to hiera('rabbit_username', 'sensu')
 #
-# [*password*]
-#   (Optional) String. Password to connect to RabbitMQ server
-#   Defaults to hiera('rabbit_password', undef)
+# [*vhost*]
+#   (Optional) String. RabbitMQ vhost to be used by Sensu
+#   Defaults to '/sensu'
 #
 class tripleo::profile::base::monitoring::rabbitmq (
-  $vhost    = hiera('monitoring_rabbitmq_vhost', '/sensu'),
-  $user     = hiera('monitoring_rabbitmq_username', 'sensu'),
   $password = hiera('monitoring_rabbitmq_password', undef),
+  $user     = hiera('monitoring_rabbitmq_username', 'sensu'),
+  $vhost    = hiera('monitoring_rabbitmq_vhost', '/sensu'),
 ) {
   rabbitmq_vhost { 'sensu-rabbit-vhost':
     ensure => present,

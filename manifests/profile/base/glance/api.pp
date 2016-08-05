@@ -18,18 +18,18 @@
 #
 # === Parameters
 #
+# [*glance_backend*]
+#   (Optional) Glance backend(s) to use.
+#   Defaults to downcase(hiera('glance_backend', 'swift'))
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*glance_backend*]
-#   (Optional) Glance backend(s) to use.
-#   Defaults to downcase(hiera('glance_backend', 'swift'))
-#
 class tripleo::profile::base::glance::api (
-  $step           = hiera('step'),
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
+  $step           = hiera('step'),
 ) {
 
   if $step >= 4 {

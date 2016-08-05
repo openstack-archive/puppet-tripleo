@@ -31,7 +31,6 @@ class tripleo::profile::base::cinder::volume::dellsc (
   $backend_name = hiera('cinder::backend::dellsc_iscsi::volume_backend_name', 'tripleo_dellsc'),
   $step         = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {

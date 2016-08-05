@@ -18,13 +18,41 @@
 #
 # === Parameters
 #
-# [*vip*]
-#   (Optional) Public Virtual IP Address for this cloud
-#   Defaults to hiera('public_virtual_ip')
+# [*admin_password*]
+#   (Optional) Admin Password for Midonet API
+#   Defaults to hiera('admin_password')
+#
+# [*bind_address*]
+#   (Optional) The address to bind Cassandra and Midonet API to
+#   Defaults to hiera('neutron::bind_host')
 #
 # [*keystone_admin_token*]
 #   (Optional) The Keystone Admin Token
 #   Defaults to hiera('keystone::admin_token')
+#
+# [*neutron_api_node_ips*]
+#   (Optional) The IPs of the Neutron API hosts
+#   Defaults to hiera('neutron_api_node_ips')
+#
+# [*neutron_auth_password*]
+#   (Optional) Password to use for Neutron authentication
+#   Defaults to hiera('neutron::server::auth_password')
+#
+# [*neutron_auth_tenant*]
+#   (Optional) Tenant to use for Neutron authentication
+#   Defaults to hiera('neutron::server::auth_tenant')
+#
+# [*step*]
+#   (Optional) The current step of the deployment
+#   Defaults to hiera('step')
+#
+# [*vip*]
+#   (Optional) Public Virtual IP Address for this cloud
+#   Defaults to hiera('public_virtual_ip')
+#
+# [*zk_on_controller*]
+#   (Optional) Whether to put zookeeper on the controllers
+#   Defaults to hiera('enable_zookeeper_on_controller')
 #
 # [*zookeeper_client_ip*]
 #   (Optional) The IP of the Zookeeper Client
@@ -34,53 +62,19 @@
 #   (Optional) The IPs of the Zookeeper Servers
 #   Defaults to hiera('controller_node_names')
 #
-# [*neutron_api_node_ips*]
-#   (Optional) The IPs of the Neutron API hosts
-#   Defaults to hiera('neutron_api_node_ips')
-#
-# [*bind_address*]
-#   (Optional) The address to bind Cassandra and Midonet API to
-#   Defaults to hiera('neutron::bind_host')
-#
-# [*admin_password*]
-#   (Optional) Admin Password for Midonet API
-#   Defaults to hiera('admin_password')
-#
-# [*zk_on_controller*]
-#   (Optional) Whether to put zookeeper on the controllers
-#   Defaults to hiera('enable_zookeeper_on_controller')
-#
-# [*neutron_auth_tenant*]
-#   (Optional) Tenant to use for Neutron authentication
-#   Defaults to hiera('neutron::server::auth_tenant')
-#
-# [*neutron_auth_password*]
-#   (Optional) Password to use for Neutron authentication
-#   Defaults to hiera('neutron::server::auth_password')
-#
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
-#
-# [*step*]
-#   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
-#
 class tripleo::profile::base::neutron::midonet (
-  $vip                   = hiera('public_virtual_ip'),
+  $admin_password        = hiera('admin_password', ''),
+  $bind_address          = hiera('neutron::bind_host', ''),
   $keystone_admin_token  = hiera('keystone::admin_token', ''),
+  $neutron_api_node_ips  = hiera('neutron_api_node_ips', ''),
+  $neutron_auth_password = hiera('neutron::server::auth_password', ''),
+  $neutron_auth_tenant   = hiera('neutron::server::auth_tenant', ''),
+  $step                  = hiera('step'),
+  $vip                   = hiera('public_virtual_ip'),
+  $zk_on_controller      = hiera('enable_zookeeper_on_controller', ''),
   $zookeeper_client_ip   = hiera('neutron::bind_host', ''),
   $zookeeper_hostnames   = hiera('controller_node_names', ''),
-  $neutron_api_node_ips  = hiera('neutron_api_node_ips', ''),
-  $bind_address          = hiera('neutron::bind_host', ''),
-  $admin_password        = hiera('admin_password', ''),
-  $zk_on_controller      = hiera('enable_zookeeper_on_controller', ''),
-  $neutron_auth_tenant   = hiera('neutron::server::auth_tenant', ''),
-  $neutron_auth_password = hiera('neutron::server::auth_password', ''),
-  $step                  = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::neutron
   include ::tripleo::profile::base::neutron::agents::midonet
 

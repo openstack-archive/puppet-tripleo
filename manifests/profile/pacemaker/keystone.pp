@@ -22,21 +22,20 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
+# [*enable_load_balancer*]
+#   (Optional) Whether load balancing is enabled for this cluster
+#   Defaults to hiera('enable_load_balancer', true)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*enable_load_balancer*]
-#   (Optional) Whether load balancing is enabled for this cluster
-#   Defaults to hiera('enable_load_balancer', true)
-#
 class tripleo::profile::pacemaker::keystone (
   $bootstrap_node       = hiera('bootstrap_nodeid'),
+  $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
-  $enable_load_balancer = hiera('enable_load_balancer', true)
 ) {
-
   Service <| tag == 'keystone-service' |> {
     hasrestart => true,
     restart    => '/bin/true',

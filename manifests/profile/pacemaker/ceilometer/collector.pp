@@ -27,19 +27,12 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to undef
-#
 class tripleo::profile::pacemaker::ceilometer::collector (
   $pacemaker_master = hiera('bootstrap_nodeid'),
   $step             = hiera('step'),
-  $sync_db          = true,
 ) {
-
   include ::ceilometer::params
   include ::tripleo::profile::pacemaker::ceilometer
-
   include ::tripleo::profile::base::ceilometer::collector
 
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {

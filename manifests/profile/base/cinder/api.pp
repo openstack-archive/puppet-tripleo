@@ -26,7 +26,7 @@
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-
+#
 class tripleo::profile::base::cinder::api (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),

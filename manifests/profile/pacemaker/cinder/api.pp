@@ -31,7 +31,6 @@ class tripleo::profile::pacemaker::cinder::api (
   $bootstrap_node = hiera('bootstrap_nodeid'),
   $step           = hiera('step'),
 ) {
-
   Service <| tag == 'cinder-service' |> {
     hasrestart => true,
     restart    => '/bin/true',

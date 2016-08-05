@@ -25,7 +25,6 @@
 class tripleo::profile::pacemaker::nova (
   $step = hiera('step'),
 ) {
-
   Service <|
     tag == 'nova-service'
   |> {

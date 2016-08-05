@@ -26,10 +26,8 @@
 class tripleo::profile::base::nova::consoleauth (
   $step = hiera('step'),
 ) {
-
   if $step >= 4 {
     include ::tripleo::profile::base::nova
     include ::nova::consoleauth
   }
-
 }

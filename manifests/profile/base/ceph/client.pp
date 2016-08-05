@@ -26,7 +26,6 @@
 class tripleo::profile::base::ceph::client (
   $step = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::ceph
 
   if $step >= 2 {

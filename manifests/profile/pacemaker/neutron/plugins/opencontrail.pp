@@ -20,7 +20,5 @@
 #
 class tripleo::profile::pacemaker::neutron::plugins::opencontrail
 {
-
   include ::tripleo::profile::base::neutron::plugins::opencontrail
-
 }

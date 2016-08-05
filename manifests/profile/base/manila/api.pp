@@ -24,9 +24,8 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::manila::api (
-  $step           = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   if $step >= 4 {
     include ::manila
     include ::manila::api

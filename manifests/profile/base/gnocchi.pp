@@ -23,11 +23,9 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-
 class tripleo::profile::base::gnocchi (
   $step = hiera('step'),
 ) {
-
   if $step >= 3 {
     include ::gnocchi
     include ::gnocchi::config

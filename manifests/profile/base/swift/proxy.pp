@@ -23,11 +23,9 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-#
 class tripleo::profile::base::swift::proxy (
   $step = hiera('step'),
 ) {
-
   if $step >= 4 {
     include ::swift::proxy
     include ::swift::proxy::proxy_logging

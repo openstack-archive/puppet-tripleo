@@ -22,21 +22,20 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
+# [*erlang_cookie*]
+#   (Optional) Content of erlang cookie.
+#   Defaults to hiera('rabbitmq::erlang_cookie').
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*erlang_cookie*]
-#   (Optional) Content of erlang cookie.
-#   Defaults to hiera('rabbitmq::erlang_cookie').
-#
 class tripleo::profile::pacemaker::rabbitmq (
   $bootstrap_node = hiera('bootstrap_nodeid'),
-  $step           = hiera('step'),
   $erlang_cookie  = hiera('rabbitmq::erlang_cookie'),
+  $step           = hiera('step'),
 ) {
-
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {

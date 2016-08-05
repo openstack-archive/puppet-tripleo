@@ -37,7 +37,6 @@ class tripleo::profile::base::cinder (
   $pacemaker_master       = true,
   $step                   = hiera('step'),
 ) {
-
   if $step >= 4 or ($step >= 3 and $pacemaker_master) {
     include ::cinder
     include ::cinder::config

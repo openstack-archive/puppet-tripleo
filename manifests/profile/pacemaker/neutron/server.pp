@@ -31,7 +31,6 @@ class tripleo::profile::pacemaker::neutron::server (
   $pacemaker_master = hiera('bootstrap_nodeid', undef),
   $step             = hiera('step'),
 ) {
-
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
 

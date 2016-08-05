@@ -27,12 +27,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-
 class tripleo::profile::pacemaker::gnocchi::statsd (
   $pacemaker_master = hiera('bootstrap_nodeid'),
   $step             = hiera('step'),
 ) {
-
   include ::gnocchi::params
   include ::tripleo::profile::pacemaker::gnocchi
 

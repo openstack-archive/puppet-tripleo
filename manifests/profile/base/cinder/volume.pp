@@ -61,7 +61,6 @@ class tripleo::profile::base::cinder::volume (
   $cinder_user_enabled_backends = hiera('cinder_user_enabled_backends', undef),
   $step                         = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::cinder
 
   if $step >= 4 {

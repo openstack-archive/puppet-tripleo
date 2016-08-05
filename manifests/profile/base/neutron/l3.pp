@@ -18,17 +18,13 @@
 #
 # === Parameters
 #
-# [*neutron_ovs_use_veth*]
-#   (Optional) Whether to set ovs_use_veth (for older kernel support)
-#   Defaults to hiera('neutron_ovs_use_veth', false)
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::l3 (
-  $step           = hiera('step'),
+  $step = hiera('step'),
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::neutron

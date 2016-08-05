@@ -18,15 +18,6 @@
 #
 # === Parameters
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
-#
-# [*notification_driver*]
-#   (Optional) Heat notification driver to use.
-#   Defaults to 'messaging'
-#
 # [*bootstrap_master*]
 #   (Optional) The hostname of the node responsible for bootstrapping
 #   Defaults to downcase(hiera('bootstrap_nodeid'))
@@ -35,13 +26,21 @@
 #   (Optional) Whether keystone token flushing should be enabled
 #   Defaults to hiera('keystone_enable_db_purge', true)
 #
+# [*notification_driver*]
+#   (Optional) Heat notification driver to use.
+#   Defaults to 'messaging'
+#
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
+#
 class tripleo::profile::base::heat (
-  $step = hiera('step'),
+  $bootstrap_master    = downcase(hiera('bootstrap_nodeid')),
+  $manage_db_purge     = hiera('heat_enable_db_purge', true),
   $notification_driver = 'messaging',
-  $bootstrap_master = downcase(hiera('bootstrap_nodeid')),
-  $manage_db_purge = hiera('heat_enable_db_purge', true),
+  $step                = hiera('step'),
 ) {
-
   # Domain resources will be created at step5 on the pacemaker_master so we
   # configure heat.conf at step3 and 4 but actually create the domain later.
   if $step == 3 or $step == 4 {

@@ -23,11 +23,9 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-
 class tripleo::profile::base::ceilometer::agent::central (
   $step = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::ceilometer
 
   if $step >= 4 {

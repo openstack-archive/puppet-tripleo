@@ -18,29 +18,30 @@
 #
 # === Parameters
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
+# [*manage_resources*]
+#   (Optional) Whether or not manage root user, root my.cnf, and service.
+#   Defaults to true
 #
 # [*mysql_server_options*]
 #   (Optional) Extras options to deploy MySQL. Useful when deploying Galera cluster.
 #   Should be an hash.
 #   Defaults to {}
 #
-# [*manage_resources*]
-#   (Optional) Whether or not manage root user, root my.cnf, and service.
-#   Defaults to true
-#
 # [*remove_default_accounts*]
 #   (Optional) Whether or not remove default MySQL accounts.
 #   Defaults to true
 #
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
+#
 class tripleo::profile::base::database::mysql (
-  $step                    = hiera('step'),
-  $mysql_server_options    = {},
   $manage_resources        = true,
+  $mysql_server_options    = {},
   $remove_default_accounts = true,
+  $step                    = hiera('step'),
+
 ) {
 
   validate_hash($mysql_server_options)

@@ -18,18 +18,17 @@
 #
 # === Parameters
 #
-# [*mongodb_node_ips*]
-#   List of The mongodb node ip addresses
-#
 # [*mongodb_ipv6_enabled*]
 #   A boolean value for mongodb server ipv6 is enabled or not
 #   Defaults to false
 #
+# [*mongodb_node_ips*]
+#   List of The mongodb node ip addresses
+#
 class tripleo::profile::base::database::mongodbcommon (
-  $mongodb_node_ips     = hiera('mongo_node_ips'),
   $mongodb_ipv6_enabled = false,
+  $mongodb_node_ips     = hiera('mongo_node_ips'),
 ) {
-
   $port = '27017'
 
   # NOTE(gfidente): the following vars are needed on all nodes so they

@@ -31,7 +31,6 @@ class tripleo::profile::pacemaker::ceilometer::agent::central (
   $pacemaker_master = hiera('bootstrap_nodeid'),
   $step             = hiera('step'),
 ) {
-
   include ::ceilometer::params
   include ::tripleo::profile::pacemaker::ceilometer
   include ::tripleo::profile::base::ceilometer::agent::central

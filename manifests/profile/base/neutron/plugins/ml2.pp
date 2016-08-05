@@ -18,23 +18,23 @@
 #
 # === Parameters
 #
-# [*mechanism_drivers*]
-#   (Optional) The mechanism drivers to use with the Ml2 plugin
-#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
-#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
+#
+# [*mechanism_drivers*]
+#   (Optional) The mechanism drivers to use with the Ml2 plugin
+#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-
+#
 class tripleo::profile::base::neutron::plugins::ml2 (
-  $mechanism_drivers  = hiera('neutron::plugins::ml2::mechanism_drivers'),
-  $bootstrap_node     = hiera('bootstrap_nodeid', undef),
-  $step               = hiera('step'),
+  $bootstrap_node    = hiera('bootstrap_nodeid', undef),
+  $mechanism_drivers = hiera('neutron::plugins::ml2::mechanism_drivers'),
+  $step              = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

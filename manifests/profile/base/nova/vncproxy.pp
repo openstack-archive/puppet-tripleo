@@ -26,10 +26,8 @@
 class tripleo::profile::base::nova::vncproxy (
   $step = hiera('step'),
 ) {
-
   if $step >= 4 {
     include ::tripleo::profile::base::nova
     include ::nova::vncproxy
   }
-
 }

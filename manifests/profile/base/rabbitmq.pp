@@ -18,25 +18,25 @@
 #
 # === Parameters
 #
-# [*nodes*]
-#   (Optional) Array of host(s) for RabbitMQ nodes.
-#   Defaults to hiera('rabbit_node_ips', []).
-#
-# [*ipv6*]
-#   (Optional) Whether to deploy RabbitMQ on IPv6 network.
-#   Defaults to str2bool(hiera('rabbit_ipv6', false)).
+# [*config_variables*]
+#   (Optional) RabbitMQ environment.
+#   Defaults to hiera('rabbitmq_config_variables').
 #
 # [*environment*]
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
 #
+# [*ipv6*]
+#   (Optional) Whether to deploy RabbitMQ on IPv6 network.
+#   Defaults to str2bool(hiera('rabbit_ipv6', false)).
+#
 # [*kernel_variables*]
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
 #
-# [*config_variables*]
-#   (Optional) RabbitMQ environment.
-#   Defaults to hiera('rabbitmq_config_variables').
+# [*nodes*]
+#   (Optional) Array of host(s) for RabbitMQ nodes.
+#   Defaults to hiera('rabbit_node_ips', []).
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -44,14 +44,13 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::rabbitmq (
-  $nodes            = hiera('rabbit_node_ips', []),
-  $ipv6             = str2bool(hiera('rabbit_ipv6', false)),
-  $environment      = hiera('rabbitmq_environment'),
-  $kernel_variables = hiera('rabbitmq_kernel_variables'),
   $config_variables = hiera('rabbitmq_config_variables'),
+  $environment      = hiera('rabbitmq_environment'),
+  $ipv6             = str2bool(hiera('rabbit_ipv6', false)),
+  $kernel_variables = hiera('rabbitmq_kernel_variables'),
+  $nodes            = hiera('rabbit_node_ips', []),
   $step             = hiera('step'),
 ) {
-
   # IPv6 environment, necessary for RabbitMQ.
   if $ipv6 {
     $rabbit_env = merge($environment, {

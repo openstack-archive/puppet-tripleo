@@ -32,10 +32,9 @@
 #
 class tripleo::profile::pacemaker::database::mongodb (
   $mongodb_replset,
-  $bootstrap_node       = hiera('bootstrap_nodeid'),
-  $step                 = hiera('step'),
+  $bootstrap_node = hiera('bootstrap_nodeid'),
+  $step           = hiera('step'),
 ) {
-
   if $step >= 1 {
     include ::mongodb::globals
     include ::mongodb::client

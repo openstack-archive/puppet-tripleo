@@ -25,7 +25,7 @@
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
-
+#
 class tripleo::profile::base::ironic (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),

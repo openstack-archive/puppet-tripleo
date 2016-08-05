@@ -23,10 +23,10 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ironic::api (
-  $step    = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::ironic
+
   if $step >= 4 {
       include ::ironic::api
   }

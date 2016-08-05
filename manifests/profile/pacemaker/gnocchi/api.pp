@@ -22,15 +22,11 @@
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-
+#
 class tripleo::profile::pacemaker::gnocchi::api (
-  $step             = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   include ::tripleo::profile::pacemaker::gnocchi
   include ::tripleo::profile::pacemaker::apache
-
-  class { '::tripleo::profile::base::gnocchi::api':
-    step    => $step,
-  }
+  include ::tripleo::profile::base::gnocchi::api
 }

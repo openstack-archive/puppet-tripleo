@@ -26,7 +26,6 @@
 class tripleo::profile::pacemaker::sahara (
   $step = hiera('step'),
 ) {
-
   Service <| tag == 'sahara-service' |> {
     hasrestart => true,
     restart    => '/bin/true',

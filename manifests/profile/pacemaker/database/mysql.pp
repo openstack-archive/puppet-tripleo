@@ -26,7 +26,6 @@
 class tripleo::profile::pacemaker::database::mysql (
   $step = hiera('step'),
 ) {
-
   if $::hostname == downcase(hiera('bootstrap_nodeid')) {
     $pacemaker_master = true
   } else {

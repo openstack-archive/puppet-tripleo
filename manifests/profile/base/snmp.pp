@@ -18,25 +18,24 @@
 #
 # === Parameters
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
+# [*snmpd_password*]
+#   The SNMP password
+#   Defaults to hiera('snmpd_readonly_user_password')
 #
 # [*snmpd_user*]
 #   The SNMP username
 #   Defaults to hiera('snmpd_readonly_user_name')
 #
-# [*snmpd_password*]
-#   The SNMP password
-#   Defaults to hiera('snmpd_readonly_user_password')
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
 #
 class tripleo::profile::base::snmp (
-  $step           = hiera('step'),
-  $snmpd_user     = hiera('snmpd_readonly_user_name'),
   $snmpd_password = hiera('snmpd_readonly_user_password'),
+  $snmpd_user     = hiera('snmpd_readonly_user_name'),
+  $step           = hiera('step'),
 ) {
-
   if $step >= 4 {
     snmp::snmpv3_user { $snmpd_user:
       authtype => 'MD5',

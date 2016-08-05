@@ -20,7 +20,5 @@
 #
 class tripleo::profile::pacemaker::neutron::plugins::plumgrid
 {
-
   include ::tripleo::profile::base::neutron::plugins::plumgrid
-
 }

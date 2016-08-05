@@ -20,7 +20,5 @@
 #
 class tripleo::profile::pacemaker::neutron::plugins::nuage
 {
-
   include ::tripleo::profile::base::neutron::plugins::nuage
-
 }

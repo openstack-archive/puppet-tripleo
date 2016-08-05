@@ -18,21 +18,20 @@
 #
 # === Parameters
 #
+# [*enable_swift_storage*]
+#   (Optional) enable_swift_storage
+#   Deprecated: defaults to true
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*enable_swift_storage*]
-#   (Optional) enable_swift_storage
-#   Deprecated: defaults to true
-#
 class tripleo::profile::base::swift::storage (
-  $step                 = hiera('step'),
   # Deprecated conditional to support ControllerEnableSwiftStorage parameter
   $enable_swift_storage = true,
+  $step                 = hiera('step'),
 ) {
-
   if $step >= 4 {
     if $enable_swift_storage {
       include ::swift::storage::all

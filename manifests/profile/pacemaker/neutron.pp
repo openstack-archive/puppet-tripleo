@@ -18,21 +18,13 @@
 #
 # === Parameters
 #
-# [*step*]
-#   (Optional) The step in the deployment
-#   Defaults to hiera('step')
-#
-# [*pacemaker_master*]
-#   (Optional) The hostname of the pacemaker master
-#   Defaults to hiera('bootstrap_nodeid', undef)
+# [*enable_dhcp*]
+#   (Optional) Whether to include the Neutron DHCP agent pacemaker profile
+#   Defaults to hiera('neutron::enable_dhcp_agent', false)
 #
 # [*enable_l3*]
 #   (Optional) Whether to include the Neutron L3 agent pacemaker profile
 #   Defaults to hiera('neutron::enable_l3_agent', false)
-#
-# [*enable_dhcp*]
-#   (Optional) Whether to include the Neutron DHCP agent pacemaker profile
-#   Defaults to hiera('neutron::enable_dhcp_agent', false)
 #
 # [*enable_metadata*]
 #   (Optional) Whether to include the Neutron Metadata agent pacemaker profile
@@ -42,16 +34,24 @@
 #   (Optional) Whether to include the Neutron OVS agent pacemaker profile
 #   Defaults to hiera('neutron::enable_ovs_agent', false)
 #
+# [*pacemaker_master*]
+#   (Optional) The hostname of the pacemaker master
+#   Defaults to hiera('bootstrap_nodeid', undef)
+#
+# [*step*]
+#   (Optional) The step in the deployment
+#   Defaults to hiera('step')
+#
 class tripleo::profile::pacemaker::neutron (
-  $step             = hiera('step'),
-  $pacemaker_master = hiera('bootstrap_nodeid', undef),
   # We can drop the hiera defaults once the neutron roles are decomposed
-  $enable_l3        = hiera('neutron::enable_l3_agent', false),
   $enable_dhcp      = hiera('neutron::enable_dhcp_agent', false),
+  $enable_l3        = hiera('neutron::enable_l3_agent', false),
   $enable_metadata  = hiera('neutron::enable_metadata_agent', false),
   $enable_ovs       = hiera('neutron::enable_ovs_agent', false),
+  #Don't drop below this line
+  $pacemaker_master = hiera('bootstrap_nodeid', undef),
+  $step             = hiera('step'),
 ) {
-
   Service <|
     tag == 'neutron-service'
   |> {

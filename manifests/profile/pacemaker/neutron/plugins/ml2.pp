@@ -20,10 +20,7 @@
 #
 class tripleo::profile::pacemaker::neutron::plugins::ml2
 {
-
   include ::neutron::params
   include ::tripleo::profile::pacemaker::neutron
-
   include ::tripleo::profile::base::neutron::plugins::ml2
-
 }

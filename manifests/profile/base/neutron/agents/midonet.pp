@@ -18,26 +18,24 @@
 #
 # === Parameters
 #
-# [*neutron_api_node_ips*]
-#   (Optional) The IPs of the Neutron API hosts
-#   Defaults to hiera('neutron_api_node_ips')
-#
 # [*midonet_libvirt_qemu_data*]
 #   (Optional) qemu.conf data for midonet.
 #   Defaults to hiera('midonet_libvirt_qemu_data')
+#
+# [*neutron_api_node_ips*]
+#   (Optional) The IPs of the Neutron API hosts
+#   Defaults to hiera('neutron_api_node_ips')
 #
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::agents::midonet (
-  $neutron_api_node_ips       = hiera('neutron_api_node_ips', ''),
-  $midonet_libvirt_qemu_data  = hiera('midonet_libvirt_qemu_data', ''),
-  $step                       = hiera('step'),
+  $midonet_libvirt_qemu_data = hiera('midonet_libvirt_qemu_data', ''),
+  $neutron_api_node_ips      = hiera('neutron_api_node_ips', ''),
+  $step                      = hiera('step'),
 ) {
-
   if $step >= 4 {
-
     # TODO(devvesa) provide non-controller ips for these services
     class { '::tripleo::network::midonet::agent':
       zookeeper_servers => $neutron_api_node_ips,
@@ -50,7 +48,5 @@ class tripleo::profile::base::neutron::agents::midonet (
         content => hiera('midonet_libvirt_qemu_data')
       }
     }
-
   }
-
 }

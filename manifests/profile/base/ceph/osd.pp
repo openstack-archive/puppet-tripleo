@@ -31,7 +31,6 @@ class tripleo::profile::base::ceph::osd (
   $ceph_osd_selinux_permissive = false,
   $step                        = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::ceph
 
   if $step >= 3 {

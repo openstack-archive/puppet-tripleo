@@ -18,26 +18,24 @@
 #
 # === Parameters
 #
-# [*redis_node_ips*]
-#   (Optional) List of Redis node ips
-#   Defaults to hiera('redis_node_ips')
-#
 # [*bootstrap_nodeid*]
 #   (Optional) Hostname of Redis master
 #   Defaults to hiera('bootstrap_nodeid')
+#
+# [*redis_node_ips*]
+#   (Optional) List of Redis node ips
+#   Defaults to hiera('redis_node_ips')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-
 class tripleo::profile::base::database::redis (
-  $redis_node_ips   = hiera('redis_node_ips'),
   $bootstrap_nodeid = hiera('bootstrap_nodeid'),
+  $redis_node_ips   = hiera('redis_node_ips'),
   $step             = hiera('step'),
 ) {
-
   if $step >= 2 {
     if $bootstrap_nodeid == $::hostname {
       $slaveof = undef

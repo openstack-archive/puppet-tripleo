@@ -20,11 +20,10 @@
 #
 # [*swift_zones*]
 #   (Optional) The number of swift zones.
-
+#
 define tripleo::profile::base::swift::add_devices(
   $swift_zones = '1'
 ){
-
   # NOTE(dprince): Swift zones is not yet properly wired into the Heat
   # templates. See: https://review.openstack.org/#/c/97758/3
   # For now our regex supports the r1z1-192.0.2.6:%PORT%/d1 syntax or the

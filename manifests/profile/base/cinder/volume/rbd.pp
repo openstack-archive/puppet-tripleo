@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*backend_name*]
+#   (Optional) Name given to the Cinder backend stanza
+#   Defaults to 'tripleo_ceph'
+#
 # [*cinder_rbd_backend_host*]
 #   (Optional) String to use as backend_host in the backend stanza
 #   Defaults to 'cinder::host'
@@ -34,24 +38,19 @@
 #   (Optional) The user name for the RBD client
 #   Defaults to 'openstack'
 #
-# [*backend_name*]
-#   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_ceph'
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::volume::rbd (
+  $backend_name            = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph'),
   $cinder_rbd_backend_host = hiera('cinder::host', 'hostgroup'),
   $cinder_rbd_pool_name    = 'volumes',
   $cinder_rbd_secret_uuid  = hiera('ceph::profile::params::fsid', undef),
   $cinder_rbd_user_name    = 'openstack',
-  $backend_name            = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph'),
   $step                    = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {

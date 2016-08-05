@@ -24,9 +24,8 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::heat::api_cloudwatch (
-  $step           = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   if $step >= 4 {
     include ::tripleo::profile::base::heat
     include ::heat::api_cloudwatch

@@ -22,28 +22,28 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
-# [*step*]
-#   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+# [*libvirt_enabled*]
+#   (Optional) Whether or not Libvirt is enabled.
+#   Defaults to false
 #
 # [*manage_migration*]
 #   (Optional) Whether or not manage Nova Live migration
-#   Defaults to false
-#
-# [*libvirt_enabled*]
-#   (Optional) Whether or not Libvirt is enabled.
 #   Defaults to false
 #
 # [*nova_compute_enabled*]
 #   (Optional) Whether or not nova-compute is enabled.
 #   Defaults to false
 #
+# [*step*]
+#   (Optional) The current step of the deployment
+#   Defaults to hiera('step')
+#
 class tripleo::profile::base::nova (
   $bootstrap_node       = hiera('bootstrap_nodeid', undef),
-  $step                 = hiera('step'),
-  $manage_migration     = false,
   $libvirt_enabled      = false,
+  $manage_migration     = false,
   $nova_compute_enabled = false,
+  $step                 = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

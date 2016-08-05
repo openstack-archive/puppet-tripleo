@@ -18,22 +18,22 @@
 #
 # === Parameters
 #
-# [*manage_db_purge*]
-#   (Optional) Whether keystone token flushing should be enabled
-#   Defaults to hiera('keystone_enable_db_purge', true)
-#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
+#
+# [*manage_db_purge*]
+#   (Optional) Whether keystone token flushing should be enabled
+#   Defaults to hiera('keystone_enable_db_purge', true)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-
+#
 class tripleo::profile::base::keystone (
-  $manage_db_purge = hiera('keystone_enable_db_purge', true),
   $bootstrap_node  = hiera('bootstrap_nodeid', undef),
+  $manage_db_purge = hiera('keystone_enable_db_purge', true),
   $step            = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {

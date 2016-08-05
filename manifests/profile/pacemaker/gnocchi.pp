@@ -18,26 +18,24 @@
 #
 # === Parameters
 #
-# [*gnocchi_indexer_backend*]
-#   (Optional) Gnocchi indexer backend
-#   Defaults to mysql
-#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
+#
+# [*gnocchi_indexer_backend*]
+#   (Optional) Gnocchi indexer backend
+#   Defaults to mysql
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-
 class tripleo::profile::pacemaker::gnocchi (
+  $bootstrap_node          = hiera('bootstrap_nodeid'),
   $gnocchi_indexer_backend = downcase(hiera('gnocchi_indexer_backend', 'mysql')),
-  $bootstrap_node  = hiera('bootstrap_nodeid'),
-  $step            = hiera('step'),
+  $step                    = hiera('step'),
 ) {
-
   Service <| tag == 'gnocchi-service' |> {
     hasrestart => true,
     restart    => '/bin/true',

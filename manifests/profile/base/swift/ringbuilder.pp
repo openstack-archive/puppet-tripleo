@@ -18,30 +18,33 @@
 #
 # === Parameters
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
-#  [*swift_zones*]
-#   (Optional) The swift zones
-#   Defaults to 1
+#  [*replicas*]
+#    replicas
+#
+#  [*build_ring*] = true,
+#   (Optional) Whether to build the ring
+#   Defaults to true
+#
 #  [*devices*]
 #   (Optional) The swift devices
 #   Defaults to ''
-#  [*build_ring*]      = true,
-#   (Optional) Whether to build the ring
-#   Defaults to true
-#  [*replicas*]
-#    replicas
-
+#
+#  [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
+#
+#  [*swift_zones*]
+#   (Optional) The swift zones
+#   Defaults to 1
+#
 class tripleo::profile::base::swift::ringbuilder (
-  $step = hiera('step'),
-  $swift_zones     = '1',
-  $devices         = '',
-  $build_ring      = true,
   $replicas,
+  $build_ring  = true,
+  $devices     = '',
+  $step        = hiera('step'),
+  $swift_zones = '1',
 ) {
-
   if $step >= 2 {
     # pre-install swift here so we can build rings
     include ::swift

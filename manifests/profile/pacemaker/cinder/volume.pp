@@ -31,7 +31,6 @@ class tripleo::profile::pacemaker::cinder::volume (
   $bootstrap_node = hiera('bootstrap_nodeid'),
   $step           = hiera('step'),
 ) {
-
   Service <| tag == 'cinder::volume' |> {
     hasrestart => true,
     restart    => '/bin/true',

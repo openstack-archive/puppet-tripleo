@@ -23,11 +23,9 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-#
 class tripleo::profile::base::memcached (
-  $step             = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   if $step >= 1 {
       include ::memcached
   }

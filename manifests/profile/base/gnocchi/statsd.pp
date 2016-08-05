@@ -23,11 +23,9 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-
 class tripleo::profile::base::gnocchi::statsd (
   $step = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::gnocchi
 
   if $step >= 4 {

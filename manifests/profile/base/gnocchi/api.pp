@@ -18,22 +18,22 @@
 #
 # === Parameters
 #
-# [*gnocchi_backend*]
-#   (Optional) Gnocchi backend string file, swift or rbd
-#   Defaults to swift
-#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
+#
+# [*gnocchi_backend*]
+#   (Optional) Gnocchi backend string file, swift or rbd
+#   Defaults to swift
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-
+#
 class tripleo::profile::base::gnocchi::api (
-  $gnocchi_backend = downcase(hiera('gnocchi_backend', 'swift')),
   $bootstrap_node  = hiera('bootstrap_nodeid', undef),
+  $gnocchi_backend = downcase(hiera('gnocchi_backend', 'swift')),
   $step            = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {

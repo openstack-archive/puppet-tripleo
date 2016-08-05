@@ -31,7 +31,6 @@ class tripleo::profile::pacemaker::memcached (
   $bootstrap_node = hiera('bootstrap_nodeid'),
   $step           = hiera('step'),
 ) {
-
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {

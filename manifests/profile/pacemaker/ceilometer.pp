@@ -31,7 +31,6 @@ class tripleo::profile::pacemaker::ceilometer (
   $bootstrap_node = hiera('bootstrap_nodeid'),
   $step           = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::ceilometer
 
   $ceilometer_backend = downcase(hiera('ceilometer_backend', 'mongodb'))

@@ -21,6 +21,10 @@
 # [*cinder_iscsi_address*]
 #   The address where to bind the iscsi targets daemon
 #
+# [*backend_name*]
+#   (Optional) Name given to the Cinder backend stanza
+#   Defaults to 'tripleo_iscsi'
+#
 # [*cinder_iscsi_helper*]
 #   (Optional) The iscsi helper to use
 #   Defaults to 'tgtadm'
@@ -29,10 +33,6 @@
 #   (Optional) The size (in MB) of the LVM loopback volume
 #   Defaults to '10280'
 #
-# [*backend_name*]
-#   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_iscsi'
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -40,12 +40,11 @@
 #
 class tripleo::profile::base::cinder::volume::iscsi (
   $cinder_iscsi_address,
-  $cinder_iscsi_helper          = 'tgtadm',
-  $cinder_lvm_loop_device_size  = '10280',
-  $backend_name                 = hiera('cinder::backend::iscsi::volume_backend_name', 'tripleo_iscsi'),
-  $step                         = hiera('step'),
+  $backend_name                = hiera('cinder::backend::iscsi::volume_backend_name', 'tripleo_iscsi'),
+  $cinder_iscsi_helper         = 'tgtadm',
+  $cinder_lvm_loop_device_size = '10280',
+  $step                        = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {

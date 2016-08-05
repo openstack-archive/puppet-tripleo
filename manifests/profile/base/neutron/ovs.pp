@@ -26,7 +26,6 @@
 class tripleo::profile::base::neutron::ovs(
   $step           = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::neutron
 
   if $step >= 4 {

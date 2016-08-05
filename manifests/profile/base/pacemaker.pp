@@ -26,7 +26,6 @@
 class tripleo::profile::base::pacemaker (
   $step = hiera('step'),
 ) {
-
   Pcmk_resource <| |> {
     tries     => 10,
     try_sleep => 3,

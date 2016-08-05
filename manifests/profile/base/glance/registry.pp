@@ -22,19 +22,19 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
+# [*glance_backend*]
+#   (Optional) Glance backend(s) to use.
+#   Defaults to downcase(hiera('glance_backend', 'swift'))
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*glance_backend*]
-#   (Optional) Glance backend(s) to use.
-#   Defaults to downcase(hiera('glance_backend', 'swift'))
-
 class tripleo::profile::base::glance::registry (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
+  $step           = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

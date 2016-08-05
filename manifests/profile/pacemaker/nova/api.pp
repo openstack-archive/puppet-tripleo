@@ -18,18 +18,18 @@
 #
 # === Parameters
 #
+# [*pacemaker_master*]
+#   (Optional) The hostname of the pacemaker master
+#   Defaults to downcase(hiera('bootstrap_nodeid'))
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*pacemaker_master*]
-#   (Optional) The hostname of the pacemaker master
-#   Defaults to downcase(hiera('bootstrap_nodeid'))
-#
 class tripleo::profile::pacemaker::nova::api (
-  $step             = hiera('step'),
   $pacemaker_master = downcase(hiera('bootstrap_nodeid')),
+  $step             = hiera('step'),
 ) {
 
   include ::nova::params

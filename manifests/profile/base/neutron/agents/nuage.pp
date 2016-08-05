@@ -18,36 +18,34 @@
 #
 # === Parameters
 #
-# [*nova_os_tenant_name*]
-#   (Optional) Nova tenant name
-#   Defaults to hiera('nova_os_tenant_name')
-#
-# [*nova_os_password*]
-#   (Optional) Nova password
-#   Defaults to hiera('nova_password')
+# [*nova_auth_ip*]
+#   (Optional) Nova auth IP
+#   Defaults to hiera('keystone_public_api_virtual_ip')
 #
 # [*nova_metadata_ip*]
 #   (Optional) Nova metadata node IPs
 #   Defaults to hiera('nova_metadata_node_ips')
 #
-# [*nova_auth_ip*]
-#   (Optional) Nova auth IP
-#   Defaults to hiera('keystone_public_api_virtual_ip')
+# [*nova_os_password*]
+#   (Optional) Nova password
+#   Defaults to hiera('nova_password')
+#
+# [*nova_os_tenant_name*]
+#   (Optional) Nova tenant name
+#   Defaults to hiera('nova_os_tenant_name')
 #
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::agents::nuage (
-  $nova_os_tenant_name       = hiera('nova::api::admin_tenant_name', ''),
-  $nova_os_password          = hiera('nova_password', ''),
-  $nova_metadata_ip          = hiera('nova_metadata_node_ips', ''),
-  $nova_auth_ip              = hiera('keystone_public_api_virtual_ip', ''),
-  $step                      = hiera('step'),
+  $nova_auth_ip        = hiera('keystone_public_api_virtual_ip', ''),
+  $nova_metadata_ip    = hiera('nova_metadata_node_ips', ''),
+  $nova_os_password    = hiera('nova_password', ''),
+  $nova_os_tenant_name = hiera('nova::api::admin_tenant_name', ''),
+  $step                = hiera('step'),
 ) {
-
   if $step >= 4 {
-
     include ::nuage::vrs
 
     class { '::nuage::metadataagent':
@@ -56,7 +54,5 @@ class tripleo::profile::base::neutron::agents::nuage (
       nova_metadata_ip    => $nova_metadata_ip,
       nova_auth_ip        => $nova_auth_ip,
     }
-
   }
-
 }

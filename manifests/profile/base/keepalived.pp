@@ -18,25 +18,23 @@
 #
 # === Parameters
 #
+# [*enable_load_balancer*]
+#   (Optional) Whether or not loadbalancer is enabled.
+#   Defaults to hiera('enable_load_balancer', true).
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*enable_load_balancer*]
-#   (Optional) Whether or not loadbalancer is enabled.
-#   Defaults to hiera('enable_load_balancer', true).
-#
 class tripleo::profile::base::keepalived (
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
 ) {
-
   if $step >= 1 {
     if $enable_load_balancer and hiera('enable_keepalived', true){
       include ::tripleo::keepalived
     }
   }
-
 }
 

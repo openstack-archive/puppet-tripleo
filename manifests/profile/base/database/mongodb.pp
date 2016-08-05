@@ -32,10 +32,9 @@
 #
 class tripleo::profile::base::database::mongodb (
   $mongodb_replset,
-  $bootstrap_node       = downcase(hiera('bootstrap_nodeid')),
-  $step                 = hiera('step'),
+  $bootstrap_node = downcase(hiera('bootstrap_nodeid')),
+  $step           = hiera('step'),
 ) {
-
   if $step >= 2 {
 
     include ::mongodb::globals

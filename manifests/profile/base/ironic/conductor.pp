@@ -23,9 +23,8 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ironic::conductor (
-  $step    = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::ironic
 
   if $step >= 4 {

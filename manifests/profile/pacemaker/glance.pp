@@ -22,18 +22,9 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
-#
 # [*glance_backend*]
 #   (Optional) Glance backend(s) to use.
 #   Defaults to downcase(hiera('glance_backend', 'swift'))
-#
-# [*glance_file_pcmk_manage*]
-#   (Optional) Whether or not manage glance_file_pcmk.
-#   Defaults to hiera('glance_file_pcmk_manage', false)
 #
 # [*glance_file_pcmk_device*]
 #   (Optional) Device to mount glance file backend.
@@ -47,21 +38,29 @@
 #   (Optional) Filesystem type to mount glance file backend.
 #   Defaults to hiera('glance_file_pcmk_fstype', '')
 #
+# [*glance_file_pcmk_manage*]
+#   (Optional) Whether or not manage glance_file_pcmk.
+#   Defaults to hiera('glance_file_pcmk_manage', false)
+#
 # [*glance_file_pcmk_options*]
 #   (Optional) pcmk options to mount Glance file backend..
 #   Defaults to hiera('glance_file_pcmk_options', '')
 #
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
+#
 class tripleo::profile::pacemaker::glance (
   $bootstrap_node             = hiera('bootstrap_nodeid'),
-  $step                       = hiera('step'),
   $glance_backend             = downcase(hiera('glance_backend', 'swift')),
-  $glance_file_pcmk_manage    = hiera('glance_file_pcmk_manage', false),
   $glance_file_pcmk_device    = hiera('glance_file_pcmk_device', ''),
   $glance_file_pcmk_directory = hiera('glance_file_pcmk_directory', ''),
   $glance_file_pcmk_fstype    = hiera('glance_file_pcmk_fstype', ''),
+  $glance_file_pcmk_manage    = hiera('glance_file_pcmk_manage', false),
   $glance_file_pcmk_options   = hiera('glance_file_pcmk_options', ''),
+  $step                       = hiera('step'),
 ) {
-
   Service <| tag == 'glance-service' |> {
     hasrestart => true,
     restart    => '/bin/true',

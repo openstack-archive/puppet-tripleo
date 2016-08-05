@@ -31,7 +31,6 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-
 class tripleo::profile::pacemaker::database::redis (
   $bootstrap_node       = hiera('bootstrap_nodeid'),
   $enable_load_balancer = hiera('enable_load_balancer', true),

@@ -24,12 +24,10 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::manila::share (
-  $step           = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   if $step >= 4 {
     include ::manila::share
   }
-
 }
 

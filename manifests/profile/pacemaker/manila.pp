@@ -22,86 +22,85 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
-#
-# [*manila_generic_enable*]
-#   (Optional) Enable the generic backend.
-#   Defaults to hiera('manila_generic_enable_backend', 'false')
+# [*cinder_volume_type*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::generic::cinder_volume_type', '')
 #
 # [*driver_handles_share_servers*]
 #   (Optional)
 #   Defaults to hiera('manila::backend::generic::driver_handles_share_servers')
 #
-# [*smb_template_config_path*]
-#   (Optional)
-#   Defaults to hiera('manila::backend::generic::smb_template_config_path')
-#
-# [*volume_name_template*]
-#   (Optional)
-#   Defaults to hiera('manila::backend::generic::volume_name_template')
-
-# [*volume_snapshot_name_template*]
-#   (Optional)
-#   Defaults to hiera('manila::backend::generic::volume_snapshot_name_template')
-#
-# [*share_mount_path*]
-#   (Optional)
-#   Defaults to hiera('manila::backend::generic::share_mount_path')
-#
-# [*max_time_to_create_volume*]
-#   (Optional)
-#   Defaults to hiera('manila::backend::generic::max_time_to_create_volume')
+# [*manila_generic_enable*]
+#   (Optional) Enable the generic backend.
+#   Defaults to hiera('manila_generic_enable_backend', 'false')
 #
 # [*max_time_to_attach*]
 #   (Optional)
 #   Defaults to hiera('manila::backend::generic::max_time_to_attach')
 #
+# [*max_time_to_create_volume*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::generic::max_time_to_create_volume')
+#
+# [*service_instance_flavor_id*]
+#   (Optional)
+#   Defaults to hiera('manila::service_instance::service_instance_flavor_id')
+#
+# [*service_instance_password*]
+#   (Optional)
+#   Defaults to hiera('manila::service_instance::service_instance_password')
+#
 # [*service_instance_smb_config_path*]
 #   (Optional)
 #   Defaults to downcase(hiera('manila::backend::generic::service_instance_smb_config_path'))
+#
+# [*service_instance_user*]
+#   (Optional)
+#   Defaults to hiera('manila::service_instance::service_instance_user')
+#
+# [*share_mount_path*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::generic::share_mount_path')
 #
 # [*share_volume_fstype*]
 #   (Optional)
 #   Defaults to hiera('manila::backend::generic::share_volume_fstype')
 #
-# [*cinder_volume_type*]
+# [*smb_template_config_path*]
 #   (Optional)
-#   Defaults to hiera('manila::backend::generic::cinder_volume_type', '')
+#   Defaults to hiera('manila::backend::generic::smb_template_config_path')
 #
-# [*service_instance_user*]
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
+#
+# [*volume_name_template*]
 #   (Optional)
-#   Defaults to hiera('manila::service_instance::service_instance_user')
-
-# [*service_instance_password*]
+#   Defaults to hiera('manila::backend::generic::volume_name_template')
+#
+# [*volume_snapshot_name_template*]
 #   (Optional)
-#   Defaults to hiera('manila::service_instance::service_instance_password')
-
-# [*service_instance_flavor_id*]
-#   (Optional)
-#   Defaults to hiera('manila::service_instance::service_instance_flavor_id')
+#   Defaults to hiera('manila::backend::generic::volume_snapshot_name_template')
 #
 class tripleo::profile::pacemaker::manila (
   $bootstrap_node                   = hiera('bootstrap_nodeid'),
-  $step                             = hiera('step'),
-  $manila_generic_enable            = hiera('manila_generic_enable_backend', false),
+  $cinder_volume_type               = hiera('manila::backend::generic::cinder_volume_type', ''),
   $driver_handles_share_servers     = hiera('manila::backend::generic::driver_handles_share_servers'),
+  $manila_generic_enable            = hiera('manila_generic_enable_backend', false),
+  $max_time_to_attach               = hiera('manila::backend::generic::max_time_to_attach'),
+  $max_time_to_create_volume        = hiera('manila::backend::generic::max_time_to_create_volume'),
+  $service_instance_flavor_id       = hiera('manila::service_instance::service_instance_flavor_id'),
+  $service_instance_password        = hiera('manila::service_instance::service_instance_password'),
+  $service_instance_smb_config_path = hiera('manila::backend::generic::service_instance_smb_config_path'),
+  $service_instance_user            = hiera('manila::service_instance::service_instance_user'),
+  $share_mount_path                 = hiera('manila::backend::generic::share_mount_path'),
+  $share_volume_fstype              = hiera('manila::backend::generic::share_volume_fstype'),
   $smb_template_config_path         = hiera('manila::backend::generic::smb_template_config_path'),
+  $step                             = hiera('step'),
   $volume_name_template             = hiera('manila::backend::generic::volume_name_template'),
   $volume_snapshot_name_template    = hiera('manila::backend::generic::volume_snapshot_name_template'),
-  $share_mount_path                 = hiera('manila::backend::generic::share_mount_path'),
-  $max_time_to_create_volume        = hiera('manila::backend::generic::max_time_to_create_volume'),
-  $max_time_to_attach               = hiera('manila::backend::generic::max_time_to_attach'),
-  $service_instance_smb_config_path = hiera('manila::backend::generic::service_instance_smb_config_path'),
-  $share_volume_fstype              = hiera('manila::backend::generic::share_volume_fstype'),
-  $cinder_volume_type               = hiera('manila::backend::generic::cinder_volume_type', ''),
-  $service_instance_user            = hiera('manila::service_instance::service_instance_user'),
-  $service_instance_password        = hiera('manila::service_instance::service_instance_password'),
-  $service_instance_flavor_id       = hiera('manila::service_instance::service_instance_flavor_id'),
 ) {
-
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {

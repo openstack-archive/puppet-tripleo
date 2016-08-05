@@ -28,10 +28,9 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::heat::api_cloudwatch (
-  $bootstrap_node             = hiera('bootstrap_nodeid'),
-  $step                       = hiera('step'),
+  $bootstrap_node = hiera('bootstrap_nodeid'),
+  $step           = hiera('step'),
 ) {
-
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {

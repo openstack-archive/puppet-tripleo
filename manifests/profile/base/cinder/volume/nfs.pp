@@ -18,10 +18,6 @@
 #
 # === Parameters
 #
-# [*cinder_nfs_mount_options*]
-#   (Optional) List of mount options for the NFS share
-#   Defaults to ''
-#
 # [*cinder_nfs_servers*]
 #   List of NFS shares to mount
 #
@@ -29,18 +25,21 @@
 #   (Optional) Name given to the Cinder backend stanza
 #   Defaults to 'tripleo_nfs'
 #
+# [*cinder_nfs_mount_options*]
+#   (Optional) List of mount options for the NFS share
+#   Defaults to ''
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::volume::nfs (
-  $cinder_nfs_mount_options = '',
   $cinder_nfs_servers,
   $backend_name             = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs'),
+  $cinder_nfs_mount_options = '',
   $step                     = hiera('step'),
 ) {
-
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {

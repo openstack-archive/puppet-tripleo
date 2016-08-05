@@ -18,20 +18,14 @@
 #
 # === Parameters
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::heat (
-  $bootstrap_node             = hiera('bootstrap_nodeid'),
-  $step                       = hiera('step'),
+  $step = hiera('step'),
 ) {
-
   Service <| tag == 'heat-service' |> {
     hasrestart => true,
     restart    => '/bin/true',
@@ -39,8 +33,6 @@ class tripleo::profile::pacemaker::heat (
     stop       => '/bin/true',
   }
 
-  class { '::tripleo::profile::base::heat':
-    bootstrap_master         => $bootstrap_node,
-  }
+  include ::tripleo::profile::base::heat
 
 }
