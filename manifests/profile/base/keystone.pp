@@ -67,34 +67,6 @@ class tripleo::profile::base::keystone (
       include ::keystone::endpoint
     }
 
-    #TODO: need a cleanup-keystone-tokens.sh solution here
-    file { [ '/etc/keystone/ssl', '/etc/keystone/ssl/certs', '/etc/keystone/ssl/private' ]:
-      ensure  => 'directory',
-      owner   => 'keystone',
-      group   => 'keystone',
-      require => Package['keystone'],
-    }
-    file { '/etc/keystone/ssl/certs/signing_cert.pem':
-      content => hiera('keystone_signing_certificate'),
-      owner   => 'keystone',
-      group   => 'keystone',
-      notify  => Service[$::apache::params::service_name],
-      require => File['/etc/keystone/ssl/certs'],
-    }
-    file { '/etc/keystone/ssl/private/signing_key.pem':
-      content => hiera('keystone_signing_key'),
-      owner   => 'keystone',
-      group   => 'keystone',
-      notify  => Service[$::apache::params::service_name],
-      require => File['/etc/keystone/ssl/private'],
-    }
-    file { '/etc/keystone/ssl/certs/ca.pem':
-      content => hiera('keystone_ca_certificate'),
-      owner   => 'keystone',
-      group   => 'keystone',
-      notify  => Service[$::apache::params::service_name],
-      require => File['/etc/keystone/ssl/certs'],
-    }
   }
 
   if $step >= 5 and $manage_db_purge {

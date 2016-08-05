@@ -77,9 +77,6 @@ class tripleo::profile::pacemaker::keystone (
       require         => [Pacemaker::Resource::Ocf['rabbitmq'],
                           Pacemaker::Resource::Ocf['openstack-core']],
     }
-    File['/etc/keystone/ssl/certs/ca.pem'] -> Pacemaker::Resource::Service[$::apache::params::service_name]
-    File['/etc/keystone/ssl/private/signing_key.pem'] -> Pacemaker::Resource::Service[$::apache::params::service_name]
-    File['/etc/keystone/ssl/certs/signing_cert.pem'] -> Pacemaker::Resource::Service[$::apache::params::service_name]
   }
 
 }
