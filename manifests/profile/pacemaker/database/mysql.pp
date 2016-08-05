@@ -161,6 +161,7 @@ class tripleo::profile::pacemaker::database::mysql (
       unless  => '/bin/test -e /etc/sysconfig/clustercheck && grep -q clustercheck /etc/sysconfig/clustercheck',
     }
     xinetd::service { 'galera-monitor' :
+      bind           => hiera('mysql_bind_host'),
       port           => '9200',
       server         => '/usr/bin/clustercheck',
       per_source     => 'UNLIMITED',
