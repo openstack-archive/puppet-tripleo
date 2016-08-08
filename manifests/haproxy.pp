@@ -177,6 +177,10 @@
 #  (optional) Enable or not Aodh API binding
 #  Defaults to hiera('aodh_api_enabled', false)
 #
+# [*barbican*]
+#  (optional) Enable or not Barbican API binding
+#  Defaults to false
+#
 # [*gnocchi*]
 #  (optional) Enable or not Gnocchi API binding
 #  Defaults to hiera('gnocchi_api_enabled', false)
@@ -257,6 +261,10 @@
 # [*aodh_network*]
 #  (optional) Specify the network aodh is running on.
 #  Defaults to hiera('aodh_api_network', undef)
+#
+# [*barbican_network*]
+#  (optional) Specify the network barbican is running on.
+#  Defaults to hiera('barbican_api_network', undef)
 #
 # [*ceilometer_network*]
 #  (optional) Specify the network ceilometer is running on.
@@ -359,6 +367,8 @@
 #  The available keys to modify the services' ports are:
 #    'aodh_api_port' (Defaults to 8042)
 #    'aodh_api_ssl_port' (Defaults to 13042)
+#    'barbican_api_port' (Defaults to 9311)
+#    'barbican_api_ssl_port' (Defaults to 13311)
 #    'ceilometer_api_port' (Defaults to 8777)
 #    'ceilometer_api_ssl_port' (Defaults to 13777)
 #    'cinder_api_port' (Defaults to 8776)
@@ -444,6 +454,7 @@ class tripleo::haproxy (
   $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
   $ceilometer                  = hiera('ceilometer_api_enabled', false),
   $aodh                        = hiera('aodh_api_enabled', false),
+  $barbican                    = hiera('barbican_api_enabled', false),
   $gnocchi                     = hiera('gnocchi_api_enabled', false),
   $mistral                     = hiera('mistral_api_enabled', false),
   $swift_proxy_server          = hiera('swift_proxy_enabled', false),
@@ -464,6 +475,7 @@ class tripleo::haproxy (
   $opendaylight                = hiera('opendaylight_api_enabled', false),
   $zaqar_ws                    = hiera('zaqar_api_enabled', false),
   $aodh_network                = hiera('aodh_api_network', undef),
+  $barbican_network            = hiera('barbican_api_network', false),
   $ceilometer_network          = hiera('ceilometer_api_network', undef),
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
   $cinder_network              = hiera('cinder_api_network', undef),
@@ -492,6 +504,8 @@ class tripleo::haproxy (
   $default_service_ports = {
     aodh_api_port => 8042,
     aodh_api_ssl_port => 13042,
+    barbican_api_port => 9311,
+    barbican_api_ssl_port => 13311,
     ceilometer_api_port => 8777,
     ceilometer_api_ssl_port => 13777,
     cinder_api_port => 8776,
@@ -877,6 +891,18 @@ class tripleo::haproxy (
       server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[aodh_api_ssl_port],
       service_network   => $aodh_network,
+    }
+  }
+
+  if $barbican {
+    ::tripleo::haproxy::endpoint { 'barbican':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('barbican_api_vip', $controller_virtual_ip),
+      service_port      => $ports[barbican_api_port],
+      ip_addresses      => hiera('barbican_api_node_ips', $controller_hosts_real),
+      server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
+      public_ssl_port   => $ports[barbican_api_ssl_port],
+      service_network   => $barbican_network
     }
   }
 
