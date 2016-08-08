@@ -19,8 +19,14 @@
 # === Parameters
 #
 # [*ceph_pools*]
-#   (Optional) List of pools to create
-#   Defaults to []
+#   (Optional) Hash of pools to create
+#   Example with hiera:
+#     tripleo::profile::base::ceph::mon::ceph_pools:
+#       mypool:
+#         size: 5
+#         pg_num: 128
+#         pgp_num: 128
+#   Defaults to {}
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,7 +34,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ceph::mon (
-  $ceph_pools = [],
+  $ceph_pools = {},
   $step       = hiera('step'),
 ) {
 
@@ -39,10 +45,6 @@ class tripleo::profile::base::ceph::mon (
   }
 
   if $step >= 4 {
-    ceph::pool { $ceph_pools :
-      pg_num  => hiera('ceph::profile::params::osd_pool_default_pg_num'),
-      pgp_num => hiera('ceph::profile::params::osd_pool_default_pgp_num'),
-      size    => hiera('ceph::profile::params::osd_pool_default_size'),
-    }
+    create_resources('ceph::pool', $ceph_pools)
   }
 }
