@@ -36,11 +36,11 @@
 #
 # [*neutron_auth_password*]
 #   (Optional) Password to use for Neutron authentication
-#   Defaults to hiera('neutron::server::auth_password')
+#   Defaults to hiera('neutron::server::password')
 #
 # [*neutron_auth_tenant*]
 #   (Optional) Tenant to use for Neutron authentication
-#   Defaults to hiera('neutron::server::auth_tenant')
+#   Defaults to hiera('neutron::server::project_name')
 #
 # [*step*]
 #   (Optional) The current step of the deployment
@@ -67,8 +67,8 @@ class tripleo::profile::base::neutron::midonet (
   $bind_address          = hiera('neutron::bind_host', ''),
   $keystone_admin_token  = hiera('keystone::admin_token', ''),
   $neutron_api_node_ips  = hiera('neutron_api_node_ips', ''),
-  $neutron_auth_password = hiera('neutron::server::auth_password', ''),
-  $neutron_auth_tenant   = hiera('neutron::server::auth_tenant', ''),
+  $neutron_auth_password = hiera('neutron::server::password', ''),
+  $neutron_auth_tenant   = hiera('neutron::server::project_name', ''),
   $step                  = hiera('step'),
   $vip                   = hiera('public_virtual_ip'),
   $zk_on_controller      = hiera('enable_zookeeper_on_controller', ''),
