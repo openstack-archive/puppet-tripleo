@@ -18,14 +18,12 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*cinder_enable_db_purge*]
 #   (Optional) Wheter to enable db purging
-#   Defaults to true
-#
-# [*pacemaker_master*]
-#   (Optional) The master node runs some tasks
-#   one step earlier than others; disable to
-#   the node is not the master.
 #   Defaults to true
 #
 # [*step*]
@@ -33,11 +31,17 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder (
+  $bootstrap_node         = hiera('bootstrap_nodeid', undef),
   $cinder_enable_db_purge = true,
-  $pacemaker_master       = true,
   $step                   = hiera('step'),
 ) {
-  if $step >= 4 or ($step >= 3 and $pacemaker_master) {
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
+
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::cinder
     include ::cinder::config
   }
