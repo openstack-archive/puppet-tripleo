@@ -40,7 +40,7 @@ class tripleo::profile::base::aodh::notifier (
 
   include ::tripleo::profile::base::aodh
 
-  if $step >= 4 and $sync_db {
+  if $step >= 4 {
     include ::aodh::notifier
   }
 
