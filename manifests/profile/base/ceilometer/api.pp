@@ -30,6 +30,9 @@ class tripleo::profile::base::ceilometer::api (
 
   if $step >= 4 {
     include ::ceilometer::api
+    #NOTE: remove conditional once tht changes are merged
+    if hiera('ceilometer_wsgi', false) {
+      include ::ceilometer::wsgi::apache
+    }
   }
-
 }
