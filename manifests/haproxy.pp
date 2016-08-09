@@ -517,6 +517,21 @@ class tripleo::haproxy (
   }
 
   if $keystone_public {
+    $keystone_listen_opts = {
+      'http-request' => [
+        'set-header X-Forwarded-Proto https if { ssl_fc }',
+        'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+    }
+    if $service_certificate {
+      $keystone_public_tls_listen_opts = {
+        'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
+        # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
+        'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
+        'option'       => 'forwardfor',
+      }
+    } else {
+      $keystone_public_tls_listen_opts = {}
+    }
     ::tripleo::haproxy::endpoint { 'keystone_public':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('keystone_public_api_vip', $controller_virtual_ip),
@@ -524,11 +539,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('keystone_public_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
+      listen_options    => merge($keystone_listen_opts, $keystone_public_tls_listen_opts),
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
     }
   }
