@@ -37,12 +37,13 @@ class tripleo::profile::base::sahara::engine (
     $sync_db = false
   }
 
+  include ::tripleo::profile::base::sahara
+
   if $step >= 3 and $sync_db {
     include ::sahara::db::mysql
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::tripleo::profile::base::sahara
     include ::sahara::service::engine
   }
 }
