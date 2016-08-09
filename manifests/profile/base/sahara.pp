@@ -18,14 +18,27 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::sahara (
-  $step = hiera('step'),
+  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $step           = hiera('step'),
 ) {
-  if $step >= 4 {
-    include ::sahara
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
+
+  if $step >= 4 or ($step >= 3 and $sync_db){
+    class { '::sahara':
+      sync_db => $sync_db,
+    }
   }
 }
