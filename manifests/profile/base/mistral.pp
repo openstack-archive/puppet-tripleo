@@ -41,7 +41,7 @@ class tripleo::profile::base::mistral (
     include ::mistral::db::mysql
   }
 
-  if $step >= 4 and $sync_db {
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::mistral
     include ::mistral::config
     include ::mistral::client
