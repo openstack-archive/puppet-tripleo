@@ -52,9 +52,9 @@ class tripleo::profile::base::nova (
   }
 
   if hiera('nova::use_ipv6', false) {
-    $memcache_servers = suffix(hiera('memcache_node_ips_v6'), ':11211')
+    $memcache_servers = suffix(hiera('memcached_node_ips_v6'), ':11211')
   } else {
-    $memcache_servers = suffix(hiera('memcache_node_ips'), ':11211')
+    $memcache_servers = suffix(hiera('memcached_node_ips'), ':11211')
   }
 
   if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {

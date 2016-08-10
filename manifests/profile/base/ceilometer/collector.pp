@@ -44,12 +44,12 @@ class tripleo::profile::base::ceilometer::collector (
     # without the brackets as 'members' argument for the 'mongodb_replset'
     # resource.
     if str2bool(hiera('mongodb::server::ipv6', false)) {
-      $mongo_node_ips_with_port_prefixed = prefix(hiera('mongo_node_ips'), '[')
+      $mongo_node_ips_with_port_prefixed = prefix(hiera('mongodb_node_ips'), '[')
       $mongo_node_ips_with_port = suffix($mongo_node_ips_with_port_prefixed, ']:27017')
-      $mongo_node_ips_with_port_nobr = suffix(hiera('mongo_node_ips'), ':27017')
+      $mongo_node_ips_with_port_nobr = suffix(hiera('mongodb_node_ips'), ':27017')
     } else {
-      $mongo_node_ips_with_port = suffix(hiera('mongo_node_ips'), ':27017')
-      $mongo_node_ips_with_port_nobr = suffix(hiera('mongo_node_ips'), ':27017')
+      $mongo_node_ips_with_port = suffix(hiera('mongodb_node_ips'), ':27017')
+      $mongo_node_ips_with_port_nobr = suffix(hiera('mongodb_node_ips'), ':27017')
     }
     $mongo_node_string = join($mongo_node_ips_with_port, ',')
 

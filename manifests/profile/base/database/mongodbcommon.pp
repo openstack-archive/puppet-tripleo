@@ -27,7 +27,7 @@
 #
 class tripleo::profile::base::database::mongodbcommon (
   $mongodb_ipv6_enabled = false,
-  $mongodb_node_ips     = hiera('mongo_node_ips'),
+  $mongodb_node_ips     = hiera('mongodb_node_ips'),
 ) {
   $port = '27017'
 
