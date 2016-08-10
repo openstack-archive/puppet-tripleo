@@ -18,8 +18,8 @@
 #
 # === Parameters
 #
-# [*bootstrap_master*]
-#   (Optional) The hostname of the node responsible for bootstrapping
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to downcase(hiera('bootstrap_nodeid'))
 #
 # [*manage_db_purge*]
@@ -36,12 +36,12 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::heat (
-  $bootstrap_master    = downcase(hiera('bootstrap_nodeid')),
+  $bootstrap_node      = downcase(hiera('bootstrap_nodeid')),
   $manage_db_purge     = hiera('heat_enable_db_purge', true),
   $notification_driver = 'messaging',
   $step                = hiera('step'),
 ) {
-  # Domain resources will be created at step5 on the pacemaker_master so we
+  # Domain resources will be created at step5 on the bootstrap_node so we
   # configure heat.conf at step3 and 4 but actually create the domain later.
   if $step == 3 or $step == 4 {
     class { '::heat::keystone::domain':
@@ -62,7 +62,7 @@ class tripleo::profile::base::heat (
     if $manage_db_purge {
       include ::heat::cron::purge_deleted
     }
-    if $bootstrap_master == $::hostname {
+    if $bootstrap_node == $::hostname {
       # Class ::heat::keystone::domain has to run on bootstrap node
       # because it creates DB entities via API calls.
       include ::heat::keystone::domain

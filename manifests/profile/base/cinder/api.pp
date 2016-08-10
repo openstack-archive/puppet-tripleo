@@ -37,9 +37,7 @@ class tripleo::profile::base::cinder::api (
     $sync_db = false
   }
 
-  class { '::tripleo::profile::base::cinder':
-    pacemaker_master => $sync_db,
-  }
+  include ::tripleo::profile::base::cinder
 
   if $step >= 3 and $sync_db {
     include ::cinder::db::mysql

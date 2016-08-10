@@ -31,8 +31,7 @@ class tripleo::profile::base::database::mongodbcommon (
 ) {
   $port = '27017'
 
-  # NOTE(gfidente): the following vars are needed on all nodes so they
-  # need to stay out of pacemaker_master conditional.
+  # NOTE(gfidente): the following vars are needed on all nodes.
   # The addresses mangling will hopefully go away when we'll be able to
   # configure the connection string via hostnames, until then, we need to pass
   # the list of IPv6 addresses *with* port and without the brackets as 'members'
