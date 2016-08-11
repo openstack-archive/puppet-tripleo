@@ -83,6 +83,34 @@
 #   (Optional)
 #   Defaults to hiera('manila::backend::generic::volume_snapshot_name_template')
 #
+# [*manila_cephfsnative_enable*]
+#   (Optional) Enable the CephFS Native backend.
+#   Defaults to hiera('manila_cephfsnative_enable_backend', 'false')
+#
+# [*cephfs_handles_share_servers*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::cephfsnative::driver_handles_share_servers', false)
+#
+# [*cephfs_backend_name*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::cephfsnative::cephfs_backend_name')
+#
+# [*cephfs_conf_path*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::cephfsnative::cephfs_conf_path')
+#
+# [*cephfs_auth_id*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::cephfsnative::cephfs_auth_id')
+#
+# [*cephfs_cluster_name*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::cephfsnative::cephfs_cluster_name')
+#
+# [*cephfs_enable_snapshots*]
+#   (Optional)
+#   Defaults to hiera('manila::backend::cephfsnative::cephfs_enable_snapshots')
+#
 class tripleo::profile::pacemaker::manila (
   $bootstrap_node                   = hiera('bootstrap_nodeid'),
   $cinder_volume_type               = hiera('manila::backend::generic::cinder_volume_type', ''),
@@ -100,6 +128,13 @@ class tripleo::profile::pacemaker::manila (
   $step                             = hiera('step'),
   $volume_name_template             = hiera('manila::backend::generic::volume_name_template'),
   $volume_snapshot_name_template    = hiera('manila::backend::generic::volume_snapshot_name_template'),
+  $manila_cephfsnative_enable       = hiera('manila::backend::cephfsnative::enable_backend', false),
+  $cephfs_handles_share_servers     = hiera('manila::backend::cephfsnative::driver_handles_share_servers'),
+  $cephfs_backend_name              = hiera('manila::backend::cephfsnative::cephfs_backend_name'),
+  $cephfs_conf_path                 = hiera('manila::backend::cephfsnative::cephfs_conf_path'),
+  $cephfs_auth_id                   = hiera('manila::backend::cephfsnative::cephfs_auth_id'),
+  $cephfs_cluster_name              = hiera('manila::backend::cephfsnative::cephfs_cluster_name'),
+  $cephfs_enable_snapshots          = hiera('manila::backend::cephfsnative::cephfs_enable_snapshots'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -145,7 +180,25 @@ class tripleo::profile::pacemaker::manila (
       include ::manila::volume::cinder
     }
 
-    $manila_enabled_backends = delete_undef_values([$manila_generic_backend])
+    # manila cephfsnative:
+    if $manila_cephfsnative_enable {
+      $manila_cephfsnative_backend = hiera('manila::backend::cephfsnative::title')
+      manila::backend::cephfsnative { $manila_cephfsnative_backend :
+        driver_handles_share_servers => $cephfs_handles_share_servers,
+        cephfs_backend_name          => $cephfs_backend_name,
+        cephfs_conf_path             => $cephfs_conf_path,
+        cephfs_auth_id               => $cephfs_auth_id,
+        cephfs_cluster_name          => $cephfs_cluster_name,
+        cephfs_enable_snapshots      => $cephfs_enable_snapshots,
+      }
+    }
+
+    $manila_enabled_backends = delete_undef_values(
+      [
+        $manila_generic_backend,
+        $manila_cephfsnative_backend
+      ]
+    )
     class { '::manila::backends' :
       enabled_share_backends => $manila_enabled_backends,
     }
