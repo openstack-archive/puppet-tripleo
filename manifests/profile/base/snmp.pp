@@ -43,7 +43,16 @@ class tripleo::profile::base::snmp (
     }
     class { '::snmp':
       agentaddress => ['udp:161','udp6:[::1]:161'],
-      snmpd_config => [ join(['createUser ', $snmpd_user, ' MD5 "', $snmpd_password, '"']), join(['rouser ', $snmpd_user]), 'proc  cron', 'includeAllDisks  10%', 'master agentx', 'trapsink localhost public', 'iquerySecName internalUser', 'rouser internalUser', 'defaultMonitors yes', 'linkUpDownNotifications yes' ],
+      snmpd_config => [ join(['createUser ', $snmpd_user, ' MD5 "', $snmpd_password, '"']),
+                        join(['rouser ', $snmpd_user]),
+                        'proc  cron',
+                        'includeAllDisks  10%',
+                        'master agentx',
+                        'trapsink localhost public',
+                        'iquerySecName internalUser',
+                        'rouser internalUser',
+                        'defaultMonitors yes',
+                        'linkUpDownNotifications yes' ],
     }
   }
 }

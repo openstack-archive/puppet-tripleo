@@ -870,7 +870,12 @@ class tripleo::haproxy (
       options          => {
         'balance'   => 'first',
         'option'    => ['tcp-check',],
-        'tcp-check' => union($redis_tcp_check_options, ['send PING\r\n','expect string +PONG','send info\ replication\r\n','expect string role:master','send QUIT\r\n','expect string +OK']),
+        'tcp-check' => union($redis_tcp_check_options, ['send PING\r\n',
+                                                        'expect string +PONG',
+                                                        'send info\ replication\r\n',
+                                                        'expect string role:master',
+                                                        'send QUIT\r\n',
+                                                        'expect string +OK']),
       },
       collect_exported => false,
     }
