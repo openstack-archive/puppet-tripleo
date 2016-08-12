@@ -45,5 +45,7 @@ class tripleo::profile::base::ironic (
     class { '::ironic':
       sync_db => $sync_db,
     }
+
+    include ::ironic::cors
   }
 }
