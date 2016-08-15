@@ -297,6 +297,10 @@
 #  (optional) Enable or not Ironic API binding
 #  Defaults to false
 #
+# [*ironic_inspector*]
+#  (optional) Enable or not Ironic Inspector API binding
+#  Defaults to false
+#
 # [*mysql*]
 #  (optional) Enable or not MySQL Galera binding
 #  Defaults to false
@@ -344,6 +348,8 @@
 #    'heat_cw_ssl_port' (Defaults to 13003)
 #    'ironic_api_port' (Defaults to 6385)
 #    'ironic_api_ssl_port' (Defaults to 13385)
+#    'ironic_inspector_port' (Defaults to 5050)
+#    'ironic_inspector_ssl_port' (Defaults to 13050)
 #    'keystone_admin_api_port' (Defaults to 35357)
 #    'keystone_admin_api_ssl_port' (Defaults to 13357)
 #    'keystone_public_api_port' (Defaults to 5000)
@@ -429,6 +435,7 @@ class tripleo::loadbalancer (
   $heat_cfn                  = false,
   $horizon                   = false,
   $ironic                    = false,
+  $ironic_inspector          = false,
   $mysql                     = false,
   $mysql_clustercheck        = false,
   $rabbitmq                  = false,
@@ -457,6 +464,8 @@ class tripleo::loadbalancer (
     heat_cw_ssl_port => 13003,
     ironic_api_port => 6385,
     ironic_api_ssl_port => 13385,
+    ironic_inspector_port => 5050,
+    ironic_inspector_ssl_port => 13050,
     keystone_admin_api_port => 35357,
     keystone_admin_api_ssl_port => 13357,
     keystone_public_api_port => 5000,
@@ -652,6 +661,8 @@ class tripleo::loadbalancer (
   } else {
     $ironic_bind_certificate = $service_certificate
   }
+  # The individual certificates get removed in newton.
+  $ironic_inspector_bind_certificate = $service_certificate
   # TODO(bnemec): When we have support for SSL on private and admin endpoints,
   # have the haproxy stats endpoint use that certificate by default.
   if $haproxy_stats_certificate {
@@ -929,6 +940,18 @@ class tripleo::loadbalancer (
     $ironic_bind_opts = {
       "${ironic_api_vip}:${ports[ironic_api_port]}" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:${ports[ironic_api_port]}" => $haproxy_listen_bind_param,
+    }
+  }
+  $ironic_inspector_api_vip = hiera('ironic_inspector_vip', $controller_virtual_ip)
+  if $ironic_inspector_bind_certificate {
+    $ironic_inspector_bind_opts = {
+      "${ironic_inspector_api_vip}:${ports[ironic_inspector_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[ironic_inspector_ssl_port]}" => union($haproxy_listen_bind_param, ['ssl', 'crt', $ironic_inspector_bind_certificate]),
+    }
+  } else {
+    $ironic_inspector_bind_opts = {
+      "${ironic_inspector_api_vip}:${ports[ironic_inspector_port]}" => $haproxy_listen_bind_param,
+      "${public_virtual_ip}:${ports[ironic_inspector_port]}" => $haproxy_listen_bind_param,
     }
   }
 
@@ -1324,6 +1347,20 @@ class tripleo::loadbalancer (
       ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => union($haproxy_member_options, ["cookie ${::hostname}"]),
+    }
+  }
+
+  if $ironic_inspector {
+    haproxy::listen { 'ironic-inspector':
+      bind             => $ironic_inspector_bind_opts,
+      collect_exported => false,
+    }
+    haproxy::balancermember { 'ironic-inspector':
+      listening_service => 'ironic_inspector',
+      ports             => '5050',
+      ipaddresses       => hiera('ironic_inspector_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      options           => $haproxy_member_options,
     }
   }
 
