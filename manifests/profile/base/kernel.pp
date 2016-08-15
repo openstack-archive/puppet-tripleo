@@ -19,8 +19,12 @@
 #
 class tripleo::profile::base::kernel {
 
-  create_resources(kmod::load, hiera('kernel_modules'), { })
-  create_resources(sysctl::value, hiera('sysctl_settings'), { })
-  Exec <| tag == 'kmod::load' |>  -> Sysctl <| |>
+  if hiera('kernel_modules', undef) {
+    create_resources(kmod::load, hiera('kernel_modules'), { })
+  }
+  if hiera('sysctl_settings', undef) {
+    create_resources(sysctl::value, hiera('sysctl_settings'), { })
+  }
+  Exec <| tag == 'kmod::load' |> -> Sysctl <| |>
 
 }
