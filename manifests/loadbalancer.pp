@@ -981,6 +981,7 @@ class tripleo::loadbalancer (
   }
 
   sysctl::value { 'net.ipv4.ip_nonlocal_bind': value => '1' }
+  sysctl::value { 'net.ipv6.ip_nonlocal_bind': value => '1' }
 
   class { '::haproxy':
     service_manage   => $haproxy_service_manage,
