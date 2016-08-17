@@ -42,7 +42,7 @@ class tripleo::profile::base::aodh (
     include ::aodh::db::mysql
   }
 
-  if $step >= 4 and $sync_db {
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::aodh
     include ::aodh::auth
     include ::aodh::config

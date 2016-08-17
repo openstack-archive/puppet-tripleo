@@ -40,7 +40,7 @@ class tripleo::profile::base::aodh::api (
 
   include ::tripleo::profile::base::aodh
 
-  if $step >= 4 and $sync_db {
+  if $step >= 4 {
     include ::aodh::api
     include ::aodh::wsgi::apache
   }
