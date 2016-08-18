@@ -71,7 +71,7 @@ class tripleo::profile::pacemaker::database::mysql (
     mysql_server_options    => $mysqld_options,
   }
 
-  if $step >= 2 and $pacemaker_master {
+  if $step >= 2 {
     if $pacemaker_master {
       pacemaker::resource::ocf { 'galera' :
         ocf_agent_name  => 'heartbeat:galera',
