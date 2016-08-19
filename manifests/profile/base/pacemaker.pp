@@ -75,6 +75,10 @@ class tripleo::profile::base::pacemaker (
     Pacemaker::Resource::Service {
       op_params => 'start timeout=200s stop timeout=200s',
     }
+
+    file { '/var/lib/tripleo/pacemaker-restarts':
+      ensure => directory,
+    } ~> Tripleo::Pacemaker::Resource_restart_flag<||>
   }
 
   if $step >= 2 {

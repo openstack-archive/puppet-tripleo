@@ -47,6 +47,12 @@ class tripleo::profile::pacemaker::cinder::backup (
 
   include ::tripleo::profile::base::cinder::backup
 
+  if $step >= 3 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+    Cinder_config<||>
+    ~>
+    tripleo::pacemaker::resource_restart_flag { "${::cinder::params::backup_service}": }
+  }
+
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::cinder::params::backup_service : }
   }

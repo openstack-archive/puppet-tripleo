@@ -46,6 +46,12 @@ class tripleo::profile::pacemaker::cinder::volume (
 
   include ::tripleo::profile::base::cinder::volume
 
+  if $step >= 3 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+    Cinder_api_paste_ini<||> ~> Tripleo::Pacemaker::Resource_restart_flag["${::cinder::params::volume_service}"]
+    Cinder_config<||> ~> Tripleo::Pacemaker::Resource_restart_flag["${::cinder::params::volume_service}"]
+    tripleo::pacemaker::resource_restart_flag { "${::cinder::params::volume_service}": }
+  }
+
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::cinder::params::volume_service : }
   }

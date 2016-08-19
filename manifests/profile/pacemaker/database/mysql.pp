@@ -71,6 +71,12 @@ class tripleo::profile::pacemaker::database::mysql (
     mysql_server_options    => $mysqld_options,
   }
 
+  if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+    tripleo::pacemaker::resource_restart_flag { 'galera-master':
+      subscribe => File['mysql-config-file'],
+    }
+  }
+
   if $step >= 2 {
     if $pacemaker_master {
       pacemaker::resource::ocf { 'galera' :
