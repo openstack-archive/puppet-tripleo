@@ -23,8 +23,14 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*enable_combination_alarms*]
+#   (optional) Setting to enable combination alarms
+#   Defaults to: false
+#
+
 class tripleo::profile::base::aodh::api (
-  $step = hiera('step'),
+  $step                      = hiera('step'),
+  $enable_combination_alarms = false,
 ) {
 
   include ::tripleo::profile::base::aodh
@@ -32,5 +38,12 @@ class tripleo::profile::base::aodh::api (
   if $step >= 4 {
     include ::aodh::api
     include ::aodh::wsgi::apache
+
+    #NOTE: Combination alarms are deprecated in newton and disabled by default.
+    # we need a way to override this setting for users still using this type
+    # of alarms.
+    aodh_config {
+      'api/enable_combination_alarms' : value => $enable_combination_alarms;
+    }
   }
 }
