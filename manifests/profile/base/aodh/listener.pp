@@ -23,20 +23,9 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
-#
 class tripleo::profile::base::aodh::listener (
-  $step           = hiera('step'),
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $step = hiera('step'),
 ) {
-
-  if $::hostname == downcase($bootstrap_node) {
-    $sync_db = true
-  } else {
-    $sync_db = false
-  }
 
   include ::tripleo::profile::base::aodh
 
