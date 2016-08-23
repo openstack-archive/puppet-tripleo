@@ -87,22 +87,6 @@ class tripleo::profile::pacemaker::ceilometer (
       require         => [Pacemaker::Resource::Service[$::ceilometer::params::agent_central_service_name],
                           Pacemaker::Resource::Service[$::ceilometer::params::collector_service_name]],
     }
-    pacemaker::constraint::base { 'ceilometer-collector-then-ceilometer-api-constraint':
-      constraint_type => 'order',
-      first_resource  => "${::ceilometer::params::collector_service_name}-clone",
-      second_resource => "${::ceilometer::params::api_service_name}-clone",
-      first_action    => 'start',
-      second_action   => 'start',
-      require         => [Pacemaker::Resource::Service[$::ceilometer::params::collector_service_name],
-                          Pacemaker::Resource::Service[$::ceilometer::params::api_service_name]],
-    }
-    pacemaker::constraint::colocation { 'ceilometer-api-with-ceilometer-collector-colocation':
-      source  => "${::ceilometer::params::api_service_name}-clone",
-      target  => "${::ceilometer::params::collector_service_name}-clone",
-      score   => 'INFINITY',
-      require => [Pacemaker::Resource::Service[$::ceilometer::params::api_service_name],
-                  Pacemaker::Resource::Service[$::ceilometer::params::collector_service_name]],
-    }
   }
 
 }

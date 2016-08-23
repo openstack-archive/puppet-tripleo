@@ -34,10 +34,11 @@ class tripleo::profile::pacemaker::ceilometer::api (
   include ::ceilometer::params
   include ::tripleo::profile::pacemaker::ceilometer
   include ::tripleo::profile::base::ceilometer::api
+  include ::tripleo::profile::pacemaker::apache
 
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
-    pacemaker::resource::service { $::ceilometer::params::api_service_name :
-      clone_params => 'interleave=true',
+    class { '::tripleo::profile::base::ceilometer::api':
+      step    => $step,
     }
   }
 
