@@ -414,11 +414,14 @@ class tripleo::haproxy (
       "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
     }
     $horizon_options = {
-      'cookie'   => 'SERVERID insert indirect nocache',
-      'rsprep'   => '^Location:\ http://(.*) Location:\ https://\1',
+      'cookie'       => 'SERVERID insert indirect nocache',
+      'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
-      'redirect' => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
-      'option'   => 'forwardfor',
+      'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
+      'option'       => 'forwardfor',
+      'http-request' => [
+          'set-header X-Forwarded-Proto https if { ssl_fc }',
+          'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
     }
   } else {
     $horizon_bind_opts = {
