@@ -1,9 +1,7 @@
 source ENV['GEM_SOURCE'] || "https://rubygems.org"
 
 group :development, :test do
-  # puppetlabs_spec_helper 1.2.0 pulled in a gem with ruby >= 2.2 requirements
-  # but CI has ruby 2.0.0.
-  gem 'puppetlabs_spec_helper', '1.1.1',      :require => 'false'
+  gem 'puppetlabs_spec_helper',               :require => 'false'
   gem 'rspec-puppet', '~> 2.2.0',             :require => 'false'
   gem 'metadata-json-lint',                   :require => 'false'
   gem 'puppet-lint-param-docs',               :require => 'false'
