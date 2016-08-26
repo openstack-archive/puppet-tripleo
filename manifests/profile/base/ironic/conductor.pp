@@ -22,8 +22,13 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*manage_pxe*]
+#   (Optional) Whether to manage the PXE/iPXE environment for the conductor.
+#   Defaults to true
+#
 class tripleo::profile::base::ironic::conductor (
   $step = hiera('step'),
+  $manage_pxe = true,
 ) {
   include ::tripleo::profile::base::ironic
 
@@ -32,5 +37,8 @@ class tripleo::profile::base::ironic::conductor (
       include ::ironic::drivers::ipmi
       include ::ironic::drivers::pxe
       include ::ironic::conductor
+      if $manage_pxe {
+          include ::ironic::pxe
+      }
   }
 }
