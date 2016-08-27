@@ -58,6 +58,7 @@ class tripleo::profile::base::keystone (
 
     include ::keystone::config
     include ::keystone::wsgi::apache
+    include ::keystone::cors
 
     if $manage_roles {
       include ::keystone::roles::admin

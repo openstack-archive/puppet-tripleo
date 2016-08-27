@@ -56,6 +56,7 @@ class tripleo::profile::base::heat (
       notification_driver => $notification_driver,
     }
     include ::heat::config
+    include ::heat::cors
   }
 
   if $step >= 5 {
