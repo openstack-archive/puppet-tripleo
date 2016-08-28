@@ -27,9 +27,15 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+#
+
 class tripleo::profile::base::aodh (
   $step           = hiera('step'),
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -43,7 +49,9 @@ class tripleo::profile::base::aodh (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::aodh
+    class { '::aodh' :
+      rabbit_hosts => $rabbit_hosts,
+    }
     include ::aodh::auth
     include ::aodh::config
     include ::aodh::client

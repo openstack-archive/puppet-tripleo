@@ -35,11 +35,16 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::heat (
   $bootstrap_node      = downcase(hiera('bootstrap_nodeid')),
   $manage_db_purge     = hiera('heat_enable_db_purge', true),
   $notification_driver = 'messaging',
   $step                = hiera('step'),
+  $rabbit_hosts        = hiera('rabbitmq_node_ips', undef),
 ) {
   # Domain resources will be created at step5 on the bootstrap_node so we
   # configure heat.conf at step3 and 4 but actually create the domain later.
@@ -54,6 +59,7 @@ class tripleo::profile::base::heat (
   if $step >= 4 {
     class { '::heat' :
       notification_driver => $notification_driver,
+      rabbit_hosts        => $rabbit_hosts,
     }
     include ::heat::config
     include ::heat::cors

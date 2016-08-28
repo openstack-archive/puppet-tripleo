@@ -23,12 +23,19 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::ceilometer (
   $step = hiera('step'),
+  $rabbit_hosts        = hiera('rabbitmq_node_ips', undef),
 ) {
 
   if $step >= 3 {
-    include ::ceilometer
+    class { '::ceilometer' :
+      rabbit_hosts => $rabbit_hosts,
+    }
     include ::ceilometer::config
   }
 

@@ -38,12 +38,17 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::nova (
   $bootstrap_node       = hiera('bootstrap_nodeid', undef),
   $libvirt_enabled      = false,
   $manage_migration     = false,
   $nova_compute_enabled = false,
   $step                 = hiera('step'),
+  $rabbit_hosts         = hiera('rabbitmq_node_ips', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -58,7 +63,9 @@ class tripleo::profile::base::nova (
   }
 
   if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
-    include ::nova
+    class { '::nova' :
+      rabbit_hosts => $rabbit_hosts,
+    }
     include ::nova::config
     class { '::nova::cache':
       enabled          => true,

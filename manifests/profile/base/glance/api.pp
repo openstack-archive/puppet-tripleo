@@ -27,9 +27,14 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::glance::api (
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
   $step           = hiera('step'),
+  $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
 ) {
 
   if $step >= 4 {
@@ -48,7 +53,9 @@ class tripleo::profile::base::glance::api (
     class { '::glance::api':
       stores => $glance_store,
     }
-    include ::glance::notify::rabbitmq
+    class { '::glance::notify::rabbitmq' :
+      rabbit_hosts => $rabbit_hosts,
+    }
     include join(['::glance::backend::', $glance_backend])
   }
 

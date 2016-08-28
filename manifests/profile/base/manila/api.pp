@@ -23,11 +23,18 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::manila::api (
-  $step = hiera('step'),
+  $step         = hiera('step'),
+  $rabbit_hosts = hiera('rabbitmq_node_ips', undef),
 ) {
   if $step >= 4 {
-    include ::manila
+    class { '::manila' :
+      rabbit_hosts => $rabbit_hosts,
+    }
     include ::manila::api
   }
 }

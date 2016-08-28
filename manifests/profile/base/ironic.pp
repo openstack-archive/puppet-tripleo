@@ -26,9 +26,14 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::ironic (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
+  $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
 ) {
   # Database is accessed by both API and conductor, hence it's here.
   if $::hostname == downcase($bootstrap_node) {
@@ -43,7 +48,8 @@ class tripleo::profile::base::ironic (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::ironic':
-      sync_db => $sync_db,
+      sync_db      => $sync_db,
+      rabbit_hosts => $rabbit_hosts,
     }
 
     include ::ironic::cors
