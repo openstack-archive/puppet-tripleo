@@ -73,5 +73,53 @@ class tripleo::profile::base::keystone (
   if $step >= 5 and $manage_db_purge {
     include ::keystone::cron::token_flush
   }
+
+  if $step >= 5 and $manage_endpoint{
+    if hiera('aodh_api_enabled', false) {
+      include ::aodh::keystone::auth
+    }
+    if hiera('ceilometer_api_enabled', false) {
+      include ::ceilometer::keystone::auth
+    }
+    if hiera('cinder_api_enabled', false) {
+      include ::cinder::keystone::auth
+    }
+    if hiera('glance_api_enabled', false) {
+      include ::glance::keystone::auth
+    }
+    if hiera('gnocchi_api_enabled', false) {
+      include ::gnocchi::keystone::auth
+    }
+    if hiera('heat_api_enabled', false) {
+      include ::heat::keystone::auth
+    }
+    if hiera('heat_api_cfn_enabled', false) {
+      include ::heat::keystone::auth_cfn
+    }
+    if hiera('ironic_api_enabled', false) {
+      include ::ironic::keystone::auth
+    }
+    if hiera('manila_api_enabled', false) {
+      include ::manila::keystone::auth
+    }
+    if hiera('mistral_api_enabled', false) {
+      include ::mistral::keystone::auth
+    }
+    if hiera('neutron_api_enabled', false) {
+      include ::neutron::keystone::auth
+    }
+    if hiera('nova_api_enabled', false) {
+      include ::nova::keystone::auth
+    }
+    if hiera('sahara_api_enabled', false) {
+      include ::sahara::keystone::auth
+    }
+    if hiera('swift_proxy_enabled', false) {
+      include ::swift::keystone::auth
+    }
+    if hiera('trove_api_enabled', false) {
+      include ::trove::keystone::auth
+    }
+  }
 }
 
