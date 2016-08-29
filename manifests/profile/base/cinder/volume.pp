@@ -108,7 +108,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_rbd_backend_name = undef
     }
 
-    $cinder_enabled_backends = delete_undef_values([$cinder_iscsi_backend_name, $cinder_rbd_backend_name, $cinder_eqlx_backend_name, $cinder_dellsc_backend_name, $cinder_netapp_backend_name, $cinder_nfs_backend_name, $cinder_user_enabled_backends])
+    $cinder_enabled_backends = delete_undef_values([$cinder_iscsi_backend_name,
+                                                    $cinder_rbd_backend_name,
+                                                    $cinder_eqlx_backend_name,
+                                                    $cinder_dellsc_backend_name,
+                                                    $cinder_netapp_backend_name,
+                                                    $cinder_nfs_backend_name,
+                                                    $cinder_user_enabled_backends])
     class { '::cinder::backends' :
       enabled_backends => $cinder_enabled_backends,
     }

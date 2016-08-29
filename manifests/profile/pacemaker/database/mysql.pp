@@ -150,8 +150,12 @@ MYSQL_HOST=localhost\n",
     # with proper credentials. This step happens on every node because this sql
     # statement does not automatically replicate across nodes.
     $mysql_root_password = hiera('mysql::server::root_password')
+    $galera_set_pwd = "/bin/touch /root/.my.cnf && \
+                      /bin/echo \"UPDATE mysql.user SET Password = PASSWORD('${mysql_root_password}') WHERE user = 'root'; \
+                      flush privileges;\" | \
+                      /bin/mysql --defaults-extra-file=/root/.my.cnf -u root"
     exec { 'galera-set-root-password':
-      command => "/bin/touch /root/.my.cnf && /bin/echo \"UPDATE mysql.user SET Password = PASSWORD('${mysql_root_password}') WHERE user = 'root'; flush privileges;\" | /bin/mysql --defaults-extra-file=/root/.my.cnf -u root",
+      command => $galera_set_pwd,
     }
     file { '/root/.my.cnf' :
       ensure  => file,
