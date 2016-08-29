@@ -41,11 +41,16 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 class tripleo::profile::pacemaker::rabbitmq (
   $bootstrap_node = hiera('rabbitmq_short_bootstrap_node_name'),
   $erlang_cookie  = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues = hiera('rabbitmq::nr_ha_queues', 0),
   $rabbit_nodes   = hiera('rabbitmq_node_names'),
+  $pcs_tries      = hiera('pcs_tries', 20),
   $step           = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -72,22 +77,37 @@ class tripleo::profile::pacemaker::rabbitmq (
     }
   }
 
-  if $step >= 2 and $pacemaker_master {
-    include ::stdlib
-    # The default nr of ha queues is ceiling(N/2)
-    if $user_ha_queues == 0 {
-      $nr_rabbit_nodes = size($rabbit_nodes)
-      $nr_ha_queues = $nr_rabbit_nodes / 2 + ($nr_rabbit_nodes % 2)
-    } else {
-      $nr_ha_queues = $user_ha_queues
+  if $step >= 2 {
+    pacemaker::property { 'rabbitmq-role-node-property':
+      property => 'rabbitmq-role',
+      value    => true,
+      tries    => $pcs_tries,
+      node     => $::hostname,
     }
-    pacemaker::resource::ocf { 'rabbitmq':
-      ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
-      resource_params => "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'",
-      clone_params    => 'ordered=true interleave=true',
-      meta_params     => 'notify=true',
-      op_params       => 'start timeout=200s stop timeout=200s',
-      require         => Class['::rabbitmq'],
+    if $pacemaker_master {
+      include ::stdlib
+      # The default nr of ha queues is ceiling(N/2)
+      if $user_ha_queues == 0 {
+        $nr_rabbit_nodes = size($rabbit_nodes)
+        $nr_ha_queues = $nr_rabbit_nodes / 2 + ($nr_rabbit_nodes % 2)
+      } else {
+        $nr_ha_queues = $user_ha_queues
+      }
+      pacemaker::resource::ocf { 'rabbitmq':
+        ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
+        resource_params => "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'",
+        clone_params    => 'ordered=true interleave=true',
+        meta_params     => 'notify=true',
+        op_params       => 'start timeout=200s stop timeout=200s',
+        tries           => $pcs_tries,
+        location_rule   => {
+          resource_discovery => 'exclusive',
+          score              => 0,
+          expression         => ['rabbitmq-role eq true'],
+        },
+        require         => [Class['::rabbitmq'],
+                            Pacemaker::Property['rabbitmq-role-node-property']],
+      }
     }
   }
 }

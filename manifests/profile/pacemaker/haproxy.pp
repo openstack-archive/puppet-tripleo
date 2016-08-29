@@ -31,10 +31,15 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 class tripleo::profile::pacemaker::haproxy (
   $bootstrap_node       = hiera('haproxy_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
+  $pcs_tries            = hiera('pcs_tries', 20),
 ) {
   include ::tripleo::profile::base::haproxy
 
@@ -50,56 +55,90 @@ class tripleo::profile::pacemaker::haproxy (
     }
   }
 
-  if $step >= 2 and $pacemaker_master and $enable_load_balancer {
+  if $step >= 2 and $enable_load_balancer {
+    pacemaker::property { 'haproxy-role-node-property':
+      property => 'haproxy-role',
+      value    => true,
+      tries    => $pcs_tries,
+      node     => $::hostname,
+    }
+    if $pacemaker_master {
+      $haproxy_location_rule = {
+        resource_discovery => 'exclusive',
+        score              => 0,
+        expression         => ['haproxy-role eq true'],
+      }
       # FIXME: we should not have to access tripleo::haproxy class
       # parameters here to configure pacemaker VIPs. The configuration
       # of pacemaker VIPs could move into puppet-tripleo or we should
       # make use of less specific hiera parameters here for the settings.
       pacemaker::resource::service { 'haproxy':
-        op_params    => 'start timeout=200s stop timeout=200s',
-        clone_params => true,
+        op_params     => 'start timeout=200s stop timeout=200s',
+        clone_params  => true,
+        location_rule => $haproxy_location_rule,
+        tries         => $pcs_tries,
+        require       => Pacemaker::Property['haproxy-role-node-property'],
       }
 
       $control_vip = hiera('controller_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_control_vip':
-        vip_name   => 'control',
-        ip_address => $control_vip,
+        vip_name      => 'control',
+        ip_address    => $control_vip,
+        location_rule => $haproxy_location_rule,
+        pcs_tries     => $pcs_tries,
+        require       => Pacemaker::Property['haproxy-role-node-property'],
       }
 
       $public_vip = hiera('public_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_public_vip':
-        ensure     => $public_vip and $public_vip != $control_vip,
-        vip_name   => 'public',
-        ip_address => $public_vip,
+        ensure        => $public_vip and $public_vip != $control_vip,
+        vip_name      => 'public',
+        ip_address    => $public_vip,
+        location_rule => $haproxy_location_rule,
+        pcs_tries     => $pcs_tries,
+        require       => Pacemaker::Property['haproxy-role-node-property'],
       }
 
       $redis_vip = hiera('redis_vip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_redis_vip':
-        ensure     => $redis_vip and $redis_vip != $control_vip,
-        vip_name   => 'redis',
-        ip_address => $redis_vip,
+        ensure        => $redis_vip and $redis_vip != $control_vip,
+        vip_name      => 'redis',
+        ip_address    => $redis_vip,
+        location_rule => $haproxy_location_rule,
+        pcs_tries     => $pcs_tries,
+        require       => Pacemaker::Property['haproxy-role-node-property'],
       }
 
       $internal_api_vip = hiera('internal_api_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_internal_api_vip':
-        ensure     => $internal_api_vip and $internal_api_vip != $control_vip,
-        vip_name   => 'internal_api',
-        ip_address => $internal_api_vip,
+        ensure        => $internal_api_vip and $internal_api_vip != $control_vip,
+        vip_name      => 'internal_api',
+        ip_address    => $internal_api_vip,
+        location_rule => $haproxy_location_rule,
+        pcs_tries     => $pcs_tries,
+        require       => Pacemaker::Property['haproxy-role-node-property'],
       }
 
       $storage_vip = hiera('storage_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_vip':
-        ensure     => $storage_vip and $storage_vip != $control_vip,
-        vip_name   => 'storage',
-        ip_address => $storage_vip,
+        ensure        => $storage_vip and $storage_vip != $control_vip,
+        vip_name      => 'storage',
+        ip_address    => $storage_vip,
+        location_rule => $haproxy_location_rule,
+        pcs_tries     => $pcs_tries,
+        require       => Pacemaker::Property['haproxy-role-node-property'],
       }
 
       $storage_mgmt_vip = hiera('storage_mgmt_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_mgmt_vip':
-        ensure     => $storage_mgmt_vip and $storage_mgmt_vip != $control_vip,
-        vip_name   => 'storage_mgmt',
-        ip_address => $storage_mgmt_vip,
+        ensure        => $storage_mgmt_vip and $storage_mgmt_vip != $control_vip,
+        vip_name      => 'storage_mgmt',
+        ip_address    => $storage_mgmt_vip,
+        location_rule => $haproxy_location_rule,
+        pcs_tries     => $pcs_tries,
+        require       => Pacemaker::Property['haproxy-role-node-property'],
       }
+    }
   }
 
 }

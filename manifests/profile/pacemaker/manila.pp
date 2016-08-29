@@ -45,6 +45,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 class tripleo::profile::pacemaker::manila (
   $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
@@ -52,6 +56,7 @@ class tripleo::profile::pacemaker::manila (
   $ceph_mds_enabled        = hiera('ceph_mds_enabled', false),
   $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
   $step                    = hiera('step'),
+  $pcs_tries               = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -69,6 +74,15 @@ class tripleo::profile::pacemaker::manila (
   }
 
   include ::tripleo::profile::base::manila::share
+
+  if $step >= 2 {
+    pacemaker::property { 'manila-share-role-node-property':
+      property => 'manila-share-role',
+      value    => true,
+      tries    => $pcs_tries,
+      node     => $::hostname,
+    }
+  }
 
   if $step >= 4 {
     # manila generic:
@@ -185,7 +199,13 @@ allow command \"auth get\", allow command \"auth get-or-create\"',
 
     # only manila-share is pacemaker managed, and in a/p
     pacemaker::resource::service { $::manila::params::share_service :
-      op_params => 'start timeout=200s stop timeout=200s',
+      op_params     => 'start timeout=200s stop timeout=200s',
+      tries         => $pcs_tries,
+      location_rule => {
+        resource_discovery => 'exclusive',
+        score              => 0,
+        expression         => ['manila-share-role eq true'],
+      },
     }
 
   }

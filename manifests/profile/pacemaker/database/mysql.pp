@@ -36,11 +36,16 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 class tripleo::profile::pacemaker::database::mysql (
   $bootstrap_node     = hiera('mysql_short_bootstrap_node_name'),
   $bind_address       = $::hostname,
   $gmcast_listen_addr = hiera('mysql_bind_host'),
   $step               = hiera('step'),
+  $pcs_tries          = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -118,6 +123,12 @@ class tripleo::profile::pacemaker::database::mysql (
   }
 
   if $step >= 2 {
+    pacemaker::property { 'galera-role-node-property':
+      property => 'galera-role',
+      value    => true,
+      tries    => $pcs_tries,
+      node     => $::hostname,
+    }
     if $pacemaker_master {
       pacemaker::resource::ocf { 'galera' :
         ocf_agent_name  => 'heartbeat:galera',
@@ -125,7 +136,14 @@ class tripleo::profile::pacemaker::database::mysql (
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true",
         resource_params => "additional_parameters='--open-files-limit=16384' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}'",
-        require         => Class['::mysql::server'],
+        tries           => $pcs_tries,
+        location_rule   => {
+          resource_discovery => 'exclusive',
+          score              => 0,
+          expression         => ['galera-role eq true'],
+        },
+        require         => [Class['::mysql::server'],
+                            Pacemaker::Property['galera-role-node-property']],
         before          => Exec['galera-ready'],
       }
       exec { 'galera-ready' :
