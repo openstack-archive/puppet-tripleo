@@ -36,6 +36,7 @@ class tripleo::profile::base::neutron::sriov(
   if $step >= 4 {
     if 'sriovnicswitch' in $mechanism_drivers  {
       include ::neutron::agents::ml2::sriov
+      include ::tripleo::host::sriov
     }
   }
 
