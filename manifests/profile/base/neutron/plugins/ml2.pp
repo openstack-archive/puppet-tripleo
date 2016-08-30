@@ -68,5 +68,8 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include ::tripleo::profile::base::neutron::plugins::ml2::opendaylight
     }
 
+    if 'ovn' in $mechanism_drivers {
+      include ::tripleo::profile::base::neutron::plugins::ml2::ovn
+    }
   }
 }
