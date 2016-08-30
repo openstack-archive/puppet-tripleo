@@ -18,22 +18,13 @@
 #
 # === Parameters
 #
-# [*ceph_ipv6*]
-#   (Optional) Force daemons to bind on IPv6 addresses
-#   Defaults to false
-#
 # [*ceph_mon_initial_members*]
 #   (Optional) List of IP addresses to use as mon_initial_members
-#   Defaults to undef
+#   Defaults to hiera('ceph_mon_node_names')
 #
 # [*ceph_mon_host*]
 #   (Optional) List of IP addresses to use as mon_host
-#   Deftauls to undef
-#
-# [*ceph_mon_host_v6*]
-#   (Optional) List of IPv6 addresses, surrounded by brackets, used as
-#   mon_host when ceph_ipv6 is true
-#   Defaults to undef
+#   Deftauls to hiera('ceph_mon_node_ips')
 #
 # [*enable_ceph_storage*]
 #   (Optional) enable_ceph_storage
@@ -45,22 +36,29 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ceph (
-  $ceph_ipv6                = false,
-  $ceph_mon_initial_members = undef,
-  $ceph_mon_host            = undef,
-  $ceph_mon_host_v6         = undef,
+  $ceph_mon_initial_members = hiera('ceph_mon_node_names', undef),
+  $ceph_mon_host            = hiera('ceph_mon_node_ips', '127.0.0.1'),
   $enable_ceph_storage      = false,
   $step                     = hiera('step'),
 ) {
 
   if $step >= 2 {
     if $ceph_mon_initial_members {
-      $mon_initial_members = downcase($ceph_mon_initial_members)
+      if is_array($ceph_mon_initial_members) {
+        $mon_initial_members = downcase(join($ceph_mon_initial_members, ','))
+      } else {
+        $mon_initial_members = downcase($ceph_mon_initial_members)
+      }
     } else {
       $mon_initial_members = undef
     }
-    if $ceph_ipv6 {
-      $mon_host = $ceph_mon_host_v6
+
+    if is_array($ceph_mon_host) {
+      if is_ipv6_address($ceph_mon_host[0]) {
+        $mon_host = join(enclose_ipv6($ceph_mon_host), ',')
+      } else {
+        $mon_host = join($ceph_mon_host, ',')
+      }
     } else {
       $mon_host = $ceph_mon_host
     }
