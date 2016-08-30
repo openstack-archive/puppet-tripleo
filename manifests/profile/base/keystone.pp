@@ -81,6 +81,9 @@ class tripleo::profile::base::keystone (
     if hiera('ceilometer_api_enabled', false) {
       include ::ceilometer::keystone::auth
     }
+    if hiera('ceph_rgw_enabled', false) {
+      include ::ceph::rgw::keystone::auth
+    }
     if hiera('cinder_api_enabled', false) {
       include ::cinder::keystone::auth
     }
