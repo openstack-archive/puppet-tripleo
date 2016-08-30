@@ -32,8 +32,17 @@ class tripleo::profile::pacemaker::database::mysql (
     $pacemaker_master = false
   }
   $mysql_bind_host = hiera('mysql_bind_host')
-  $galera_nodes = downcase(hiera('galera_node_names', $::hostname))
+
+  # use only mysql_node_names when we land a patch in t-h-t that
+  # switches to autogenerating these values from composable services
+  $galera_node_names_lookup = hiera('mysql_node_names', hiera('galera_node_names', $::hostname))
+  if is_array($galera_node_names_lookup) {
+    $galera_nodes = downcase(join($galera_node_names_lookup, ','))
+  } else {
+    $galera_nodes = downcase($galera_node_names_lookup)
+  }
   $galera_nodes_count = count(split($galera_nodes, ','))
+
   $mysqld_options = {
     'mysqld' => {
       'skip-name-resolve'             => '1',
