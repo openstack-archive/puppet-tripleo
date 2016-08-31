@@ -52,8 +52,11 @@ class tripleo::profile::base::cinder::volume::iscsi (
       size => join([$cinder_lvm_loop_device_size, 'M']),
     }
 
+    # NOTE(gfidente): never emit in hieradata:
+    # key: [ipv6]
+    # as it will cause hiera parsing errors
     cinder::backend::iscsi { $backend_name :
-      iscsi_ip_address => $cinder_iscsi_address,
+      iscsi_ip_address => normalize_ip_for_uri($cinder_iscsi_address),
       iscsi_helper     => $cinder_iscsi_helper,
     }
   }
