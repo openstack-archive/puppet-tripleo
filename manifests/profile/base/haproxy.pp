@@ -82,6 +82,20 @@ class tripleo::profile::base::haproxy (
       }
 
       include ::tripleo::haproxy
+
+      unless hiera('tripleo::haproxy::haproxy_service_manage', true) {
+        # Reload HAProxy configuration if the haproxy class has refreshed or any
+        # HAProxy frontend endpoint has changed.
+        exec { 'haproxy-reload':
+          command     => 'systemctl reload haproxy',
+          path        => ['/usr/bin', '/usr/sbin'],
+          refreshonly => true,
+          onlyif      => 'pcs property | grep -q "maintenance-mode.*true"',
+          subscribe   => Class['::haproxy']
+        }
+        Haproxy::Listen<||> ~> Exec['haproxy-reload']
+        Haproxy::Balancermember<||> ~> Exec['haproxy-reload']
+      }
     }
   }
 
