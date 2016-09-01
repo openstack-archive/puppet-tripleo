@@ -44,6 +44,14 @@ class tripleo::profile::pacemaker::database::redis (
 
   if $step >= 1 {
     include ::redis
+
+    if $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+      tripleo::pacemaker::resource_restart_flag { 'redis-master':
+        # ouch, but trying to stay close how notification works in
+        # puppet-redis when pacemaker is not being used
+        subscribe => Exec["cp -p ${::redis::config_file_orig} ${::redis::config_file}"]
+      }
+    }
   }
 
   if $step >= 2 and $pacemaker_master {

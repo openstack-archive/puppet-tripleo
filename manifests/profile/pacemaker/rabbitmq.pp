@@ -54,6 +54,12 @@ class tripleo::profile::pacemaker::rabbitmq (
     require => Class['::rabbitmq'],
   }
 
+  if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+    tripleo::pacemaker::resource_restart_flag { 'rabbitmq-clone':
+      subscribe => Class['rabbitmq::service'],
+    }
+  }
+
   if $step >= 2 and $pacemaker_master {
     pacemaker::resource::ocf { 'rabbitmq':
       ocf_agent_name  => 'heartbeat:rabbitmq-cluster',

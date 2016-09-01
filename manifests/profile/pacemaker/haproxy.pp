@@ -44,6 +44,12 @@ class tripleo::profile::pacemaker::haproxy (
     $pacemaker_master = false
   }
 
+  if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+    tripleo::pacemaker::resource_restart_flag { 'haproxy-clone':
+      subscribe => Concat['/etc/haproxy/haproxy.cfg'],
+    }
+  }
+
   if $step >= 2 and $pacemaker_master and $enable_load_balancer {
       # FIXME: we should not have to access tripleo::haproxy class
       # parameters here to configure pacemaker VIPs. The configuration

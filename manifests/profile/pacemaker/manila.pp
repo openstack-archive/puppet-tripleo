@@ -202,6 +202,12 @@ class tripleo::profile::pacemaker::manila (
     class { '::manila::backends' :
       enabled_share_backends => $manila_enabled_backends,
     }
+
+    if $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+      Manila_api_paste_ini<||> ~> Tripleo::Pacemaker::Resource_restart_flag["${::manila::params::share_service}"]
+      Manila_config<||> ~> Tripleo::Pacemaker::Resource_restart_flag["${::manila::params::share_service}"]
+      tripleo::pacemaker::resource_restart_flag { "${::manila::params::share_service}": }
+    }
   }
 
   if $step >= 5 and $pacemaker_master {
