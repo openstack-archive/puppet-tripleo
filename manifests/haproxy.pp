@@ -111,99 +111,99 @@
 #
 # [*keystone_admin*]
 #  (optional) Enable or not Keystone Admin API binding
-#  Defaults to false
+#  Defaults to hiera('keystone_enabled', false)
 #
 # [*keystone_public*]
 #  (optional) Enable or not Keystone Public API binding
-#  Defaults to false
+#  Defaults to hiera('keystone_enabled', false)
 #
 # [*neutron*]
 #  (optional) Enable or not Neutron API binding
-#  Defaults to false
+#  Defaults to hiera('neutron_api_enabled', false)
 #
 # [*cinder*]
 #  (optional) Enable or not Cinder API binding
-#  Defaults to false
+#  Defaults to hiera('cinder_api_enabled', false)
 #
 # [*manila*]
 #  (optional) Enable or not Manila API binding
-#  Defaults to false
+#  Defaults to hiera('manila_api_enabled', false)
 #
 # [*sahara*]
 #  (optional) Enable or not Sahara API binding
-#  defaults to false
+#  defaults to hiera('sahara_api_enabled', false)
 #
 # [*trove*]
 #  (optional) Enable or not Trove API binding
-#  defaults to false
+#  defaults to hiera('trove_api_enabled', false)
 #
 # [*glance_api*]
 #  (optional) Enable or not Glance API binding
-#  Defaults to false
+#  Defaults to hiera('glance_api_enabled', false)
 #
 # [*glance_registry*]
 #  (optional) Enable or not Glance registry binding
-#  Defaults to false
+#  Defaults to hiera('glance_registry_enabled', false)
 #
 # [*nova_osapi*]
 #  (optional) Enable or not Nova API binding
-#  Defaults to false
+#  Defaults to hiera('nova_api_enabled', false)
 #
 # [*nova_metadata*]
 #  (optional) Enable or not Nova metadata binding
-#  Defaults to false
+#  Defaults to hiera('nova_api_enabled', false)
 #
 # [*nova_novncproxy*]
 #  (optional) Enable or not Nova novncproxy binding
-#  Defaults to false
+#  Defaults to hiera('nova_vncproxy_enabled', false)
 #
 # [*ceilometer*]
 #  (optional) Enable or not Ceilometer API binding
-#  Defaults to false
+#  Defaults to hiera('ceilometer_api_enabled', false)
 #
 # [*aodh*]
 #  (optional) Enable or not Aodh API binding
-#  Defaults to false
+#  Defaults to hiera('aodh_api_enabled', false)
 #
 # [*gnocchi*]
 #  (optional) Enable or not Gnocchi API binding
-#  Defaults to false
+#  Defaults to hiera('gnocchi_api_enabled', false)
 #
 # [*mistral*]
 #  (optional) Enable or not Mistral API binding
-#  Defaults to false
+#  Defaults to hiera('mistral_api_enabled', false)
 #
 # [*swift_proxy_server*]
 #  (optional) Enable or not Swift API binding
-#  Defaults to false
+#  Defaults to hiera('swift_proxy_enabled', false)
 #
 # [*heat_api*]
 #  (optional) Enable or not Heat API binding
-#  Defaults to false
+#  Defaults to hiera('heat_api_enabled', false)
 #
 # [*heat_cloudwatch*]
 #  (optional) Enable or not Heat Cloudwatch API binding
-#  Defaults to false
+#  Defaults to hiera('heat_api_cloudwatch_enabled', false)
 #
 # [*heat_cfn*]
 #  (optional) Enable or not Heat CFN API binding
-#  Defaults to false
+#  Defaults to hiera('heat_api_cfn_enabled', false)
 #
 # [*horizon*]
 #  (optional) Enable or not Horizon dashboard binding
-#  Defaults to false
+#  Defaults to hiera('horizon_enabled', false)
 #
 # [*ironic*]
 #  (optional) Enable or not Ironic API binding
-#  Defaults to false
+#  Defaults to hiera('ironic_enabled', false)
 #
 # [*ironic_inspector*]
 #  (optional) Enable or not Ironic Inspector API binding
-#  Defaults to false
+#  Defaults to hiera('ironic_inspector_enabled', false)
 #
 # [*mysql*]
 #  (optional) Enable or not MySQL Galera binding
-#  Defaults to false
+#  Defaults to hiera('mysql_enabled', false)
 #
 # [*mysql_clustercheck*]
 #  (optional) Enable check via clustercheck for mysql
@@ -215,7 +215,7 @@
 #
 # [*redis*]
 #  (optional) Enable or not Redis binding
-#  Defaults to false
+#  Defaults to hiera('redis_enabled', false)
 #
 # [*redis_password*]
 #  (optional) Password for Redis authentication, eventually needed by the
@@ -228,11 +228,11 @@
 #
 # [*zaqar_api*]
 #  (optional) Enable or not Zaqar Api binding
-# Defaults to false
+#  Defaults to hiera('zaqar_api_enabled', false)
 #
 # [*opendaylight*]
 #  (optional) Enable or not OpenDaylight binding
-#  Defaults to false
+#  Defaults to hiera('opendaylight_api_enabled', false)
 #
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
@@ -303,37 +303,37 @@ class tripleo::haproxy (
   $ssl_cipher_suite          = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
   $ssl_options               = 'no-sslv3',
   $haproxy_stats_certificate = undef,
-  $keystone_admin            = false,
-  $keystone_public           = false,
-  $neutron                   = false,
-  $cinder                    = false,
-  $sahara                    = false,
-  $trove                     = false,
-  $manila                    = false,
-  $glance_api                = false,
-  $glance_registry           = false,
-  $nova_osapi                = false,
-  $nova_metadata             = false,
-  $nova_novncproxy           = false,
-  $ceilometer                = false,
-  $aodh                      = false,
-  $gnocchi                   = false,
-  $mistral                   = false,
-  $swift_proxy_server        = false,
-  $heat_api                  = false,
-  $heat_cloudwatch           = false,
-  $heat_cfn                  = false,
-  $horizon                   = false,
-  $ironic                    = false,
-  $ironic_inspector          = false,
-  $mysql                     = false,
+  $keystone_admin            = hiera('keystone_enabled', false),
+  $keystone_public           = hiera('keystone_enabled', false),
+  $neutron                   = hiera('neutron_api_enabled', false),
+  $cinder                    = hiera('cinder_api_enabled', false),
+  $manila                    = hiera('manila_api_enabled', false),
+  $sahara                    = hiera('sahara_api_enabled', false),
+  $trove                     = hiera('trove_api_enabled', false),
+  $glance_api                = hiera('glance_api_enabled', false),
+  $glance_registry           = hiera('glance_registry_enabled', false),
+  $nova_osapi                = hiera('nova_api_enabled', false),
+  $nova_metadata             = hiera('nova_api_enabled', false),
+  $nova_novncproxy           = hiera('nova_vncproxy_enabled', false),
+  $ceilometer                = hiera('ceilometer_api_enabled', false),
+  $aodh                      = hiera('aodh_api_enabled', false),
+  $gnocchi                   = hiera('gnocchi_api_enabled', false),
+  $mistral                   = hiera('mistral_api_enabled', false),
+  $swift_proxy_server        = hiera('swift_proxy_enabled', false),
+  $heat_api                  = hiera('heat_api_enabled', false),
+  $heat_cloudwatch           = hiera('heat_api_cloudwatch_enabled', false),
+  $heat_cfn                  = hiera('heat_api_cfn_enabled', false),
+  $horizon                   = hiera('horizon_enabled', false),
+  $ironic                    = hiera('ironic_api_enabled', false),
+  $ironic_inspector          = hiera('ironic_inspector_enabled', false),
+  $mysql                     = hiera('mysql_enabled', false),
   $mysql_clustercheck        = false,
   $rabbitmq                  = false,
-  $redis                     = false,
+  $redis                     = hiera('redis_enabled', false),
   $redis_password            = undef,
   $midonet_api               = false,
-  $zaqar_api                 = false,
-  $opendaylight              = false,
+  $zaqar_api                 = hiera('zaqar_api_enabled', false),
+  $opendaylight              = hiera('opendaylight_api_enabled', false),
   $service_ports             = {}
 ) {
   $default_service_ports = {
