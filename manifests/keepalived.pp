@@ -54,6 +54,11 @@
 #  A string.
 #  Defaults to false
 #
+# [*redis_virtual_ip*]
+#  Virtual IP on the redis service.
+#  A string.
+#  Defaults to false
+#
 class tripleo::keepalived (
   $controller_virtual_ip,
   $control_virtual_interface,
@@ -62,6 +67,7 @@ class tripleo::keepalived (
   $internal_api_virtual_ip = false,
   $storage_virtual_ip      = false,
   $storage_mgmt_virtual_ip = false,
+  $redis_virtual_ip        = false,
 ) {
 
   case $::osfamily {
@@ -135,6 +141,18 @@ class tripleo::keepalived (
     keepalived::instance { '55':
       interface    => $storage_mgmt_virtual_interface,
       virtual_ips  => [join([$storage_mgmt_virtual_ip, ' dev ', $storage_mgmt_virtual_interface])],
+      state        => 'MASTER',
+      track_script => ['haproxy'],
+      priority     => 101,
+    }
+  }
+
+  if $redis_virtual_ip and $redis_virtual_ip != $controller_virtual_ip {
+    $redis_virtual_interface = interface_for_ip($redis_virtual_ip)
+    # KEEPALIVE STORAGE MANAGEMENT NETWORK
+    keepalived::instance { '56':
+      interface    => $redis_virtual_interface,
+      virtual_ips  => [join([$redis_virtual_ip, ' dev ', $redis_virtual_interface])],
       state        => 'MASTER',
       track_script => ['haproxy'],
       priority     => 101,
