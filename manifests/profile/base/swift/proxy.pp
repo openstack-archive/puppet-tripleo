@@ -23,14 +23,27 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*memcache_servers*]
+#   (Optional) List of memcache servers
+#   Defaults to hiera('memcached_node_ips')
+#
+# [*memcache_port*]
+#   (Optional) memcache port
+#   Defaults to 11211
+#
 class tripleo::profile::base::swift::proxy (
   $step = hiera('step'),
+  $memcache_servers = hiera('memcached_node_ips'),
+  $memcache_port = 11211,
 ) {
   if $step >= 4 {
+    $swift_memcache_servers = suffix($memcache_servers, ":${memcache_port}")
     include ::swift::proxy
     include ::swift::proxy::proxy_logging
     include ::swift::proxy::healthcheck
-    include ::swift::proxy::cache
+    class { '::swift::proxy::cache':
+      memcache_servers => $swift_memcache_servers
+    }
     include ::swift::proxy::keystone
     include ::swift::proxy::authtoken
     include ::swift::proxy::staticweb
