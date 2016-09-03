@@ -22,11 +22,18 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::neutron (
-  $step = hiera('step'),
+  $step         = hiera('step'),
+  $rabbit_hosts = hiera('rabbitmq_node_ips', undef),
 ) {
   if $step >= 3 {
-    include ::neutron
+    class { '::neutron' :
+      rabbit_hosts => $rabbit_hosts,
+    }
     include ::neutron::config
   }
 }

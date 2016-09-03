@@ -31,10 +31,15 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::keystone (
   $bootstrap_node  = hiera('bootstrap_nodeid', undef),
   $manage_db_purge = hiera('keystone_enable_db_purge', true),
   $step            = hiera('step'),
+  $rabbit_hosts    = hiera('rabbitmq_node_ips', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -54,6 +59,7 @@ class tripleo::profile::base::keystone (
     class { '::keystone':
       sync_db          => $sync_db,
       enable_bootstrap => $sync_db,
+      rabbit_hosts     => $rabbit_hosts,
     }
 
     include ::keystone::config
