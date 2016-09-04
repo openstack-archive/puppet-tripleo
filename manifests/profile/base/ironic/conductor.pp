@@ -33,12 +33,16 @@ class tripleo::profile::base::ironic::conductor (
   include ::tripleo::profile::base::ironic
 
   if $step >= 4 {
-      include ::ironic::drivers::deploy
-      include ::ironic::drivers::ipmi
-      include ::ironic::drivers::pxe
       include ::ironic::conductor
+      include ::ironic::drivers::pxe
       if $manage_pxe {
           include ::ironic::pxe
       }
+
+      # Configure a few popular drivers
+      include ::ironic::drivers::drac
+      include ::ironic::drivers::ilo
+      include ::ironic::drivers::ipmi
+      include ::ironic::drivers::ssh
   }
 }
