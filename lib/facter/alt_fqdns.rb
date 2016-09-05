@@ -14,9 +14,9 @@
 # under the License.
 [
   'external',
-  'internalapi',
+  'internal_api',
   'storage',
-  'storagemgmt',
+  'storage_mgmt',
   'tenant',
   'management',
 ].each do |network|
@@ -24,7 +24,7 @@
     setcode do
       external_hostname_parts = [
         Facter.value(:hostname),
-        network,
+        network.gsub('_', ''),
         Facter.value(:domain),
       ].reject { |part| part.nil? || part.empty? }
       external_hostname_parts.join(".")
