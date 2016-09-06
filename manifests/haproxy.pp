@@ -230,6 +230,10 @@
 #  (optional) Enable or not Zaqar Api binding
 #  Defaults to hiera('zaqar_api_enabled', false)
 #
+# [*ceph_rgw*]
+#  (optional) Enable or not Ceph RadosGW binding
+#  Defaults to hiera('ceph_rgw_enabled', false)
+#
 # [*opendaylight*]
 #  (optional) Enable or not OpenDaylight binding
 #  Defaults to hiera('opendaylight_api_enabled', false)
@@ -281,6 +285,8 @@
 #    'trove_api_ssl_port' (Defaults to 13779)
 #    'zaqar_api_port' (Defaults to 8888)
 #    'zaqar_api_ssl_port' (Defaults to 13888)
+#    'ceph_rgw_port' (Defaults to 8080)
+#    'ceph_rgw_ssl_port' (Defaults to 13808)
 #  Defaults to {}
 #
 class tripleo::haproxy (
@@ -333,6 +339,7 @@ class tripleo::haproxy (
   $redis_password            = undef,
   $midonet_api               = false,
   $zaqar_api                 = hiera('zaqar_api_enabled', false),
+  $ceph_rgw                  = hiera('ceph_rgw_enabled', false),
   $opendaylight              = hiera('opendaylight_api_enabled', false),
   $service_ports             = {}
 ) {
@@ -381,6 +388,8 @@ class tripleo::haproxy (
     trove_api_ssl_port => 13779,
     zaqar_api_port => 8888,
     zaqar_api_ssl_port => 13888,
+    ceph_rgw_port => 8080,
+    ceph_rgw_ssl_port => 13808,
   }
   $ports = merge($default_service_ports, $service_ports)
 
@@ -932,6 +941,17 @@ class tripleo::haproxy (
       server_names      => $controller_hosts_names_real,
       mode              => 'http',
       public_ssl_port   => $ports[zaqar_api_ssl_port],
+    }
+  }
+
+  if $ceph_rgw {
+    ::tripleo::haproxy::endpoint { 'ceph_rgw':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('ceph_rgw_vip', $controller_virtual_ip),
+      service_port      => $ports[ceph_rgw_port],
+      ip_addresses      => hiera('ceph_rgw_node_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      public_ssl_port   => $ports[ceph_rgw_ssl_port],
     }
   }
 
