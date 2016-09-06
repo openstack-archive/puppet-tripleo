@@ -26,8 +26,9 @@
 class tripleo::profile::base::heat::api_cfn (
   $step = hiera('step'),
 ) {
+  include ::tripleo::profile::base::heat
+
   if $step >= 4 {
-    include ::tripleo::profile::base::heat
     include ::heat::api_cfn
   }
 }
