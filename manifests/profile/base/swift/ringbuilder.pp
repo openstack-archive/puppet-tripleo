@@ -26,7 +26,8 @@
 #   Defaults to true
 #
 #  [*devices*]
-#   (Optional) The swift devices
+#   (Optional) DEPRECATED The swift devices
+#   Should pass raw_disk_prefix, raw_disks and swift_storage_node_ips instead
 #   Defaults to ''
 #
 #  [*step*]
@@ -38,12 +39,30 @@
 #   (Optional) The swift zones
 #   Defaults to 1
 #
+#  [*raw_disk_prefix*]
+#   (Optional) Disk prefix used to create devices list
+#   Defaults to 'r1z1-'
+#
+#  [*raw_disks*]
+#   (Optional) list of raw disks in format
+#   [':%PORT%/device1', ':%PORT%/device2']
+#   Combined with raw_disk_prefix and swift_storage_node_ips
+#   to create devices list
+#   Defaults to an empty list
+#
+#  [*swift_storage_node_ips*]
+#  (Optional) list of ip addresses for nodes running swift_storage service
+#  Defaults to hiera('swift_storage_node_ips') or an empty list
+#
 class tripleo::profile::base::swift::ringbuilder (
   $replicas,
   $build_ring  = true,
-  $devices     = '',
+  $devices     = undef,
   $step        = hiera('step'),
   $swift_zones = '1',
+  $raw_disk_prefix = 'r1z1-',
+  $raw_disks = [],
+  $swift_storage_node_ips = hiera('swift_storage_node_ips', []),
 ) {
   if $step >= 2 {
     # pre-install swift here so we can build rings
@@ -54,8 +73,11 @@ class tripleo::profile::base::swift::ringbuilder (
     validate_bool($build_ring)
 
     if $build_ring {
-
-      $device_array = strip(split(rstrip($devices), ','))
+      if $devices {
+        $device_array = strip(split(rstrip($devices), ','))
+      } else {
+        $device_array = tripleo_swift_devices($raw_disk_prefix, $swift_storage_node_ips, $raw_disks)
+      }
 
       # create local rings
       swift::ringbuilder::create{ ['object', 'account', 'container']:
