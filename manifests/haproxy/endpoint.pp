@@ -64,9 +64,27 @@
 #  Certificate path used to enable TLS for the public proxy endpoint.
 #  Defaults to undef.
 #
-# [*internal_certificate*]
-#  Certificate path used to enable TLS for the internal proxy endpoint.
-#  Defaults to undef.
+# [*use_internal_certificates*]
+#  Flag that indicates if we'll use an internal certificate for this specific
+#  service. When set, enables SSL on the internal API endpoints using the file
+#  that certmonger is tracking; this is derived from the network the service is
+#  listening on.
+#  Defaults to false
+#
+# [*internal_certificates_specs*]
+#  A hash that should contain the specs that were used to create the
+#  certificates. As the name indicates, only the internal certificates will be
+#  fetched from here. And the keys should follow the following pattern
+#  "haproxy-<network name>". The network name should be as it was defined in
+#  tripleo-heat-templates.
+#  Note that this is only taken into account if the $use_internal_certificates
+#  flag is set.
+#  Defaults to {}
+#
+# [*service_network*]
+#  (optional) Indicates the network that the service is running on. Used for
+#  fetching the certificate for that specific network.
+#  Defaults to undef
 #
 define tripleo::haproxy::endpoint (
   $internal_ip,
@@ -74,15 +92,17 @@ define tripleo::haproxy::endpoint (
   $ip_addresses,
   $server_names,
   $member_options,
-  $public_virtual_ip         = undef,
-  $mode                      = undef,
-  $haproxy_listen_bind_param = undef,
-  $listen_options            = {
+  $public_virtual_ip           = undef,
+  $mode                        = undef,
+  $haproxy_listen_bind_param   = undef,
+  $listen_options              = {
     'option' => [],
   },
-  $public_ssl_port           = undef,
-  $public_certificate        = undef,
-  $internal_certificate      = undef,
+  $public_ssl_port             = undef,
+  $public_certificate          = undef,
+  $use_internal_certificates   = false,
+  $internal_certificates_specs = {},
+  $service_network             = undef,
 ) {
   if $public_virtual_ip {
     # service exposed to the public network
@@ -98,9 +118,17 @@ define tripleo::haproxy::endpoint (
     $public_bind_opts = {}
   }
 
-  if $internal_certificate {
+  if $use_internal_certificates {
+    if !$service_network {
+      fail("The service_network for this service is undefined. Can't configure TLS for the internal network.")
+    }
+    # NOTE(jaosorior): The key of the internal_certificates_specs hash must
+    # must match the convention haproxy-<network name> or else this
+    # will fail. Futherly, it must contain the path that we'll use under
+    # 'service_pem'.
+    $internal_cert_path = $internal_certificates_specs["haproxy-${service_network}"]['service_pem']
     $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"),
-                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $internal_cert_path]))
   } else {
     $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
   }
