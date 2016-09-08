@@ -29,6 +29,10 @@
 #   (Optional) The iscsi helper to use
 #   Defaults to 'tgtadm'
 #
+# [*cinder_iscsi_protocol*]
+#   (Optional) The iscsi protocol to use
+#   Defaults to 'iscsi'
+#
 # [*cinder_lvm_loop_device_size*]
 #   (Optional) The size (in MB) of the LVM loopback volume
 #   Defaults to '10280'
@@ -42,6 +46,7 @@ class tripleo::profile::base::cinder::volume::iscsi (
   $cinder_iscsi_address,
   $backend_name                = hiera('cinder::backend::iscsi::volume_backend_name', 'tripleo_iscsi'),
   $cinder_iscsi_helper         = 'tgtadm',
+  $cinder_iscsi_protocol       = 'iscsi',
   $cinder_lvm_loop_device_size = '10280',
   $step                        = hiera('step'),
 ) {
@@ -58,6 +63,7 @@ class tripleo::profile::base::cinder::volume::iscsi (
     cinder::backend::iscsi { $backend_name :
       iscsi_ip_address => normalize_ip_for_uri($cinder_iscsi_address),
       iscsi_helper     => $cinder_iscsi_helper,
+      iscsi_protocol   => $cinder_iscsi_protocol,
     }
   }
 
