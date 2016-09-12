@@ -19,129 +19,138 @@
 #
 # == Parameters:
 #
-# [*admin_password*]
-#  (required) admin password
-#  String value.
-#
-# [*admin_tenant_name*]
-#  (required) admin tenant name.
-#  String value.
-#
-# [*admin_token*]
-#  (required) admin token
-#  String value.
-#
-# [*admin_user*]
-#  (required) admin user name.
-#  String value.
-#
-# [*auth_host*]
-#  (required) keystone server ip address
-#  String (IPv4) value.
-#
-# [*cassandra_server_list*]
-#  (required) List IPs+port of Cassandra servers
-#  Array of strings value.
-#
-# [*disc_server_ip*]
-#  (required) IPv4 address of discovery server.
-#  String (IPv4) value.
-#
 # [*host_ip*]
 #  (required) host IP address of Analytics
 #  String (IPv4) value.
 #
-# [*kafka_broker_list*]
-#  (required) List IPs+port of kafka servers
-#  Array of strings value.
+# [*admin_password*]
+#  (optional) admin password
+#  String value.
+#  Defaults to hiera('contrail::admin_password')
 #
-# [*zk_server_ip*]
-#  (required) List IPs+port of Zookeeper servers
-#  Array of strings value.
+# [*admin_tenant_name*]
+#  (optional) admin tenant name.
+#  String value.
+#  Defaults to hiera('contrail::admin_tenant_name')
+#
+# [*admin_token*]
+#  (optional) admin token
+#  String value.
+#  Defaults to hiera('contrail::admin_token')
+#
+# [*admin_user*]
+#  (optional) admin user name.
+#  String value.
+#  Defaults to hiera('contrail::admin_user')
+#
+# [*auth_host*]
+#  (optional) keystone server ip address
+#  String (IPv4) value.
+#  Defaults to hiera('contrail::auth_host')
 #
 # [*auth_port*]
-#  (required) keystone port.
+#  (optional) keystone port.
 #  Integer value.
-#  Defaults to 35357.
+#  Defaults to hiera('contrail::auth_port')
 #
 # [*auth_protocol*]
-#  (required) authentication protocol.
+#  (optional) authentication protocol.
 #  String value.
-#  Defaults to http.
+#  Defaults to hiera('contrail::auth_protocol')
+#
+# [*cassandra_server_list*]
+#  (optional) List IPs+port of Cassandra servers
+#  Array of strings value.
+#  Defaults to hiera('contrail::cassandra_server_list')
 #
 # [*collector_http_server_port*]
-#  (required) Collector http port
+#  (optional) Collector http port
 #  Integer value.
 #  Defaults to 8089
 #
 # [*collector_sandesh_port*]
-#  (required) Collector sandesh port
+#  (optional) Collector sandesh port
 #  Integer value.
 #  Defaults to 8086
 #
+# [*disc_server_ip*]
+#  (optional) IPv4 address of discovery server.
+#  String (IPv4) value.
+#  Defaults to hiera('contrail::disc_server_ip')
+#
 # [*disc_server_port*]
-#  (required) port Discovery server listens on.
+#  (optional) port Discovery server listens on.
 #  Integer value.
-#  Defaults to 5998
+#  Defaults to hiera('contrail::disc_server_port')
 #
 # [*http_server_port*]
-#  (required) Analytics http port
+#  (optional) Analytics http port
 #  Integer value.
 #  Defaults to 8090
 #
 # [*insecure*]
-#  (required) insecure mode.
+#  (optional) insecure mode.
 #  Boolean value.
-#  Defaults to false
+#  Defaults to falsehiera('contrail::insecure')
 #
-# [*redis_server*]
-#  (required) IPv4 address of redis server.
-#  String (IPv4) value.
-#  Defaults to '127.0.0.1'.
-#
-# [*redis_server_port*]
-#  (required) port Redis server listens on.
-#  Integer value.
-#  Defaults to 6379
-#
-# [*rest_api_ip*]
-#  (required) IP address Analytics rest interface listens on
-#  String (IPv4) value.
-#  Defaults to '0.0.0.0'
-#
-# [*rest_api_port*]
-#  (required) Analytics rest port
-#  Integer value.
-#  Defaults to 8081
+# [*kafka_broker_list*]
+#  (optional) List IPs+port of kafka servers
+#  Array of strings value.
+#  Defaults to hiera('contrail::kafka_broker_list')
 #
 # [*memcached_servers*]
 #  (optional) IPv4 address of memcached servers
 #  String (IPv4) value + port
-#  Defaults to '127.0.0.1:12111'
+#  Defaults to hiera('contrail::memcached_server')
+#
+# [*redis_server*]
+#  (optional) IPv4 address of redis server.
+#  String (IPv4) value.
+#  Defaults to '127.0.0.1'.
+#
+# [*redis_server_port*]
+#  (optional) port Redis server listens on.
+#  Integer value.
+#  Defaults to 6379
+#
+# [*rest_api_ip*]
+#  (optional) IP address Analytics rest interface listens on
+#  String (IPv4) value.
+#  Defaults to '0.0.0.0'
+#
+# [*rest_api_port*]
+#  (optional) Analytics rest port
+#  Integer value.
+#  Defaults to 8081
+#
+# [*zk_server_ip*]
+#  (optional) List IPs+port of Zookeeper servers
+#  Array of strings value.
+#  Defaults to hiera('contrail::zk_server_ip')
 #
 class tripleo::network::contrail::analytics(
+  $host_ip,
   $admin_password = hiera('contrail::admin_password'),
   $admin_tenant_name = hiera('contrail::admin_tenant_name'),
   $admin_token = hiera('contrail::admin_token'),
   $admin_user = hiera('contrail::admin_user'),
   $auth_host = hiera('contrail::auth_host'),
-  $cassandra_server_list = hiera('contrail::cassandra_server_list'),
-  $disc_server_ip = hiera('contrail::disc_server_ip'),
-  $host_ip,
-  $kafka_broker_list = hiera('contrail::kafka_broker_list'),
-  $zk_server_ip = hiera('contrail::zk_server_ip'),
   $auth_port = hiera('contrail::auth_port'),
   $auth_protocol = hiera('contrail::auth_protocol'),
+  $cassandra_server_list = hiera('contrail::cassandra_server_list'),
   $collector_http_server_port = 8089,
   $collector_sandesh_port = 8086,
+  $disc_server_ip = hiera('contrail::disc_server_ip'),
   $disc_server_port = hiera('contrail::disc_server_port'),
   $http_server_port = 8090,
   $insecure = hiera('contrail::insecure'),
+  $kafka_broker_list = hiera('contrail::kafka_broker_list'),
+  $memcached_servers = hiera('contrail::memcached_server'),
   $redis_server = '127.0.0.1',
   $redis_server_port = 6379,
   $rest_api_ip = '0.0.0.0',
   $rest_api_port = 8081,
-  $memcached_servers = hiera('contrail::memcached_server'),
+  $zk_server_ip = hiera('contrail::zk_server_ip'),
 )
 {
   class {'::contrail::keystone':

@@ -19,34 +19,6 @@
 #
 # == Parameters:
 #
-# [*admin_password*]
-#  (required) admin password
-#  String value.
-#
-# [*admin_tenant_name*]
-#  (required) admin tenant name.
-#  String value.
-#
-# [*admin_token*]
-#  (required) admin token
-#  String value.
-#
-# [*admin_user*]
-#  (required) admin user name.
-#  String value.
-#
-# [*auth_host*]
-#  (required) keystone server ip address
-#  String (IPv4) value.
-#
-# [*cassandra_server_list*]
-#  (required) List IPs+port of Cassandra servers
-#  Array of strings value.
-#
-# [*disc_server_ip*]
-#  (required) IPv4 address of discovery server.
-#  String (IPv4) value.
-#
 # [*ifmap_password*]
 #  (required) ifmap password
 #  String value.
@@ -63,71 +35,107 @@
 #  (required) IPv4 address of rabbit server.
 #  String (IPv4) value.
 #
-# [*zk_server_ip*]
-#  (required) List IPs+port of Zookeeper servers
-#  Array of strings value.
+# [*admin_password*]
+#  (optional) admin password
+#  String value.
+#  Defaults to hiera('contrail::admin_password')
+#
+# [*admin_tenant_name*]
+#  (optional) admin tenant name.
+#  String value.
+#  Defaults to hiera('contrail::admin_tenant_name')
+#
+# [*admin_token*]
+#  (optional) admin token
+#  String value.
+#  Defaults to hiera('contrail::admin_token')
+#
+# [*admin_user*]
+#  (optional) admin user name.
+#  String value.
+#  Defaults to hiera('contrail::admin_user')
 #
 # [*auth*]
-#  (required) Authentication method.
-#  Defaults to 'keystone'.
+#  (optional) Authentication method.
+#  Defaults to hiera('contrail::auth')
+#
+# [*auth_host*]
+#  (optional) keystone server ip address
+#  String (IPv4) value.
+#  Defaults to hiera('contrail::auth_host')
 #
 # [*auth_port*]
-#  (required) keystone port.
-#  Defaults to 35357.
+#  (optional) keystone port.
+#  Defaults to hiera('contrail::auth_port')
 #
 # [*auth_protocol*]
-#  (required) authentication protocol.
-#  Defaults to http.
+#  (optional) authentication protocol.
+#  Defaults to hiera('contrail::auth_protocol')
+#
+# [*cassandra_server_list*]
+#  (optional) List IPs+port of Cassandra servers
+#  Array of strings value.
+#  Defaults to hiera('contrail::cassandra_server_list')
+#
+# [*disc_server_ip*]
+#  (optional) IPv4 address of discovery server.
+#  String (IPv4) value.
+#  Defaults to hiera('contrail::disc_server_ip')
 #
 # [*insecure*]
-#  (required) insecure mode.
-#  Defaults to false
+#  (optional) insecure mode.
+#  Defaults to hiera('contrail::insecure')
 #
 # [*listen_ip_address*]
-#  (required) IP address to listen on.
+#  (optional) IP address to listen on.
 #  String (IPv4) value.
-#  Defaults to '0.0.0.0'.
+#  Defaults to '0.0.0.0'
 #
 # [*listen_port*]
-#  (required) Listen port for config-api
-#  Defaults to 8082.
+#  (optional) Listen port for config-api
+#  Defaults to 8082
 #
 # [*memcached_servers*]
 #  (optional) IPv4 address of memcached servers
 #  String (IPv4) value + port
-#  Defaults to '127.0.0.1:12111'
+#  Defaults to hiera('contrail::memcached_server')
 #
 # [*multi_tenancy*]
-#  (required) Defines if mutli-tenancy is enabled.
-#  Defaults to 'true'.
+#  (optional) Defines if mutli-tenancy is enabled.
+#  Defaults to hiera('contrail::multi_tenancy')
 #
 # [*redis_server*]
-#  (required) IPv4 address of redis server.
+#  (optional) IPv4 address of redis server.
 #  String (IPv4) value.
-#  Defaults to '127.0.0.1'.
+#  Defaults to '127.0.0.1'
+#
+# [*zk_server_ip*]
+#  (optional) List IPs+port of Zookeeper servers
+#  Array of strings value.
+#  Defaults to hiera('contrail::zk_server_ip')
 #
 class tripleo::network::contrail::config(
-  $admin_password = hiera('contrail::admin_password'),
-  $admin_tenant_name = hiera('contrail::admin_tenant_name'),
-  $admin_token = hiera('contrail::admin_token'),
-  $admin_user = hiera('contrail::admin_user'),
-  $auth_host = hiera('contrail::auth_host'),
-  $cassandra_server_list = hiera('contrail::cassandra_server_list'),
-  $disc_server_ip = hiera('contrail::disc_server_ip'),
   $ifmap_password,
   $ifmap_server_ip,
   $ifmap_username,
   $rabbit_server,
-  $zk_server_ip = hiera('contrail::zk_server_ip'),
+  $admin_password = hiera('contrail::admin_password'),
+  $admin_tenant_name = hiera('contrail::admin_tenant_name'),
+  $admin_token = hiera('contrail::admin_token'),
+  $admin_user = hiera('contrail::admin_user'),
   $auth = hiera('contrail::auth'),
+  $auth_host = hiera('contrail::auth_host'),
   $auth_port = hiera('contrail::auth_port'),
   $auth_protocol = hiera('contrail::auth_protocol'),
+  $cassandra_server_list = hiera('contrail::cassandra_server_list'),
+  $disc_server_ip = hiera('contrail::disc_server_ip'),
   $insecure = hiera('contrail::insecure'),
   $listen_ip_address = '0.0.0.0',
   $listen_port = 8082,
   $memcached_servers = hiera('contrail::memcached_server'),
   $multi_tenancy = hiera('contrail::multi_tenancy'),
   $redis_server = '127.0.0.1',
+  $zk_server_ip = hiera('contrail::zk_server_ip'),
 )
 {
   validate_ip_address($listen_ip_address)
