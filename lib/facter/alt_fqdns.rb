@@ -19,26 +19,16 @@
   'storage_mgmt',
   'tenant',
   'management',
+  'ctlplane',
 ].each do |network|
   Facter.add('fqdn_' + network) do
     setcode do
-      external_hostname_parts = [
+      hostname_parts = [
         Facter.value(:hostname),
         network.gsub('_', ''),
         Facter.value(:domain),
       ].reject { |part| part.nil? || part.empty? }
-      external_hostname_parts.join(".")
+      hostname_parts.join(".")
     end
-  end
-end
-# map ctlplane network to management fqdn
-Facter.add('fqdn_ctlplane') do
-  setcode do
-    hostname_parts = [
-      Facter.value(:hostname),
-      'management',
-      Facter.value(:domain),
-    ].reject { |part| part.nil? || part.empty? }
-    hostname_parts.join(".")
   end
 end
