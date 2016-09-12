@@ -49,6 +49,7 @@ define tripleo::certmonger::haproxy (
 ){
     certmonger_certificate { "${title}-cert":
       hostname     => $hostname,
+      dnsname      => $hostname,
       certfile     => $service_certificate,
       keyfile      => $service_key,
       postsave_cmd => $postsave_cmd,
