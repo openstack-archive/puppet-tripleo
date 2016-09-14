@@ -39,7 +39,10 @@ define tripleo::profile::base::swift::add_devices(
   $zone = (($server_num%$swift_zones) + 1)
 
   # add the rings
-  $base = regsubst($name,'^r1.*-(.*)$','\1')
+  $base_notnormal = regsubst($name,'^r1.*-(.*)$','\1')
+  $ip_notnormal = regsubst($base_notnormal, ':%PORT%.*', '')
+  $ip = normalize_ip_for_uri($ip_notnormal)
+  $base = regsubst($base_notnormal, $ip_notnormal, $ip)
   $object = regsubst($base, '%PORT%', '6000')
   ring_object_device { $object:
     zone   => '1',
