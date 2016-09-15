@@ -47,6 +47,7 @@ define tripleo::certmonger::haproxy (
   $postsave_cmd,
   $principal = undef,
 ){
+    include ::haproxy::params
     certmonger_certificate { "${title}-cert":
       hostname     => $hostname,
       dnsname      => $hostname,
@@ -56,10 +57,11 @@ define tripleo::certmonger::haproxy (
       principal    => $principal,
     }
     concat { $service_pem :
-      ensure => present,
-      mode   => '0640',
-      owner  => 'haproxy',
-      group  => 'haproxy',
+      ensure  => present,
+      mode    => '0640',
+      owner   => 'haproxy',
+      group   => 'haproxy',
+      require => Package[$::haproxy::params::package_name],
     }
     concat::fragment { "${title}-cert-fragment":
       target  => $service_pem,

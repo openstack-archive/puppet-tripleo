@@ -79,6 +79,9 @@ class tripleo::profile::base::haproxy (
           require     => Class['::certmonger'],
         }
         create_resources('::tripleo::certmonger::haproxy', $certificates_specs)
+        # The haproxy fronends (or listen resources) depend on the certificate
+        # existing and need to be refreshed if it changed.
+        Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
       }
 
       include ::tripleo::haproxy
