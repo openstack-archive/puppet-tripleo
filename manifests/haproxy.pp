@@ -155,7 +155,7 @@
 #
 # [*nova_novncproxy*]
 #  (optional) Enable or not Nova novncproxy binding
-#  Defaults to hiera('nova_vncproxy_enabled', false)
+#  Defaults to hiera('nova_vnc_proxy_enabled', false)
 #
 # [*ceilometer*]
 #  (optional) Enable or not Ceilometer API binding
@@ -320,7 +320,7 @@ class tripleo::haproxy (
   $glance_registry           = hiera('glance_registry_enabled', false),
   $nova_osapi                = hiera('nova_api_enabled', false),
   $nova_metadata             = hiera('nova_api_enabled', false),
-  $nova_novncproxy           = hiera('nova_vncproxy_enabled', false),
+  $nova_novncproxy           = hiera('nova_vnc_proxy_enabled', false),
   $ceilometer                = hiera('ceilometer_api_enabled', false),
   $aodh                      = hiera('aodh_api_enabled', false),
   $gnocchi                   = hiera('gnocchi_api_enabled', false),
