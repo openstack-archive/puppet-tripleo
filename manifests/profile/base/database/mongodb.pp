@@ -44,6 +44,13 @@ class tripleo::profile::base::database::mongodb (
     include ::tripleo::profile::base::database::mongodbcommon
 
     if $bootstrap_node == $::hostname {
+      # make sure we can connect to all servers before forming the replset
+      tripleo::profile::pacemaker::database::mongodbvalidator {
+        $tripleo::profile::base::database::mongodbcommon::mongodb_node_ips :
+        port    => $tripleo::profile::base::database::mongodbcommon::port,
+        require => Service['mongodb'],
+        before  => Mongodb_replset[$mongodb_replset],
+      }
       mongodb_replset { $mongodb_replset :
         members => $tripleo::profile::base::database::mongodbcommon::mongo_node_ips_with_port_nobr,
       }
