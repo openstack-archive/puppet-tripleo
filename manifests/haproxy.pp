@@ -238,6 +238,10 @@
 #  (optional) Enable or not OpenDaylight binding
 #  Defaults to hiera('opendaylight_api_enabled', false)
 #
+# [*zaqar_ws*]
+#  (optional) Enable or not Zaqar Websockets binding
+#  Defaults to false
+#
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
@@ -287,6 +291,10 @@
 #    'zaqar_api_ssl_port' (Defaults to 13888)
 #    'ceph_rgw_port' (Defaults to 8080)
 #    'ceph_rgw_ssl_port' (Defaults to 13808)
+#    'zaqar_ws_port' (Defaults to 9000)
+#    'zaqar_ws_ssl_port' (Defaults to 9000)
+#  * Note that for zaqar's websockets we don't support having a different
+#  port for SSL, because it ignores the handshake.
 #  Defaults to {}
 #
 class tripleo::haproxy (
@@ -341,6 +349,7 @@ class tripleo::haproxy (
   $zaqar_api                 = hiera('zaqar_api_enabled', false),
   $ceph_rgw                  = hiera('ceph_rgw_enabled', false),
   $opendaylight              = hiera('opendaylight_api_enabled', false),
+  $zaqar_ws                  = hiera('zaqar_api_enabled', false),
   $service_ports             = {}
 ) {
   $default_service_ports = {
@@ -390,6 +399,8 @@ class tripleo::haproxy (
     zaqar_api_ssl_port => 13888,
     ceph_rgw_port => 8080,
     ceph_rgw_ssl_port => 13808,
+    zaqar_ws_port => 9000,
+    zaqar_ws_ssl_port => 9000,
   }
   $ports = merge($default_service_ports, $service_ports)
 
@@ -980,6 +991,28 @@ class tripleo::haproxy (
       ipaddresses       => hiera('opendaylight_api_node_ips', $controller_hosts_real),
       server_names      => $controller_hosts_names_real,
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
+    }
+  }
+
+  if $zaqar_ws {
+    ::tripleo::haproxy::endpoint { 'zaqar_ws':
+      public_virtual_ip         => $public_virtual_ip,
+      internal_ip               => hiera('zaqar_ws_vip', $controller_virtual_ip),
+      service_port              => $ports[zaqar_ws_port],
+      ip_addresses              => hiera('zaqar_ws_node_ips', $controller_hosts_real),
+      server_names              => $controller_hosts_names_real,
+      mode                      => 'http',
+      haproxy_listen_bind_param => [],  # We don't use a transparent proxy here
+      listen_options            => {
+        # NOTE(jaosorior): Websockets have more overhead in establishing
+        # connections than regular HTTP connections. Also, since it begins
+        # as an HTTP connection and then "upgrades" to a TCP connection, some
+        # timeouts get overriden by others at certain times of the connection.
+        # The following values were taken from the following site:
+        # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
+        'timeout' => ['connect 5s', 'client 25s', 'server 25s', 'tunnel 3600s'],
+      },
+      public_ssl_port           => $ports[zaqar_ws_ssl_port],
     }
   }
 }
