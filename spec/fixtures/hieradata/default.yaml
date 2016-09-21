@@ -1,3 +1,10 @@
+---
 my_hash:
   network: '127.0.0.1'
 not_hash: string
+# aodh profile required hieradata
+aodh_redis_password: 'password'
+redis_vip: '127.0.0.1'
+aodh::auth::auth_password: 'password'
+aodh::db::mysql::password: 'password'
+aodh::keystone::authtoken::password: 'password'
