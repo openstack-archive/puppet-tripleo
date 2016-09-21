@@ -19,15 +19,7 @@ require 'spec_helper'
 
 describe 'tripleo::cluster::cassandra' do
 
-  shared_examples_for 'cassandra cluster service' do
-
-    let :facts do
-      {
-        :hostname                  => 'host1.midonet',
-        :osfamily                  => 'RedHat',
-        :operatingsystemmajrelease => 7,
-      }
-    end
+  shared_examples_for 'tripleo::cluster::cassandra' do
 
     let :params do
       {
@@ -49,6 +41,14 @@ describe 'tripleo::cluster::cassandra' do
     end
   end
 
-  it_configures 'cassandra cluster service'
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
+
+      it_behaves_like 'tripleo::cluster::cassandra'
+    end
+  end
 
 end

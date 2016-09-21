@@ -19,97 +19,68 @@ require 'spec_helper'
 
 describe 'tripleo::cluster::zookeeper' do
 
-  let :default_params do
-    {
-      :zookeeper_server_ips => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
-      :zookeeper_hostnames  => ['host1.midonet', 'host2.midonet', 'host3.midonet']
-    }
-  end
-
-  context 'on host1' do
-    let :facts do
+  shared_examples_for 'tripleo::cluster::zookeeper' do
+    let :params do
       {
-        :hostname                  => 'host1.midonet',
-        :osfamily                  => 'RedHat',
-        :operatingsystemmajrelease => 7,
+        :zookeeper_server_ips => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
+        :zookeeper_hostnames  => ['host1.midonet', 'host2.midonet', 'host3.midonet']
       }
     end
 
-    let :params do
-    {
-      :zookeeper_client_ip => '23.43.2.34'
-    }
+    context 'on host1' do
+      before :each do
+        facts.merge!({ :hostname => 'host1.midonet'})
+        params.merge!({ :zookeeper_client_ip => '23.43.2.34' })
+      end
+
+      it 'should call zookeeper using id==1' do
+        is_expected.to contain_class('zookeeper').with(
+          :servers   => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
+          :client_ip => '23.43.2.34',
+          :id        => 1
+        )
+      end
     end
 
-    before do
-      params.merge!(default_params)
+    context 'on host2' do
+      before :each do
+        facts.merge!({ :hostname => 'host2.midonet'})
+        params.merge!({ :zookeeper_client_ip => '23.43.2.35' })
+      end
+
+      it 'should call zookeeper using id==1' do
+        is_expected.to contain_class('zookeeper').with(
+          :servers   => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
+          :client_ip => '23.43.2.35',
+          :id        => 2
+        )
+      end
     end
 
-    it 'should call zookeeper using id==1' do
-      is_expected.to contain_class('zookeeper').with(
-        :servers   => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
-        :client_ip => '23.43.2.34',
-        :id        => 1
-      )
-    end
+    context 'on host3' do
+      before :each do
+        facts.merge!({ :hostname => 'host3.midonet'})
+        params.merge!({ :zookeeper_client_ip => '23.43.2.36' })
+      end
 
+      it 'should call zookeeper using id==1' do
+        is_expected.to contain_class('zookeeper').with(
+          :servers   => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
+          :client_ip => '23.43.2.36',
+          :id        => 3
+        )
+      end
+
+    end
   end
 
-  context 'on host2' do
-    let :facts do
-      {
-        :hostname                  => 'host2.midonet',
-        :osfamily                  => 'RedHat',
-        :operatingsystemmajrelease => 7,
-      }
-    end
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
 
-    let :params do
-    {
-      :zookeeper_client_ip => '23.43.2.35'
-    }
-    end
-
-    before do
-      params.merge!(default_params)
-    end
-
-    it 'should call zookeeper using id==1' do
-      is_expected.to contain_class('zookeeper').with(
-        :servers   => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
-        :client_ip => '23.43.2.35',
-        :id        => 2
-      )
+      it_behaves_like 'tripleo::cluster::zookeeper'
     end
   end
-
-  context 'on host3' do
-    let :facts do
-      {
-        :hostname                  => 'host3.midonet',
-        :osfamily                  => 'RedHat',
-        :operatingsystemmajrelease => 7,
-      }
-    end
-
-    let :params do
-    {
-      :zookeeper_client_ip => '23.43.2.36'
-    }
-    end
-
-    before do
-      params.merge!(default_params)
-    end
-
-    it 'should call zookeeper using id==1' do
-      is_expected.to contain_class('zookeeper').with(
-        :servers   => ['23.43.2.34', '23.43.2.35', '24.43.2.36'],
-        :client_ip => '23.43.2.36',
-        :id        => 3
-      )
-    end
-
-  end
-
 end

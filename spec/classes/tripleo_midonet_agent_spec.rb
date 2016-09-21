@@ -19,17 +19,7 @@ require 'spec_helper'
 
 describe 'tripleo::network::midonet::agent' do
 
-  let :facts do
-    {
-      :hostname                  => 'host2.midonet',
-      :osfamily                  => 'RedHat',
-      :operatingsystem           => 'CentOS',
-      :operatingsystemrelease    => '7.1',
-      :operatingsystemmajrelease => 7,
-    }
-  end
-
-  shared_examples_for 'midonet agent test' do
+  shared_examples_for 'tripleo::network::midonet::agent' do
 
     let :params do
       {
@@ -56,7 +46,13 @@ describe 'tripleo::network::midonet::agent' do
     end
   end
 
-  it_configures 'midonet agent test'
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
 
-
+      it_behaves_like 'tripleo::network::midonet::agent'
+    end
+  end
 end
