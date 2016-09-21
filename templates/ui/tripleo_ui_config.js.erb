@@ -1,0 +1,14 @@
+window.tripleOUiConfig = {
+  "keystone": "<%= @keystone_url %>",
+
+  // The UI automatically discovers below URLs by querying keystone but can be
+  // changed here if desired.
+  //"heat": "<%= @heat_url %>",
+  //"ironic": "<%= @ironic_url %>",
+  //"mistral": "<%= @mistral_url %>",
+  //"swift": "<%= @swift_url %>",
+  //"zaqar_websocket_url": "<%= @zaqar_websocket_url %>",
+
+  // Default websocket queue name
+  "zaqar_default_queue": "<%= @zaqar_default_queue %>"
+};
