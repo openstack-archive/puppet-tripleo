@@ -19,30 +19,6 @@
 #
 # == Parameters:
 #
-# [*admin_password*]
-#  (required) admin password
-#  String value.
-#
-# [*admin_tenant_name*]
-#  (required) admin tenant name.
-#  String value.
-#
-# [*admin_token*]
-#  (required) admin token
-#  String value.
-#
-# [*admin_user*]
-#  (required) admin user name.
-#  String value.
-#
-# [*auth_host*]
-#  (required) keystone server ip address
-#  String (IPv4) value.
-#
-# [*disc_server_ip*]
-#  (required) IPv4 address of discovery server.
-#  String (IPv4) value.
-#
 # [*host_ip*]
 #  (required) host IP address of Control
 #  String (IPv4) value.
@@ -51,52 +27,75 @@
 #  (required) ifmap password
 #  String value.
 #
-# [*ifmap_server_ip*]
-#  (required) ifmap server ip address.
-#  String value.
-#
 # [*ifmap_username*]
-#  (required) ifmap username
+#  (optional) ifmap username
 #  String value.
+#  Defaults to hiera('contrail::ifmap_username'),
+#
+# [*admin_password*]
+#  (optional) admin password
+#  String value.
+#  Defaults to hiera('contrail::admin_password'),
+#
+# [*admin_tenant_name*]
+#  (optional) admin tenant name.
+#  String value.
+#  Defaults to hiera('contrail::admin_tenant_name'),
+#
+# [*admin_token*]
+#  (optional) admin token
+#  String value.
+#  Defaults to hiera('contrail::admin_token'),
+#
+# [*admin_user*]
+#  (optional) admin user name.
+#  String value.
+#  Defaults to hiera('contrail::admin_user'),
+#
+# [*auth_host*]
+#  (optional) keystone server ip address
+#  String (IPv4) value.
+#  Defaults to hiera('contrail::auth_host'),
 #
 # [*auth_port*]
-#  (required) keystone port.
-#  Defaults to 35357.
+#  (optional) keystone port.
+#  Defaults to hiera('contrail::auth_port'),
 #
 # [*auth_protocol*]
-#  (required) authentication protocol.
-#  Defaults to http.
+#  (optional) authentication protocol.
+#  Defaults to hiera('contrail::auth_protocol'),
+#
+# [*disc_server_ip*]
+#  (optional) IPv4 address of discovery server.
+#  String (IPv4) value.
+#  Defaults to hiera('contrail::disc_server_ip'),
 #
 # [*disc_server_port*]
-#  (required) port Discovery server listens on.
+#  (optional) port Discovery server listens on.
 #  Integer value.
-#  Defaults to 5998
+#  Defaults to hiera('contrail::disc_server_port'),
 #
 # [*insecure*]
-#  (required) insecure mode.
-#  Defaults to false
+#  (optional) insecure mode.
+#  Defaults to hiera('contrail::insecure'),
 #
 # [*memcached_servers*]
 #  (optional) IPv4 address of memcached servers
 #  String (IPv4) value + port
-#  Defaults to '127.0.0.1:12111'
-#
-# [*multi_tenancy*]
-#  (required) Defines if mutli-tenancy is enabled.
-#  Defaults to 'true'.
+#  Defaults to hiera('contrail::memcached_servers'),
 #
 class tripleo::network::contrail::control(
-  $admin_tenant_name = hiera('contrail::admin_tenant_name'),
-  $admin_token = hiera('contrail::admin_token'),
-  $admin_password = hiera('contrail::admin_password'),
-  $admin_user = hiera('contrail::admin_user'),
-  $auth_host = hiera('contrail::auth_host'),
-  $disc_server_ip = hiera('contrail::disc_server_ip'),
   $host_ip,
   $ifmap_password,
   $ifmap_username,
+  $admin_password = hiera('contrail::admin_password'),
+  $admin_tenant_name = hiera('contrail::admin_tenant_name'),
+  $admin_token = hiera('contrail::admin_token'),
+  $admin_user = hiera('contrail::admin_user'),
+  $auth_host = hiera('contrail::auth_host'),
   $auth_port = hiera('contrail::auth_port'),
   $auth_protocol = hiera('contrail::auth_protocol'),
+  $disc_server_ip = hiera('contrail::disc_server_ip'),
   $disc_server_port = hiera('contrail::disc_server_port'),
   $insecure = hiera('contrail::insecure'),
   $memcached_servers = hiera('contrail::memcached_server'),

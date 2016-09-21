@@ -19,22 +19,23 @@
 #
 # == Parameters:
 #
-# [*disc_server_ip*]
-#  (required) IPv4 address of discovery server.
-#  String (IPv4) value.
-#
 # [*host_ip*]
 #  (required) host IP address of Database node
 #  String (IPv4) value.
 #
+# [*disc_server_ip*]
+#  (optional) IPv4 address of discovery server.
+#  String (IPv4) value.
+#  Defaults to hiera('contrail::disc_server_ip')
+#
 # [*disc_server_port*]
-#  (required) port Discovery server listens on.
+#  (optional) port Discovery server listens on.
 #  Integer value.
-#  Defaults to 5998
+#  Defaults to hiera('contrail::disc_server_port')
 #
 class tripleo::network::contrail::database(
-  $disc_server_ip = hiera('contrail::disc_server_ip'),
   $host_ip,
+  $disc_server_ip = hiera('contrail::disc_server_ip'),
   $disc_server_port = hiera('contrail::disc_server_port'),
 )
 {
