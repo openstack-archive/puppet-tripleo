@@ -91,7 +91,7 @@ class tripleo::profile::base::swift::ringbuilder (
 
       # rebalance
       swift::ringbuilder::rebalance{ ['object', 'account', 'container']:
-        seed => 999,
+        seed => '999',
       }
 
       Ring_object_device<| |> ~> Exec['rebalance_object']
