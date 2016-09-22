@@ -18,34 +18,19 @@
 #
 # === Parameters
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::manila::scheduler (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $step = hiera('step'),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
-    $sync_db = true
-  } else {
-    $sync_db = false
-  }
-
-  if $step >= 3 and $sync_db {
-    include ::manila::db::mysql
-  }
+  include ::tripleo::profile::base::manila
 
   if $step >= 4 {
     include ::manila::compute::nova
     include ::manila::network::neutron
     include ::manila::scheduler
   }
-
 }
-
