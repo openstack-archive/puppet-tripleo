@@ -29,9 +29,11 @@ class tripleo::certmonger::ca::local(
   $extract_cmd = "openssl pkcs12 -in ${ca_pkcs12} -out ${ca_pem} -nokeys -nodes -passin pass:''"
   $trust_ca_cmd = 'update-ca-trust extract'
   exec { 'extract-and-trust-ca':
-    command => "${extract_cmd} && ${trust_ca_cmd}",
-    path    => '/usr/bin',
-    creates => $ca_pem,
-    require => Package['certmonger'],
+    command   => "${extract_cmd} && ${trust_ca_cmd}",
+    path      => '/usr/bin',
+    creates   => $ca_pem,
+    tries     => 5,
+    try_sleep => 1,
+    require   => Service['certmonger'],
   }
 }
