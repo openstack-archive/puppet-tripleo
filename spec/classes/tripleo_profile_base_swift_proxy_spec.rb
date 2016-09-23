@@ -63,6 +63,21 @@ describe 'tripleo::profile::base::swift::proxy' do
       end
     end
 
+    context 'with ipv4, ipv6 and fqdn memcache servers' do
+      before :each do
+        params.merge!(
+          :step             => 4,
+          :memcache_servers => ['192.168.0.1', '::2', 'myserver.com'],
+        )
+      end
+
+      it 'configure swift proxy cache with ips and fqdn' do
+        is_expected.to contain_class('swift::proxy::cache').with({
+          :memcache_servers => ['192.168.0.1:11211', '[::2]:11211', 'myserver.com:11211']
+        })
+      end
+    end
+
   end
 
   context 'on Debian platforms' do
