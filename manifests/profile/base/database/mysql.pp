@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*bind_address*]
+#   (Optional) The address that the local mysql instance should bind to.
+#   Defaults to $::hostname
+#
 # [*manage_resources*]
 #   (Optional) Whether or not manage root user, root my.cnf, and service.
 #   Defaults to true
@@ -37,11 +41,11 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::database::mysql (
+  $bind_address            = $::hostname,
   $manage_resources        = true,
   $mysql_server_options    = {},
   $remove_default_accounts = true,
   $step                    = hiera('step'),
-
 ) {
 
   validate_hash($mysql_server_options)
@@ -59,14 +63,14 @@ class tripleo::profile::base::database::mysql (
     } else {
       $mysql_config_file = '/etc/my.cnf.d/server.cnf'
     }
-    # TODO Galara
+    # TODO Galera
     # FIXME: due to https://bugzilla.redhat.com/show_bug.cgi?id=1298671 we
     # set bind-address to a hostname instead of an ip address; to move Mysql
     # from internal_api on another network we'll have to customize both
     # MysqlNetwork and ControllerHostnameResolveNetwork in ServiceNetMap
     $mysql_server_default = {
       'mysqld' => {
-        'bind-address'     => $::hostname,
+        'bind-address'     => $bind_address,
         'max_connections'  => hiera('mysql_max_connections'),
         'open_files_limit' => '-1',
       }
