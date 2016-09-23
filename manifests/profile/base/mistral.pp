@@ -27,9 +27,14 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
+
 class tripleo::profile::base::mistral (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
+  $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -42,7 +47,9 @@ class tripleo::profile::base::mistral (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::mistral
+    class  { '::mistral':
+      rabbit_hosts => $rabbit_hosts,
+    }
     include ::mistral::config
     include ::mistral::client
     include ::mistral::db::sync
