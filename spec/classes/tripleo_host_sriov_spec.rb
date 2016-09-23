@@ -2,15 +2,7 @@ require 'spec_helper'
 
 describe 'tripleo::host::sriov' do
 
-  shared_examples_for 'sriov vfs configuration for Red Hat distributions' do
-
-    let :facts do
-      {
-        :osfamily                  => 'RedHat',
-        :operatingsystemmajrelease => 7,
-      }
-    end
-
+  shared_examples_for 'tripleo::host::sriov' do
     let :params do
       {:number_of_vfs => []}
     end
@@ -35,5 +27,13 @@ describe 'tripleo::host::sriov' do
     end
   end
 
-  it_configures 'sriov vfs configuration for Red Hat distributions'
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
+
+      it_behaves_like 'tripleo::host::sriov'
+    end
+  end
 end

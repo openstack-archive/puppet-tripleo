@@ -17,17 +17,10 @@ require 'spec_helper'
 
 describe 'tripleo::packages' do
 
-  shared_examples_for 'Red Hat distributions' do
+  shared_examples_for 'tripleo::packages' do
 
     let :pre_condition do
       "service{'nova-compute': ensure => 'running'}"
-    end
-
-    let :facts do
-      {
-        :osfamily                  => 'RedHat',
-        :operatingsystemmajrelease => 7,
-      }
     end
 
     let :params do
@@ -43,6 +36,15 @@ describe 'tripleo::packages' do
 
   end
 
-  it_configures 'Red Hat distributions'
+
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
+
+      it_behaves_like 'tripleo::packages'
+    end
+  end
 
 end

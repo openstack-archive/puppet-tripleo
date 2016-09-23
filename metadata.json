@@ -14,11 +14,11 @@
   ],
   "operatingsystem_support": [
     {
-      "operatingsystem": "Fedora",
-      "operatingsystemrelease": ["20"]
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": ["7"]
     },
     {
-      "operatingsystem": "RedHat",
+      "operatingsystem": "CentOS",
       "operatingsystemrelease": ["7"]
     }
   ],

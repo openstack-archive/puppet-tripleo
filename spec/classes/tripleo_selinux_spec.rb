@@ -19,11 +19,14 @@ require 'spec_helper'
 
 describe 'tripleo::selinux' do
 
-  shared_examples_for 'manage selinux' do
+  shared_examples_for 'tripleo::selinux' do
 
     context 'with selinux enforcing' do
       before :each do
-        facts.merge!( :selinux_current_mode => 'enforcing' )
+        facts.merge!({
+          :selinux              => true,
+          :selinux_current_mode => 'enforcing'
+        })
       end
 
       let :params do
@@ -55,7 +58,7 @@ describe 'tripleo::selinux' do
 
     context 'with selinux disabled' do
       before :each do
-        facts.merge!( :selinux => 'false' )
+        facts.merge!({ :selinux => 'false' })
       end
 
       let :params do
@@ -89,18 +92,19 @@ describe 'tripleo::selinux' do
 
   context 'on Debian platforms' do
     let :facts do
-      { :osfamily               => 'Debian' }
+      { :osfamily => 'Debian' }
     end
 
     it_raises 'a Puppet::Error', /OS family unsuppored yet \(Debian\), SELinux support is only limited to RedHat family OS/
   end
 
-  context 'on RedHat platforms' do
-    let :facts do
-      { :osfamily => 'RedHat' }
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
+
+      it_behaves_like 'tripleo::selinux'
     end
-
-    it_configures 'manage selinux'
   end
-
 end

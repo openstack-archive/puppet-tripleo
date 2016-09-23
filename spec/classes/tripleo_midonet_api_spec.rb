@@ -19,13 +19,7 @@ require 'spec_helper'
 
 describe 'tripleo::network::midonet::api' do
 
-  let :facts do
-    {
-      :augeasversion => '1.0.0'
-    }
-  end
-
-  shared_examples_for 'midonet api test' do
+  shared_examples_for 'tripleo::midonet::api' do
 
     let :params do
       {
@@ -67,6 +61,16 @@ describe 'tripleo::network::midonet::api' do
 
   end
 
-  it_configures 'midonet api test'
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({
+           :augeasversion => '1.0.0'
+        })
+      end
+
+      it_behaves_like 'tripleo::midonet::api'
+    end
+  end
 
 end

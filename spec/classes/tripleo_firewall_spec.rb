@@ -24,7 +24,7 @@ describe 'tripleo::firewall' do
     { }
   end
 
-  shared_examples_for 'tripleo node' do
+  shared_examples_for 'tripleo::firewall' do
 
     context 'with firewall enabled' do
       before :each do
@@ -114,23 +114,13 @@ describe 'tripleo::firewall' do
 
   end
 
-  context 'on Debian platforms' do
-    let :facts do
-      { :osfamily => 'Debian' }
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
+
+      it_behaves_like 'tripleo::firewall'
     end
-
-    it_configures 'tripleo node'
   end
-
-  context 'on RedHat platforms' do
-    let :facts do
-      {
-        :osfamily               => 'RedHat',
-        :operatingsystemrelease => '7.1',
-      }
-    end
-
-    it_configures 'tripleo node'
-  end
-
 end

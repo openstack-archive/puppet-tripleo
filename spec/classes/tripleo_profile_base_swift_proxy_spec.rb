@@ -21,7 +21,7 @@ describe 'tripleo::profile::base::swift::proxy' do
     { }
   end
 
-  shared_examples_for 'tripleo swift proxy base profile' do
+  shared_examples_for 'tripleo::profile::base::swift::proxy' do
 
     let :pre_condition do
       "class { '::swift':
@@ -80,25 +80,13 @@ describe 'tripleo::profile::base::swift::proxy' do
 
   end
 
-  context 'on Debian platforms' do
-    let :facts do
-      { :osfamily       => 'Debian',
-        :processorcount => 1 }
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
+
+      it_behaves_like 'tripleo::profile::base::swift::proxy'
     end
-
-    it_configures 'tripleo swift proxy base profile'
   end
-
-  context 'on RedHat platforms' do
-    let :facts do
-      {
-        :osfamily               => 'RedHat',
-        :operatingsystemrelease => '7.1',
-        :processorcount         => 1,
-      }
-    end
-
-    it_configures 'tripleo swift proxy base profile'
-  end
-
 end
