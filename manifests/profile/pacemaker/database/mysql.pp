@@ -22,21 +22,26 @@
 #   (Optional) The address that the local mysql instance should bind to.
 #   Defaults to $::hostname
 #
+# [*gmcast_listen_addr*]
+#   (Optional) This variable defines the address on which the node listens to
+#   connections from other nodes in the cluster.
+#   Defaults to hiera('mysql_bind_host')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::database::mysql (
-  $bind_address = $::hostname,
-  $step         = hiera('step'),
+  $bind_address       = $::hostname,
+  $gmcast_listen_addr = hiera('mysql_bind_host'),
+  $step               = hiera('step'),
 ) {
   if $::hostname == downcase(hiera('bootstrap_nodeid')) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false
   }
-  $mysql_bind_host = hiera('mysql_bind_host')
 
   # use only mysql_node_names when we land a patch in t-h-t that
   # switches to autogenerating these values from composable services
@@ -75,7 +80,7 @@ class tripleo::profile::pacemaker::database::mysql (
       'wsrep_drupal_282555_workaround'=> '0',
       'wsrep_causal_reads'            => '0',
       'wsrep_sst_method'              => 'rsync',
-      'wsrep_provider_options'        => "gmcast.listen_addr=tcp://${mysql_bind_host}:4567;",
+      'wsrep_provider_options'        => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;",
     }
   }
 
