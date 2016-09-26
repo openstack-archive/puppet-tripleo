@@ -37,11 +37,6 @@ class tripleo::profile::base::nova::api (
 
   include ::tripleo::profile::base::nova
 
-  if $step >= 3 and $sync_db {
-    include ::nova::db::mysql
-    include ::nova::db::mysql_api
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::nova::api':
       sync_db     => $sync_db,

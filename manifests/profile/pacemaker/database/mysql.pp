@@ -125,6 +125,11 @@ class tripleo::profile::pacemaker::database::mysql (
         table      => '*.*',
         user       => 'clustercheck@localhost',
       }
+
+      # We create databases for services at step 2 as well. This ensures
+      # Galara is up before those get created
+      Exec['galera-ready'] -> Mysql_database<||>
+
     }
     # This step is to create a sysconfig clustercheck file with the root user and empty password
     # on the first install only (because later on the clustercheck db user will be used)

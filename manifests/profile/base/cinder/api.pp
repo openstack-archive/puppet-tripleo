@@ -39,10 +39,6 @@ class tripleo::profile::base::cinder::api (
 
   include ::tripleo::profile::base::cinder
 
-  if $step >= 3 and $sync_db {
-    include ::cinder::db::mysql
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::cinder::api
     include ::cinder::ceilometer

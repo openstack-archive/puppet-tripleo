@@ -45,7 +45,6 @@ class tripleo::profile::base::gnocchi::api (
   include ::tripleo::profile::base::gnocchi
 
   if $step >= 3 and $sync_db {
-    include ::gnocchi::db::mysql
     include ::gnocchi::db::sync
   }
 

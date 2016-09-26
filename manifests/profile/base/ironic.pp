@@ -42,10 +42,6 @@ class tripleo::profile::base::ironic (
     $sync_db = false
   }
 
-  if $step >= 3 and $sync_db {
-    include ::ironic::db::mysql
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::ironic':
       sync_db      => $sync_db,

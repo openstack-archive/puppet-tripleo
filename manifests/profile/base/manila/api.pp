@@ -39,10 +39,6 @@ class tripleo::profile::base::manila::api (
 
   include ::tripleo::profile::base::manila
 
-  if $step >= 3 and $sync_db {
-    include ::manila::db::mysql
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::manila::api
   }

@@ -22,6 +22,10 @@
 #   (Optional) The address that the local mysql instance should bind to.
 #   Defaults to $::hostname
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*manage_resources*]
 #   (Optional) Whether or not manage root user, root my.cnf, and service.
 #   Defaults to true
@@ -42,11 +46,18 @@
 #
 class tripleo::profile::base::database::mysql (
   $bind_address            = $::hostname,
+  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
   $manage_resources        = true,
   $mysql_server_options    = {},
   $remove_default_accounts = true,
   $step                    = hiera('step'),
 ) {
+
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
 
   validate_hash($mysql_server_options)
 
@@ -84,6 +95,53 @@ class tripleo::profile::base::database::mysql (
       service_manage          => $manage_resources,
       service_enabled         => $manage_resources,
       remove_default_accounts => $remove_default_accounts,
+    }
+  }
+
+  if $step >= 2 and $sync_db {
+    Class['::mysql::server'] -> Mysql_database<||>
+    if hiera('aodh_api_enabled', false) {
+      include ::aodh::db::mysql
+    }
+    if hiera('ceilometer_collector_enabled', false) {
+      include ::ceilometer::db::mysql
+    }
+    if hiera('cinder_api_enabled', false) {
+      include ::cinder::db::mysql
+    }
+    if hiera('glance_registry_enabled', false) {
+      include ::glance::db::mysql
+    }
+    if hiera('gnocchi_api_enabled', false) {
+      include ::gnocchi::db::mysql
+    }
+    if hiera('heat_engine_enabled', false) {
+      include ::heat::db::mysql
+    }
+    if hiera('ironic_api_enabled', false) {
+      include ::ironic::db::mysql
+    }
+    if hiera('keystone_enabled', false) {
+      include ::keystone::db::mysql
+    }
+    if hiera('manila_api_enabled', false) {
+      include ::manila::db::mysql
+    }
+    if hiera('mistral_api_enabled', false) {
+      include ::mistral::db::mysql
+    }
+    if hiera('neutron_api_enabled', false) {
+      include ::neutron::db::mysql
+    }
+    if hiera('nova_api_enabled', false) {
+      include ::nova::db::mysql
+      include ::nova::db::mysql_api
+    }
+    if hiera('sahara_api_enabled', false) {
+      include ::sahara::db::mysql
+    }
+    if hiera('trove_api_enabled', false) {
+      include ::trove::db::mysql
     }
   }
 

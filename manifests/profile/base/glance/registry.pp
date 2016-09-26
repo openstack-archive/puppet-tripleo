@@ -42,10 +42,6 @@ class tripleo::profile::base::glance::registry (
     $sync_db = false
   }
 
-  if $step >= 3 and $sync_db {
-    include ::glance::db::mysql
-  }
-
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     # TODO: notifications, scrubber, etc.
     include ::glance

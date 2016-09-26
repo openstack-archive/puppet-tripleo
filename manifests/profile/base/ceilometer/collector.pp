@@ -59,10 +59,6 @@ class tripleo::profile::base::ceilometer::collector (
 
   include ::tripleo::profile::base::ceilometer
 
-  if $step >= 2 and $sync_db and $ceilometer_backend == 'mysql' {
-    include ::ceilometer::db::mysql
-  }
-
   if $step >= 3 and $sync_db {
     include ::ceilometer::db::sync
   }
