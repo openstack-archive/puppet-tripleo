@@ -26,8 +26,9 @@
 class tripleo::profile::base::manila::share (
   $step = hiera('step'),
 ) {
+  include ::tripleo::profile::base::manila
+
   if $step >= 4 {
     include ::manila::share
   }
 }
-

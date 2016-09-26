@@ -46,11 +46,11 @@ class tripleo::profile::pacemaker::manila (
     stop       => '/bin/true',
   }
 
-  if $step >= 4 {
-    include ::tripleo::profile::base::manila::api
-    include ::tripleo::profile::base::manila::scheduler
-    include ::tripleo::profile::base::manila::share
+  include ::tripleo::profile::base::manila::api
+  include ::tripleo::profile::base::manila::scheduler
+  include ::tripleo::profile::base::manila::share
 
+  if $step >= 4 {
     # manila generic:
     $manila_generic_enable = hiera('manila_generic_enable_backend', false)
     if $manila_generic_enable {

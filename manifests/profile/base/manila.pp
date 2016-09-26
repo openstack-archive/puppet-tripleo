@@ -12,9 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::manila::api
+# == Class: tripleo::profile::base::manila
 #
-# Manila API profile for tripleo
+# Manila common profile for tripleo
 #
 # === Parameters
 #
@@ -23,13 +23,17 @@
 #   Defaults to hiera('bootstrap_nodeid')
 #
 # [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
+#   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
+#
+# [*rabbit_hosts*]
+#   list of the rabbbit host IPs
+#   Defaults to hiera('rabbitmq_node_ips')
 
-class tripleo::profile::base::manila::api (
+class tripleo::profile::base::manila (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
+  $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -37,13 +41,10 @@ class tripleo::profile::base::manila::api (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::manila
-
-  if $step >= 3 and $sync_db {
-    include ::manila::db::mysql
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::manila::api
+    class { '::manila' :
+      rabbit_hosts => $rabbit_hosts,
+    }
+    include ::manila::config
   }
 }
