@@ -38,10 +38,26 @@ class tripleo::profile::base::nova::api (
   include ::tripleo::profile::base::nova
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    class { '::nova::api':
-      sync_db     => $sync_db,
-      sync_db_api => $sync_db,
+
+    # Manages the migration to Nova API in mod_wsgi with Apache.
+    # - First update nova.conf with new parameters
+    # - Stop nova-api process before starting apache to avoid binding error
+    # - Start apache after configuring all vhosts
+    exec { 'stop_nova-api':
+      command     => 'service openstack-nova-api stop',
+      path        => ['/usr/bin', '/usr/sbin'],
+      onlyif      => 'systemctl is-active openstack-nova-api',
+      refreshonly => true,
     }
+    Nova_config<||> ~> Exec['stop_nova-api']
+    Exec['stop_nova-api'] -> Service['httpd']
+
+    class { '::nova::api':
+      service_name => 'httpd', # Temporary: will be moved to t-h-t
+      sync_db      => $sync_db,
+      sync_db_api  => $sync_db,
+    }
+    include ::nova::wsgi::apache
     include ::nova::network::neutron
   }
 
