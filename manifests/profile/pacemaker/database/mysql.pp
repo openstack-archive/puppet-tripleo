@@ -18,13 +18,18 @@
 #
 # === Parameters
 #
+# [*bind_address*]
+#   (Optional) The address that the local mysql instance should bind to.
+#   Defaults to $::hostname
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::database::mysql (
-  $step = hiera('step'),
+  $bind_address = $::hostname,
+  $step         = hiera('step'),
 ) {
   if $::hostname == downcase(hiera('bootstrap_nodeid')) {
     $pacemaker_master = true
@@ -52,7 +57,7 @@ class tripleo::profile::pacemaker::database::mysql (
       'innodb_locks_unsafe_for_binlog'=> '1',
       'query_cache_size'              => '0',
       'query_cache_type'              => '0',
-      'bind-address'                  => $::hostname,
+      'bind-address'                  => $bind_address,
       'max_connections'               => hiera('mysql_max_connections'),
       'open_files_limit'              => '-1',
       'wsrep_on'                      => 'ON',
