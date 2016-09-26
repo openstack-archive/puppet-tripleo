@@ -41,7 +41,7 @@ class tripleo::profile::base::swift::storage (
           ensure  => directory,
           owner   => 'swift',
           group   => 'swift',
-          require => Package['openstack-swift'],
+          require => Package['swift'],
         }
       }
       $swift_components = ['account', 'container', 'object']
