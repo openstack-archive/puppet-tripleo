@@ -51,10 +51,6 @@ class tripleo::profile::base::keystone (
     $manage_endpoint = false
   }
 
-  if $step >= 3 and $sync_db {
-    include ::keystone::db::mysql
-  }
-
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     class { '::keystone':
       sync_db          => $sync_db,

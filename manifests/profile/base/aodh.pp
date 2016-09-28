@@ -44,10 +44,6 @@ class tripleo::profile::base::aodh (
     $sync_db = false
   }
 
-  if $step >= 3 and $sync_db {
-    include ::aodh::db::mysql
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::aodh' :
       rabbit_hosts => $rabbit_hosts,

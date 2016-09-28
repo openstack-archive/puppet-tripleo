@@ -39,10 +39,6 @@ class tripleo::profile::base::neutron::server (
 
   include ::tripleo::profile::base::neutron
 
-  if $step >= 3 and $sync_db {
-    include ::neutron::db::mysql
-  }
-
   # We start neutron-server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes

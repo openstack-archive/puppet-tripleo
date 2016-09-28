@@ -37,10 +37,6 @@ class tripleo::profile::base::trove::api (
     $sync_db = false
   }
 
-  if $step >= 3 and $sync_db {
-    include ::trove::db::mysql
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::trove
     include ::trove::config

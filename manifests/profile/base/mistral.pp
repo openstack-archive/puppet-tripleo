@@ -42,10 +42,6 @@ class tripleo::profile::base::mistral (
     $sync_db = false
   }
 
-  if $step >= 3 and $sync_db {
-    include ::mistral::db::mysql
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class  { '::mistral':
       rabbit_hosts => $rabbit_hosts,
