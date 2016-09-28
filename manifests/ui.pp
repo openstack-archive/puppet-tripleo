@@ -82,19 +82,13 @@ class tripleo::ui (
 ) {
 
   ::apache::vhost { 'tripleo-ui':
-    ensure     => 'present',
-    servername => $servername,
-    ip         => $bind_host,
-    port       => $ui_port,
-    docroot    => '/var/www/openstack-tripleo-ui/dist',
-    options    => ['Indexes', 'FollowSymLinks'],
-    rewrites   => [
-      {
-        comment      => 'Redirect 404 to index',
-        rewrite_cond => ['%{REQUEST_FILENAME} !-f', '%{REQUEST_FILENAME} !-d'],
-        rewrite_rule => ['(.*) index.html'],
-      },
-    ],
+    ensure           => 'present',
+    servername       => $servername,
+    ip               => $bind_host,
+    port             => $ui_port,
+    docroot          => '/var/www/openstack-tripleo-ui/dist',
+    options          => ['Indexes', 'FollowSymLinks'],
+    fallbackresource => '/index.html',
   }
 
   file { '/var/www/openstack-tripleo-ui/dist/tripleo_ui_config.js' :
