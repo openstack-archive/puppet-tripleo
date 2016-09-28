@@ -26,6 +26,28 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
+# [*certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate
+#   it will create. Note that the certificate nickname must be 'mysql' in
+#   the case of this service.
+#   Example with hiera:
+#     tripleo::profile::base::database::mysql::certificate_specs:
+#       hostname: <overcloud controller fqdn>
+#       service_certificate: <service certificate path>
+#       service_key: <service key path>
+#       principal: "mysql/<overcloud controller fqdn>"
+#   Defaults to {}.
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*generate_service_certificates*]
+#   (Optional) Whether or not certmonger will generate certificates for
+#   MySQL. This could be as many as specified by the $certificates_specs
+#   variable.
+#   Defaults to hiera('generate_service_certificate', false).
+#
 # [*manage_resources*]
 #   (Optional) Whether or not manage root user, root my.cnf, and service.
 #   Defaults to true
@@ -45,12 +67,15 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::database::mysql (
-  $bind_address            = $::hostname,
-  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
-  $manage_resources        = true,
-  $mysql_server_options    = {},
-  $remove_default_accounts = true,
-  $step                    = hiera('step'),
+  $bind_address                  = $::hostname,
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $certificate_specs             = {},
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $generate_service_certificates = hiera('generate_service_certificates', false),
+  $manage_resources              = true,
+  $mysql_server_options          = {},
+  $remove_default_accounts       = true,
+  $step                          = hiera('step'),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -60,6 +85,18 @@ class tripleo::profile::base::database::mysql (
   }
 
   validate_hash($mysql_server_options)
+  validate_hash($certificate_specs)
+
+  if $enable_internal_tls {
+    if $generate_service_certificates {
+      ensure_resource('class', 'tripleo::certmonger::mysql', $certificate_specs)
+    }
+    $tls_certfile = $certificate_specs['service_certificate']
+    $tls_keyfile = $certificate_specs['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
+  }
 
   # non-ha scenario
   if $manage_resources {
@@ -84,6 +121,10 @@ class tripleo::profile::base::database::mysql (
         'bind-address'     => $bind_address,
         'max_connections'  => hiera('mysql_max_connections'),
         'open_files_limit' => '-1',
+        'ssl'              => $enable_internal_tls,
+        'ssl-key'          => $tls_keyfile,
+        'ssl-cert'         => $tls_certfile,
+        'ssl-ca'           => undef,
       }
     }
     $mysql_server_options_real = deep_merge($mysql_server_default, $mysql_server_options)
