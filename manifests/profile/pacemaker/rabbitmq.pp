@@ -26,6 +26,16 @@
 #   (Optional) Content of erlang cookie.
 #   Defaults to hiera('rabbitmq::erlang_cookie').
 #
+# [*user_ha_queues*]
+#   (Optional) The number of HA queues in to be configured in rabbitmq
+#   Defaults to hiera('rabbitmq::nr_ha_queues'), which is usually 0 meaning
+#   that the queues number will be CEIL(N/2) where N is the number of rabbitmq
+#   nodes.
+#
+# [*rabbit_nodes*]
+#   (Optional) The list of rabbitmq nodes names
+#   Defaults to hiera('rabbitmq_node_names')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -34,6 +44,8 @@
 class tripleo::profile::pacemaker::rabbitmq (
   $bootstrap_node = hiera('bootstrap_nodeid'),
   $erlang_cookie  = hiera('rabbitmq::erlang_cookie'),
+  $user_ha_queues = hiera('rabbitmq::nr_ha_queues', 0),
+  $rabbit_nodes   = hiera('rabbitmq_node_names'),
   $step           = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -61,9 +73,17 @@ class tripleo::profile::pacemaker::rabbitmq (
   }
 
   if $step >= 2 and $pacemaker_master {
+    include ::stdlib
+    # The default nr of ha queues is ceiling(N/2)
+    if $user_ha_queues == 0 {
+      $nr_rabbit_nodes = size($rabbit_nodes)
+      $nr_ha_queues = $nr_rabbit_nodes / 2 + ($nr_rabbit_nodes % 2)
+    } else {
+      $nr_ha_queues = $user_ha_queues
+    }
     pacemaker::resource::ocf { 'rabbitmq':
       ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
-      resource_params => 'set_policy=\'ha-all ^(?!amq\.).* {"ha-mode":"all"}\'',
+      resource_params => "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'",
       clone_params    => 'ordered=true interleave=true',
       meta_params     => 'notify=true',
       require         => Class['::rabbitmq'],
