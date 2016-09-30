@@ -97,6 +97,21 @@ class tripleo::ui (
     ],
   }
 
+  # We already use apache::vhost to generate our own
+  # configuration file, let's clean the configuration
+  # embedded within the package
+  file { "${apache::confd_dir}/openstack-tripleo-ui.conf" :
+    ensure  => present,
+    content => "#
+# This file has been cleaned by Puppet.
+#
+# OpenStack TripleO UI configuration has been moved to:
+# - 25-tripleo-ui.conf
+#",
+    require => Package['openstack-tripleo-ui'],
+    before  => Service[$::apache::params::service_name],
+  }
+
   file { '/var/www/openstack-tripleo-ui/dist/tripleo_ui_config.js' :
     ensure  => file,
     content => template('tripleo/ui/tripleo_ui_config.js.erb'),
