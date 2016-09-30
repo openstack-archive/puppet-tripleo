@@ -37,6 +37,7 @@ class tripleo::profile::pacemaker::ceilometer::agent::notification (
 
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::ceilometer::params::agent_notification_service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }

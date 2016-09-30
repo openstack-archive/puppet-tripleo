@@ -42,6 +42,7 @@ class tripleo::profile::pacemaker::heat::api_cfn (
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::heat::params::api_cfn_service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }

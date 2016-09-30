@@ -43,6 +43,7 @@ class tripleo::profile::pacemaker::heat::api_cloudwatch (
   if $step >= 5 and $pacemaker_master {
     # Heat
     pacemaker::resource::service { $::heat::params::api_cloudwatch_service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }

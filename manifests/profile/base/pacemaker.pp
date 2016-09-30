@@ -69,13 +69,6 @@ class tripleo::profile::base::pacemaker (
       Class['tripleo::fencing'] -> Class['pacemaker::stonith']
     }
 
-    # FIXME(gfidente): sets 200secs as default start timeout op
-    # param; until we can use pcmk global defaults we'll still
-    # need to add it to every resource which redefines op params
-    Pacemaker::Resource::Service {
-      op_params => 'start timeout=200s stop timeout=200s',
-    }
-
     file { '/var/lib/tripleo/pacemaker-restarts':
       ensure => directory,
     } ~> Tripleo::Pacemaker::Resource_restart_flag<||>

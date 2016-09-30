@@ -48,6 +48,7 @@ class tripleo::profile::pacemaker::cinder::scheduler (
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::cinder::params::scheduler_service :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
     pacemaker::constraint::base { 'cinder-api-then-cinder-scheduler-constraint':

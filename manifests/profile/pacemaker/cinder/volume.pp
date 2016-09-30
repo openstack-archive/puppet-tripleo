@@ -53,7 +53,9 @@ class tripleo::profile::pacemaker::cinder::volume (
   }
 
   if $step >= 5 and $pacemaker_master {
-    pacemaker::resource::service { $::cinder::params::volume_service : }
+    pacemaker::resource::service { $::cinder::params::volume_service :
+      op_params => 'start timeout=200s stop timeout=200s',
+    }
   }
 
 }
