@@ -51,7 +51,10 @@ class tripleo::profile::base::gnocchi::api (
   if $step >= 4 {
     include ::gnocchi::api
     include ::gnocchi::wsgi::apache
-    include ::gnocchi::storage
+
+    class { '::gnocchi::storage':
+      coordination_url => join(['redis://:', hiera('gnocchi_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/']),
+    }
     case $gnocchi_backend {
       'swift': { include ::gnocchi::storage::swift }
       'file': { include ::gnocchi::storage::file }
