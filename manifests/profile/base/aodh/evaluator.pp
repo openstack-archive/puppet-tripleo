@@ -30,7 +30,9 @@ class tripleo::profile::base::aodh::evaluator (
   include ::tripleo::profile::base::aodh
 
   if $step >= 4 {
-    include ::aodh::evaluator
+    class { '::aodh::evaluator':
+      coordination_url => join(['redis://:', hiera('aodh_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/']),
+    }
   }
 
 }

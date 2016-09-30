@@ -30,7 +30,9 @@ class tripleo::profile::base::ceilometer::agent::central (
 
   if $step >= 4 {
     include ::ceilometer::agent::auth
-    include ::ceilometer::agent::central
+    class { '::ceilometer::agent::central':
+      coordination_url => join(['redis://:', hiera('ceilometer_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/']),
+    }
   }
 
 }
