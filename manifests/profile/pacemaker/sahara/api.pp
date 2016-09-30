@@ -43,6 +43,7 @@ class tripleo::profile::pacemaker::sahara::api (
   if $step >= 5 and $pacemaker_master {
     # Sahara
     pacemaker::resource::service { $::sahara::params::api_service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }

@@ -39,6 +39,7 @@ class tripleo::profile::pacemaker::gnocchi::statsd (
     include ::gnocchi::statsd
 
     pacemaker::resource::service { $::gnocchi::params::statsd_service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }

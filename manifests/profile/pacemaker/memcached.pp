@@ -41,6 +41,7 @@ class tripleo::profile::pacemaker::memcached (
 
   if $step >= 2 and $pacemaker_master {
     pacemaker::resource::service { $::memcached::params::service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
       require      => Class['::memcached'],
     }

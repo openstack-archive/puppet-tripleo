@@ -40,6 +40,7 @@ class tripleo::profile::pacemaker::apache (
   if $step >= 5 and $pacemaker_master {
     include ::apache::params
     pacemaker::resource::service { $::apache::params::service_name:
+      op_params        => 'start timeout=200s stop timeout=200s',
       clone_params     => 'interleave=true',
       verify_on_create => true,
     }

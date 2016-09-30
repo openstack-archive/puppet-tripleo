@@ -37,6 +37,7 @@ class tripleo::profile::pacemaker::neutron::metadata (
 
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
     pacemaker::resource::service { $::neutron::params::metadata_agent_service:
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }

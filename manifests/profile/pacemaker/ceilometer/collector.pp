@@ -41,6 +41,7 @@ class tripleo::profile::pacemaker::ceilometer::collector (
       Exec<| title == 'galera-ready'|> -> Class['ceilometer::db::mysql']
     }
     pacemaker::resource::service { $::ceilometer::params::collector_service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }
