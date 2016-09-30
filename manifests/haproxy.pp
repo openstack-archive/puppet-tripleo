@@ -1007,7 +1007,7 @@ class tripleo::haproxy (
         # NOTE(jaosorior): Websockets have more overhead in establishing
         # connections than regular HTTP connections. Also, since it begins
         # as an HTTP connection and then "upgrades" to a TCP connection, some
-        # timeouts get overriden by others at certain times of the connection.
+        # timeouts get overridden by others at certain times of the connection.
         # The following values were taken from the following site:
         # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
         'timeout' => ['connect 5s', 'client 25s', 'server 25s', 'tunnel 3600s'],
