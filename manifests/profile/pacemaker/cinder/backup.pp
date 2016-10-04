@@ -54,7 +54,9 @@ class tripleo::profile::pacemaker::cinder::backup (
   }
 
   if $step >= 5 and $pacemaker_master {
-    pacemaker::resource::service { $::cinder::params::backup_service : }
+    pacemaker::resource::service { $::cinder::params::backup_service :
+      op_params => 'start timeout=200s stop timeout=200s',
+    }
   }
 
 }

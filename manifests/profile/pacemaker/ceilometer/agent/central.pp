@@ -40,12 +40,14 @@ class tripleo::profile::pacemaker::ceilometer::agent::central (
     case downcase(hiera('ceilometer_backend')) {
       /mysql/: {
         pacemaker::resource::service { $::ceilometer::params::agent_central_service_name:
+          op_params    => 'start timeout=200s stop timeout=200s',
           clone_params => 'interleave=true',
           require      => Pacemaker::Resource::Ocf['openstack-core'],
         }
       }
       default: {
         pacemaker::resource::service { $::ceilometer::params::agent_central_service_name:
+          op_params    => 'start timeout=200s stop timeout=200s',
           clone_params => 'interleave=true',
           require      => [Pacemaker::Resource::Ocf['openstack-core'],
                           Pacemaker::Resource::Service[$::mongodb::params::service_name]],
