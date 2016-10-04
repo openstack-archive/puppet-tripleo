@@ -25,10 +25,8 @@
 class tripleo::profile::base::monitoring::sensu (
   $step = hiera('step', undef),
 ) {
-  if $step == undef or $step >= 3 {
-    include ::sensu
-    package { 'osops-tools-monitoring-oschecks':
-      ensure => 'present'
-    }
+  include ::sensu
+  package { 'osops-tools-monitoring-oschecks':
+    ensure => 'present'
   }
 }
