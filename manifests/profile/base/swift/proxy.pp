@@ -52,5 +52,6 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::tempurl
     include ::swift::proxy::formpost
     include ::swift::proxy::bulk
+    include ::swift::proxy::ceilometer
   }
 }
