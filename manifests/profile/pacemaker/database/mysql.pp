@@ -45,7 +45,12 @@ class tripleo::profile::pacemaker::database::mysql (
 
   # use only mysql_node_names when we land a patch in t-h-t that
   # switches to autogenerating these values from composable services
-  $galera_node_names_lookup = hiera('mysql_node_names', hiera('galera_node_names', $::hostname))
+  # The galera node names need to match the pacemaker node names... so if we
+  # want to use FQDNs for this, the cluster will not finish bootstrapping,
+  # since all the nodes will be marked as slaves. For now, we'll stick to the
+  # short name which is already registered in pacemaker until we get around
+  # this issue.
+  $galera_node_names_lookup = hiera('mysql_short_node_names', hiera('mysql_node_names', $::hostname))
   if is_array($galera_node_names_lookup) {
     $galera_nodes = downcase(join($galera_node_names_lookup, ','))
   } else {
