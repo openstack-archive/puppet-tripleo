@@ -18,6 +18,18 @@
 #
 # === Parameters
 #
+# [*backend_generic_enabled*]
+#   (Optional) Whether or not the generic backend is enabled
+#   Defaults to hiera('manila_backend_generic_enabled', false)
+#
+# [*backend_netapp_enabled*]
+#   (Optional) Whether or not the netapp backend is enabled
+#   Defaults to hiera('manila_backend_netapp_enabled', false)
+#
+# [*backend_cephfs_enabled*]
+#   (Optional) Whether or not the cephfs backend is enabled
+#   Defaults to hiera('manila_backend_cephfs_enabled', false)
+#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
@@ -28,8 +40,11 @@
 #   Defaults to hiera('step')
 
 class tripleo::profile::base::manila::api (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
+  $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
+  $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
+  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
+  $step                    = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -40,6 +55,20 @@ class tripleo::profile::base::manila::api (
   include ::tripleo::profile::base::manila
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::manila::api
+    if $backend_generic_enabled or $backend_netapp_enabled {
+      $nfs_protocol = 'NFS'
+      $cifs_protocol = 'CIFS'
+    } else {
+      $nfs_protocol = undef
+      $cifs_protocol = undef
+    }
+    if $backend_cephfs_enabled {
+      $cephfs_protocol = 'CEPHFS'
+    } else {
+      $cephfs_protocol = undef
+    }
+    class { '::manila::api' :
+      enabled_share_protocols => join(delete_undef_values([$nfs_protocol,$cifs_protocol,$cephfs_protocol]), ',')
+    }
   }
 }
