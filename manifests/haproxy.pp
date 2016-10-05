@@ -533,7 +533,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('keystone_admin_api_vip', $controller_virtual_ip),
       service_port      => $ports[keystone_admin_api_port],
       ip_addresses      => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('keystone_admin_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => {
           'http-request' => [
@@ -565,7 +565,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('keystone_public_api_vip', $controller_virtual_ip),
       service_port      => $ports[keystone_public_api_port],
       ip_addresses      => hiera('keystone_public_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($keystone_listen_opts, $keystone_public_tls_listen_opts),
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
@@ -578,7 +578,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('neutron_api_vip', $controller_virtual_ip),
       service_port      => $ports[neutron_api_port],
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[neutron_api_ssl_port],
     }
   }
@@ -589,7 +589,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('cinder_api_vip', $controller_virtual_ip),
       service_port      => $ports[cinder_api_port],
       ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('cinder_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => {
           'http-request' => [
@@ -606,7 +606,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('manila_api_vip', $controller_virtual_ip),
       service_port      => $ports[manila_api_port],
       ip_addresses      => hiera('manila_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('manila_api_node_names', $controller_hosts_names_real),
       listen_options    => {
           'http-request' => [
             'set-header X-Forwarded-Proto https if { ssl_fc }',
@@ -622,7 +622,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('sahara_api_vip', $controller_virtual_ip),
       service_port      => $ports[sahara_api_port],
       ip_addresses      => hiera('sahara_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('sahara_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[sahara_api_ssl_port],
     }
   }
@@ -633,7 +633,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('trove_api_vip', $controller_virtual_ip),
       service_port      => $ports[trove_api_port],
       ip_addresses      => hiera('trove_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('trove_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[trove_api_ssl_port],
     }
   }
@@ -644,7 +644,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('glance_api_vip', $controller_virtual_ip),
       service_port      => $ports[glance_api_port],
       ip_addresses      => hiera('glance_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('glance_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[glance_api_ssl_port],
       mode              => 'http',
       listen_options    => {
@@ -660,7 +660,7 @@ class tripleo::haproxy (
       internal_ip  => hiera('glance_registry_vip', $controller_virtual_ip),
       service_port => $ports[glance_registry_port],
       ip_addresses => hiera('glance_registry_node_ips', $controller_hosts_real),
-      server_names => $controller_hosts_names_real,
+      server_names => hiera('glance_registry_node_names', $controller_hosts_names_real),
     }
   }
 
@@ -671,7 +671,7 @@ class tripleo::haproxy (
       internal_ip       => $nova_api_vip,
       service_port      => $ports[nova_api_port],
       ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('nova_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => {
           'http-request' => [
@@ -687,7 +687,7 @@ class tripleo::haproxy (
       internal_ip  => hiera('nova_metadata_vip', $controller_virtual_ip),
       service_port => $ports[nova_metadata_port],
       ip_addresses => hiera('nova_metadata_node_ips', $controller_hosts_real),
-      server_names => $controller_hosts_names_real,
+      server_names => hiera('nova_metadata_node_names', $controller_hosts_names_real),
     }
   }
 
@@ -697,7 +697,7 @@ class tripleo::haproxy (
       internal_ip       => $nova_api_vip,
       service_port      => $ports[nova_novnc_port],
       ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('nova_api_node_names', $controller_hosts_names_real),
       listen_options    => {
         'balance' => 'source',
         'timeout' => [ 'tunnel 1h' ],
@@ -712,7 +712,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('ceilometer_api_vip', $controller_virtual_ip),
       service_port      => $ports[ceilometer_api_port],
       ip_addresses      => hiera('ceilometer_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('ceilometer_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ceilometer_api_ssl_port],
     }
   }
@@ -723,7 +723,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('aodh_api_vip', $controller_virtual_ip),
       service_port      => $ports[aodh_api_port],
       ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[aodh_api_ssl_port],
     }
   }
@@ -734,7 +734,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('gnocchi_api_vip', $controller_virtual_ip),
       service_port      => $ports[gnocchi_api_port],
       ip_addresses      => hiera('gnocchi_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('gnocchi_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
     }
   }
@@ -745,7 +745,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('mistral_api_vip', $controller_virtual_ip),
       service_port      => $ports[mistral_api_port],
       ip_addresses      => hiera('mistral_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('mistral_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[mistral_api_ssl_port],
     }
   }
@@ -756,7 +756,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('swift_proxy_vip', $controller_virtual_ip),
       service_port      => $ports[swift_proxy_port],
       ip_addresses      => hiera('swift_proxy_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('swift_proxy_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[swift_proxy_ssl_port],
     }
   }
@@ -782,7 +782,7 @@ class tripleo::haproxy (
       internal_ip       => $heat_api_vip,
       service_port      => $ports[heat_api_port],
       ip_addresses      => $heat_ip_addresses,
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_api_ssl_port],
@@ -795,7 +795,7 @@ class tripleo::haproxy (
       internal_ip       => $heat_api_vip,
       service_port      => $ports[heat_cw_port],
       ip_addresses      => $heat_ip_addresses,
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_cw_ssl_port],
@@ -808,7 +808,7 @@ class tripleo::haproxy (
       internal_ip       => $heat_api_vip,
       service_port      => $ports[heat_cfn_port],
       ip_addresses      => $heat_ip_addresses,
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_cfn_ssl_port],
@@ -826,7 +826,7 @@ class tripleo::haproxy (
       listening_service => 'horizon',
       ports             => '80',
       ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('horizon_node_names', $controller_hosts_names_real),
       options           => union($haproxy_member_options, ["cookie ${::hostname}"]),
     }
   }
@@ -837,7 +837,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('ironic_api_vip', $controller_virtual_ip),
       service_port      => $ports[ironic_api_port],
       ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('ironic_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_api_ssl_port],
     }
   }
@@ -848,7 +848,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('ironic_inspector_vip', $controller_virtual_ip),
       service_port      => $ports[ironic_inspector_port],
       ip_addresses      => hiera('ironic_inspector_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('ironic_inspector_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
     }
   }
@@ -880,7 +880,7 @@ class tripleo::haproxy (
       listening_service => 'mysql',
       ports             => '3306',
       ipaddresses       => hiera('mysql_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('mysql_node_names', $controller_hosts_names_real),
       options           => $mysql_member_options,
     }
   }
@@ -898,7 +898,7 @@ class tripleo::haproxy (
       listening_service => 'rabbitmq',
       ports             => '5672',
       ipaddresses       => hiera('rabbitmq_network', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('rabbitmq_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
     }
   }
@@ -927,7 +927,7 @@ class tripleo::haproxy (
       listening_service => 'redis',
       ports             => '6379',
       ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('redis_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
     }
   }
@@ -947,7 +947,7 @@ class tripleo::haproxy (
       listening_service => 'midonet_api',
       ports             => '8081',
       ipaddresses       => hiera('midonet_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('midonet_api_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
     }
   }
@@ -957,7 +957,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('zaqar_api_vip', $controller_virtual_ip),
       service_port      => $ports[zaqar_api_port],
       ip_addresses      => hiera('zaqar_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('zaqar_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[zaqar_api_ssl_port],
     }
@@ -969,7 +969,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('ceph_rgw_vip', $controller_virtual_ip),
       service_port      => $ports[ceph_rgw_port],
       ip_addresses      => hiera('ceph_rgw_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('ceph_rgw_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
     }
   }
@@ -992,7 +992,7 @@ class tripleo::haproxy (
       listening_service => 'opendaylight',
       ports             => '8081',
       ipaddresses       => hiera('opendaylight_api_node_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
+      server_names      => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
       options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
   }
@@ -1003,7 +1003,7 @@ class tripleo::haproxy (
       internal_ip               => hiera('zaqar_ws_vip', $controller_virtual_ip),
       service_port              => $ports[zaqar_ws_port],
       ip_addresses              => hiera('zaqar_ws_node_ips', $controller_hosts_real),
-      server_names              => $controller_hosts_names_real,
+      server_names              => hiera('zaqar_ws_node_names', $controller_hosts_names_real),
       mode                      => 'http',
       haproxy_listen_bind_param => [],  # We don't use a transparent proxy here
       listen_options            => {
