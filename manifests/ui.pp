@@ -72,7 +72,7 @@ class tripleo::ui (
   $servername          = $::fqdn,
   $bind_host           = undef,
   $ui_port             = 3000,
-  $keystone_url        = hiera('keystone::endpoint::public_url'),
+  $keystone_url        = hiera('keystone_auth_uri_v2'),
   $heat_url            = hiera('heat::keystone::auth::public_url', undef),
   $ironic_url          = hiera('ironic::keystone::auth::public_url', undef),
   $mistral_url         = hiera('mistral::keystone::auth::public_url', undef),
