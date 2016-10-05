@@ -38,6 +38,7 @@ class tripleo::profile::pacemaker::neutron::midonet (
   if $step >= 5 and downcase($::hostname) == $pacemaker_master {
 
     pacemaker::resource::service {'tomcat':
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
 

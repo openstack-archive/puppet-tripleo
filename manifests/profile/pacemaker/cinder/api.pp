@@ -48,6 +48,7 @@ class tripleo::profile::pacemaker::cinder::api (
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::cinder::params::api_service :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
       require      => Pacemaker::Resource::Ocf['openstack-core'],
     }

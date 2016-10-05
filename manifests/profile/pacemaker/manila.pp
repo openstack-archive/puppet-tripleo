@@ -139,7 +139,9 @@ class tripleo::profile::pacemaker::manila (
   if $step >= 5 and $pacemaker_master {
 
     # only manila-share is pacemaker managed, and in a/p
-    pacemaker::resource::service { $::manila::params::share_service : }
+    pacemaker::resource::service { $::manila::params::share_service :
+      op_params => 'start timeout=200s stop timeout=200s',
+    }
 
   }
 }

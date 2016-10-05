@@ -39,6 +39,7 @@ class tripleo::profile::pacemaker::gnocchi::metricd (
     include ::gnocchi::metricd
 
     pacemaker::resource::service { $::gnocchi::params::metricd_service_name :
+      op_params    => 'start timeout=200s stop timeout=200s',
       clone_params => 'interleave=true',
     }
   }

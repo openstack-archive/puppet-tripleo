@@ -56,6 +56,7 @@ class tripleo::profile::pacemaker::haproxy (
       # of pacemaker VIPs could move into puppet-tripleo or we should
       # make use of less specific hiera parameters here for the settings.
       pacemaker::resource::service { 'haproxy':
+        op_params    => 'start timeout=200s stop timeout=200s',
         clone_params => true,
       }
 

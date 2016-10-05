@@ -91,11 +91,13 @@ class tripleo::profile::pacemaker::neutron (
         unless  => '/sbin/pcs resource show neutron-server',
       } ->
       pacemaker::resource::service { $::neutron::params::server_service:
+        op_params    => 'start timeout=200s stop timeout=200s',
         clone_params => 'interleave=true',
         require      => Pacemaker::Resource::Ocf['openstack-core']
       }
     } else {
       pacemaker::resource::service { $::neutron::params::server_service:
+        op_params    => 'start timeout=200s stop timeout=200s',
         clone_params => 'interleave=true',
         require      => Pacemaker::Resource::Ocf['openstack-core']
       }
