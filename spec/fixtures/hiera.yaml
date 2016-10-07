@@ -4,4 +4,5 @@
 :yaml:
   :datadir: './spec/fixtures/hieradata'
 :hierarchy:
+  - 'step%{::step}'
   - 'default'
