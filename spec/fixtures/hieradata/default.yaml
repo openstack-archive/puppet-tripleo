@@ -9,3 +9,5 @@ aodh::auth::auth_password: 'password'
 aodh::db::mysql::password: 'password'
 aodh::keystone::authtoken::password: 'password'
 ceilometer::keystone::authtoken::password: 'password'
+# ceph related items
+ceph::profile::params::mon_key: 'password'
