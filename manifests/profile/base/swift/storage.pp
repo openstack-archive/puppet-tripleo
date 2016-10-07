@@ -34,6 +34,7 @@ class tripleo::profile::base::swift::storage (
 ) {
   if $step >= 4 {
     if $enable_swift_storage {
+      include ::swift::config
       include ::swift::storage::disks
       include ::swift::storage::all
       if(!defined(File['/srv/node'])) {

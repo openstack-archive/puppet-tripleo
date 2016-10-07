@@ -38,6 +38,7 @@ class tripleo::profile::base::swift::proxy (
 ) {
   if $step >= 4 {
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
+    include ::swift::config
     include ::swift::proxy
     include ::swift::proxy::proxy_logging
     include ::swift::proxy::healthcheck
