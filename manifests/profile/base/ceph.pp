@@ -20,7 +20,7 @@
 #
 # [*ceph_mon_initial_members*]
 #   (Optional) List of IP addresses to use as mon_initial_members
-#   Defaults to hiera('ceph_mon_node_names')
+#   Defaults to hiera('ceph_mon_short_node_names')
 #
 # [*ceph_mon_host*]
 #   (Optional) List of IP addresses to use as mon_host
@@ -36,18 +36,23 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ceph (
-  $ceph_mon_initial_members = hiera('ceph_mon_node_names', undef),
+  $ceph_mon_initial_members = hiera('ceph_mon_short_node_names', undef),
   $ceph_mon_host            = hiera('ceph_mon_node_ips', '127.0.0.1'),
   $enable_ceph_storage      = false,
   $step                     = hiera('step'),
 ) {
+  if ! $ceph_mon_initial_members {
+    $ceph_mon_initial_members_real = hiera('ceph_mon_node_names', undef)
+  } else {
+    $ceph_mon_initial_members_real = $ceph_mon_initial_members
+  }
 
   if $step >= 2 {
-    if $ceph_mon_initial_members {
-      if is_array($ceph_mon_initial_members) {
-        $mon_initial_members = downcase(join($ceph_mon_initial_members, ','))
+    if $ceph_mon_initial_members_real {
+      if is_array($ceph_mon_initial_members_real) {
+        $mon_initial_members = downcase(join($ceph_mon_initial_members_real, ','))
       } else {
-        $mon_initial_members = downcase($ceph_mon_initial_members)
+        $mon_initial_members = downcase($ceph_mon_initial_members_real)
       }
     } else {
       $mon_initial_members = undef
