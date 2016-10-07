@@ -43,7 +43,7 @@ class tripleo::profile::base::cinder::volume::eqlx (
       eqlx_pool          => hiera('cinder::backend::eqlx::eqlx_pool', undef),
       eqlx_use_chap      => hiera('cinder::backend::eqlx::eqlx_use_chap', undef),
       eqlx_chap_login    => hiera('cinder::backend::eqlx::eqlx_chap_login', undef),
-      eqlx_chap_password => hiera('cinder::backend::eqlx::eqlx_san_password', undef),
+      eqlx_chap_password => hiera('cinder::backend::eqlx::eqlx_chap_password', undef),
     }
   }
 
