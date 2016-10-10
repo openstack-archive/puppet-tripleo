@@ -89,10 +89,22 @@
 #  When set, enables SSL on the public API endpoints using the specified file.
 #  Defaults to undef
 #
-# [*internal_certificate*]
-#  Filename of an HAProxy-compatible certificate and key file
-#  When set, enables SSL on the internal API endpoints using the specified file.
-#  Defaults to undef
+# [*use_internal_certificates*]
+#  Flag that indicates if we'll use an internal certificate for this specific
+#  service. When set, enables SSL on the internal API endpoints using the file
+#  that certmonger is tracking; this is derived from the network the service is
+#  listening on.
+#  Defaults to false
+#
+# [*internal_certificates_specs*]
+#  A hash that should contain the specs that were used to create the
+#  certificates. As the name indicates, only the internal certificates will be
+#  fetched from here. And the keys should follow the following pattern
+#  "haproxy-<network name>". The network name should be as it was defined in
+#  tripleo-heat-templates.
+#  Note that this is only taken into account if the $use_internal_certificates
+#  flag is set.
+#  Defaults to {}
 #
 # [*ssl_cipher_suite*]
 #  The default string describing the list of cipher algorithms ("cipher suite")
@@ -242,6 +254,106 @@
 #  (optional) Enable or not Zaqar Websockets binding
 #  Defaults to false
 #
+# [*aodh_network*]
+#  (optional) Specify the network aodh is running on.
+#  Defaults to hiera('aodh_api_network', undef)
+#
+# [*ceilometer_network*]
+#  (optional) Specify the network ceilometer is running on.
+#  Defaults to hiera('ceilometer_api_network', undef)
+#
+# [*ceph_rgw_network*]
+#  (optional) Specify the network ceph_rgw is running on.
+#  Defaults to hiera('ceph_rgw_network', undef)
+#
+# [*cinder_network*]
+#  (optional) Specify the network cinder is running on.
+#  Defaults to hiera('cinder_api_network', undef)
+#
+# [*glance_api_network*]
+#  (optional) Specify the network glance_api is running on.
+#  Defaults to hiera('glance_api_network', undef)
+#
+# [*glance_registry_network*]
+#  (optional) Specify the network glance_registry is running on.
+#  Defaults to hiera('glance_registry_network', undef)
+#
+# [*gnocchi_network*]
+#  (optional) Specify the network gnocchi is running on.
+#  Defaults to hiera('gnocchi_api_network', undef)
+#
+# [*heat_api_network*]
+#  (optional) Specify the network heat_api is running on.
+#  Defaults to hiera('heat_api_network', undef)
+#
+# [*heat_cfn_network*]
+#  (optional) Specify the network heat_cfn is running on.
+#  Defaults to hiera('heat_api_cfn_network', undef)
+#
+# [*heat_cloudwatch_network*]
+#  (optional) Specify the network heat_cloudwatch is running on.
+#  Defaults to hiera('heat_api_cloudwatch_network', undef)
+#
+# [*ironic_inspector_network*]
+#  (optional) Specify the network ironic_inspector is running on.
+#  Defaults to hiera('ironic_inspector_network', undef)
+#
+# [*ironic_network*]
+#  (optional) Specify the network ironic is running on.
+#  Defaults to hiera('ironic_api_network', undef)
+#
+# [*keystone_admin_network*]
+#  (optional) Specify the network keystone_admin is running on.
+#  Defaults to hiera('keystone_network', undef)
+#
+# [*keystone_public_network*]
+#  (optional) Specify the network keystone_public is running on.
+#  Defaults to hiera('keystone_network', undef)
+#
+# [*manila_network*]
+#  (optional) Specify the network manila is running on.
+#  Defaults to hiera('manila_api_network', undef)
+#
+# [*mistral_network*]
+#  (optional) Specify the network mistral is running on.
+#  Defaults to hiera('mistral_api_network', undef)
+#
+# [*neutron_network*]
+#  (optional) Specify the network neutron is running on.
+#  Defaults to hiera('neutron_api_network', undef)
+#
+# [*nova_metadata_network*]
+#  (optional) Specify the network nova_metadata is running on.
+#  Defaults to hiera('nova_api_network', undef)
+#
+# [*nova_novncproxy_network*]
+#  (optional) Specify the network nova_novncproxy is running on.
+#  Defaults to hiera('nova_vncproxy_network', undef)
+#
+# [*nova_osapi_network*]
+#  (optional) Specify the network nova_osapi is running on.
+#  Defaults to hiera('nova_api_network', undef)
+#
+# [*opendaylight_network*]
+#  (optional) Specify the network opendaylight is running on.
+#  Defaults to hiera('opendaylight_api_network', undef)
+#
+# [*sahara_network*]
+#  (optional) Specify the network sahara is running on.
+#  Defaults to hiera('sahara_api_network', undef)
+#
+# [*swift_proxy_server_network*]
+#  (optional) Specify the network swift_proxy_server is running on.
+#  Defaults to hiera('swift_proxy_network', undef)
+#
+# [*trove_network*]
+#  (optional) Specify the network trove is running on.
+#  Defaults to hiera('trove_api_network', undef)
+#
+# [*zaqar_api_network*]
+#  (optional) Specify the network zaqar_api is running on.
+#  Defaults to hiera('zaqar_api_network', undef)
+#
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
@@ -300,57 +412,82 @@
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
-  $keepalived                = true,
-  $haproxy_service_manage    = true,
-  $haproxy_global_maxconn    = 20480,
-  $haproxy_default_maxconn   = 4096,
-  $haproxy_default_timeout   = [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
-  $haproxy_listen_bind_param = [ 'transparent' ],
-  $haproxy_member_options    = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
-  $haproxy_log_address       = '/dev/log',
-  $haproxy_stats_user        = 'admin',
-  $haproxy_stats_password    = undef,
-  $controller_hosts          = hiera('controller_node_ips'),
-  $controller_hosts_names    = hiera('controller_node_names', undef),
-  $service_certificate       = undef,
-  $internal_certificate      = undef,
-  $ssl_cipher_suite          = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
-  $ssl_options               = 'no-sslv3',
-  $haproxy_stats_certificate = undef,
-  $keystone_admin            = hiera('keystone_enabled', false),
-  $keystone_public           = hiera('keystone_enabled', false),
-  $neutron                   = hiera('neutron_api_enabled', false),
-  $cinder                    = hiera('cinder_api_enabled', false),
-  $manila                    = hiera('manila_api_enabled', false),
-  $sahara                    = hiera('sahara_api_enabled', false),
-  $trove                     = hiera('trove_api_enabled', false),
-  $glance_api                = hiera('glance_api_enabled', false),
-  $glance_registry           = hiera('glance_registry_enabled', false),
-  $nova_osapi                = hiera('nova_api_enabled', false),
-  $nova_metadata             = hiera('nova_api_enabled', false),
-  $nova_novncproxy           = hiera('nova_vnc_proxy_enabled', false),
-  $ceilometer                = hiera('ceilometer_api_enabled', false),
-  $aodh                      = hiera('aodh_api_enabled', false),
-  $gnocchi                   = hiera('gnocchi_api_enabled', false),
-  $mistral                   = hiera('mistral_api_enabled', false),
-  $swift_proxy_server        = hiera('swift_proxy_enabled', false),
-  $heat_api                  = hiera('heat_api_enabled', false),
-  $heat_cloudwatch           = hiera('heat_api_cloudwatch_enabled', false),
-  $heat_cfn                  = hiera('heat_api_cfn_enabled', false),
-  $horizon                   = hiera('horizon_enabled', false),
-  $ironic                    = hiera('ironic_api_enabled', false),
-  $ironic_inspector          = hiera('ironic_inspector_enabled', false),
-  $mysql                     = hiera('mysql_enabled', false),
-  $mysql_clustercheck        = false,
-  $rabbitmq                  = false,
-  $redis                     = hiera('redis_enabled', false),
-  $redis_password            = undef,
-  $midonet_api               = false,
-  $zaqar_api                 = hiera('zaqar_api_enabled', false),
-  $ceph_rgw                  = hiera('ceph_rgw_enabled', false),
-  $opendaylight              = hiera('opendaylight_api_enabled', false),
-  $zaqar_ws                  = hiera('zaqar_api_enabled', false),
-  $service_ports             = {}
+  $keepalived                  = true,
+  $haproxy_service_manage      = true,
+  $haproxy_global_maxconn      = 20480,
+  $haproxy_default_maxconn     = 4096,
+  $haproxy_default_timeout     = [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
+  $haproxy_listen_bind_param   = [ 'transparent' ],
+  $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
+  $haproxy_log_address         = '/dev/log',
+  $haproxy_stats_user          = 'admin',
+  $haproxy_stats_password      = undef,
+  $controller_hosts            = hiera('controller_node_ips'),
+  $controller_hosts_names      = hiera('controller_node_names', undef),
+  $service_certificate         = undef,
+  $use_internal_certificates   = false,
+  $internal_certificates_specs = {},
+  $ssl_cipher_suite            = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
+  $ssl_options                 = 'no-sslv3',
+  $haproxy_stats_certificate   = undef,
+  $keystone_admin              = hiera('keystone_enabled', false),
+  $keystone_public             = hiera('keystone_enabled', false),
+  $neutron                     = hiera('neutron_api_enabled', false),
+  $cinder                      = hiera('cinder_api_enabled', false),
+  $manila                      = hiera('manila_api_enabled', false),
+  $sahara                      = hiera('sahara_api_enabled', false),
+  $trove                       = hiera('trove_api_enabled', false),
+  $glance_api                  = hiera('glance_api_enabled', false),
+  $glance_registry             = hiera('glance_registry_enabled', false),
+  $nova_osapi                  = hiera('nova_api_enabled', false),
+  $nova_metadata               = hiera('nova_api_enabled', false),
+  $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
+  $ceilometer                  = hiera('ceilometer_api_enabled', false),
+  $aodh                        = hiera('aodh_api_enabled', false),
+  $gnocchi                     = hiera('gnocchi_api_enabled', false),
+  $mistral                     = hiera('mistral_api_enabled', false),
+  $swift_proxy_server          = hiera('swift_proxy_enabled', false),
+  $heat_api                    = hiera('heat_api_enabled', false),
+  $heat_cloudwatch             = hiera('heat_api_cloudwatch_enabled', false),
+  $heat_cfn                    = hiera('heat_api_cfn_enabled', false),
+  $horizon                     = hiera('horizon_enabled', false),
+  $ironic                      = hiera('ironic_api_enabled', false),
+  $ironic_inspector            = hiera('ironic_inspector_enabled', false),
+  $mysql                       = hiera('mysql_enabled', false),
+  $mysql_clustercheck          = false,
+  $rabbitmq                    = false,
+  $redis                       = hiera('redis_enabled', false),
+  $redis_password              = undef,
+  $midonet_api                 = false,
+  $zaqar_api                   = hiera('zaqar_api_enabled', false),
+  $ceph_rgw                    = hiera('ceph_rgw_enabled', false),
+  $opendaylight                = hiera('opendaylight_api_enabled', false),
+  $zaqar_ws                    = hiera('zaqar_api_enabled', false),
+  $aodh_network                = hiera('aodh_api_network', undef),
+  $ceilometer_network          = hiera('ceilometer_api_network', undef),
+  $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
+  $cinder_network              = hiera('cinder_api_network', undef),
+  $glance_api_network          = hiera('glance_api_network', undef),
+  $glance_registry_network     = hiera('glance_registry_network', undef),
+  $gnocchi_network             = hiera('gnocchi_api_network', undef),
+  $heat_api_network            = hiera('heat_api_network', undef),
+  $heat_cfn_network            = hiera('heat_api_cfn_network', undef),
+  $heat_cloudwatch_network     = hiera('heat_api_cloudwatch_network', undef),
+  $ironic_inspector_network    = hiera('ironic_inspector_network', undef),
+  $ironic_network              = hiera('ironic_api_network', undef),
+  $keystone_admin_network      = hiera('keystone_admin_api_network', undef),
+  $keystone_public_network     = hiera('keystone_public_api_network', undef),
+  $manila_network              = hiera('manila_api_network', undef),
+  $mistral_network             = hiera('mistral_api_network', undef),
+  $neutron_network             = hiera('neutron_api_network', undef),
+  $nova_metadata_network       = hiera('nova_api_network', undef),
+  $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', undef),
+  $nova_osapi_network          = hiera('nova_api_network', undef),
+  $sahara_network              = hiera('sahara_api_network', undef),
+  $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
+  $trove_network               = hiera('trove_api_network', undef),
+  $zaqar_api_network           = hiera('zaqar_api_network', undef),
+  $service_ports               = {}
 ) {
   $default_service_ports = {
     aodh_api_port => 8042,
@@ -506,10 +643,11 @@ class tripleo::haproxy (
   }
 
   Tripleo::Haproxy::Endpoint {
-    haproxy_listen_bind_param => $haproxy_listen_bind_param,
-    member_options            => $haproxy_member_options,
-    public_certificate        => $service_certificate,
-    internal_certificate      => $internal_certificate,
+    haproxy_listen_bind_param   => $haproxy_listen_bind_param,
+    member_options              => $haproxy_member_options,
+    public_certificate          => $service_certificate,
+    use_internal_certificates   => $use_internal_certificates,
+    internal_certificates_specs => $internal_certificates_specs,
   }
 
   $stats_base = ['enable', 'uri /']
@@ -541,6 +679,7 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
       public_ssl_port   => $ports[keystone_admin_api_ssl_port],
+      service_network   => $keystone_admin_network,
     }
   }
 
@@ -569,6 +708,7 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => merge($keystone_listen_opts, $keystone_public_tls_listen_opts),
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
+      service_network   => $keystone_public_network,
     }
   }
 
@@ -580,6 +720,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[neutron_api_ssl_port],
+      service_network   => $neutron_network,
     }
   }
 
@@ -597,6 +738,7 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
       public_ssl_port   => $ports[cinder_api_ssl_port],
+      service_network   => $cinder_network,
     }
   }
 
@@ -613,6 +755,7 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
       public_ssl_port   => $ports[manila_api_ssl_port],
+      service_network   => $manila_network,
     }
   }
 
@@ -624,6 +767,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('sahara_api_node_ips', $controller_hosts_real),
       server_names      => hiera('sahara_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[sahara_api_ssl_port],
+      service_network   => $sahara_network,
     }
   }
 
@@ -635,6 +779,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('trove_api_node_ips', $controller_hosts_real),
       server_names      => hiera('trove_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[trove_api_ssl_port],
+      service_network   => $trove_network,
     }
   }
 
@@ -652,15 +797,17 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto https if { ssl_fc }',
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
+      service_network   => $glance_api_network,
     }
   }
 
   if $glance_registry {
     ::tripleo::haproxy::endpoint { 'glance_registry':
-      internal_ip  => hiera('glance_registry_vip', $controller_virtual_ip),
-      service_port => $ports[glance_registry_port],
-      ip_addresses => hiera('glance_registry_node_ips', $controller_hosts_real),
-      server_names => hiera('glance_registry_node_names', $controller_hosts_names_real),
+      internal_ip     => hiera('glance_registry_vip', $controller_virtual_ip),
+      service_port    => $ports[glance_registry_port],
+      ip_addresses    => hiera('glance_registry_node_ips', $controller_hosts_real),
+      server_names    => hiera('glance_registry_node_names', $controller_hosts_names_real),
+      service_network => $glance_registry_network,
     }
   }
 
@@ -679,15 +826,17 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
       public_ssl_port   => $ports[nova_api_ssl_port],
+      service_network   => $nova_osapi_network,
     }
   }
 
   if $nova_metadata {
     ::tripleo::haproxy::endpoint { 'nova_metadata':
-      internal_ip  => hiera('nova_metadata_vip', $controller_virtual_ip),
-      service_port => $ports[nova_metadata_port],
-      ip_addresses => hiera('nova_metadata_node_ips', $controller_hosts_real),
-      server_names => hiera('nova_metadata_node_names', $controller_hosts_names_real),
+      internal_ip     => hiera('nova_metadata_vip', $controller_virtual_ip),
+      service_port    => $ports[nova_metadata_port],
+      ip_addresses    => hiera('nova_metadata_node_ips', $controller_hosts_real),
+      server_names    => hiera('nova_metadata_node_names', $controller_hosts_names_real),
+      service_network => $nova_metadata_network,
     }
   }
 
@@ -703,6 +852,7 @@ class tripleo::haproxy (
         'timeout' => [ 'tunnel 1h' ],
       },
       public_ssl_port   => $ports[nova_novnc_ssl_port],
+      service_network   => $nova_novncproxy_network,
     }
   }
 
@@ -714,6 +864,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ceilometer_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ceilometer_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ceilometer_api_ssl_port],
+      service_network   => $ceilometer_network,
     }
   }
 
@@ -725,6 +876,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
       server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[aodh_api_ssl_port],
+      service_network   => $aodh_network,
     }
   }
 
@@ -736,6 +888,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('gnocchi_api_node_ips', $controller_hosts_real),
       server_names      => hiera('gnocchi_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
+      service_network   => $gnocchi_network,
     }
   }
 
@@ -747,6 +900,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('mistral_api_node_ips', $controller_hosts_real),
       server_names      => hiera('mistral_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[mistral_api_ssl_port],
+      service_network   => $mistral_network,
     }
   }
 
@@ -758,6 +912,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('swift_proxy_node_ips', $controller_hosts_real),
       server_names      => hiera('swift_proxy_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[swift_proxy_ssl_port],
+      service_network   => $swift_proxy_server_network,
     }
   }
 
@@ -786,6 +941,7 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_api_ssl_port],
+      service_network   => $heat_api_network,
     }
   }
 
@@ -799,6 +955,7 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_cw_ssl_port],
+      service_network   => $heat_cloudwatch_network,
     }
   }
 
@@ -812,6 +969,7 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_cfn_ssl_port],
+      service_network   => $heat_cfn_network,
     }
   }
 
@@ -839,6 +997,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ironic_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_api_ssl_port],
+      service_network   => $ironic_network,
     }
   }
 
@@ -850,6 +1009,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ironic_inspector_node_ips', $controller_hosts_real),
       server_names      => hiera('ironic_inspector_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
+      service_network   => $ironic_inspector_network,
     }
   }
 
@@ -960,6 +1120,7 @@ class tripleo::haproxy (
       server_names      => hiera('zaqar_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[zaqar_api_ssl_port],
+      service_network   => $zaqar_api_network,
     }
   }
 
@@ -971,6 +1132,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ceph_rgw_node_ips', $controller_hosts_real),
       server_names      => hiera('ceph_rgw_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
+      service_network   => $ceph_rgw_network,
     }
   }
 
@@ -1016,6 +1178,7 @@ class tripleo::haproxy (
         'timeout' => ['connect 5s', 'client 25s', 'server 25s', 'tunnel 3600s'],
       },
       public_ssl_port           => $ports[zaqar_ws_ssl_port],
+      service_network           => $zaqar_api_network,
     }
   }
 }

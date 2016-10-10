@@ -84,7 +84,9 @@ class tripleo::profile::base::haproxy (
         Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
       }
 
-      include ::tripleo::haproxy
+      class {'::tripleo::haproxy':
+        internal_certificates_specs => $certificates_specs,
+      }
 
       unless hiera('tripleo::haproxy::haproxy_service_manage', true) {
         # Reload HAProxy configuration if the haproxy class has refreshed or any
