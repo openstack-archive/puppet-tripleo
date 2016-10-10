@@ -18,6 +18,18 @@
 #
 # === Parameters
 #
+# [*backend_generic_enabled*]
+#   (Optional) Whether or not the generic backend is enabled
+#   Defaults to hiera('manila_backend_generic_enabled', false)
+#
+# [*backend_netapp_enabled*]
+#   (Optional) Whether or not the netapp backend is enabled
+#   Defaults to hiera('manila_backend_netapp_enabled', false)
+#
+# [*backend_cephfs_enabled*]
+#   (Optional) Whether or not the cephfs backend is enabled
+#   Defaults to hiera('manila_backend_cephfs_enabled', false)
+#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
@@ -28,8 +40,11 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::manila (
-  $bootstrap_node                   = hiera('bootstrap_nodeid'),
-  $step                             = hiera('step'),
+  $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
+  $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
+  $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
+  $bootstrap_node          = hiera('bootstrap_nodeid'),
+  $step                    = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -52,8 +67,7 @@ class tripleo::profile::pacemaker::manila (
 
   if $step >= 4 {
     # manila generic:
-    $manila_generic_enable = hiera('manila_generic_enable_backend', false)
-    if $manila_generic_enable {
+    if $backend_generic_enabled {
       $manila_generic_backend = hiera('manila::backend::generic::title')
       manila::backend::generic { $manila_generic_backend :
         driver_handles_share_servers     => hiera('manila::backend::generic::driver_handles_share_servers', true),
@@ -81,8 +95,7 @@ class tripleo::profile::pacemaker::manila (
     }
 
     # manila cephfsnative:
-    $manila_cephfsnative_enable = hiera('manila::backend::cephfsnative::enable_backend', false)
-    if $manila_cephfsnative_enable {
+    if $backend_cephfs_enabled {
       $manila_cephfsnative_backend = hiera('manila::backend::cephfsnative::title')
       manila::backend::cephfsnative { $manila_cephfsnative_backend :
         driver_handles_share_servers => hiera('manila::backend::cephfsnative::driver_handles_share_servers', false),
@@ -95,8 +108,7 @@ class tripleo::profile::pacemaker::manila (
     }
 
     # manila netapp:
-    $manila_netapp_enable = hiera('manila_netapp_enable_backend', false)
-    if $manila_netapp_enable {
+    if $backend_netapp_enabled {
       $manila_netapp_backend = hiera('manila::backend::netapp::title')
       manila::backend::netapp { $manila_netapp_backend :
         driver_handles_share_servers         => hiera('manila::backend::netapp::driver_handles_share_servers', true),
