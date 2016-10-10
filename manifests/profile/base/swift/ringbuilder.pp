@@ -54,6 +54,15 @@
 #  (Optional) list of ip addresses for nodes running swift_storage service
 #  Defaults to hiera('swift_storage_node_ips') or an empty list
 #
+#  [*part_power*]
+#  (Optional) The total number of partitions that should exist in the ring.
+#  This is expressed as a power of 2.
+#  Defaults to undef
+#
+#  [*min_part_hours*]
+#  Minimum amount of time before partitions can be moved.
+#  Defaults to undef
+#
 class tripleo::profile::base::swift::ringbuilder (
   $replicas,
   $build_ring  = true,
@@ -63,6 +72,8 @@ class tripleo::profile::base::swift::ringbuilder (
   $raw_disk_prefix = 'r1z1-',
   $raw_disks = [],
   $swift_storage_node_ips = hiera('swift_storage_node_ips', []),
+  $part_power = undef,
+  $min_part_hours = undef,
 ) {
   if $step >= 2 {
     # pre-install swift here so we can build rings
@@ -81,7 +92,9 @@ class tripleo::profile::base::swift::ringbuilder (
 
       # create local rings
       swift::ringbuilder::create{ ['object', 'account', 'container']:
+        part_power     => $part_power,
         replicas       => min(count($device_array), $replicas),
+        min_part_hours => $min_part_hours,
       } ->
 
       # add all other devices
