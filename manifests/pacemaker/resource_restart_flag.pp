@@ -26,10 +26,21 @@
 #
 define tripleo::pacemaker::resource_restart_flag() {
 
+  ensure_resource('file', ['/var/lib/tripleo', '/var/lib/tripleo/pacemaker-restarts'],
+    {
+      'ensure' => 'directory',
+      'owner'  => 'root',
+      'mode'   => '0755',
+      'group'  => 'root',
+    }
+  )
+
   exec { "${title} resource restart flag":
     command     => "touch /var/lib/tripleo/pacemaker-restarts/${title}",
     path        => ['/bin','/usr/bin','/sbin','/usr/sbin'],
     refreshonly => true,
   }
 
+  File['/var/lib/tripleo/pacemaker-restarts'] ->
+  Exec["${title} resource restart flag"]
 }
