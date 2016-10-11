@@ -68,10 +68,6 @@ class tripleo::profile::base::pacemaker (
       # enable stonith after all fencing devices have been created
       Class['tripleo::fencing'] -> Class['pacemaker::stonith']
     }
-
-    file { '/var/lib/tripleo/pacemaker-restarts':
-      ensure => directory,
-    } ~> Tripleo::Pacemaker::Resource_restart_flag<||>
   }
 
   if $step >= 2 {
