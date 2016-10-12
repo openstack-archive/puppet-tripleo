@@ -60,6 +60,7 @@ class tripleo::profile::pacemaker::database::redis (
       master_params   => '',
       meta_params     => 'notify=true ordered=true interleave=true',
       resource_params => 'wait_last_known_master=true',
+      op_params       => 'start timeout=200s stop timeout=200s',
       require         => Class['::redis'],
     }
   }
