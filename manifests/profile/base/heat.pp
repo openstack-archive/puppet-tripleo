@@ -46,7 +46,7 @@ class tripleo::profile::base::heat (
   $step                = hiera('step'),
   $rabbit_hosts        = hiera('rabbitmq_node_ips', undef),
 ) {
-  # Domain resources will be created at step5 on the bootstrap_node so we
+  # Domain resources will be created at step5 on the node running keystone.pp
   # configure heat.conf at step3 and 4 but actually create the domain later.
   if $step == 3 or $step == 4 {
     class { '::heat::keystone::domain':
@@ -68,20 +68,6 @@ class tripleo::profile::base::heat (
   if $step >= 5 {
     if $manage_db_purge {
       include ::heat::cron::purge_deleted
-    }
-    if $bootstrap_node == $::hostname {
-      # Class ::heat::keystone::domain has to run on bootstrap node
-      # because it creates DB entities via API calls.
-      include ::heat::keystone::domain
-
-      Class['::keystone::roles::admin'] -> Class['::heat::keystone::domain']
-    } else {
-      # On non-bootstrap node we don't need to create Keystone resources again
-      class { '::heat::keystone::domain':
-        manage_domain => false,
-        manage_user   => false,
-        manage_role   => false,
-      }
     }
   }
 }
