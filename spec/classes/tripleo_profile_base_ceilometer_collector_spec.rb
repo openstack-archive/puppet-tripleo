@@ -52,6 +52,7 @@ describe 'tripleo::profile::base::ceilometer::collector' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer::collector')
         is_expected.to contain_class('ceilometer::db::sync')
         is_expected.to contain_class('ceilometer::db').with(
+          :sync_db             => true,
           :database_connection => 'mongodb://[::1]:27017,[fe80::ca5b:76ff:fe4b:be3b]:27017/ceilometer?replicaSet=replicaset'
         )
       end
@@ -71,6 +72,9 @@ describe 'tripleo::profile::base::ceilometer::collector' do
         is_expected.to contain_class('ceilometer::db::sync')
         is_expected.to contain_class('ceilometer::db').without(
           :database_connection => 'mongodb://127.0.0.1:27017/ceilometer?replicaSet=replicaset'
+        )
+        is_expected.to contain_class('ceilometer::db').with(
+          :sync_db => true
         )
       end
     end
@@ -98,6 +102,7 @@ describe 'tripleo::profile::base::ceilometer::collector' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('ceilometer::db::sync')
         is_expected.to contain_class('ceilometer::db').with(
+          :sync_db             => true,
           :database_connection => 'mongodb://127.0.0.1:27017/ceilometer?replicaSet=replicaset'
         )
         is_expected.to contain_class('ceilometer::collector')
@@ -114,9 +119,9 @@ describe 'tripleo::profile::base::ceilometer::collector' do
       } }
 
       it 'should trigger complete configuration' do
-        #TODO(aschultz): LP#1629373
-        #is_expected.to_not contain_class('ceilometer::db::sync')
+        is_expected.to_not contain_class('ceilometer::db::sync')
         is_expected.to contain_class('ceilometer::db').with(
+          :sync_db             => false,
           :database_connection => 'mongodb://127.0.0.1:27017/ceilometer?replicaSet=replicaset'
         )
         is_expected.to contain_class('ceilometer::collector')

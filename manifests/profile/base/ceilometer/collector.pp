@@ -60,10 +60,6 @@ class tripleo::profile::base::ceilometer::collector (
 
   include ::tripleo::profile::base::ceilometer
 
-  if $step >= 3 and $sync_db {
-    include ::ceilometer::db::sync
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
     if downcase($ceilometer_backend) == 'mongodb' {
       if empty($mongodb_node_ips) {
@@ -88,10 +84,13 @@ class tripleo::profile::base::ceilometer::collector (
       $ceilometer_mongodb_conn_string = "mongodb://${mongo_node_string}/ceilometer?replicaSet=${mongodb_replset}"
 
       class { '::ceilometer::db' :
+        sync_db             => $sync_db,
         database_connection => $ceilometer_mongodb_conn_string,
       }
     } else {
-      include ::ceilometer::db
+      class { '::ceilometer::db' :
+        sync_db => $sync_db,
+      }
     }
     include ::ceilometer::collector
     include ::ceilometer::dispatcher::gnocchi
