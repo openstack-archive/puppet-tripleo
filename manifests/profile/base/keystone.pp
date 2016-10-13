@@ -45,10 +45,12 @@ class tripleo::profile::base::keystone (
     $sync_db = true
     $manage_roles = true
     $manage_endpoint = true
+    $manage_domain = true
   } else {
     $sync_db = false
     $manage_roles = false
     $manage_endpoint = false
+    $manage_domain = false
   }
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
@@ -74,6 +76,27 @@ class tripleo::profile::base::keystone (
 
   if $step >= 5 and $manage_db_purge {
     include ::keystone::cron::token_flush
+  }
+
+  if $step >= 5 and $manage_domain {
+    if hiera('heat_engine_enabled', false) {
+      # if Heat and Keystone are collocated, so we want to
+      # both configure heat.conf and create Keystone resources.
+      # note: domain_password is given via Hiera.
+      if defined(Class['::tripleo::profile::base::heat']) {
+        include ::heat::keystone::domain
+      } else {
+        # if Heat and Keystone are not collocated, we want Puppet
+        # to only create Keystone resources on the Keystone node
+        # but not try to configure Heat, to avoid leaking the password.
+        class { '::heat::keystone::domain':
+          domain_name     => $::os_service_default,
+          domain_admin    => $::os_service_default,
+          domain_password => $::os_service_default,
+        }
+      }
+      Class['::keystone::roles::admin'] -> Class['::heat::keystone::domain']
+    }
   }
 
   if $step >= 5 and $manage_endpoint{
