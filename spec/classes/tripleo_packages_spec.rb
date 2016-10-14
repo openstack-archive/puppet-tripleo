@@ -29,9 +29,8 @@ describe 'tripleo::packages' do
       }
     end
 
-    it 'should contain correct upgrade ordering' do
-        is_expected.to contain_exec('package-upgrade').that_comes_before('Service[nova-compute]')
-        is_expected.to contain_exec('package-upgrade').with(:command     => 'yum -y update')
+    it 'should contain upgrade exec' do
+        is_expected.to contain_exec('package-upgrade').with(:command => 'yum -y update')
     end
 
   end
