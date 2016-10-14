@@ -32,6 +32,9 @@ class tripleo::packages (
   $enable_upgrade = false,
 ) {
 
+  # required for stages
+  include ::stdlib
+
   if !$enable_install and !$enable_upgrade {
     case $::osfamily {
       'RedHat': {
@@ -45,33 +48,12 @@ class tripleo::packages (
 
   if $enable_upgrade {
     Package <| |> { ensure => 'latest' }
-
-    case $::osfamily {
-      'RedHat': {
-        $pkg_upgrade_cmd = 'yum -y update'
-      }
-      default: {
-        warning('Please specify a package upgrade command for distribution.')
-      }
-    }
-
-    exec { 'package-upgrade':
-      command => $pkg_upgrade_cmd,
-      path    => '/usr/bin',
-      timeout => 0,
-    }
-    # A resource chain to ensure the upgrade ordering we want:
-    # 1) Upgrade all packages via exec.
-    #    Note: The Package Puppet resources can be managed after or before package-upgrade,
-    #          it does not matter. what we need to make sure is that they'll notify their
-    #          respective services (if they have ~> in their manifests or here with the ->)
-    #          for the other packages, they'll be upgraded before any Service notify.
-    #          This approach prevents from Puppet dependencies cycle.
-    # 2) This upgrade will be run before any Service notified & managed by Puppet.
-    #    Note: For example, during the Puppet catalog, configuration will change for most of
-    #          the services so the Services will be likely restarted after the package upgrade.
-    Exec['package-upgrade'] -> Service <| |>
-
+    # Running the package upgrade before managing Services in the main stage.
+    # So we're sure that services will be able to restart with the new version
+    # of the package.
+    ensure_resource('class', 'tripleo::packages::upgrades', {
+      'stage' => 'setup',
+    })
   }
 
 }
