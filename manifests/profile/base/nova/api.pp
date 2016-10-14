@@ -53,9 +53,8 @@ class tripleo::profile::base::nova::api (
     Exec['stop_nova-api'] -> Service['httpd']
 
     class { '::nova::api':
-      service_name => 'httpd', # Temporary: will be moved to t-h-t
-      sync_db      => $sync_db,
-      sync_db_api  => $sync_db,
+      sync_db     => $sync_db,
+      sync_db_api => $sync_db,
     }
     include ::nova::wsgi::apache
     include ::nova::network::neutron
