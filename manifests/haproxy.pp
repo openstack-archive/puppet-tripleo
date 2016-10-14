@@ -242,6 +242,10 @@
 #  (optional) Enable or not Zaqar Websockets binding
 #  Defaults to false
 #
+# [*ui*]
+#  (optional) Enable or not TripleO UI
+#  Defaults to false
+#
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
@@ -350,6 +354,7 @@ class tripleo::haproxy (
   $ceph_rgw                  = hiera('ceph_rgw_enabled', false),
   $opendaylight              = hiera('opendaylight_api_enabled', false),
   $zaqar_ws                  = hiera('zaqar_api_enabled', false),
+  $ui                        = hiera('enable_ui', false),
   $service_ports             = {}
 ) {
   $default_service_ports = {
@@ -395,6 +400,8 @@ class tripleo::haproxy (
     swift_proxy_ssl_port => 13808,
     trove_api_port => 8779,
     trove_api_ssl_port => 13779,
+    ui_port => 3000,
+    ui_ssl_port => 443,
     zaqar_api_port => 8888,
     zaqar_api_ssl_port => 13888,
     ceph_rgw_port => 8080,
@@ -1023,4 +1030,17 @@ class tripleo::haproxy (
       public_ssl_port           => $ports[zaqar_ws_ssl_port],
     }
   }
+
+  if $ui {
+    ::tripleo::haproxy::endpoint { 'ui':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('ui_vip', $controller_virtual_ip),
+      service_port      => $ports[ui_port],
+      ip_addresses      => hiera('ui_ips', $controller_hosts_real),
+      server_names      => $controller_hosts_names_real,
+      mode              => 'http',
+      public_ssl_port   => $ports[ui_ssl_port],
+    }
+  }
+
 }

@@ -70,7 +70,7 @@
 #
 class tripleo::ui (
   $servername          = $::fqdn,
-  $bind_host           = undef,
+  $bind_host           = hiera('controller_host'),
   $ui_port             = 3000,
   $keystone_url        = hiera('keystone_auth_uri_v2'),
   $heat_url            = hiera('heat::keystone::auth::public_url', undef),
