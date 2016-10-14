@@ -35,7 +35,7 @@ describe 'tripleo::profile::base::ceilometer' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('ceilometer').with(
-          :rabbit_hosts => params[:rabbit_hosts]
+          :rabbit_hosts => params[:rabbit_hosts].map{ |h| h + ':5672' }
         )
         is_expected.to contain_class('ceilometer::config')
       end

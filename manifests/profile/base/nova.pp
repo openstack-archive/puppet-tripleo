@@ -41,6 +41,10 @@
 # [*rabbit_hosts*]
 #   list of the rabbbit host IPs
 #   Defaults to hiera('rabbitmq_node_ips')
+#
+# [*rabbit_port*]
+#   IP port for rabbitmq service
+#   Defaults to hiera('nova::rabbit_port', 5672)
 
 class tripleo::profile::base::nova (
   $bootstrap_node       = hiera('bootstrap_nodeid', undef),
@@ -49,6 +53,7 @@ class tripleo::profile::base::nova (
   $nova_compute_enabled = false,
   $step                 = hiera('step'),
   $rabbit_hosts         = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port          = hiera('nova::rabbit_port', 5672),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -64,7 +69,7 @@ class tripleo::profile::base::nova (
 
   if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
     class { '::nova' :
-      rabbit_hosts => $rabbit_hosts,
+      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
     }
     include ::nova::config
     class { '::nova::cache':

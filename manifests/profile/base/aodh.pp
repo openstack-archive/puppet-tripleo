@@ -31,11 +31,15 @@
 #   list of the rabbbit host IPs
 #   Defaults to hiera('rabbitmq_node_ips')
 #
+# [*rabbit_port*]
+#   IP port for rabbitmq service
+#   Defaults to hiera('aodh::rabbit_port', 5672)
 
 class tripleo::profile::base::aodh (
   $step           = hiera('step'),
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port    = hiera('aodh::rabbit_port', 5672),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -46,7 +50,7 @@ class tripleo::profile::base::aodh (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::aodh' :
-      rabbit_hosts => $rabbit_hosts,
+      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
     }
     include ::aodh::auth
     include ::aodh::config
