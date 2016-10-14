@@ -86,6 +86,7 @@ class tripleo::profile::pacemaker::rabbitmq (
       resource_params => "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'",
       clone_params    => 'ordered=true interleave=true',
       meta_params     => 'notify=true',
+      op_params       => 'start timeout=200s stop timeout=200s',
       require         => Class['::rabbitmq'],
     }
   }
