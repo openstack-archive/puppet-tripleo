@@ -38,6 +38,17 @@ class tripleo::profile::base::nova::api (
   include ::tripleo::profile::base::nova
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
+
+    if hiera('nova::use_ipv6', false) {
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri(hiera('memcached_node_ips_v6'))), ':11211')
+    } else {
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri(hiera('memcached_node_ips'))), ':11211')
+    }
+
+    class { '::nova::keystone::authtoken':
+      memcached_servers => $memcache_servers
+    }
+
     class { '::nova::api':
       sync_db     => $sync_db,
       sync_db_api => $sync_db,
