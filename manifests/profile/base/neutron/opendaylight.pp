@@ -39,7 +39,7 @@ class tripleo::profile::base::neutron::opendaylight (
 
   if $step >= 1 {
     # Configure ODL only on first controller
-    if hiera('odl_on_controller') and $primary_controller == downcase($::hostname) {
+    if $primary_controller == downcase($::hostname) {
       include ::opendaylight
     }
   }
