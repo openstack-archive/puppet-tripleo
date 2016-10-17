@@ -48,12 +48,7 @@ class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
 ) {
 
   if $step >= 4 {
-    # Figure out ODL IP
-    if hiera('odl_on_controller') {
-      $odl_url_ip = hiera('opendaylight_api_vip')
-    } else {
-      $odl_url_ip = hiera('opendaylight::odl_bind_ip')
-    }
+    $odl_url_ip = hiera('opendaylight_api_vip')
 
     if ! $odl_url_ip { fail('OpenDaylight Controller IP/VIP is Empty') }
 
