@@ -40,9 +40,8 @@ class tripleo::profile::base::nova::api (
   if $step >= 4 or ($step >= 3 and $sync_db) {
 
     class { '::nova::api':
-      service_name => 'httpd', # Temporary: will be moved to t-h-t
-      sync_db      => $sync_db,
-      sync_db_api  => $sync_db,
+      sync_db     => $sync_db,
+      sync_db_api => $sync_db,
     }
     include ::nova::wsgi::apache
     include ::nova::network::neutron
