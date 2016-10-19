@@ -54,7 +54,8 @@ class tripleo::profile::base::rabbitmq (
   # IPv6 environment, necessary for RabbitMQ.
   if $ipv6 {
     $rabbit_env = merge($environment, {
-      'RABBITMQ_SERVER_START_ARGS' => '"-proto_dist inet6_tcp"'
+      'RABBITMQ_SERVER_START_ARGS' => '"-proto_dist inet6_tcp"',
+      'RABBITMQ_CTL_ERL_ARGS' => '"-proto_dist inet6_tcp"'
     })
   } else {
     $rabbit_env = $environment
