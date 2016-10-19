@@ -39,7 +39,7 @@ describe 'tripleo::profile::base::aodh' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh').with(
-          :rabbit_hosts => params[:rabbit_hosts]
+          :rabbit_hosts => params[:rabbit_hosts].map { |h| h + ":5672" }
         )
         is_expected.to contain_class('aodh::auth')
         is_expected.to contain_class('aodh::config')
@@ -72,7 +72,7 @@ describe 'tripleo::profile::base::aodh' do
 
       it 'should trigger aodh configuration without mysql grant' do
         is_expected.to contain_class('aodh').with(
-          :rabbit_hosts => params[:rabbit_hosts]
+          :rabbit_hosts => params[:rabbit_hosts].map { |h| h + ":5672" }
         )
         is_expected.to contain_class('aodh::auth')
         is_expected.to contain_class('aodh::config')

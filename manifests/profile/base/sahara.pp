@@ -29,11 +29,16 @@
 # [*rabbit_hosts*]
 #   list of the rabbbit host IPs
 #   Defaults to hiera('rabbitmq_node_ips')
+#
+# [*rabbit_port*]
+#   IP port for rabbitmq service
+#   Defaults to hiera('sahara::rabbit_port', 5672)
 
 class tripleo::profile::base::sahara (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
   $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port    = hiera('sahara::rabbit_port', 5672),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -44,7 +49,7 @@ class tripleo::profile::base::sahara (
   if $step >= 4 or ($step >= 3 and $sync_db){
     class { '::sahara':
       sync_db      => $sync_db,
-      rabbit_hosts => $rabbit_hosts,
+      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
     }
   }
 }

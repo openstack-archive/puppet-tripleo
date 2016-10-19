@@ -38,6 +38,10 @@
 # [*rabbit_hosts*]
 #   list of the rabbbit host IPs
 #   Defaults to hiera('rabbitmq_node_ips')
+#
+# [*rabbit_port*]
+#   IP port for rabbitmq service
+#   Defaults to hiera('heat::rabbit_port', 5672)
 
 class tripleo::profile::base::heat (
   $bootstrap_node      = downcase(hiera('bootstrap_nodeid')),
@@ -45,6 +49,7 @@ class tripleo::profile::base::heat (
   $notification_driver = 'messaging',
   $step                = hiera('step'),
   $rabbit_hosts        = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port         = hiera('heat::rabbit_port', 5672),
 ) {
   # Domain resources will be created at step5 on the node running keystone.pp
   # configure heat.conf at step3 and 4 but actually create the domain later.
@@ -59,7 +64,7 @@ class tripleo::profile::base::heat (
   if $step >= 4 {
     class { '::heat' :
       notification_driver => $notification_driver,
-      rabbit_hosts        => $rabbit_hosts,
+      rabbit_hosts        => suffix($rabbit_hosts, ":${rabbit_port}")
     }
     include ::heat::config
     include ::heat::cors

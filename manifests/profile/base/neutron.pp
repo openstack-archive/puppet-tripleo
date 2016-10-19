@@ -25,14 +25,19 @@
 # [*rabbit_hosts*]
 #   list of the rabbbit host IPs
 #   Defaults to hiera('rabbitmq_node_ips')
+#
+# [*rabbit_port*]
+#   IP port for rabbitmq service
+#   Defaults to hiera('neutron::rabbit_port', 5672
 
 class tripleo::profile::base::neutron (
   $step         = hiera('step'),
   $rabbit_hosts = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port  = hiera('neutron::rabbit_port', 5672),
 ) {
   if $step >= 3 {
     class { '::neutron' :
-      rabbit_hosts => $rabbit_hosts,
+      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
     }
     include ::neutron::config
   }

@@ -29,11 +29,16 @@
 # [*rabbit_hosts*]
 #   list of the rabbbit host IPs
 #   Defaults to hiera('rabbitmq_node_ips')
+#
+# [*rabbit_port*]
+#   IP port for rabbitmq service
+#   Defaults to hiera('ironic::rabbit_port', 5672)
 
 class tripleo::profile::base::ironic (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
   $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port    = hiera('ironic::rabbit_port', 5672),
 ) {
   # Database is accessed by both API and conductor, hence it's here.
   if $::hostname == downcase($bootstrap_node) {
@@ -45,7 +50,7 @@ class tripleo::profile::base::ironic (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::ironic':
       sync_db      => $sync_db,
-      rabbit_hosts => $rabbit_hosts,
+      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
     }
 
     include ::ironic::cors
