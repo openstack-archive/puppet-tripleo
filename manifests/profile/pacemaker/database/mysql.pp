@@ -89,9 +89,19 @@ class tripleo::profile::pacemaker::database::mysql (
     }
   }
 
+  # remove_default_accounts parameter will execute some mysql commands
+  # to remove the default accounts created by MySQL package.
+  # We need MySQL running to run the commands successfully, so better to
+  # wait step 2 before trying to run the commands.
+  if $step >= 2 and $pacemaker_master {
+    $remove_default_accounts = true
+  } else {
+    $remove_default_accounts = false
+  }
+
   class { '::tripleo::profile::base::database::mysql':
     manage_resources        => false,
-    remove_default_accounts => $pacemaker_master,
+    remove_default_accounts => $remove_default_accounts,
     mysql_server_options    => $mysqld_options,
   }
 
