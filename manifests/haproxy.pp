@@ -225,6 +225,10 @@
 #  (optional) Enable or not RabbitMQ binding
 #  Defaults to false
 #
+# [*docker_registry*]
+#  (optional) Enable or not the Docker Registry API binding
+#  Defaults to hiera('enable_docker_registry', false)
+#
 # [*redis*]
 #  (optional) Enable or not Redis binding
 #  Defaults to hiera('redis_enabled', false)
@@ -269,6 +273,10 @@
 # [*cinder_network*]
 #  (optional) Specify the network cinder is running on.
 #  Defaults to hiera('cinder_api_network', undef)
+#
+# [*docker_registry_network*]
+#  (optional) Specify the network docker-registry is running on.
+#  Defaults to hiera('docker_registry_network', undef)
 #
 # [*glance_api_network*]
 #  (optional) Specify the network glance_api is running on.
@@ -363,6 +371,8 @@
 #    'ceilometer_api_ssl_port' (Defaults to 13777)
 #    'cinder_api_port' (Defaults to 8776)
 #    'cinder_api_ssl_port' (Defaults to 13776)
+#    'docker_registry_port' (Defaults to 8787)
+#    'docker_registry_ssl_port' (Defaults to 13787)
 #    'glance_api_port' (Defaults to 9292)
 #    'glance_api_ssl_port' (Defaults to 13292)
 #    'glance_registry_port' (Defaults to 9191)
@@ -456,6 +466,7 @@ class tripleo::haproxy (
   $mysql                       = hiera('mysql_enabled', false),
   $mysql_clustercheck          = false,
   $rabbitmq                    = false,
+  $docker_registry             = hiera('enable_docker_registry', false),
   $redis                       = hiera('redis_enabled', false),
   $redis_password              = undef,
   $midonet_api                 = false,
@@ -467,6 +478,7 @@ class tripleo::haproxy (
   $ceilometer_network          = hiera('ceilometer_api_network', undef),
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
   $cinder_network              = hiera('cinder_api_network', undef),
+  $docker_registry_network     = hiera('docker_registry_network', undef),
   $glance_api_network          = hiera('glance_api_network', undef),
   $glance_registry_network     = hiera('glance_registry_network', undef),
   $gnocchi_network             = hiera('gnocchi_api_network', undef),
@@ -496,6 +508,8 @@ class tripleo::haproxy (
     ceilometer_api_ssl_port => 13777,
     cinder_api_port => 8776,
     cinder_api_ssl_port => 13776,
+    docker_registry_port => 8787,
+    docker_registry_ssl_port => 13787,
     glance_api_port => 9292,
     glance_api_ssl_port => 13292,
     glance_registry_port => 9191,
@@ -1060,6 +1074,18 @@ class tripleo::haproxy (
       ipaddresses       => hiera('rabbitmq_network', $controller_hosts_real),
       server_names      => hiera('rabbitmq_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
+    }
+  }
+
+  if $docker_registry {
+    ::tripleo::haproxy::endpoint { 'docker-registry':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('docker_registry_vip', $controller_virtual_ip),
+      service_port      => $ports[docker_registry_port],
+      ip_addresses      => hiera('docker_registry_node_ips', $controller_hosts_real),
+      server_names      => hiera('docker_registry_node_names', $controller_hosts_names_real),
+      public_ssl_port   => $ports[docker_registry_ssl_port],
+      service_network   => $docker_registry_network,
     }
   }
 
