@@ -934,12 +934,17 @@ class tripleo::haproxy (
   }
 
   if $swift_proxy_server {
+    $swift_proxy_server_listen_options = {
+      'timeout client' => '2m',
+      'timeout server' => '2m',
+    }
     ::tripleo::haproxy::endpoint { 'swift_proxy_server':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('swift_proxy_vip', $controller_virtual_ip),
       service_port      => $ports[swift_proxy_port],
       ip_addresses      => hiera('swift_proxy_node_ips', $controller_hosts_real),
       server_names      => hiera('swift_proxy_node_names', $controller_hosts_names_real),
+      listen_options    => $swift_proxy_server_listen_options,
       public_ssl_port   => $ports[swift_proxy_ssl_port],
       service_network   => $swift_proxy_server_network,
     }
