@@ -659,6 +659,10 @@ class tripleo::haproxy (
       'maxconn'                  => $haproxy_global_maxconn,
       'ssl-default-bind-ciphers' => $ssl_cipher_suite,
       'ssl-default-bind-options' => $ssl_options,
+      'stats'                    => [
+        'socket /var/run/haproxy.sock mode 600 level user',
+        'timeout 2m'
+      ],
     },
     defaults_options => {
       'mode'    => 'tcp',
