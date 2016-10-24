@@ -59,4 +59,7 @@ class tripleo::fencing(
 
   $ipmilan_devices = local_fence_devices('fence_ipmilan', $all_devices)
   create_resources('pacemaker::stonith::fence_ipmilan', $ipmilan_devices, $common_params)
+
+  $ironic_devices = local_fence_devices('fence_ironic', $all_devices)
+  create_resources('pacemaker::stonith::fence_ironic', $ironic_devices, $common_params)
 }
