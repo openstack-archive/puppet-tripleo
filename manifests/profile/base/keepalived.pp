@@ -27,13 +27,54 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*control_virtual_interface*]
+#   (Optional) Interface specified for control plane network
+#   Defaults to hiera('tripleo::keepalived::control_virtual_interface', false)
+#
+# [*control_virtual_ip*]
+#   Virtual IP address used for control plane network
+#   Defaults to hiera('tripleo::keepalived::controller_virtual_ip')
+#
+# [*public_virtual_interface*]
+#   (Optional) Interface specified for public/external network
+#   Defaults to hiera('tripleo::keepalived::public_virtual_interface', false)
+#
+# [*public_virtual_ip*]
+#   Virtual IP address used for public/ network
+#   Defaults to hiera('tripleo::keepalived::public_virtual_ip')
+#
 class tripleo::profile::base::keepalived (
-  $enable_load_balancer = hiera('enable_load_balancer', true),
-  $step                 = hiera('step'),
+  $enable_load_balancer      = hiera('enable_load_balancer', true),
+  $control_virtual_interface = hiera('tripleo::keepalived::control_virtual_interface', false),
+  $control_virtual_ip        = hiera('tripleo::keepalived::controller_virtual_ip'),
+  $public_virtual_interface  = hiera('tripleo::keepalived::public_virtual_interface', false),
+  $public_virtual_ip         = hiera('tripleo::keepalived::public_virtual_ip'),
+  $step                      = hiera('step'),
 ) {
   if $step >= 1 {
     if $enable_load_balancer and hiera('enable_keepalived', true){
-      include ::tripleo::keepalived
+      if ! $control_virtual_interface {
+        $control_detected_interface = interface_for_ip($control_virtual_ip)
+        if ! $control_detected_interface {
+          fail('Unable to find interface for control plane network')
+        }
+      } else {
+        $control_detected_interface = $control_virtual_interface
+      }
+
+      if ! $public_virtual_interface {
+        $public_detected_interface = interface_for_ip($public_virtual_ip)
+        if ! $public_detected_interface {
+          fail('Unable to find interface for public network')
+        }
+      } else {
+        $public_detected_interface = $public_virtual_interface
+      }
+
+      class { '::tripleo::keepalived':
+        control_virtual_interface => $control_detected_interface,
+        public_virtual_interface  => $public_detected_interface,
+      }
     }
   }
 }

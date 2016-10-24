@@ -19,10 +19,6 @@
 #
 # === Parameters:
 #
-# [*keepalived*]
-#  Whether to configure keepalived to manage the VIPs or not.
-#  Defaults to true
-#
 # [*haproxy_service_manage*]
 #  Will be passed as value for service_manage to HAProxy module.
 #  Defaults to true
@@ -312,7 +308,6 @@
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
-  $keepalived                = true,
   $haproxy_service_manage    = true,
   $haproxy_global_maxconn    = 20480,
   $haproxy_default_maxconn   = 4096,
@@ -425,13 +420,6 @@ class tripleo::haproxy (
     $controller_hosts_names_real = $controller_hosts_real
   } else {
     $controller_hosts_names_real = downcase(any2array(split($controller_hosts_names, ',')))
-  }
-
-  # This code will be removed once we switch undercloud and overcloud to use both haproxy & keepalived roles.
-  if $keepalived {
-    include ::tripleo::keepalived
-    # Make sure keepalive starts before haproxy.
-    Class['::keepalived::service'] -> Class['::haproxy']
   }
 
   # TODO(bnemec): When we have support for SSL on private and admin endpoints,
