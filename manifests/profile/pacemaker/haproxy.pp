@@ -44,7 +44,7 @@ class tripleo::profile::pacemaker::haproxy (
     $pacemaker_master = false
   }
 
-  if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
+  if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' and $enable_load_balancer {
     tripleo::pacemaker::resource_restart_flag { 'haproxy-clone':
       subscribe => Concat['/etc/haproxy/haproxy.cfg'],
     }
