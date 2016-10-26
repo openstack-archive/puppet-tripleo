@@ -40,7 +40,10 @@ class tripleo::profile::base::cinder::api (
   include ::tripleo::profile::base::cinder
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::cinder::api
+    class { '::cinder::api':
+      service_name => 'httpd'
+    }
+    include ::cinder::wsgi::apache
     include ::cinder::ceilometer
     include ::cinder::glance
   }
