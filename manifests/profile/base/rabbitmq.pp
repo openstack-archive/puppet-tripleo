@@ -68,7 +68,6 @@ class tripleo::profile::base::rabbitmq (
       class { '::rabbitmq':
         config_cluster          => $manage_service,
         cluster_nodes           => $nodes,
-        tcp_keepalive           => false,
         config_kernel_variables => $kernel_variables,
         config_variables        => $config_variables,
         environment_variables   => $rabbit_env,
@@ -85,7 +84,6 @@ class tripleo::profile::base::rabbitmq (
     } else {
       # Standard configuration
       class { '::rabbitmq':
-        tcp_keepalive           => false,
         config_kernel_variables => $kernel_variables,
         config_variables        => $config_variables,
         environment_variables   => $rabbit_env,
