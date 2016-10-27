@@ -32,8 +32,23 @@ class tripleo::profile::base::zaqar (
 ) {
   if $step >= 4  {
     include ::zaqar
-    include ::zaqar::management::mongodb
-    include ::zaqar::messaging::mongodb
+
+    if str2bool(hiera('mongodb::server::ipv6', false)) {
+      $mongo_node_ips_with_port_prefixed = prefix(hiera('mongodb_node_ips'), '[')
+      $mongo_node_ips_with_port = suffix($mongo_node_ips_with_port_prefixed, ']:27017')
+    } else {
+      $mongo_node_ips_with_port = suffix(hiera('mongodb_node_ips'), ':27017')
+    }
+    $mongodb_replset = hiera('mongodb::server::replset')
+    $mongo_node_string = join($mongo_node_ips_with_port, ',')
+    $database_connection = "mongodb://${mongo_node_string}/zaqar?replicaSet=${mongodb_replset}"
+
+    class { '::zaqar::management::mongodb':
+      uri => $database_connection,
+    }
+    class {'::zaqar::messaging::mongodb':
+      uri => $database_connection,
+    }
     include ::zaqar::transport::websocket
     include ::zaqar::transport::wsgi
 
