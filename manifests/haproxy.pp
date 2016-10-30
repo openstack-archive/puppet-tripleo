@@ -1195,8 +1195,8 @@ class tripleo::haproxy (
 
   $opendaylight_api_vip = hiera('opendaylight_api_vip', $controller_virtual_ip)
   $opendaylight_bind_opts = {
-    "${opendaylight_api_vip}:8081" => [],
-    "${public_virtual_ip}:8081" => [],
+    "${opendaylight_api_vip}:8081" => $haproxy_listen_bind_param,
+    "${public_virtual_ip}:8081" => $haproxy_listen_bind_param,
   }
 
   if $opendaylight {
