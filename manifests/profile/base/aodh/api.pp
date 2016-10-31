@@ -18,6 +18,35 @@
 #
 # === Parameters
 #
+# [*aodh_network*]
+#   (Optional) The network name where the aodh endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('aodh_api_network', undef)
+#
+# [*certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Example with hiera:
+#     apache_certificates_specs:
+#       httpd-internal_api:
+#         hostname: <overcloud controller fqdn>
+#         service_certificate: <service certificate path>
+#         service_key: <service key path>
+#         principal: "haproxy/<overcloud controller fqdn>"
+#   Defaults to hiera('apache_certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*generate_service_certificates*]
+#   (Optional) Whether or not certmonger will generate certificates for
+#   HAProxy. This could be as many as specified by the $certificates_specs
+#   variable.
+#   Note that this doesn't configure the certificates in haproxy, it merely
+#   creates the certificates.
+#   Defaults to hiera('generate_service_certificate', false).
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -29,15 +58,38 @@
 #
 
 class tripleo::profile::base::aodh::api (
-  $step                      = hiera('step'),
-  $enable_combination_alarms = false,
+  $aodh_network                  = hiera('aodh_api_network', undef),
+  $certificates_specs            = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $generate_service_certificates = hiera('generate_service_certificates', false),
+  $step                          = hiera('step'),
+  $enable_combination_alarms     = false,
 ) {
 
   include ::tripleo::profile::base::aodh
 
+  if $enable_internal_tls {
+    if $generate_service_certificates {
+      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
+    }
+
+    if !$aodh_network {
+      fail('aodh_api_network is not set in the hieradata.')
+    }
+    $tls_certfile = $certificates_specs["httpd-${aodh_network}"]['service_certificate']
+    $tls_keyfile = $certificates_specs["httpd-${aodh_network}"]['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
+  }
+
+
   if $step >= 4 {
     include ::aodh::api
-    include ::aodh::wsgi::apache
+    class { '::aodh::wsgi::apache':
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
+    }
 
     #NOTE: Combination alarms are deprecated in newton and disabled by default.
     # we need a way to override this setting for users still using this type
