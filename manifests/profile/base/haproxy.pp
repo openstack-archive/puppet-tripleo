@@ -95,7 +95,7 @@ class tripleo::profile::base::haproxy (
           command     => 'systemctl reload haproxy',
           path        => ['/usr/bin', '/usr/sbin'],
           refreshonly => true,
-          onlyif      => 'pcs property | grep -q "maintenance-mode.*true"',
+          onlyif      => 'systemctl is-active haproxy | grep -q active',
           subscribe   => Class['::haproxy']
         }
         Haproxy::Listen<||> ~> Exec['haproxy-reload']
