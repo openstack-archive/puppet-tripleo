@@ -176,6 +176,9 @@ class tripleo::profile::base::keystone (
     if hiera('aodh_api_enabled', false) {
       include ::aodh::keystone::auth
     }
+    if hiera('barbican_api_enabled', false) {
+      include ::barbican::keystone::auth
+    }
     if hiera('ceilometer_api_enabled', false) {
       include ::ceilometer::keystone::auth
     }
