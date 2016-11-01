@@ -779,6 +779,7 @@ class tripleo::haproxy (
       },
       public_ssl_port   => $ports[cinder_api_ssl_port],
       service_network   => $cinder_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
