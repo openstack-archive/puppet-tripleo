@@ -8,6 +8,9 @@ redis_vip: '127.0.0.1'
 aodh::auth::auth_password: 'password'
 aodh::db::mysql::password: 'password'
 aodh::keystone::authtoken::password: 'password'
+# babican profile required hieradata
+barbican::db::mysql::password: 'password'
+barbican::keystone::authtoken::password: 'password'
 ceilometer::keystone::authtoken::password: 'password'
 # ceph related items
 ceph::profile::params::mon_key: 'password'
