@@ -38,13 +38,34 @@
 # [*rabbit_port*]
 #   IP port for rabbitmq service
 #   Defaults to hiera('keystone::rabbit_port', 5672)
-
+#
+# [*heat_admin_domain*]
+#   domain name for heat admin
+#   Defaults to hiera('heat::keystone::domain::domain_name', 'heat')
+#
+# [*heat_admin_user*]
+#   heat admin user name
+#   Defaults to hiera('heat::keystone::domain::domain_admin', 'heat_admin')
+#
+# [*heat_admin_email*]
+#   heat admin email address
+#   Defaults to hiera('heat::keystone::domain::domain_admin_email',
+#     'heat_admin@localhost')
+#
+# [*heat_admin_password*]
+#   heat admin password
+#   Defaults to hiera('heat::keystone::domain::domain_password')
+#
 class tripleo::profile::base::keystone (
-  $bootstrap_node  = hiera('bootstrap_nodeid', undef),
-  $manage_db_purge = hiera('keystone_enable_db_purge', true),
-  $step            = hiera('step'),
-  $rabbit_hosts    = hiera('rabbitmq_node_ips', undef),
-  $rabbit_port     = hiera('keystone::rabbit_port', 5672),
+  $bootstrap_node      = hiera('bootstrap_nodeid', undef),
+  $manage_db_purge     = hiera('keystone_enable_db_purge', true),
+  $step                = hiera('step'),
+  $rabbit_hosts        = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port         = hiera('keystone::rabbit_port', 5672),
+  $heat_admin_domain   = hiera('heat::keystone::domain::domain_name', 'heat'),
+  $heat_admin_user     = hiera('heat::keystone::domain::domain_admin', 'heat_admin'),
+  $heat_admin_email    = hiera('heat::keystone::domain::domain_admin_email', 'heat_admin@localhost'),
+  $heat_admin_password = hiera('heat::keystone::domain::domain_password'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -85,22 +106,22 @@ class tripleo::profile::base::keystone (
 
   if $step >= 5 and $manage_domain {
     if hiera('heat_engine_enabled', false) {
-      # if Heat and Keystone are collocated, so we want to
-      # both configure heat.conf and create Keystone resources.
-      # note: domain_password is given via Hiera.
-      if defined(Class['::tripleo::profile::base::heat']) {
-        include ::heat::keystone::domain
-      } else {
-        # if Heat and Keystone are not collocated, we want Puppet
-        # to only create Keystone resources on the Keystone node
-        # but not try to configure Heat, to avoid leaking the password.
-        class { '::heat::keystone::domain':
-          domain_name     => $::os_service_default,
-          domain_admin    => $::os_service_default,
-          domain_password => $::os_service_default,
-        }
+      # create these seperate and don't use ::heat::keystone::domain since
+      # that class writes out the configs
+      keystone_domain { $heat_admin_domain:
+        ensure  => 'present',
+        enabled => true
       }
-      Class['::keystone::roles::admin'] -> Class['::heat::keystone::domain']
+      keystone_user { "${heat_admin_user}::${heat_admin_domain}":
+        ensure   => 'present',
+        enabled  => true,
+        email    => $heat_admin_email,
+        password => $heat_admin_password
+      }
+      keystone_user_role { "${heat_admin_user}::${heat_admin_domain}@::${heat_admin_domain}":
+        roles   => ['admin'],
+        require => Class['::keystone::roles::admin']
+      }
     }
   }
 
