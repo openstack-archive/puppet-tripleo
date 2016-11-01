@@ -184,7 +184,7 @@
 #
 # [*barbican*]
 #  (optional) Enable or not Barbican API binding
-#  Defaults to false
+#  Defaults to hiera('barbican_api_enabled', false)
 #
 # [*gnocchi*]
 #  (optional) Enable or not Gnocchi API binding
