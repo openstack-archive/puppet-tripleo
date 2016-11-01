@@ -22,6 +22,10 @@
 #   (Optional) Glance backend(s) to use.
 #   Defaults to downcase(hiera('glance_backend', 'swift'))
 #
+# [*glance_nfs_enabled*]
+#   (Optional) Whether to use NFS mount as 'file' backend storage location.
+#   Defaults to false
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -36,11 +40,16 @@
 #   Defaults to hiera('glance::notify::rabbitmq::rabbit_port', 5672)
 
 class tripleo::profile::base::glance::api (
-  $glance_backend = downcase(hiera('glance_backend', 'swift')),
-  $step           = hiera('step'),
-  $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
-  $rabbit_port    = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
+  $glance_backend     = downcase(hiera('glance_backend', 'swift')),
+  $glance_nfs_enabled = false,
+  $step               = hiera('step'),
+  $rabbit_hosts       = hiera('rabbitmq_node_ips', undef),
+  $rabbit_port        = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
 ) {
+
+  if $step >= 1 and $glance_nfs_enabled {
+    include ::tripleo::glance::nfs_mount
+  }
 
   if $step >= 4 {
     case $glance_backend {
