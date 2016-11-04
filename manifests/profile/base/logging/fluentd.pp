@@ -52,7 +52,7 @@
 #   secure-foward plugin.
 #
 # [*fluentd_listen_syslog*]
-#   (Optional, default true) When true, fluentd will listen for syslog 
+#   (Optional, default true) When true, fluentd will listen for syslog
 #   messages on a local UDP port.
 #
 # [*fluentd_syslog_port*]
@@ -71,107 +71,105 @@ class tripleo::profile::base::logging::fluentd (
   $fluentd_listen_syslog = true,
   $fluentd_syslog_port = 42185
 ) {
-  if $step == undef or $step >= 3 {
-    include ::fluentd
+  include ::fluentd
 
-    if $fluentd_groups {
-      user { $::fluentd::config_owner:
-        ensure     => present,
-        groups     => $fluentd_groups,
-        membership => 'minimum',
+  if $fluentd_groups {
+    user { $::fluentd::config_owner:
+      ensure     => present,
+      groups     => $fluentd_groups,
+      membership => 'minimum',
+    }
+  }
+
+  if $fluentd_pos_file_path {
+    file { $fluentd_pos_file_path:
+      ensure => 'directory',
+      owner  => $::fluentd::config_owner,
+      group  => $::fluentd::config_group,
+      mode   => '0750',
+    }
+  }
+
+  ::fluentd::plugin { 'rubygem-fluent-plugin-add':
+    plugin_provider => 'yum',
+  }
+
+  if $fluentd_sources {
+    ::fluentd::config { '100-openstack-sources.conf':
+      config => {
+        'source' => $fluentd_sources,
       }
     }
+  }
 
-    if $fluentd_pos_file_path {
-      file { $fluentd_pos_file_path:
-        ensure => 'directory',
-        owner  => $::fluentd::config_owner,
-        group  => $::fluentd::config_group,
-        mode   => '0750',
-      }
-    }
-
-    ::fluentd::plugin { 'rubygem-fluent-plugin-add':
-      plugin_provider => 'yum',
-    }
-
-    if $fluentd_sources {
-      ::fluentd::config { '100-openstack-sources.conf':
-        config => {
-          'source' => $fluentd_sources,
+  if $fluentd_listen_syslog {
+    # fluentd will receive syslog messages by listening on a local udp
+    # socket.
+    ::fluentd::config { '110-system-sources.conf':
+      config => {
+        'source' => {
+          'type' => 'syslog',
+          'tag'  => 'system.messages',
+          'port' => $fluentd_syslog_port,
         }
       }
     }
 
-    if $fluentd_listen_syslog {
-      # fluentd will receive syslog messages by listening on a local udp
-      # socket.
-      ::fluentd::config { '110-system-sources.conf':
+    file { '/etc/rsyslog.d/fluentd.conf':
+      content => "*.* @127.0.0.1:${fluentd_syslog_port}",
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+    } ~> exec { 'reload rsyslog':
+      command => '/bin/systemctl restart rsyslog',
+    }
+  }
+
+  if $fluentd_filters {
+    ::fluentd::config { '200-openstack-filters.conf':
+      config => {
+        'filter' => $fluentd_filters,
+      }
+    }
+  }
+
+  if $fluentd_servers and !empty($fluentd_servers) {
+    if $fluentd_use_ssl {
+      ::fluentd::plugin { 'rubygem-fluent-plugin-secure-forward':
+        plugin_provider => 'yum',
+      }
+
+      file {'/etc/fluentd/ca_cert.pem':
+        content => $fluentd_ssl_certificate,
+        owner   => $::fluentd::config_owner,
+        group   => $::fluentd::config_group,
+        mode    => '0444',
+      }
+
+      ::fluentd::config { '300-openstack-matches.conf':
         config => {
-          'source' => {
-            'type' => 'syslog',
-            'tag'  => 'system.messages',
-            'port' => $fluentd_syslog_port,
+          'match' => {
+            # lint:ignore:single_quote_string_with_variables
+            # lint:ignore:quoted_booleans
+            'type'          => 'secure_forward',
+            'tag_pattern'   => '**',
+            'self_hostname' => '${hostname}',
+            'secure'        => 'true',
+            'ca_cert_path'  => '/etc/fluentd/ca_cert.pem',
+            'shared_key'    => $fluentd_shared_key,
+            'server'        => $fluentd_servers,
+            # lint:endignore
+            # lint:endignore
           }
         }
       }
-
-      file { '/etc/rsyslog.d/fluentd.conf':
-        content => "*.* @127.0.0.1:${fluentd_syslog_port}",
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-      } ~> exec { 'reload rsyslog':
-        command => '/bin/systemctl restart rsyslog',
-      }
-    }
-
-    if $fluentd_filters {
-      ::fluentd::config { '200-openstack-filters.conf':
+    } else {
+      ::fluentd::config { '300-openstack-matches.conf':
         config => {
-          'filter' => $fluentd_filters,
-        }
-      }
-    }
-
-    if $fluentd_servers and !empty($fluentd_servers) {
-      if $fluentd_use_ssl {
-        ::fluentd::plugin { 'rubygem-fluent-plugin-secure-forward':
-          plugin_provider => 'yum',
-        }
-
-        file {'/etc/fluentd/ca_cert.pem':
-          content => $fluentd_ssl_certificate,
-          owner   => $::fluentd::config_owner,
-          group   => $::fluentd::config_group,
-          mode    => '0444',
-        }
-
-        ::fluentd::config { '300-openstack-matches.conf':
-          config => {
-            'match' => {
-              # lint:ignore:single_quote_string_with_variables
-              # lint:ignore:quoted_booleans
-              'type'          => 'secure_forward',
-              'tag_pattern'   => '**',
-              'self_hostname' => '${hostname}',
-              'secure'        => 'true',
-              'ca_cert_path'  => '/etc/fluentd/ca_cert.pem',
-              'shared_key'    => $fluentd_shared_key,
-              'server'        => $fluentd_servers,
-              # lint:endignore
-              # lint:endignore
-            }
-          }
-        }
-      } else {
-        ::fluentd::config { '300-openstack-matches.conf':
-          config => {
-            'match' => {
-              'type'        => 'forward',
-              'tag_pattern' => '**',
-              'server'      => $fluentd_servers,
-            }
+          'match' => {
+            'type'        => 'forward',
+            'tag_pattern' => '**',
+            'server'      => $fluentd_servers,
           }
         }
       }
