@@ -31,10 +31,16 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*redis_file_limit*]
+#   (Optional) The file limit to put in /etc/security/limits.d/redis.conf
+#   for when redis is managed by pacemaker. Defaults to hiera('redis_file_limit')
+#   or 10240 (default in redis systemd limits)
+#
 class tripleo::profile::pacemaker::database::redis (
   $bootstrap_node       = hiera('bootstrap_nodeid'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
+  $redis_file_limit     = hiera('redis_file_limit', 10240),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -44,6 +50,17 @@ class tripleo::profile::pacemaker::database::redis (
 
   if $step >= 1 {
     include ::redis
+    # Until puppet-redis grows support for /etc/security/limits.conf/redis.conf
+    # https://github.com/arioch/puppet-redis/issues/130
+    # we best explicitely set the file limit only in the pacemaker profile
+    # (the base profile does not need it as it is using systemd which has
+    # the limits set there)
+    file { '/etc/security/limits.d/redis.conf':
+      content => inline_template("redis soft nofile <%= @redis_file_limit %>\nredis hard nofile <%= @redis_file_limit %>\n"),
+      owner   => '0',
+      group   => '0',
+      mode    => '0644',
+    }
 
     if $pacemaker_master and hiera('stack_action') == 'UPDATE' {
       tripleo::pacemaker::resource_restart_flag { 'redis-master':
