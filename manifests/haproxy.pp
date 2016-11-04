@@ -209,6 +209,14 @@
 #  (optional) Enable check via clustercheck for mysql
 #  Defaults to false
 #
+# [*mysql_member_options*]
+#  The options to use for the mysql HAProxy balancer members.
+#  If this parameter is undefined, the actual value configured will depend
+#  on the value of $mysql_clustercheck. If cluster checking is enabled,
+#  the mysql member options will be: "['backup', 'port 9200', 'on-marked-down shutdown-sessions', 'check', 'inter 1s']"
+#  and if mysql cluster checking is disabled, the member options will be: "union($haproxy_member_options, ['backup'])"
+#  Defaults to undef
+#
 # [*rabbitmq*]
 #  (optional) Enable or not RabbitMQ binding
 #  Defaults to false
@@ -346,6 +354,7 @@ class tripleo::haproxy (
   $ironic_inspector          = hiera('ironic_inspector_enabled', false),
   $mysql                     = hiera('mysql_enabled', false),
   $mysql_clustercheck        = false,
+  $mysql_member_options      = undef,
   $rabbitmq                  = false,
   $redis                     = hiera('redis_enabled', false),
   $redis_password            = undef,
@@ -895,13 +904,21 @@ class tripleo::haproxy (
       'stick-table'    => 'type ip size 1000',
       'stick'          => 'on dst',
     }
-    $mysql_member_options = union($haproxy_member_options, ['backup', 'port 9200', 'on-marked-down shutdown-sessions'])
+    if $mysql_member_options {
+        $mysql_member_options_real = $mysql_member_options
+    } else {
+        $mysql_member_options_real = ['backup', 'port 9200', 'on-marked-down shutdown-sessions', 'check', 'inter 1s']
+    }
   } else {
     $mysql_listen_options = {
       'timeout client' => '90m',
       'timeout server' => '90m',
     }
-    $mysql_member_options = union($haproxy_member_options, ['backup'])
+    if $mysql_member_options {
+        $mysql_member_options_real = $mysql_member_options
+    } else {
+        $mysql_member_options_real = union($haproxy_member_options, ['backup'])
+    }
   }
 
   if $mysql {
@@ -915,7 +932,7 @@ class tripleo::haproxy (
       ports             => '3306',
       ipaddresses       => hiera('mysql_node_ips', $controller_hosts_real),
       server_names      => hiera('mysql_node_names', $controller_hosts_names_real),
-      options           => $mysql_member_options,
+      options           => $mysql_member_options_real,
     }
   }
 
