@@ -37,7 +37,7 @@
 #
 # [*haproxy_default_timeout*]
 #  The value to use as timeout in the HAProxy default config section.
-#  Defaults to [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ]
+#  Defaults to [ 'http-request 10s', 'queue 2m', 'connect 10s', 'client 2m', 'server 2m', 'check 10s' ]
 #
 # [*haproxy_listen_bind_param*]
 #  A list of params to be added to the HAProxy listener bind directive. By
@@ -445,7 +445,7 @@ class tripleo::haproxy (
   $haproxy_service_manage      = true,
   $haproxy_global_maxconn      = 20480,
   $haproxy_default_maxconn     = 4096,
-  $haproxy_default_timeout     = [ 'http-request 10s', 'queue 1m', 'connect 10s', 'client 1m', 'server 1m', 'check 10s' ],
+  $haproxy_default_timeout     = [ 'http-request 10s', 'queue 2m', 'connect 10s', 'client 2m', 'server 2m', 'check 10s' ],
   $haproxy_listen_bind_param   = [ 'transparent' ],
   $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address         = '/dev/log',
