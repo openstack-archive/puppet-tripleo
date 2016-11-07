@@ -21,7 +21,8 @@ class tripleo::host::sriov (
     # the numvfs configuration needs to be persisted for every boot
     tripleo::host::sriov::numvfs_persistence {'persistent_numvfs':
       vf_defs        => $number_of_vfs,
-      content_string => "#!/bin/bash\n"
+      content_string => "#!/bin/bash\n",
+      udev_rules     => ''
     }
   }
 }
