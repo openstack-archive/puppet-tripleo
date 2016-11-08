@@ -68,8 +68,9 @@ class tripleo::profile::base::nova (
   }
 
   if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
+    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
     class { '::nova' :
-      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
+      rabbit_hosts => $rabbit_endpoints,
     }
     include ::nova::config
     class { '::nova::cache':

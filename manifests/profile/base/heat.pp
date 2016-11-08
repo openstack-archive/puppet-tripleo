@@ -62,9 +62,10 @@ class tripleo::profile::base::heat (
   }
 
   if $step >= 4 {
+    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
     class { '::heat' :
       notification_driver => $notification_driver,
-      rabbit_hosts        => suffix($rabbit_hosts, ":${rabbit_port}")
+      rabbit_hosts        => $rabbit_endpoints,
     }
     include ::heat::config
     include ::heat::cors
