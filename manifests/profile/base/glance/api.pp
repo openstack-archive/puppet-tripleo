@@ -67,9 +67,9 @@ class tripleo::profile::base::glance::api (
     class { '::glance::api':
       stores => $glance_store,
     }
-
+    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
     class { '::glance::notify::rabbitmq' :
-      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
+      rabbit_hosts => $rabbit_endpoints,
     }
     include join(['::glance::backend::', $glance_backend])
   }
