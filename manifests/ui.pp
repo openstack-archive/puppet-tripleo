@@ -25,7 +25,7 @@
 #
 # [*bind_host*]
 #  The host/ip address Apache will listen on.
-#  Optional. Defaults to undef (listen on all ip addresses).
+#  Optional. Defaults to hiera('controller_host')
 #
 # [*ui_port*]
 #  The port on which the UI is listening.
