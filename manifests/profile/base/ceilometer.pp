@@ -38,8 +38,9 @@ class tripleo::profile::base::ceilometer (
 ) {
 
   if $step >= 3 {
+    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
     class { '::ceilometer' :
-      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
+      rabbit_hosts => $rabbit_endpoints,
     }
     include ::ceilometer::config
   }
