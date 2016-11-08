@@ -36,6 +36,10 @@
 #   The post-save-command that certmonger will use once it renews the
 #   certificate.
 #
+# [*certmonger_ca*]
+#   (Optional) The CA that certmonger will use to generate the certificates.
+#   Defaults to hiera('certmonger_ca', 'local').
+#
 # [*principal*]
 #   The haproxy service principal that is set for HAProxy in kerberos.
 #
@@ -45,7 +49,8 @@ define tripleo::certmonger::haproxy (
   $service_key,
   $hostname,
   $postsave_cmd,
-  $principal = undef,
+  $certmonger_ca = hiera('certmonger_ca', 'local'),
+  $principal     = undef,
 ){
     include ::haproxy::params
     certmonger_certificate { "${title}-cert":
@@ -69,10 +74,21 @@ define tripleo::certmonger::haproxy (
       order   => '01',
       require => Certmonger_certificate["${title}-cert"],
     }
+
+    if $certmonger_ca == 'local' {
+      $ca_pem = getparam(Class['tripleo::certmonger::ca::local'], 'ca_pem')
+      concat::fragment { "${title}-ca-fragment":
+        target  => $service_pem,
+        source  => $ca_pem,
+        order   => '10',
+        require => Class['tripleo::certmonger::ca::local'],
+      }
+    }
+
     concat::fragment { "${title}-key-fragment":
       target  => $service_pem,
       source  => $service_key,
-      order   => 10,
+      order   => 20,
       require => Certmonger_certificate["${title}-cert"],
     }
 }
