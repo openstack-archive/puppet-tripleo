@@ -966,6 +966,7 @@ class tripleo::haproxy (
       server_names      => hiera('gnocchi_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
       service_network   => $gnocchi_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
