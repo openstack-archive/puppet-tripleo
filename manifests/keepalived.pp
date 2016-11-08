@@ -158,8 +158,4 @@ class tripleo::keepalived (
       priority     => 101,
     }
   }
-  # Make sure keepalive starts before haproxy.
-  if (defined(Class['::haproxy'])) {
-    Class['::keepalived::service'] -> Class['::haproxy']
-  }
 }
