@@ -47,8 +47,9 @@ class tripleo::profile::base::manila (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
+    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
     class { '::manila' :
-      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
+      rabbit_hosts => $rabbit_endpoints,
     }
     include ::manila::config
   }

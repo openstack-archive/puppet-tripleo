@@ -36,8 +36,9 @@ class tripleo::profile::base::neutron (
   $rabbit_port  = hiera('neutron::rabbit_port', 5672),
 ) {
   if $step >= 3 {
+    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
     class { '::neutron' :
-      rabbit_hosts => suffix($rabbit_hosts, ":${rabbit_port}")
+      rabbit_hosts => $rabbit_endpoints,
     }
     include ::neutron::config
   }
