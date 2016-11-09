@@ -782,6 +782,11 @@ class tripleo::haproxy (
       service_port      => $ports[neutron_api_port],
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
+      listen_options    => {
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+      },
       public_ssl_port   => $ports[neutron_api_ssl_port],
       service_network   => $neutron_network,
     }
@@ -926,6 +931,11 @@ class tripleo::haproxy (
       service_port      => $ports[ceilometer_api_port],
       ip_addresses      => hiera('ceilometer_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ceilometer_api_node_names', $controller_hosts_names_real),
+      listen_options    => {
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+      },
       public_ssl_port   => $ports[ceilometer_api_ssl_port],
       service_network   => $ceilometer_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -939,6 +949,11 @@ class tripleo::haproxy (
       service_port      => $ports[aodh_api_port],
       ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
       server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
+      listen_options    => {
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+      },
       public_ssl_port   => $ports[aodh_api_ssl_port],
       service_network   => $aodh_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -964,6 +979,11 @@ class tripleo::haproxy (
       service_port      => $ports[gnocchi_api_port],
       ip_addresses      => hiera('gnocchi_api_node_ips', $controller_hosts_real),
       server_names      => hiera('gnocchi_api_node_names', $controller_hosts_names_real),
+      listen_options    => {
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+      },
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
       service_network   => $gnocchi_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
