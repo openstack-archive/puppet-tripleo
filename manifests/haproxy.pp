@@ -608,6 +608,8 @@ class tripleo::haproxy (
   # This code will be removed once we switch undercloud and overcloud to use both haproxy & keepalived roles.
   if $keepalived {
     include ::tripleo::keepalived
+    # Make sure keepalive starts before haproxy.
+    Class['::keepalived::service'] -> Class['::haproxy']
   }
 
   # TODO(bnemec): When we have support for SSL on private and admin endpoints,
