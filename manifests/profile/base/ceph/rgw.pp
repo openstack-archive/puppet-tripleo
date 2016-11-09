@@ -18,6 +18,14 @@
 #
 # === Parameters
 #
+# [*civetweb_bind_ip*]
+#   IP address where to bind the RGW civetweb instance
+#   (Optional) Defaults to 127.0.0.1
+#
+# [*civetweb_bind_port*]
+#   PORT where to bind the RGW civetweb instance
+#   (Optional) Defaults to 8080
+#
 # [*keystone_admin_token*]
 #   The keystone admin token
 #
@@ -36,14 +44,22 @@ class tripleo::profile::base::ceph::rgw (
   $keystone_admin_token,
   $keystone_url,
   $rgw_key,
-  $step = hiera('step'),
+  $civetweb_bind_ip   = '127.0.0.1',
+  $civetweb_bind_port = '8080',
+  $step               = hiera('step'),
 ) {
 
   include ::tripleo::profile::base::ceph
 
   if $step >= 3 {
-    include ::ceph::profile::rgw
     $rgw_name = hiera('ceph::profile::params::rgw_name', 'radosgw.gateway')
+    $civetweb_bind_ip_real = normalize_ip_for_uri($civetweb_bind_ip)
+    include ::ceph::params
+    include ::ceph::profile::base
+    ceph::rgw { $rgw_name:
+      frontend_type => 'civetweb',
+      rgw_frontends => "civetweb port=${civetweb_bind_ip_real}:${civetweb_bind_port}"
+    }
     ceph::key { "client.${rgw_name}":
       secret  => $rgw_key,
       cap_mon => 'allow *',

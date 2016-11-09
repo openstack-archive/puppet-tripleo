@@ -30,7 +30,9 @@ describe 'tripleo::profile::base::ceph::rgw' do
       {
         :keystone_admin_token => 'token',
         :keystone_url         => 'url',
-        :rgw_key              => 'key'
+        :rgw_key              => 'key',
+        :civetweb_bind_ip     => '2001:db8:0:1234:0:567:8:1',
+        :civetweb_bind_port   => '8888',
       }
     end
 
@@ -39,7 +41,7 @@ describe 'tripleo::profile::base::ceph::rgw' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::ceph::rgw')
         is_expected.to contain_class('tripleo::profile::base::ceph')
-        is_expected.to_not contain_class('ceph::profile::rgw')
+        is_expected.to_not contain_class('ceph::rgw')
       end
     end
 
@@ -47,7 +49,10 @@ describe 'tripleo::profile::base::ceph::rgw' do
       let(:params) { default_params.merge({ :step => 3 }) }
       it 'should include rgw configuration' do
         is_expected.to contain_class('tripleo::profile::base::ceph')
-        is_expected.to contain_class('ceph::profile::rgw')
+        is_expected.to contain_ceph__rgw('radosgw.gateway').with(
+          :frontend_type => 'civetweb',
+          :rgw_frontends => 'civetweb port=[2001:db8:0:1234:0:567:8:1]:8888'
+        )
         is_expected.to contain_ceph__key('client.radosgw.gateway').with(
           :secret  => 'key',
           :cap_mon => 'allow *',
@@ -62,7 +67,10 @@ describe 'tripleo::profile::base::ceph::rgw' do
       let(:params) { default_params.merge({ :step => 4 }) }
       it 'should include rgw configuration' do
         is_expected.to contain_class('tripleo::profile::base::ceph')
-        is_expected.to contain_class('ceph::profile::rgw')
+        is_expected.to contain_ceph__rgw('radosgw.gateway').with(
+          :frontend_type => 'civetweb',
+          :rgw_frontends => 'civetweb port=[2001:db8:0:1234:0:567:8:1]:8888'
+        )
         is_expected.to contain_ceph__key('client.radosgw.gateway').with(
           :secret  => 'key',
           :cap_mon => 'allow *',
