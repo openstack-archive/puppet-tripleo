@@ -68,5 +68,10 @@ class tripleo::profile::base::swift::proxy (
       rabbit_hosts => $swift_rabbit_hosts,
     }
     include ::swift::proxy::versioned_writes
+    include ::swift::proxy::slo
+    include ::swift::proxy::dlo
+    include ::swift::proxy::copy
+    include ::swift::proxy::container_quotas
+    include ::swift::proxy::account_quotas
   }
 }
