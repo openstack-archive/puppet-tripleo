@@ -53,9 +53,9 @@ class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
     if ! $odl_url_ip { fail('OpenDaylight Controller IP/VIP is Empty') }
 
     class { '::neutron::plugins::ml2::opendaylight':
-      odl_username  => $odl_username,
-      odl_password  => $odl_password,
-      odl_url       => "${conn_proto}://${odl_url_ip}:${odl_port}/controller/nb/v2/neutron";
+      odl_username => $odl_username,
+      odl_password => $odl_password,
+      odl_url      => "${conn_proto}://${odl_url_ip}:${odl_port}/controller/nb/v2/neutron";
     }
   }
 }
