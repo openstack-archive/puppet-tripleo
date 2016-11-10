@@ -969,7 +969,7 @@ class tripleo::haproxy (
       internal_ip       => hiera('barbican_api_vip', $controller_virtual_ip),
       service_port      => $ports[barbican_api_port],
       ip_addresses      => hiera('barbican_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
+      server_names      => hiera('barbican_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[barbican_api_ssl_port],
       service_network   => $barbican_network
     }
