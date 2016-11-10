@@ -237,6 +237,9 @@ class tripleo::profile::base::keystone (
     if hiera('nova_api_enabled', false) {
       include ::nova::keystone::auth
     }
+    if hiera('panko_api_enabled', false) {
+      include ::panko::keystone::auth
+    }
     if hiera('sahara_api_enabled', false) {
       include ::sahara::keystone::auth
     }

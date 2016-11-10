@@ -182,6 +182,10 @@
 #  (optional) Enable or not Aodh API binding
 #  Defaults to hiera('aodh_api_enabled', false)
 #
+# [*panko*]
+#  (optional) Enable or not Panko API binding
+#  Defaults to hiera('panko_api_enabled', false)
+#
 # [*barbican*]
 #  (optional) Enable or not Barbican API binding
 #  Defaults to hiera('barbican_api_enabled', false)
@@ -371,6 +375,10 @@
 #  (optional) Specify the network opendaylight is running on.
 #  Defaults to hiera('opendaylight_api_network', undef)
 #
+# [*panko_network*]
+#  (optional) Specify the network panko is running on.
+#  Defaults to hiera('panko_api_network', undef)
+#
 # [*sahara_network*]
 #  (optional) Specify the network sahara is running on.
 #  Defaults to hiera('sahara_api_network', undef)
@@ -430,6 +438,8 @@
 #    'nova_metadata_port' (Defaults to 8775)
 #    'nova_novnc_port' (Defaults to 6080)
 #    'nova_novnc_ssl_port' (Defaults to 13080)
+#    'panko_api_port' (Defaults to 8779)
+#    'panko_api_ssl_port' (Defaults to 13779)
 #    'sahara_api_port' (Defaults to 8386)
 #    'sahara_api_ssl_port' (Defaults to 13386)
 #    'swift_proxy_port' (Defaults to 8080)
@@ -482,6 +492,7 @@ class tripleo::haproxy (
   $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
   $ceilometer                  = hiera('ceilometer_api_enabled', false),
   $aodh                        = hiera('aodh_api_enabled', false),
+  $panko                       = hiera('panko_api_enabled', false),
   $barbican                    = hiera('barbican_api_enabled', false),
   $gnocchi                     = hiera('gnocchi_api_enabled', false),
   $mistral                     = hiera('mistral_api_enabled', false),
@@ -527,6 +538,7 @@ class tripleo::haproxy (
   $nova_metadata_network       = hiera('nova_api_network', undef),
   $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', undef),
   $nova_osapi_network          = hiera('nova_api_network', undef),
+  $panko_network               = hiera('panko_api_network', undef),
   $sahara_network              = hiera('sahara_api_network', undef),
   $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
   $trove_network               = hiera('trove_api_network', undef),
@@ -574,6 +586,8 @@ class tripleo::haproxy (
     nova_metadata_port => 8775,
     nova_novnc_port => 6080,
     nova_novnc_ssl_port => 13080,
+    panko_api_port => 8779,
+    panko_api_ssl_port => 13779,
     sahara_api_port => 8386,
     sahara_api_ssl_port => 13386,
     swift_proxy_port => 8080,
@@ -959,6 +973,24 @@ class tripleo::haproxy (
       },
       public_ssl_port   => $ports[aodh_api_ssl_port],
       service_network   => $aodh_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
+    }
+  }
+
+  if $panko {
+    ::tripleo::haproxy::endpoint { 'panko':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('panko_api_vip', $controller_virtual_ip),
+      service_port      => $ports[panko_api_port],
+      ip_addresses      => hiera('panko_api_node_ips', $controller_hosts_real),
+      server_names      => hiera('panko_api_node_names', $controller_hosts_names_real),
+      listen_options    => {
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+      },
+      public_ssl_port   => $ports[panko_api_ssl_port],
+      service_network   => $panko_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
