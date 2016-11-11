@@ -30,6 +30,17 @@ class tripleo::network::os_net_config {
       Package['openvswitch'],
       Service['openvswitch'],
     ],
+    notify  => Exec['trigger-keepalived-restart'],
   }
 
+  # By modifying the keepalived.conf file we ensure that puppet will
+  # trigger a restart of keepalived during the main stage. Adding back
+  # any lost conf during the os-net-config step.
+  exec { 'trigger-keepalived-restart':
+    command     => '/usr/bin/echo "# Restart keepalived" >> /etc/keepalived/keepalived.conf',
+    path        => '/usr/bin:/bin',
+    refreshonly => true,
+    # Only if keepalived is installed
+    onlyif      => 'test -e /etc/keepalived/keepalived.conf',
+  }
 }
