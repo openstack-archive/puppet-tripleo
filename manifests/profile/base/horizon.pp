@@ -23,8 +23,13 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*neutron_options*]
+#   (Optional) A hash of parameters to enable features specific to Neutron
+#   Defaults to hiera('horizon::neutron_options', undef)
+#
 class tripleo::profile::base::horizon (
-  $step = hiera('step'),
+  $step            = hiera('step'),
+  $neutron_options = hiera('horizon::neutron_options', undef),
 ) {
   if $step >= 3 {
     # Horizon
@@ -36,7 +41,7 @@ class tripleo::profile::base::horizon (
     } else {
       $_profile_support = 'None'
     }
-    $neutron_options   = {'profile_support' => $_profile_support }
+    $neutron_options_real = merge({'profile_support' => $_profile_support }, $neutron_options)
     $memcached_ipv6 = hiera('memcached_ipv6', false)
     if $memcached_ipv6 {
       $horizon_memcached_servers = hiera('memcached_node_ips_v6', '[::1]')
@@ -45,7 +50,7 @@ class tripleo::profile::base::horizon (
     }
     class { '::horizon':
       cache_server_ip => $horizon_memcached_servers,
-      neutron_options => $neutron_options,
+      neutron_options => $neutron_options_real,
     }
   }
 }
