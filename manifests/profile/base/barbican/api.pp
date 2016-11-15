@@ -18,9 +18,38 @@
 #
 # === Parameters
 #
+# [*barbican_network*]
+#   (Optional) The network name where the barbican endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('barbican_api_network', undef)
+#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
+#
+# [*certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Example with hiera:
+#     apache_certificates_specs:
+#       httpd-internal_api:
+#         hostname: <overcloud controller fqdn>
+#         service_certificate: <service certificate path>
+#         service_key: <service key path>
+#         principal: "haproxy/<overcloud controller fqdn>"
+#   Defaults to hiera('apache_certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*generate_service_certificates*]
+#   (Optional) Whether or not certmonger will generate certificates for
+#   HAProxy. This could be as many as specified by the $certificates_specs
+#   variable.
+#   Note that this doesn't configure the certificates in haproxy, it merely
+#   creates the certificates.
+#   Defaults to hiera('generate_service_certificate', false).
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,13 +57,32 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::barbican::api (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $barbican_network              = hiera('barbican_api_network', undef),
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $certificates_specs            = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $generate_service_certificates = hiera('generate_service_certificates', false),
+  $step                          = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false
+  }
+
+  if $enable_internal_tls {
+    if $generate_service_certificates {
+      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
+    }
+
+    if !$barbican_network {
+      fail('barbican_api_network is not set in the hieradata.')
+    }
+    $tls_certfile = $certificates_specs["httpd-${barbican_network}"]['service_certificate']
+    $tls_keyfile = $certificates_specs["httpd-${barbican_network}"]['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
   }
 
   include ::tripleo::profile::base::barbican
@@ -51,6 +99,9 @@ class tripleo::profile::base::barbican::api (
     include ::barbican::api::logging
     include ::barbican::keystone::notification
     include ::barbican::quota
-    include ::barbican::wsgi::apache
+    class { '::barbican::wsgi::apache':
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
+    }
   }
 }
