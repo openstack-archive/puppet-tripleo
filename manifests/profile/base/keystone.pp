@@ -76,20 +76,19 @@
 #
 # [*heat_admin_domain*]
 #   domain name for heat admin
-#   Defaults to hiera('heat::keystone::domain::domain_name', 'heat')
+#   Defaults to undef
 #
 # [*heat_admin_user*]
 #   heat admin user name
-#   Defaults to hiera('heat::keystone::domain::domain_admin', 'heat_admin')
+#   Defaults to undef
 #
 # [*heat_admin_email*]
 #   heat admin email address
-#   Defaults to hiera('heat::keystone::domain::domain_admin_email',
-#     'heat_admin@localhost')
+#   Defaults to undef
 #
 # [*heat_admin_password*]
 #   heat admin password
-#   Defaults to hiera('heat::keystone::domain::domain_password')
+#   Defaults to undef
 #
 class tripleo::profile::base::keystone (
   $admin_endpoint_network        = hiera('keystone_admin_api_network', undef),
@@ -102,10 +101,10 @@ class tripleo::profile::base::keystone (
   $rabbit_hosts                  = hiera('rabbitmq_node_ips', undef),
   $rabbit_port                   = hiera('keystone::rabbit_port', 5672),
   $step                          = hiera('step'),
-  $heat_admin_domain             = hiera('heat::keystone::domain::domain_name', 'heat'),
-  $heat_admin_user               = hiera('heat::keystone::domain::domain_admin', 'heat_admin'),
-  $heat_admin_email              = hiera('heat::keystone::domain::domain_admin_email', 'heat_admin@localhost'),
-  $heat_admin_password           = hiera('heat::keystone::domain::domain_password'),
+  $heat_admin_domain             = undef,
+  $heat_admin_user               = undef,
+  $heat_admin_email              = undef,
+  $heat_admin_password           = undef,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
