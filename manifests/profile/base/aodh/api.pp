@@ -52,10 +52,6 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*enable_combination_alarms*]
-#   (optional) Setting to enable combination alarms
-#   Defaults to: false
-#
 
 class tripleo::profile::base::aodh::api (
   $aodh_network                  = hiera('aodh_api_network', undef),
@@ -63,7 +59,6 @@ class tripleo::profile::base::aodh::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $generate_service_certificates = hiera('generate_service_certificates', false),
   $step                          = hiera('step'),
-  $enable_combination_alarms     = false,
 ) {
 
   include ::tripleo::profile::base::aodh
@@ -89,13 +84,6 @@ class tripleo::profile::base::aodh::api (
     class { '::aodh::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
-    }
-
-    #NOTE: Combination alarms are deprecated in newton and disabled by default.
-    # we need a way to override this setting for users still using this type
-    # of alarms.
-    aodh_config {
-      'api/enable_combination_alarms' : value => $enable_combination_alarms;
     }
   }
 }
