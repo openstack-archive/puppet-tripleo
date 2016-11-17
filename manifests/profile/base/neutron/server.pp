@@ -27,9 +27,30 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*l3_ha_override*]
+#   (Optional) Override the calculated value for neutron::server::l3_ha
+#   by default this is calculated to enable when DVR is not enabled
+#   and the number of nodes running neutron api is more than one.
+#   Defaults to '' which aligns with the t-h-t default, and means use
+#   the calculated value.  Other possible values are 'true' or 'false'
+#
+# [*l3_nodes*]
+#   (Optional) List of nodes running the l3 agent, used when no override
+#   is passed to l3_ha_override to calculate enabling l3 HA.
+#   Defaults to hiera('neutron_l3_short_node_names') or []
+#   (we need to default neutron_l3_short_node_names to an empty list
+#   because some neutron backends disable the l3 agent)
+#
+# [*dvr_enabled*]
+#   (Optional) Is dvr enabled, used when no override is passed to
+#   l3_ha_override to calculate enabling l3 HA.
+#   Defaults to  hiera('neutron::server::router_distributed') or false
 class tripleo::profile::base::neutron::server (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = hiera('step'),
+  $l3_ha_override = '',
+  $l3_nodes       = hiera('neutron_l3_short_node_names', []),
+  $dvr_enabled    = hiera('neutron::server::router_distributed', false)
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -38,6 +59,16 @@ class tripleo::profile::base::neutron::server (
   }
 
   include ::tripleo::profile::base::neutron
+
+  # Calculate neutron::server::l3_ha based on the number of API nodes
+  # combined with if DVR is enabled.
+  if $l3_ha_override != '' {
+    $l3_ha = str2bool($l3_ha_override)
+  } elsif ! str2bool($dvr_enabled) {
+    $l3_ha = size($l3_nodes) > 1
+  } else {
+    $l3_ha = false
+  }
 
   # We start neutron-server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens
@@ -48,12 +79,14 @@ class tripleo::profile::base::neutron::server (
     # to true
     class { '::neutron::server':
       sync_db => $sync_db,
+      l3_ha   => $l3_ha,
     }
   }
   if $step >= 5 and !$sync_db {
     include ::neutron::server::notifications
     class { '::neutron::server':
       sync_db => $sync_db,
+      l3_ha   => $l3_ha,
     }
   }
 }
