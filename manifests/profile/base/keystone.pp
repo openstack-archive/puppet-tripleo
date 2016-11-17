@@ -51,6 +51,22 @@
 #   creates the certificates.
 #   Defaults to hiera('generate_service_certificate', false).
 #
+# [*heat_admin_domain*]
+#   domain name for heat admin
+#   Defaults to undef
+#
+# [*heat_admin_email*]
+#   heat admin email address
+#   Defaults to undef
+#
+# [*heat_admin_password*]
+#   heat admin password
+#   Defaults to undef
+#
+# [*heat_admin_user*]
+#   heat admin user name
+#   Defaults to undef
+#
 # [*manage_db_purge*]
 #   (Optional) Whether keystone token flushing should be enabled
 #   Defaults to hiera('keystone_enable_db_purge', true)
@@ -74,37 +90,21 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*heat_admin_domain*]
-#   domain name for heat admin
-#   Defaults to undef
-#
-# [*heat_admin_user*]
-#   heat admin user name
-#   Defaults to undef
-#
-# [*heat_admin_email*]
-#   heat admin email address
-#   Defaults to undef
-#
-# [*heat_admin_password*]
-#   heat admin password
-#   Defaults to undef
-#
 class tripleo::profile::base::keystone (
   $admin_endpoint_network        = hiera('keystone_admin_api_network', undef),
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $generate_service_certificates = hiera('generate_service_certificates', false),
+  $heat_admin_domain             = undef,
+  $heat_admin_email              = undef,
+  $heat_admin_password           = undef,
+  $heat_admin_user               = undef,
   $manage_db_purge               = hiera('keystone_enable_db_purge', true),
   $public_endpoint_network       = hiera('keystone_public_api_network', undef),
   $rabbit_hosts                  = hiera('rabbitmq_node_ips', undef),
   $rabbit_port                   = hiera('keystone::rabbit_port', 5672),
   $step                          = hiera('step'),
-  $heat_admin_domain             = undef,
-  $heat_admin_user               = undef,
-  $heat_admin_email              = undef,
-  $heat_admin_password           = undef,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
