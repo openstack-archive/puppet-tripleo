@@ -21,7 +21,7 @@
 #
 # [*keepalived*]
 #  Whether to configure keepalived to manage the VIPs or not.
-#  Defaults to true
+#  Defaults to hiera('keepalived_enabled')
 #
 # [*haproxy_service_manage*]
 #  Will be passed as value for service_manage to HAProxy module.
@@ -449,7 +449,7 @@
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
-  $keepalived                  = true,
+  $keepalived                  = hiera('keepalived_enabled', false),
   $haproxy_service_manage      = true,
   $haproxy_global_maxconn      = 20480,
   $haproxy_default_maxconn     = 4096,
@@ -606,7 +606,7 @@ class tripleo::haproxy (
   }
 
   # This code will be removed once we switch undercloud and overcloud to use both haproxy & keepalived roles.
-  if $keepalived {
+  if str2bool($keepalived) {
     include ::tripleo::keepalived
     # Make sure keepalive starts before haproxy.
     Class['::keepalived::service'] -> Class['::haproxy']
