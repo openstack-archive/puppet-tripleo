@@ -117,6 +117,11 @@
 #  String that sets the default ssl options to force on all "bind" lines.
 #  Defaults to 'no-sslv3'
 #
+# [*ca_bundle*]
+#  Path to the CA bundle to be used for HAProxy to validate the certificates of
+#  the servers it balances
+#  Defaults to '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'
+#
 # [*haproxy_stats_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the haproxy stats endpoint using the specified file.
@@ -472,6 +477,7 @@ class tripleo::haproxy (
   $enable_internal_tls         = hiera('enable_internal_tls', false),
   $ssl_cipher_suite            = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
   $ssl_options                 = 'no-sslv3',
+  $ca_bundle                   = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
   $haproxy_stats_certificate   = undef,
   $keystone_admin              = hiera('keystone_enabled', false),
   $keystone_public             = hiera('keystone_enabled', false),
@@ -601,8 +607,7 @@ class tripleo::haproxy (
   $ports = merge($default_service_ports, $service_ports)
 
   if $enable_internal_tls {
-    # TODO(jaosorior): change verify none to verify required.
-    $internal_tls_member_options = ['ssl', 'verify none']
+    $internal_tls_member_options = ['ssl', 'verify required', "ca-file ${ca_bundle}"]
   } else {
     $internal_tls_member_options = []
   }
