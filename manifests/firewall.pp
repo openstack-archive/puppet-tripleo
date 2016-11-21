@@ -51,8 +51,6 @@ class tripleo::firewall(
   $firewall_post_extras = {},
 ) {
 
-  include ::stdlib
-
   if $manage_firewall {
 
     # Only purges IPv4 rules
@@ -79,13 +77,14 @@ class tripleo::firewall(
 
     ensure_resource('class', 'tripleo::firewall::pre', {
       'firewall_settings' => $firewall_pre_extras,
-      'stage'             => 'setup',
     })
 
     ensure_resource('class', 'tripleo::firewall::post', {
-      'stage'             => 'runtime',
       'firewall_settings' => $firewall_post_extras,
     })
+
+    Class['tripleo::firewall::pre'] -> Class['tripleo::firewall::post']
+    Service<||> -> Class['tripleo::firewall::post']
 
     # Allow composable services to load their own custom
     # example with Hiera.
