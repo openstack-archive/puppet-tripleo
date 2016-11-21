@@ -143,6 +143,9 @@ class tripleo::profile::base::database::mysql (
     if hiera('trove_api_enabled', false) {
       include ::trove::db::mysql
     }
+    if hiera('panko_api_enabled', false) {
+      include ::panko::db::mysql
+    }
   }
 
 }
