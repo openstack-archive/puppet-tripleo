@@ -68,19 +68,8 @@ class tripleo::profile::base::ceilometer::collector (
       if !$mongodb_replset {
         fail('mongodb_replset is required when using mongodb')
       }
-      # NOTE(gfidente): We need to pass the list of IPv6 addresses *with* port
-      # and without the brackets as 'members' argument for the 'mongodb_replset'
-      # resource.
-      if str2bool($mongodb_ipv6) {
-        $mongo_node_ips_with_port_prefixed = prefix($mongodb_node_ips, '[')
-        $mongo_node_ips_with_port = suffix($mongo_node_ips_with_port_prefixed, ']:27017')
-        $mongo_node_ips_with_port_nobr = suffix($mongodb_node_ips, ':27017')
-      } else {
-        $mongo_node_ips_with_port = suffix($mongodb_node_ips, ':27017')
-        $mongo_node_ips_with_port_nobr = suffix($mongodb_node_ips, ':27017')
-      }
-      $mongo_node_string = join($mongo_node_ips_with_port, ',')
-
+      $mongo_nodes = suffix(any2array(normalize_ip_for_uri($mongodb_node_ips)), ':27017')
+      $mongo_node_string = join($mongo_nodes, ',')
       $ceilometer_mongodb_conn_string = "mongodb://${mongo_node_string}/ceilometer?replicaSet=${mongodb_replset}"
 
       class { '::ceilometer::db' :
