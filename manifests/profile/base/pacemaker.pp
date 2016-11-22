@@ -27,10 +27,50 @@
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
 #
+# [*remote_short_node_names*]
+#   (Optional) List of short node names for pacemaker remote nodes
+#   Defaults to hiera('pacemaker_remote_short_node_names', [])
+#
+# [*remote_node_ips*]
+#   (Optional) List of node ips for pacemaker remote nodes
+#   Defaults to hiera('pacemaker_remote_node_ips', [])
+#
+# [*remote_authkey*]
+#   (Optional) Authkey for pacemaker remote nodes
+#   Defaults to undef
+#
+# [*remote_reconnect_interval*]
+#   (Optional) Reconnect interval for the remote
+#   Defaults to hiera('pacemaker_remote_reconnect_interval', 60)
+#
+# [*remote_monitor_interval*]
+#   (Optional) Monitor interval for the remote
+#   Defaults to hiera('pacemaker_monitor_reconnect_interval', 20)
+#
+# [*remote_tries*]
+#   (Optional) Number of tries for the remote resource creation
+#   Defaults to hiera('pacemaker_remote_tries', 5)
+#
+# [*remote_try_sleep*]
+#   (Optional) Number of seconds to sleep between remote creation tries
+#   Defaults to hiera('pacemaker_remote_try_sleep', 60)
+#
 class tripleo::profile::base::pacemaker (
-  $step      = hiera('step'),
-  $pcs_tries = hiera('pcs_tries', 20),
+  $step                      = hiera('step'),
+  $pcs_tries                 = hiera('pcs_tries', 20),
+  $remote_short_node_names   = hiera('pacemaker_remote_short_node_names', []),
+  $remote_node_ips           = hiera('pacemaker_remote_node_ips', []),
+  $remote_authkey            = undef,
+  $remote_reconnect_interval = hiera('pacemaker_remote_reconnect_interval', 60),
+  $remote_monitor_interval   = hiera('pacemaker_remote_monitor_interval', 20),
+  $remote_tries              = hiera('pacemaker_remote_tries', 5),
+  $remote_try_sleep          = hiera('pacemaker_remote_try_sleep', 60),
 ) {
+
+  if count($remote_short_node_names) != count($remote_node_ips) {
+    fail("Count of ${remote_short_node_names} is not equal to count of ${remote_node_ips}")
+  }
+
   Pcmk_resource <| |> {
     tries     => 10,
     try_sleep => 3,
@@ -60,6 +100,7 @@ class tripleo::profile::base::pacemaker (
       cluster_members      => $pacemaker_cluster_members,
       setup_cluster        => $pacemaker_master,
       cluster_setup_extras => $cluster_setup_extras,
+      remote_authkey       => $remote_authkey,
     }
     class { '::pacemaker::stonith':
       disable => !$enable_fencing,
@@ -74,6 +115,21 @@ class tripleo::profile::base::pacemaker (
       Exec <| tag == 'pacemaker_constraint' |> -> Class['tripleo::fencing']
       # enable stonith after all fencing devices have been created
       Class['tripleo::fencing'] -> Class['pacemaker::stonith']
+    }
+    # We have pacemaker remote nodes configured so let's add them as resources
+    # We do this during step 1 right after wait-for-settle, because during step 2
+    # resources might already be created on pacemaker remote nodes and we need
+    # a guarantee that remote nodes are already up
+    if $pacemaker_master and count($remote_short_node_names) > 0 {
+      # Creates a { "node" => "ip_address", ...} hash
+      $remotes_hash = hash(zip($remote_short_node_names, $remote_node_ips))
+      pacemaker::resource::remote { $remote_short_node_names:
+        remote_address     => $remotes_hash[$title],
+        reconnect_interval => $remote_reconnect_interval,
+        op_params          => "monitor interval=${remote_monitor_interval}",
+        tries              => $remote_tries,
+        try_sleep          => $remote_try_sleep,
+      }
     }
   }
 
