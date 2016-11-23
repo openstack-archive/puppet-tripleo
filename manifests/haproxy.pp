@@ -823,6 +823,7 @@ class tripleo::haproxy (
       service_port      => $ports[manila_api_port],
       ip_addresses      => hiera('manila_api_node_ips', $controller_hosts_real),
       server_names      => hiera('manila_api_node_names', $controller_hosts_names_real),
+      mode              => 'http',
       listen_options    => {
           'http-request' => [
             'set-header X-Forwarded-Proto https if { ssl_fc }',
