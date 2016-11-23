@@ -76,7 +76,8 @@ describe 'tripleo::firewall' do
             '301 add custom application 2' => {'port' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
             '302 fwd custom cidr 1'        => {'chain' => 'FORWARD', 'destination' => '192.0.2.0/24'},
             '303 add custom application 3' => {'dport' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
-            '304 add custom application 4' => {'sport' => '1000', 'proto' => 'tcp', 'action' => 'accept'}
+            '304 add custom application 4' => {'sport' => '1000', 'proto' => 'tcp', 'action' => 'accept'},
+            '305 add gre rule'             => {'proto' => 'gre'}
           }
         )
       end
@@ -109,6 +110,7 @@ describe 'tripleo::firewall' do
           :action => 'accept',
           :state  => ['NEW'],
         )
+        is_expected.to contain_firewall('305 add gre rule').without(:state)
       end
     end
 

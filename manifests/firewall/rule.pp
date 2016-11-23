@@ -83,14 +83,21 @@ define tripleo::firewall::rule (
     'sport'       => $sport,
     'proto'       => $proto,
     'action'      => $action,
-    'state'       => $state,
     'source'      => $source,
     'iniface'     => $iniface,
     'chain'       => $chain,
     'destination' => $destination,
   }
+  if $proto != 'gre' {
+    $state_rule = {
+      'state' => $state
+    }
+  } else {
+    $state_rule = {}
+  }
 
-  $rule = merge($basic, $extras)
+
+  $rule = merge($basic, $state_rule, $extras)
   validate_hash($rule)
 
   create_resources('firewall', { "${title}" => $rule })
