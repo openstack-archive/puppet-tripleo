@@ -43,6 +43,18 @@
 #   (Optional) Array of host(s) for RabbitMQ nodes.
 #   Defaults to hiera('rabbitmq_node_names', []).
 #
+# [*rabbitmq_pass*]
+#   (Optional) RabbitMQ Default Password.
+#   Defaults to hiera('rabbitmq::default_pass')
+#
+# [*rabbitmq_user*]
+#   (Optional) RabbitMQ Default User.
+#   Defaults to hiera('rabbitmq::default_user')
+#
+# [*stack_action*]
+#   (Optional) Action of the stack deployment.
+#   Defaults to hiera('stack_action')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -55,6 +67,9 @@ class tripleo::profile::base::rabbitmq (
   $kernel_variables    = hiera('rabbitmq_kernel_variables'),
   $inet_dist_interface = hiera('rabbitmq::interface', undef),
   $nodes               = hiera('rabbitmq_node_names', []),
+  $rabbitmq_pass       = hiera('rabbitmq::default_pass'),
+  $rabbitmq_user       = hiera('rabbitmq::default_user'),
+  $stack_action        = hiera('stack_action'),
   $step                = hiera('step'),
 ) {
   # IPv6 environment, necessary for RabbitMQ.
@@ -101,6 +116,17 @@ class tripleo::profile::base::rabbitmq (
         config_kernel_variables => $kernel_variables,
         config_variables        => $config_variables,
         environment_variables   => $rabbit_env,
+      }
+    }
+    # In case of HA, starting of rabbitmq-server is managed by pacemaker, because of which, a dependency
+    # to Service['rabbitmq-server'] will not work. Sticking with UPDATE action.
+    if $stack_action == 'UPDATE' {
+      # Required for changing password on update scenario. Password will be changed only when
+      # called explicity, if the rabbitmq service is already running.
+      rabbitmq_user { $rabbitmq_user :
+        password => $rabbitmq_pass,
+        provider => 'rabbitmqctl',
+        admin    => true,
       }
     }
   }
