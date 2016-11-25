@@ -18,18 +18,69 @@
 #
 # === Parameters
 #
+# [*certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Example with hiera:
+#     apache_certificates_specs:
+#       httpd-internal_api:
+#         hostname: <overcloud controller fqdn>
+#         service_certificate: <service certificate path>
+#         service_key: <service key path>
+#         principal: "haproxy/<overcloud controller fqdn>"
+#   Defaults to hiera('apache_certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*generate_service_certificates*]
+#   (Optional) Whether or not certmonger will generate certificates for
+#   HAProxy. This could be as many as specified by the $certificates_specs
+#   variable.
+#   Note that this doesn't configure the certificates in haproxy, it merely
+#   creates the certificates.
+#   Defaults to hiera('generate_service_certificate', false).
+#
+# [*panko_network*]
+#   (Optional) The network name where the panko endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('panko_api_network', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::panko::api (
-  $step = hiera('step'),
+  $certificates_specs            = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $generate_service_certificates = hiera('generate_service_certificates', false),
+  $panko_network                 = hiera('panko_api_network', undef),
+  $step                          = hiera('step'),
 ) {
   include ::tripleo::profile::base::panko
 
+  if $enable_internal_tls {
+    if $generate_service_certificates {
+      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
+    }
+
+    if !$panko_network {
+      fail('panko_api_network is not set in the hieradata.')
+    }
+    $tls_certfile = $certificates_specs["httpd-${panko_network}"]['service_certificate']
+    $tls_keyfile = $certificates_specs["httpd-${panko_network}"]['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
+  }
+
   if $step >= 4 {
     include ::panko::api
-    include ::panko::wsgi::apache
+    class { '::panko::wsgi::apache':
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
+    }
   }
 }
