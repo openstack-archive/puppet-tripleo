@@ -36,7 +36,7 @@
 #
 # [*nodes*]
 #   (Optional) Array of host(s) for RabbitMQ nodes.
-#   Defaults to hiera('rabbitmq_node_ips', []).
+#   Defaults to hiera('rabbitmq_node_names', []).
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -48,7 +48,7 @@ class tripleo::profile::base::rabbitmq (
   $environment      = hiera('rabbitmq_environment'),
   $ipv6             = str2bool(hiera('rabbit_ipv6', false)),
   $kernel_variables = hiera('rabbitmq_kernel_variables'),
-  $nodes            = hiera('rabbitmq_node_ips', []),
+  $nodes            = hiera('rabbitmq_node_names', []),
   $step             = hiera('step'),
 ) {
   # IPv6 environment, necessary for RabbitMQ.
