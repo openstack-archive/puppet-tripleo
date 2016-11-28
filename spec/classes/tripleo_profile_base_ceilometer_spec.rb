@@ -30,7 +30,7 @@ describe 'tripleo::profile::base::ceilometer' do
     context 'with step 3' do
       let(:params) { {
         :step           => 3,
-        :rabbit_hosts   => ['127.0.0.1', '127.0.0.2']
+        :rabbit_hosts   => ['localhost1.localdomain', 'localhost2.localdomain']
       } }
 
       it 'should trigger complete configuration' do

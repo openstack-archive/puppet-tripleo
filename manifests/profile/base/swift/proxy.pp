@@ -32,8 +32,8 @@
 #   Defaults to 11211
 #
 # [*rabbit_hosts*]
-#   list of the rabbbit host IPs
-#   Defaults to hiera('rabbitmq_node_ips')
+#   list of the rabbbit host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
 #
 # [*rabbit_port*]
 #   IP port for rabbitmq service
@@ -43,7 +43,7 @@ class tripleo::profile::base::swift::proxy (
   $step             = hiera('step'),
   $memcache_servers = hiera('memcached_node_ips'),
   $memcache_port    = 11211,
-  $rabbit_hosts     = hiera('rabbitmq_node_ips', undef),
+  $rabbit_hosts     = hiera('rabbitmq_node_names', undef),
   $rabbit_port      = hiera('swift::proxy::ceilometer::rabbit_port', 5672),
 ) {
   if $step >= 4 {
@@ -63,7 +63,7 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::tempurl
     include ::swift::proxy::formpost
     include ::swift::proxy::bulk
-    $swift_rabbit_hosts = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
+    $swift_rabbit_hosts = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::swift::proxy::ceilometer':
       rabbit_hosts => $swift_rabbit_hosts,
     }

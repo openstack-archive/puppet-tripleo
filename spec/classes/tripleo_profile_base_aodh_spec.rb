@@ -34,7 +34,7 @@ describe 'tripleo::profile::base::aodh' do
       let(:params) { {
         :step           => 3,
         :bootstrap_node => 'node.example.com',
-        :rabbit_hosts   => ['127.0.0.1', '127.0.0.2']
+        :rabbit_hosts   => ['localhost1.localdomain', 'localhost2.localdomain']
       } }
 
       it 'should trigger complete configuration' do
@@ -67,7 +67,7 @@ describe 'tripleo::profile::base::aodh' do
       let(:params) { {
         :step           => 4,
         :bootstrap_node => 'somethingelse.example.com',
-        :rabbit_hosts   => ['127.0.0.1', '127.0.0.2']
+        :rabbit_hosts   => ['localhost1.localdomain', 'localhost2.localdomain']
       } }
 
       it 'should trigger aodh configuration without mysql grant' do

@@ -36,8 +36,8 @@
 #   Defaults to hiera('step')
 #
 # [*rabbit_hosts*]
-#   list of the rabbbit host IPs
-#   Defaults to hiera('rabbitmq_node_ips')
+#   list of the rabbbit host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
 #
 # [*rabbit_port*]
 #   IP port for rabbitmq service
@@ -48,7 +48,7 @@ class tripleo::profile::base::heat (
   $manage_db_purge     = hiera('heat_enable_db_purge', true),
   $notification_driver = 'messaging',
   $step                = hiera('step'),
-  $rabbit_hosts        = hiera('rabbitmq_node_ips', undef),
+  $rabbit_hosts        = hiera('rabbitmq_node_names', undef),
   $rabbit_port         = hiera('heat::rabbit_port', 5672),
 ) {
   # Domain resources will be created at step5 on the node running keystone.pp
@@ -62,7 +62,7 @@ class tripleo::profile::base::heat (
   }
 
   if $step >= 4 {
-    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
+    $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::heat' :
       notification_driver => $notification_driver,
       rabbit_hosts        => $rabbit_endpoints,
