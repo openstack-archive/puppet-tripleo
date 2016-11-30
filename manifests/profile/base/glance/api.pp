@@ -32,8 +32,8 @@
 #   Defaults to hiera('step')
 #
 # [*rabbit_hosts*]
-#   list of the rabbbit host IPs
-#   Defaults to hiera('rabbitmq_node_ips')
+#   list of the rabbbit host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
 #
 # [*rabbit_port*]
 #   IP port for rabbitmq service
@@ -43,7 +43,7 @@ class tripleo::profile::base::glance::api (
   $glance_backend     = downcase(hiera('glance_backend', 'swift')),
   $glance_nfs_enabled = false,
   $step               = hiera('step'),
-  $rabbit_hosts       = hiera('rabbitmq_node_ips', undef),
+  $rabbit_hosts       = hiera('rabbitmq_node_names', undef),
   $rabbit_port        = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
 ) {
 
@@ -67,7 +67,7 @@ class tripleo::profile::base::glance::api (
     class { '::glance::api':
       stores => $glance_store,
     }
-    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
+    $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::glance::notify::rabbitmq' :
       rabbit_hosts => $rabbit_endpoints,
     }

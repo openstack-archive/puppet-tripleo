@@ -31,8 +31,8 @@
 #   Defaults to hiera('step')
 #
 # [*rabbit_hosts*]
-#   list of the rabbbit host IPs
-#   Defaults to hiera('rabbitmq_node_ips')
+#   list of the rabbbit host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
 #
 # [*rabbit_port*]
 #   IP port for rabbitmq service
@@ -42,7 +42,7 @@ class tripleo::profile::base::cinder (
   $bootstrap_node         = hiera('bootstrap_nodeid', undef),
   $cinder_enable_db_purge = true,
   $step                   = hiera('step'),
-  $rabbit_hosts           = hiera('rabbitmq_node_ips', undef),
+  $rabbit_hosts           = hiera('rabbitmq_node_names', undef),
   $rabbit_port            = hiera('cinder::rabbit_port', 5672),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -52,7 +52,7 @@ class tripleo::profile::base::cinder (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
+    $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::cinder' :
       rabbit_hosts => $rabbit_endpoints,
     }

@@ -19,7 +19,7 @@ require 'spec_helper'
 describe 'tripleo::profile::base::ceilometer::collector' do
   shared_examples_for 'tripleo::profile::base::ceilometer::collector' do
     let(:pre_condition) do
-      "class { '::tripleo::profile::base::ceilometer': step => #{params[:step]}, rabbit_hosts => ['127.0.0.1'] }"
+      "class { '::tripleo::profile::base::ceilometer': step => #{params[:step]}, rabbit_hosts => ['localhost.localdomain'] }"
     end
 
     context 'with step 3 on bootstrap node with mongodb' do
