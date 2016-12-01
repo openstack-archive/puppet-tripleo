@@ -14,6 +14,13 @@ barbican::keystone::authtoken::password: 'password'
 ceilometer::keystone::authtoken::password: 'password'
 # ceph related items
 ceph::profile::params::mon_key: 'password'
+# NOTE(gfidente): we want to use keystone v3 API for RGW so the following are
+# needed to comply with the if condition:
+# https://github.com/openstack/puppet-ceph/blob/master/manifests/rgw/keystone.pp#L111
+ceph::profile::params::rgw_keystone_admin_domain: 'keystone_domain'
+ceph::profile::params::rgw_keystone_admin_project: 'keystone_project'
+ceph::profile::params::rgw_keystone_admin_user: 'keystone_admin_user'
+ceph::profile::params::rgw_keystone_admin_password: 'keystone_admin_password'
 # cinder related items
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
