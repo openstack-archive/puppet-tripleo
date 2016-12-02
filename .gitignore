@@ -9,3 +9,6 @@ coverage/
 *.swp
 *.iml
 openstack/
+# Files created from releasenotes build
+releasenotes/build
+.tox
