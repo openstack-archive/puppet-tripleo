@@ -42,6 +42,11 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
+# [*generate_dropin_file_limit*]
+#   (Optional) Generate a systemd drop-in file to raise the file descriptor
+#   limit for the mysql service.
+#   Defaults to false
+#
 # [*generate_service_certificates*]
 #   (Optional) Whether or not certmonger will generate certificates for
 #   MySQL. This could be as many as specified by the $certificates_specs
@@ -72,6 +77,7 @@ class tripleo::profile::base::database::mysql (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificate_specs             = {},
   $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $generate_dropin_file_limit    = false,
   $generate_service_certificates = hiera('generate_service_certificates', false),
   $manage_resources              = true,
   $mysql_server_options          = {},
@@ -138,6 +144,15 @@ class tripleo::profile::base::database::mysql (
       service_manage          => $manage_resources,
       service_enabled         => $manage_resources,
       remove_default_accounts => $remove_default_accounts,
+    }
+
+    if $generate_dropin_file_limit {
+      # Raise the mysql file limit
+      ::systemd::service_limits { 'mariadb.service':
+        limits => {
+          LimitNOFILE => 16384
+        }
+      }
     }
   }
 
