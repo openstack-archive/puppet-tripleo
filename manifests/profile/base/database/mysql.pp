@@ -150,7 +150,7 @@ class tripleo::profile::base::database::mysql (
     if hiera('cinder_api_enabled', false) {
       include ::cinder::db::mysql
     }
-    if hiera('glance_registry_enabled', false) {
+    if hiera('glance_api_enabled', false) {
       include ::glance::db::mysql
     }
     if hiera('gnocchi_api_enabled', false) {
