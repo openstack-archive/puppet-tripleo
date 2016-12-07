@@ -19,6 +19,7 @@
 # === Parameters
 #
 # [*bootstrap_node*]
+#   DEPRECATED
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
@@ -32,23 +33,16 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::glance::registry (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node = undef,
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
   $step           = hiera('step'),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
-    $sync_db = true
-  } else {
-    $sync_db = false
-  }
 
-  if $step >= 4 or ( $step >= 3 and $sync_db ) {
+  if $step >= 4 {
     # TODO: notifications, scrubber, etc.
     include ::glance
     include ::glance::config
-    class { '::glance::registry' :
-      sync_db        => $sync_db,
-    }
+    include ::glance::registry
     include ::glance::notify::rabbitmq
     include join(['::glance::backend::', $glance_backend])
   }

@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*glance_backend*]
 #   (Optional) Glance backend(s) to use.
 #   Defaults to downcase(hiera('glance_backend', 'swift'))
@@ -40,6 +44,7 @@
 #   Defaults to hiera('glance::notify::rabbitmq::rabbit_port', 5672)
 
 class tripleo::profile::base::glance::api (
+  $bootstrap_node     = hiera('bootstrap_nodeid', undef),
   $glance_backend     = downcase(hiera('glance_backend', 'swift')),
   $glance_nfs_enabled = false,
   $step               = hiera('step'),
@@ -47,11 +52,17 @@ class tripleo::profile::base::glance::api (
   $rabbit_port        = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
 ) {
 
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
+
   if $step >= 1 and $glance_nfs_enabled {
     include ::tripleo::glance::nfs_mount
   }
 
-  if $step >= 4 {
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     case $glance_backend {
         'swift': { $backend_store = 'glance.store.swift.Store' }
         'file': { $backend_store = 'glance.store.filesystem.Store' }
@@ -65,7 +76,15 @@ class tripleo::profile::base::glance::api (
     include ::glance
     include ::glance::config
     class { '::glance::api':
-      stores => $glance_store,
+      stores  => $glance_store,
+      sync_db => false,
+    }
+    # When https://review.openstack.org/#/c/408554 is merged,
+    # Remove this block and set sync_db to $sync_db in glance::api.
+    if $sync_db {
+      class { '::glance::db::sync':
+        extra_params => '',
+      }
     }
     $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::glance::notify::rabbitmq' :
