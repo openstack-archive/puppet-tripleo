@@ -40,7 +40,8 @@ class tripleo::profile::base::pacemaker (
   $enable_fencing = str2bool(hiera('enable_fencing', false)) and $step >= 5
 
   if $step >= 1 {
-    $pacemaker_cluster_members = downcase(regsubst(hiera('controller_node_names'), ',', ' ', 'G'))
+    $pacemaker_short_node_names = join(hiera('pacemaker_short_node_names'), ',')
+    $pacemaker_cluster_members = downcase(regsubst($pacemaker_short_node_names, ',', ' ', 'G'))
     $corosync_ipv6 = str2bool(hiera('corosync_ipv6', false))
     if $corosync_ipv6 {
       $cluster_setup_extras = { '--token' => hiera('corosync_token_timeout', 1000), '--ipv6' => '' }
