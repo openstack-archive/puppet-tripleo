@@ -919,6 +919,7 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
       service_network   => $glance_api_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
