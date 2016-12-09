@@ -14,3 +14,6 @@ barbican::keystone::authtoken::password: 'password'
 ceilometer::keystone::authtoken::password: 'password'
 # ceph related items
 ceph::profile::params::mon_key: 'password'
+# cinder related items
+cinder::rabbit_password: 'password'
+cinder::keystone::authtoken::password: 'password'

@@ -108,13 +108,19 @@ class tripleo::profile::base::cinder::volume (
       $cinder_rbd_backend_name = undef
     }
 
-    $cinder_enabled_backends = delete_undef_values([$cinder_iscsi_backend_name,
-                                                    $cinder_rbd_backend_name,
-                                                    $cinder_eqlx_backend_name,
-                                                    $cinder_dellsc_backend_name,
-                                                    $cinder_netapp_backend_name,
-                                                    $cinder_nfs_backend_name,
-                                                    $cinder_user_enabled_backends])
+    $backends = delete_undef_values([$cinder_iscsi_backend_name,
+                                      $cinder_rbd_backend_name,
+                                      $cinder_eqlx_backend_name,
+                                      $cinder_dellsc_backend_name,
+                                      $cinder_netapp_backend_name,
+                                      $cinder_nfs_backend_name,
+                                      $cinder_user_enabled_backends])
+    # NOTE(aschultz): during testing it was found that puppet 3 may incorrectly
+    # include a "" in the previous array which is not removed by the
+    # delete_undef_values function. So we need to make sure we don't have any
+    # "" strings in our array.
+    $cinder_enabled_backends = delete($backends, '')
+
     class { '::cinder::backends' :
       enabled_backends => $cinder_enabled_backends,
     }
