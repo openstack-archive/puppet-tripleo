@@ -37,14 +37,19 @@
 #
 # [*rabbit_port*]
 #   IP port for rabbitmq service
-#   Defaults to hiera('swift::proxy::ceilometer::rabbit_port', 5672)
+#   Defaults to 5672
+#
+# [*ceilometer_enabled*]
+#   Whether the ceilometer pipeline is enabled.
+#   Defaults to true
 #
 class tripleo::profile::base::swift::proxy (
-  $step             = hiera('step'),
-  $memcache_servers = hiera('memcached_node_ips'),
-  $memcache_port    = 11211,
-  $rabbit_hosts     = hiera('rabbitmq_node_names', undef),
-  $rabbit_port      = hiera('swift::proxy::ceilometer::rabbit_port', 5672),
+  $step               = hiera('step'),
+  $memcache_servers   = hiera('memcached_node_ips'),
+  $memcache_port      = 11211,
+  $rabbit_hosts       = hiera('rabbitmq_node_names', undef),
+  $rabbit_port        = 5672,
+  $ceilometer_enabled = true,
 ) {
   if $step >= 4 {
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
@@ -64,8 +69,10 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::formpost
     include ::swift::proxy::bulk
     $swift_rabbit_hosts = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
-    class { '::swift::proxy::ceilometer':
-      rabbit_hosts => $swift_rabbit_hosts,
+    if $ceilometer_enabled {
+      class { '::swift::proxy::ceilometer':
+        rabbit_hosts => $swift_rabbit_hosts,
+      }
     }
     include ::swift::proxy::versioned_writes
     include ::swift::proxy::slo
