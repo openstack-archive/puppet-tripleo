@@ -22,6 +22,10 @@
 #   (Optional) Whether to enable the delsc backend
 #   Defaults to true
 #
+# [*cinder_enable_hpelefthand_backend*]
+#   (Optional) Whether to enable the hpelefthand backend
+#   Defaults to false
+#
 # [*cinder_enable_eqlx_backend*]
 #   (Optional) Whether to enable the eqlx backend
 #   Defaults to true
@@ -52,14 +56,15 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::volume (
-  $cinder_enable_dellsc_backend = false,
-  $cinder_enable_eqlx_backend   = false,
-  $cinder_enable_iscsi_backend  = true,
-  $cinder_enable_netapp_backend = false,
-  $cinder_enable_nfs_backend    = false,
-  $cinder_enable_rbd_backend    = false,
-  $cinder_user_enabled_backends = hiera('cinder_user_enabled_backends', undef),
-  $step                         = hiera('step'),
+  $cinder_enable_dellsc_backend      = false,
+  $cinder_enable_hpelefthand_backend = false,
+  $cinder_enable_eqlx_backend        = false,
+  $cinder_enable_iscsi_backend       = true,
+  $cinder_enable_netapp_backend      = false,
+  $cinder_enable_nfs_backend         = false,
+  $cinder_enable_rbd_backend         = false,
+  $cinder_user_enabled_backends      = hiera('cinder_user_enabled_backends', undef),
+  $step                              = hiera('step'),
 ) {
   include ::tripleo::profile::base::cinder
 
@@ -71,6 +76,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellsc_backend_name = hiera('cinder::backend::dellsc_iscsi::volume_backend_name', 'tripleo_dellsc')
     } else {
       $cinder_dellsc_backend_name = undef
+    }
+
+    if $cinder_enable_hpelefthand_backend {
+      include ::tripleo::profile::base::cinder::volume::hpelefthand
+      $cinder_hpelefthand_backend_name = hiera('cinder::backend::hpelefthand_iscsi::volume_backend_name', 'tripleo_hpelefthand')
+    } else {
+      $cinder_hpelefthand_backend_name = undef
     }
 
     if $cinder_enable_eqlx_backend {
@@ -112,6 +124,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_rbd_backend_name,
                                       $cinder_eqlx_backend_name,
                                       $cinder_dellsc_backend_name,
+                                      $cinder_hpelefthand_backend_name,
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
                                       $cinder_user_enabled_backends])
