@@ -30,6 +30,26 @@
 #   (Optional) Whether or not manage Nova Live migration
 #   Defaults to false
 #
+# [*messaging_driver*]
+#   Driver for messaging service.
+#   Defaults to hiera('messaging_service_name', 'rabbit')
+#
+# [*messaging_hosts*]
+#   list of the messaging host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
+#
+# [*messaging_password*]
+#   Password for messaging nova queue
+#   Defaults to hiera('nova::rabbit_password')
+#
+# [*messaging_port*]
+#   IP port for messaging service
+#   Defaults to hiera('nova::rabbit_port', 5672)
+#
+# [*messaging_username*]
+#   Username for messaging nova queue
+#   Defaults to hiera('nova::rabbit_userid', 'guest')
+#
 # [*nova_compute_enabled*]
 #   (Optional) Whether or not nova-compute is enabled.
 #   Defaults to false
@@ -38,22 +58,17 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
-# [*rabbit_hosts*]
-#   list of the rabbbit host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
-#
-# [*rabbit_port*]
-#   IP port for rabbitmq service
-#   Defaults to hiera('nova::rabbit_port', 5672)
-
 class tripleo::profile::base::nova (
   $bootstrap_node       = hiera('bootstrap_nodeid', undef),
   $libvirt_enabled      = false,
   $manage_migration     = false,
+  $messaging_driver     = hiera('messaging_service_name', 'rabbit'),
+  $messaging_hosts      = any2array(hiera('rabbitmq_node_names', undef)),
+  $messaging_password   = hiera('nova::rabbit_password'),
+  $messaging_port       = hiera('nova::rabbit_port', '5672'),
+  $messaging_username   = hiera('nova::rabbit_userid', 'guest'),
   $nova_compute_enabled = false,
   $step                 = hiera('step'),
-  $rabbit_hosts         = hiera('rabbitmq_node_names', undef),
-  $rabbit_port          = hiera('nova::rabbit_port', 5672),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -68,9 +83,16 @@ class tripleo::profile::base::nova (
   }
 
   if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
-    $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
+    # TODO(ccamacho): remove sprintf once we properly type the port, needs
+    # to be a string for the os_transport_url function.
     class { '::nova' :
-      rabbit_hosts => $rabbit_endpoints,
+      default_transport_url => os_transport_url({
+        'transport' => $messaging_driver,
+        'hosts'     => $messaging_hosts,
+        'port'      => sprintf('%s', $messaging_port),
+        'username'  => $messaging_username,
+        'password'  => $messaging_password,
+      }),
     }
     include ::nova::config
     class { '::nova::cache':
