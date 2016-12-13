@@ -26,6 +26,30 @@
 #   (Optional) Whether keystone token flushing should be enabled
 #   Defaults to hiera('keystone_enable_db_purge', true)
 #
+# [*messaging_driver*]
+#   Driver for messaging service.
+#   Defaults to hiera('messaging_service_name', 'rabbit')
+#
+# [*messaging_hosts*]
+#   list of the messaging host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
+#
+# [*messaging_password*]
+#   Password for messaging heat queue
+#   Defaults to hiera('heat::rabbit_password')
+#
+# [*messaging_port*]
+#   IP port for messaging service
+#   Defaults to hiera('heat::rabbit_port', 5672)
+#
+# [*messaging_username*]
+#   Username for messaging heat queue
+#   Defaults to hiera('heat::rabbit_userid', 'guest')
+#
+# [*messaging_use_ssl*]
+#   Flag indicating ssl usage.
+#   Defaults to hiera('heat::rabbit_use_ssl', '0')
+#
 # [*notification_driver*]
 #   (Optional) Heat notification driver to use.
 #   Defaults to 'messaging'
@@ -35,21 +59,18 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*rabbit_hosts*]
-#   list of the rabbbit host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
-#
-# [*rabbit_port*]
-#   IP port for rabbitmq service
-#   Defaults to hiera('heat::rabbit_port', 5672)
 
 class tripleo::profile::base::heat (
   $bootstrap_node      = downcase(hiera('bootstrap_nodeid')),
   $manage_db_purge     = hiera('heat_enable_db_purge', true),
+  $messaging_driver    = hiera('messaging_service_name', 'rabbit'),
+  $messaging_hosts     = any2array(hiera('rabbitmq_node_names', undef)),
+  $messaging_password  = hiera('heat::rabbit_password'),
+  $messaging_port      = hiera('heat::rabbit_port', '5672'),
+  $messaging_username  = hiera('heat::rabbit_userid', 'guest'),
+  $messaging_use_ssl   = hiera('heat::rabbit_use_ssl', '0'),
   $notification_driver = 'messaging',
   $step                = hiera('step'),
-  $rabbit_hosts        = hiera('rabbitmq_node_names', undef),
-  $rabbit_port         = hiera('heat::rabbit_port', 5672),
 ) {
   # Domain resources will be created at step5 on the node running keystone.pp
   # configure heat.conf at step3 and 4 but actually create the domain later.
@@ -60,10 +81,20 @@ class tripleo::profile::base::heat (
       manage_role   => false,
     }
 
-    $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
+    $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($messaging_use_ssl)))
+
+    # TODO(ccamacho): remove sprintf once we properly type the port, needs
+    # to be a string for the os_transport_url function.
     class { '::heat' :
-      notification_driver => $notification_driver,
-      rabbit_hosts        => $rabbit_endpoints,
+      notification_driver   => $notification_driver,
+      default_transport_url => os_transport_url({
+        'transport' => $messaging_driver,
+        'hosts'     => $messaging_hosts,
+        'password'  => $messaging_password,
+        'port'      => sprintf('%s', $messaging_port),
+        'username'  => $messaging_username,
+        'ssl'       => $messaging_use_ssl_real,
+      }),
     }
     include ::heat::config
     include ::heat::cors
