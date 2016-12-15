@@ -1,13 +1,27 @@
+# Copyright 2016 Red Hat, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
 # == Class: tripleo::profile::base::metrics::collectd
 #
 # Collectd configuration for TripleO
 #
 # === Parameters
 #
-# [*collectd_plugins*]
-#   (Optional) List. A list of collectd plugins to configure (the
-#   corresponding collectd::plugin::NAME class must exist in the
-#   collectd package).
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
 #
 # [*collectd_server*]
 #   (Optional) String. The name or address of a collectd server to
@@ -28,61 +42,62 @@
 # [*collectd_securitylevel*]
 #   (Optional) String.
 #
-# [*collectd_interface*]
-#   (Optional) String. Name of a network interface.
-#
-# [*collectd_graphite_server*]
-#   (Optional) String. The name or address of a graphite server to
-#   which we should send metrics.
-#
-# [*collectd_graphite_port*]
-#   (Optional) Integer.  This is the port to which we will connect on
-#   the graphite server. Defaults to 2004.
-#
-# [*collectd_graphite_prefix*]
-#   (Optional) String. Prefix to add to metric names. Defaults to
-#   'overcloud.'.
-#
-# [*collectd_graphite_protocol*]
-#   (Optional) String. One of 'udp' or 'tcp'.
-#
+# [*service_names*]
+#   (Optional) List of strings.  A list of active services in this tripleo
+#   deployment. This is used to look up service-specific plugins that
+#   need to be installed.
 class tripleo::profile::base::metrics::collectd (
-  $collectd_plugins = [],
+  $step = hiera('step'),
 
   $collectd_server = undef,
-  $collectd_port = 25826,
+  $collectd_port = undef,
   $collectd_username = undef,
   $collectd_password = undef,
   $collectd_securitylevel = undef,
-
-  $collectd_graphite_server = undef,
-  $collectd_graphite_port = 2004,
-  $collectd_graphite_prefix = undef,
-  $collectd_graphite_protocol = 'udp'
+  $service_names = hiera('service_names', [])
 ) {
-  include ::collectd
-  ::tripleo::profile::base::metrics::collectd::plugin_helper { $collectd_plugins: }
+  if $step >= 3 {
+    include ::collectd
 
-  if ! ($collectd_graphite_protocol in ['udp', 'tcp']) {
-    fail("collectd_graphite_protocol must be one of 'udp' or 'tcp'")
-  }
-
-  if $collectd_server {
-    ::collectd::plugin::network::server { $collectd_server:
-      username      => $collectd_username,
-      password      => $collectd_password,
-      port          => $collectd_port,
-      securitylevel => $collectd_securitylevel,
+    if ! ($collectd_securitylevel in [undef, 'None', 'Sign', 'Encrypt']) {
+      fail('collectd_securitylevel must be one of (None, Sign, Encrypt).')
     }
-  }
 
-  if $collectd_graphite_server {
-    ::collectd::plugin::write_graphite::carbon { 'openstack_graphite':
-      graphitehost   => $collectd_graphite_server,
-      graphiteport   => $collectd_graphite_port,
-      graphiteprefix => $collectd_graphite_prefix,
-      protocol       => $collectd_graphite_protocol,
+    # Load per-service plugin configuration
+    ::tripleo::profile::base::metrics::collectd::collectd_service {
+      $service_names: }
+
+    # Because THT doesn't allow us to default values to undef, we need
+    # to perform a number of transformations here to avoid passing a bunch of
+    # empty strings to the collectd plugins.
+
+    $_collectd_username = empty($collectd_username) ? {
+      true    => undef,
+      default => $collectd_username
+    }
+
+    $_collectd_password = empty($collectd_password) ? {
+      true    => undef,
+      default => $collectd_password
+    }
+
+    $_collectd_port = empty($collectd_port) ? {
+      true    => undef,
+      default => $collectd_port
+    }
+
+    $_collectd_securitylevel = empty($collectd_securitylevel) ? {
+      true    => undef,
+      default => $collectd_securitylevel
+    }
+
+    if ! empty($collectd_server) {
+      ::collectd::plugin::network::server { $collectd_server:
+        username      => $_collectd_username,
+        password      => $_collectd_password,
+        port          => $_collectd_port,
+        securitylevel => $_collectd_securitylevel,
+      }
     }
   }
 }
-
