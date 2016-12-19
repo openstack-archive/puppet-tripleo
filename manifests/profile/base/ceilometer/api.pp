@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*enable_legacy_api*]
+#   (Optional) Enable legacy ceilometer api service.
+#   Defaults to hiera('enable_legacy_api', false)
+#
 # [*ceilometer_network*]
 #   (Optional) The network name where the ceilometer endpoint is listening on.
 #   This is set by t-h-t.
@@ -53,6 +57,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ceilometer::api (
+  $enable_legacy_api             = hiera('enable_legacy_ceilometer_api', false),
   $ceilometer_network            = hiera('ceilometer_api_network', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
@@ -76,7 +81,7 @@ class tripleo::profile::base::ceilometer::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 {
+  if $step >= 4 and $enable_legacy_api {
     include ::ceilometer::api
     class { '::ceilometer::wsgi::apache':
       ssl_cert => $tls_certfile,
