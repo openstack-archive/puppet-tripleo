@@ -121,14 +121,27 @@ define tripleo::haproxy::endpoint (
   }
   if hiera('manage_firewall', true) {
     include ::tripleo::firewall
-    $firewall_rules = {
-      "100 ${name}_haproxy"     => {
-        'dport' => $service_port,
-      },
-      "100 ${name}_haproxy_ssl" => {
-        'dport' => $public_ssl_port,
-      },
+    # This block will construct firewall rules only when we specify
+    # a port for the regular service and also the ssl port for the service.
+    # It makes sure we're not trying to create TCP iptables rules where no port
+    # is specified.
+    if $service_port {
+      $haproxy_firewall_rules = {
+        "100 ${name}_haproxy"     => {
+          'dport' => $service_port,
+        },
+      }
     }
-    create_resources('tripleo::firewall::rule', $firewall_rules)
+    if $public_ssl_port {
+      $haproxy_ssl_firewall_rules = {
+        "100 ${name}_haproxy_ssl" => {
+          'dport' => $public_ssl_port,
+        },
+      }
+    }
+    $firewall_rules = merge($haproxy_firewall_rules, $haproxy_ssl_firewall_rules)
+    if $service_port or $public_ssl_port {
+      create_resources('tripleo::firewall::rule', $firewall_rules)
+    }
   }
 }

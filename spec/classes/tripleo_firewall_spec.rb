@@ -74,7 +74,7 @@ describe 'tripleo::firewall' do
           :firewall_rules => {
             '300 add custom application 1' => {'port' => '999', 'proto' => 'udp', 'action' => 'accept'},
             '301 add custom application 2' => {'port' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
-            '302 fwd custom cidr 1'        => {'chain' => 'FORWARD', 'destination' => '192.0.2.0/24'},
+            '302 fwd custom cidr 1'        => {'port' => 'all', 'chain' => 'FORWARD', 'destination' => '192.0.2.0/24'},
             '303 add custom application 3' => {'dport' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
             '304 add custom application 4' => {'sport' => '1000', 'proto' => 'tcp', 'action' => 'accept'},
             '305 add gre rule'             => {'proto' => 'gre'}
@@ -96,7 +96,8 @@ describe 'tripleo::firewall' do
         )
         is_expected.to contain_firewall('302 fwd custom cidr 1').with(
           :chain   => 'FORWARD',
-          :destination  => '192.0.2.0/24',
+          :proto   => 'tcp',
+          :destination => '192.0.2.0/24',
         )
         is_expected.to contain_firewall('303 add custom application 3').with(
           :dport   => '8081',
@@ -112,6 +113,18 @@ describe 'tripleo::firewall' do
         )
         is_expected.to contain_firewall('305 add gre rule').without(:state)
       end
+    end
+
+    context 'with TCP rule without port or dport or sport specified' do
+      before :each do
+        params.merge!(
+          :manage_firewall => true,
+          :firewall_rules  => {
+            '500 wrong tcp rule' => {'proto' => 'tcp', 'action' => 'accept'},
+          }
+        )
+      end
+      it_raises 'a Puppet::Error', /500 wrong tcp rule firewall rule cannot be created. TCP or UDP rules for INPUT or OUTPUT need port or sport or dport./
     end
 
   end
