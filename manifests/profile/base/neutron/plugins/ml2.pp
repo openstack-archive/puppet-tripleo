@@ -71,5 +71,10 @@ class tripleo::profile::base::neutron::plugins::ml2 (
     if 'ovn' in $mechanism_drivers {
       include ::tripleo::profile::base::neutron::plugins::ml2::ovn
     }
+
+    if 'fujitsu_cfab' in $mechanism_drivers {
+      include ::neutron::plugins::ml2::fujitsu
+      include ::neutron::plugins::ml2::fujitsu::cfab
+    }
   }
 }
