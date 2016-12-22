@@ -35,7 +35,7 @@ class tripleo::packages (
   # required for stages
   include ::stdlib
 
-  if !$enable_install and !$enable_upgrade {
+  if !str2bool($enable_install) and !str2bool($enable_upgrade) {
     case $::osfamily {
       'RedHat': {
         Package <| |> { provider => 'norpm' }
@@ -46,7 +46,7 @@ class tripleo::packages (
     }
   }
 
-  if $enable_upgrade {
+  if str2bool($enable_upgrade) {
     Package <| |> { ensure => 'latest' }
     # Running the package upgrade before managing Services in the main stage.
     # So we're sure that services will be able to restart with the new version
