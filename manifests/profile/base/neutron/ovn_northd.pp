@@ -12,31 +12,29 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::neutron::agents::ovn
+# == Class: tripleo::profile::base::neutron::plugins::ml2::ovn
 #
-# OVN Neutron agent profile for tripleo
+# OVN Neutron northd profile for tripleo
 #
-# [*ovn_db_host*]
-#   (Optional) The IP-Address where OVN DBs are listening.
-#   Defaults to hiera('ovn_dbs_vip')
-#
-# [*ovn_sbdb_port*]
-#   (Optional) Port number on which southbound database is listening
-#   Defaults to hiera('ovn::southbound::port')
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::base::neutron::agents::ovn (
-  $ovn_db_host    = hiera('ovn_dbs_vip'),
-  $ovn_sbdb_port  = hiera('ovn::southbound::port'),
-  $step           = hiera('step')
+class tripleo::profile::base::neutron::ovn_northd (
+  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $step           = hiera('step'),
 ) {
   if $step >= 4 {
-    class { '::ovn::controller':
-      ovn_remote     => "tcp:${ovn_db_host}:${ovn_sbdb_port}",
+    # Note this only runs on the first node in the cluster when
+    # deployed on a role where multiple nodes exist.
+    if $::hostname == downcase($bootstrap_node) {
+      include ::ovn::northd
     }
   }
 }
+

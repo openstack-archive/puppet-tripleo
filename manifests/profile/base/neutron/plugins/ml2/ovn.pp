@@ -17,7 +17,16 @@
 # OVN Neutron ML2 profile for tripleo
 #
 # [*ovn_db_host*]
-#   The IP-Address/Hostname where OVN DBs are deployed
+#   The IP-Address where OVN DBs are listening.
+#   Defaults to hiera('ovn_dbs_vip')
+#
+# [*ovn_nb_port*]
+#   (Optional) Port number on which northbound database is listening
+#   Defaults to hiera('ovn::northbound::port')
+#
+# [*ovn_sb_port*]
+#   (Optional) Port number on which southbound database is listening
+#   Defaults to hiera('ovn::southbound::port')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -25,18 +34,12 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::plugins::ml2::ovn (
-  $ovn_db_host,
-  $step = hiera('step')
+  $ovn_db_host = hiera('ovn_dbs_vip'),
+  $ovn_nb_port = hiera('ovn::northbound::port'),
+  $ovn_sb_port = hiera('ovn::southbound::port'),
+  $step        = hiera('step')
 ) {
   if $step >= 4 {
-    if $::hostname == $ovn_db_host {
-      # NOTE: we might split northd from plugin later, in the case of
-      # micro-services, where neutron-server & northd are not in the same
-      # containers
-      include ::ovn::northd
-    }
-    $ovn_nb_port = hiera('ovn::northbound::port')
-    $ovn_sb_port = hiera('ovn::southbound::port')
     class { '::neutron::plugins::ml2::ovn':
       ovn_nb_connection => "tcp:${ovn_db_host}:${ovn_nb_port}",
       ovn_sb_connection => "tcp:${ovn_db_host}:${ovn_sb_port}",
