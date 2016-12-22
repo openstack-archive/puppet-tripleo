@@ -77,8 +77,16 @@ define tripleo::firewall::rule (
   $extras      = {},
 ) {
 
+  if $port == 'all' {
+    warning("All ${proto} traffic will be open on this host.")
+    # undef so the IPtables rule won't have any port specified.
+    $port_real = undef
+  } else {
+    $port_real = $port
+  }
+
   $basic = {
-    'port'        => $port,
+    'port'        => $port_real,
     'dport'       => $dport,
     'sport'       => $sport,
     'proto'       => $proto,
@@ -100,6 +108,15 @@ define tripleo::firewall::rule (
   $rule = merge($basic, $state_rule, $extras)
   validate_hash($rule)
 
+  # This conditional will ensure that TCP and UDP firewall rules have
+  # a port specified in the configuration when using INPUT or OUTPUT chains.
+  # If not, the Puppet catalog will fail.
+  # If we don't do this sanity check, a user could create some TCP/UDP
+  # rules without port, and the result would be an iptables rule that allow any
+  # traffic on the host.
+  if ($proto in ['tcp', 'udp']) and (! ($port or $dport or $sport) and ($chain != 'FORWARD')) {
+    fail("${title} firewall rule cannot be created. TCP or UDP rules for INPUT or OUTPUT need port or sport or dport.")
+  }
   create_resources('firewall', { "${title}" => $rule })
 
 }
