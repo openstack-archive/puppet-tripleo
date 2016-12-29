@@ -34,6 +34,11 @@
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
 #
+# [*inet_dist_interface*]
+#   (Optional) Address to bind the inter-cluster interface
+#   to. It is the inet_dist_use_interface option in the kernel variables
+#   Defaults to hiera('rabbitmq::interface', undef).
+#
 # [*nodes*]
 #   (Optional) Array of host(s) for RabbitMQ nodes.
 #   Defaults to hiera('rabbitmq_node_names', []).
@@ -44,12 +49,13 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::rabbitmq (
-  $config_variables = hiera('rabbitmq_config_variables'),
-  $environment      = hiera('rabbitmq_environment'),
-  $ipv6             = str2bool(hiera('rabbit_ipv6', false)),
-  $kernel_variables = hiera('rabbitmq_kernel_variables'),
-  $nodes            = hiera('rabbitmq_node_names', []),
-  $step             = hiera('step'),
+  $config_variables    = hiera('rabbitmq_config_variables'),
+  $environment         = hiera('rabbitmq_environment'),
+  $ipv6                = str2bool(hiera('rabbit_ipv6', false)),
+  $kernel_variables    = hiera('rabbitmq_kernel_variables'),
+  $inet_dist_interface = hiera('rabbitmq::interface', undef),
+  $nodes               = hiera('rabbitmq_node_names', []),
+  $step                = hiera('step'),
 ) {
   # IPv6 environment, necessary for RabbitMQ.
   if $ipv6 {
@@ -60,6 +66,14 @@ class tripleo::profile::base::rabbitmq (
   } else {
     $rabbit_env = $environment
   }
+  if $inet_dist_interface {
+    $real_kernel_variables = merge(
+      $kernel_variables,
+      { 'inet_dist_use_interface' => ip_to_erl_format($inet_dist_interface) },
+    )
+  } else {
+    $real_kernel_variables = $kernel_variables
+  }
 
   $manage_service = hiera('rabbitmq::service_manage', true)
   if $step >= 1 {
@@ -68,7 +82,7 @@ class tripleo::profile::base::rabbitmq (
       class { '::rabbitmq':
         config_cluster          => $manage_service,
         cluster_nodes           => $nodes,
-        config_kernel_variables => $kernel_variables,
+        config_kernel_variables => $real_kernel_variables,
         config_variables        => $config_variables,
         environment_variables   => $rabbit_env,
       }
