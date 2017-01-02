@@ -46,8 +46,6 @@ class tripleo::profile::pacemaker::manila (
     stop       => '/bin/true',
   }
 
-  include ::tripleo::profile::base::manila::api
-  include ::tripleo::profile::base::manila::scheduler
   include ::tripleo::profile::base::manila::share
 
   if $step >= 4 {
