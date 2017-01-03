@@ -76,5 +76,10 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include ::neutron::plugins::ml2::fujitsu
       include ::neutron::plugins::ml2::fujitsu::cfab
     }
+
+    if 'fujitsu_fossw' in $mechanism_drivers {
+      include ::neutron::plugins::ml2::fujitsu
+      include ::neutron::plugins::ml2::fujitsu::fossw
+    }
   }
 }
