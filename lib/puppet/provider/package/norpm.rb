@@ -33,4 +33,8 @@ Puppet::Type.type(:package).provide :norpm, :source => :rpm, :parent => :rpm do
     true
   end
 
+  def self.instances
+    return []
+  end
+
 end
