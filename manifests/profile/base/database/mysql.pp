@@ -232,10 +232,7 @@ class tripleo::profile::base::database::mysql (
       $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool(
         pick($nova_messaging_use_ssl, hiera('nova::rabbit_user_ssl', '0')))))
 
-      # TODO(aschultz): switch this back to an include once setup_cell0 in THT
-      class { '::nova::db::mysql_api':
-        setup_cell0 => true,
-      }
+      include ::nova::db::mysql_api
       class { '::nova::db::sync_cell_v2':
         transport_url => os_transport_url({
           'transport' => $messaging_driver_real,
