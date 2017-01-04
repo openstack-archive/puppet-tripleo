@@ -101,7 +101,7 @@ class tripleo::profile::base::nova::api (
       sync_db     => $sync_db,
       sync_db_api => $sync_db,
     }
-    class { '::nova::wsgi::apache':
+    class { '::nova::wsgi::apache_api':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }
