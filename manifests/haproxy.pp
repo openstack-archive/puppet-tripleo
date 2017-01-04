@@ -447,6 +447,7 @@
 #    'nova_metadata_port' (Defaults to 8775)
 #    'nova_novnc_port' (Defaults to 6080)
 #    'nova_novnc_ssl_port' (Defaults to 13080)
+#    'opendaylight_api_port' (Defaults to 8081)
 #    'panko_api_port' (Defaults to 8779)
 #    'panko_api_ssl_port' (Defaults to 13779)
 #    'ovn_nbdb_port' (Defaults to 6641)
@@ -600,6 +601,7 @@ class tripleo::haproxy (
     nova_metadata_port => 8775,
     nova_novnc_port => 6080,
     nova_novnc_ssl_port => 13080,
+    opendaylight_api_port => 8081,
     panko_api_port => 8779,
     panko_api_ssl_port => 13779,
     ovn_nbdb_port => 6641,
@@ -1309,26 +1311,16 @@ class tripleo::haproxy (
     }
   }
 
-  $opendaylight_api_vip = hiera('opendaylight_api_vip', $controller_virtual_ip)
-  $opendaylight_bind_opts = {
-    "${opendaylight_api_vip}:8081" => $haproxy_listen_bind_param,
-    "${public_virtual_ip}:8081" => $haproxy_listen_bind_param,
-  }
-
   if $opendaylight {
-    haproxy::listen { 'opendaylight':
-      bind             => $opendaylight_bind_opts,
-      options          => {
+    ::tripleo::haproxy::endpoint { 'opendaylight':
+      internal_ip    => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
+      service_port   => $ports[opendaylight_api_port],
+      ip_addresses   => hiera('opendaylight_api_node_ips', $controller_hosts_real),
+      server_names   => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
+      mode           => 'http',
+      listen_options => {
         'balance' => 'source',
       },
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'opendaylight':
-      listening_service => 'opendaylight',
-      ports             => '8081',
-      ipaddresses       => hiera('opendaylight_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
-      options           => ['check', 'inter 2000', 'rise 2', 'fall 5'],
     }
   }
 
