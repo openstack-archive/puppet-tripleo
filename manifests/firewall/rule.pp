@@ -49,7 +49,7 @@
 #
 # [*source*]
 #  (optional) The source IP address associated to the rule.
-#  Defaults to '0.0.0.0/0'
+#  Defaults to undef
 #
 # [*iniface*]
 #  (optional) The network interface associated to the rule.
@@ -74,7 +74,7 @@ define tripleo::firewall::rule (
   $proto       = 'tcp',
   $action      = 'accept',
   $state       = ['NEW'],
-  $source      = '0.0.0.0/0',
+  $source      = undef,
   $iniface     = undef,
   $chain       = 'INPUT',
   $destination = undef,
@@ -110,6 +110,16 @@ define tripleo::firewall::rule (
     'destination' => $destination,
     'jump'        => $jump_real,
   }
+  if $proto == 'icmp' {
+    $ipv6 = {
+      'provider' => 'ip6tables',
+      'proto'    => 'ipv6-icmp',
+    }
+  } else {
+    $ipv6 = {
+      'provider' => 'ip6tables',
+    }
+  }
   if $proto != 'gre' {
     $state_rule = {
       'state' => $state
@@ -119,8 +129,10 @@ define tripleo::firewall::rule (
   }
 
 
-  $rule = merge($basic, $state_rule, $extras)
-  validate_hash($rule)
+  $ipv4_rule = merge($basic, $state_rule, $extras)
+  $ipv6_rule = merge($basic, $state_rule, $ipv6, $extras)
+  validate_hash($ipv4_rule)
+  validate_hash($ipv6_rule)
 
   # This conditional will ensure that TCP and UDP firewall rules have
   # a port specified in the configuration when using INPUT or OUTPUT chains.
@@ -131,6 +143,16 @@ define tripleo::firewall::rule (
   if ($proto in ['tcp', 'udp']) and (! ($port or $dport or $sport) and ($chain != 'FORWARD')) {
     fail("${title} firewall rule cannot be created. TCP or UDP rules for INPUT or OUTPUT need port or sport or dport.")
   }
-  create_resources('firewall', { "${title}" => $rule })
+  if $source or $destination {
+    if (('.' in join(any2array($destination), ',')) or ('.' in join(any2array($source), ','))){
+      create_resources('firewall', { "${title} ipv4" => $ipv4_rule })
+    }
+    if ((':' in join(any2array($destination), ',')) or (':' in join(any2array($source), ','))){
+      create_resources('firewall', { "${title} ipv6" => $ipv6_rule })
+    }
+  } else {
+    create_resources('firewall', { "${title} ipv4" => $ipv4_rule })
+    create_resources('firewall', { "${title} ipv6" => $ipv6_rule })
+  }
 
 }

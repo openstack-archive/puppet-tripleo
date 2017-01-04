@@ -34,35 +34,65 @@ describe 'tripleo::firewall' do
       end
 
       it 'configure basic pre firewall rules' do
-        is_expected.to contain_firewall('000 accept related established rules').with(
+        is_expected.to contain_firewall('000 accept related established rules ipv4').with(
           :proto  => 'all',
           :state  => ['RELATED', 'ESTABLISHED'],
           :action => 'accept',
         )
-        is_expected.to contain_firewall('001 accept all icmp').with(
+        is_expected.to contain_firewall('000 accept related established rules ipv6').with(
+          :proto    => 'all',
+          :state    => ['RELATED', 'ESTABLISHED'],
+          :action   => 'accept',
+          :provider => 'ip6tables',
+        )
+        is_expected.to contain_firewall('001 accept all icmp ipv4').with(
           :proto  => 'icmp',
           :action => 'accept',
           :state  => ['NEW'],
         )
-        is_expected.to contain_firewall('002 accept all to lo interface').with(
+        is_expected.to contain_firewall('001 accept all icmp ipv6').with(
+          :proto    => 'ipv6-icmp',
+          :action   => 'accept',
+          :state    => ['NEW'],
+          :provider => 'ip6tables',
+        )
+        is_expected.to contain_firewall('002 accept all to lo interface ipv4').with(
           :proto   => 'all',
           :iniface => 'lo',
           :action  => 'accept',
           :state   => ['NEW'],
         )
-        is_expected.to contain_firewall('003 accept ssh').with(
+        is_expected.to contain_firewall('002 accept all to lo interface ipv6').with(
+          :proto    => 'all',
+          :iniface  => 'lo',
+          :action   => 'accept',
+          :state    => ['NEW'],
+          :provider => 'ip6tables',
+        )
+        is_expected.to contain_firewall('003 accept ssh ipv4').with(
           :dport   => '22',
           :proto  => 'tcp',
           :action => 'accept',
           :state  => ['NEW'],
         )
+        is_expected.to contain_firewall('003 accept ssh ipv6').with(
+          :dport    => '22',
+          :proto    => 'tcp',
+          :action   => 'accept',
+          :state    => ['NEW'],
+          :provider => 'ip6tables',
+        )
       end
 
       it 'configure basic post firewall rules' do
-        is_expected.to contain_firewall('999 drop all').with(
+        is_expected.to contain_firewall('999 drop all ipv4').with(
           :proto  => 'all',
           :action => 'drop',
-          :source => '0.0.0.0/0',
+        )
+        is_expected.to contain_firewall('999 drop all ipv6').with(
+          :proto    => 'all',
+          :action   => 'drop',
+          :provider => 'ip6tables',
         )
       end
     end
@@ -77,41 +107,55 @@ describe 'tripleo::firewall' do
             '302 fwd custom cidr 1'        => {'port' => 'all', 'chain' => 'FORWARD', 'destination' => '192.0.2.0/24'},
             '303 add custom application 3' => {'dport' => '8081', 'proto' => 'tcp', 'action' => 'accept'},
             '304 add custom application 4' => {'sport' => '1000', 'proto' => 'tcp', 'action' => 'accept'},
-            '305 add gre rule'             => {'proto' => 'gre'}
+            '305 add gre rule'             => {'proto' => 'gre'},
+            '306 add custom cidr 2'        => {'port' => 'all', 'destination' => '::1/24'},
           }
         )
       end
       it 'configure custom firewall rules' do
-        is_expected.to contain_firewall('300 add custom application 1').with(
+        is_expected.to contain_firewall('300 add custom application 1 ipv4').with(
           :port   => '999',
           :proto  => 'udp',
           :action => 'accept',
           :state  => ['NEW'],
         )
-        is_expected.to contain_firewall('301 add custom application 2').with(
+        is_expected.to contain_firewall('301 add custom application 2 ipv4').with(
           :port   => '8081',
           :proto  => 'tcp',
           :action => 'accept',
           :state  => ['NEW'],
         )
-        is_expected.to contain_firewall('302 fwd custom cidr 1').with(
+        is_expected.to contain_firewall('302 fwd custom cidr 1 ipv4').with(
           :chain   => 'FORWARD',
           :proto   => 'tcp',
           :destination => '192.0.2.0/24',
         )
-        is_expected.to contain_firewall('303 add custom application 3').with(
+        is_expected.to_not contain_firewall('302 fwd custom cidr 1 ipv6')
+        is_expected.to contain_firewall('303 add custom application 3 ipv4').with(
           :dport   => '8081',
           :proto  => 'tcp',
           :action => 'accept',
           :state  => ['NEW'],
         )
-        is_expected.to contain_firewall('304 add custom application 4').with(
+        is_expected.to contain_firewall('304 add custom application 4 ipv4').with(
           :sport   => '1000',
           :proto  => 'tcp',
           :action => 'accept',
           :state  => ['NEW'],
         )
-        is_expected.to contain_firewall('305 add gre rule').without(:state)
+        is_expected.to contain_firewall('304 add custom application 4 ipv6').with(
+          :sport  => '1000',
+          :proto  => 'tcp',
+          :action => 'accept',
+          :state  => ['NEW'],
+        )
+        is_expected.to contain_firewall('305 add gre rule ipv4').without(:state)
+        is_expected.to contain_firewall('306 add custom cidr 2 ipv6').with(
+          :proto       => 'tcp',
+          :destination => '::1/24',
+          :action      => 'accept',
+          :provider    => 'ip6tables',
+        )
       end
     end
 
