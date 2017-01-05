@@ -1206,6 +1206,15 @@ class tripleo::haproxy (
       server_names      => hiera('mysql_node_names', $controller_hosts_names_real),
       options           => $mysql_member_options_real,
     }
+    if hiera('manage_firewall', true) {
+      include ::tripleo::firewall
+      $mysql_firewall_rules = {
+        '100 mysql_haproxy' => {
+          'dport' => 3306,
+        }
+      }
+      create_resources('tripleo::firewall::rule', $mysql_firewall_rules)
+    }
   }
 
   if $rabbitmq {
@@ -1264,6 +1273,15 @@ class tripleo::haproxy (
       ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
       server_names      => hiera('redis_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
+    }
+    if hiera('manage_firewall', true) {
+      include ::tripleo::firewall
+      $redis_firewall_rules = {
+        '100 redis_haproxy' => {
+          'dport' => 6379,
+        }
+      }
+      create_resources('tripleo::firewall::rule', $redis_firewall_rules)
     }
   }
 
