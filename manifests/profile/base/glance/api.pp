@@ -77,14 +77,7 @@ class tripleo::profile::base::glance::api (
     include ::glance::config
     class { '::glance::api':
       stores  => $glance_store,
-      sync_db => false,
-    }
-    # When https://review.openstack.org/#/c/408554 is merged,
-    # Remove this block and set sync_db to $sync_db in glance::api.
-    if $sync_db {
-      class { '::glance::db::sync':
-        extra_params => '',
-      }
+      sync_db => $sync_db,
     }
     $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::glance::notify::rabbitmq' :
