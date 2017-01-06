@@ -22,24 +22,19 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
-# [*primary_controller*]
-#   (Optional) The hostname of the first controller
+# [*primary_node*]
+#   (Optional) The hostname of the first node of this role type
 #   Defaults to hiera('bootstrap_nodeid', undef)
 #
 class tripleo::profile::base::neutron::opendaylight (
-  $step = hiera('step'),
-  $primary_controller = hiera('bootstrap_nodeid', undef),
+  $step         = hiera('step'),
+  $primary_node = hiera('bootstrap_nodeid', undef),
 ) {
 
-  include ::tripleo::profile::base::neutron
-
-  if ! str2bool(hiera('opendaylight::enable_l3')) {
-    include ::tripleo::profile::base::neutron::l3
-  }
-
   if $step >= 1 {
-    # Configure ODL only on first controller
-    if $primary_controller == downcase($::hostname) {
+    # Configure ODL only on first node of the role where this service is
+    # applied
+    if $primary_node == downcase($::hostname) {
       include ::opendaylight
     }
   }
