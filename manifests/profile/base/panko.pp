@@ -40,6 +40,7 @@ class tripleo::profile::base::panko (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::panko
+    include ::panko::db
     include ::panko::config
     include ::panko::db::sync
   }
