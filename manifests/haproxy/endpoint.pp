@@ -166,6 +166,8 @@ define tripleo::haproxy::endpoint (
           'dport' => $public_ssl_port,
         },
       }
+    } else {
+      $haproxy_ssl_firewall_rules = {}
     }
     $firewall_rules = merge($haproxy_firewall_rules, $haproxy_ssl_firewall_rules)
     if $service_port or $public_ssl_port {
