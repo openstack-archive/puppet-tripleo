@@ -50,6 +50,10 @@
 #   Username for messaging nova queue
 #   Defaults to hiera('nova::rabbit_userid', 'guest')
 #
+# [*messaging_use_ssl*]
+#   Flag indicating ssl usage.
+#   Defaults to hiera('nova::rabbit_use_ssl', '0')
+#
 # [*nova_compute_enabled*]
 #   (Optional) Whether or not nova-compute is enabled.
 #   Defaults to false
@@ -67,6 +71,7 @@ class tripleo::profile::base::nova (
   $messaging_password   = hiera('nova::rabbit_password'),
   $messaging_port       = hiera('nova::rabbit_port', '5672'),
   $messaging_username   = hiera('nova::rabbit_userid', 'guest'),
+  $messaging_use_ssl    = hiera('nova::rabbit_use_ssl', '0'),
   $nova_compute_enabled = false,
   $step                 = hiera('step'),
 ) {
@@ -83,6 +88,7 @@ class tripleo::profile::base::nova (
   }
 
   if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
+    $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($messaging_use_ssl)))
     # TODO(ccamacho): remove sprintf once we properly type the port, needs
     # to be a string for the os_transport_url function.
     class { '::nova' :
@@ -92,6 +98,7 @@ class tripleo::profile::base::nova (
         'port'      => sprintf('%s', $messaging_port),
         'username'  => $messaging_username,
         'password'  => $messaging_password,
+        'ssl'       => $messaging_use_ssl_real,
       }),
     }
     include ::nova::config
