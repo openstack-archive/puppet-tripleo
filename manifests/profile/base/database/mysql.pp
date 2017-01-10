@@ -185,6 +185,9 @@ class tripleo::profile::base::database::mysql (
     if hiera('sahara_api_enabled', false) {
       include ::sahara::db::mysql
     }
+    if hiera('tacker_enabled', false) {
+      include ::tacker::db::mysql
+    }
     if hiera('trove_api_enabled', false) {
       include ::trove::db::mysql
     }
