@@ -85,6 +85,17 @@ describe 'tripleo::profile::base::ceph::rgw' do
         )
       end
     end
+
+    context 'with step 4 and keystone v3' do
+      let(:params) { default_params.merge({ :step => 4, :rgw_keystone_version => 'v3' }) }
+      it 'should include rgw configuration' do
+        is_expected.to contain_ceph__rgw__keystone('radosgw.gateway').with(
+          :rgw_keystone_accepted_roles => ["admin", "_member_", "Member"],
+          :use_pki                     => false,
+          :rgw_keystone_url            => 'url'
+        )
+      end
+    end
   end
 
   on_supported_os.each do |os, facts|
