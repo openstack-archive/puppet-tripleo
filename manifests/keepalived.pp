@@ -113,10 +113,15 @@ class tripleo::keepalived (
 
   if $internal_api_virtual_ip and $internal_api_virtual_ip != $controller_virtual_ip {
     $internal_api_virtual_interface = interface_for_ip($internal_api_virtual_ip)
+    if is_ipv6_address($internal_api_virtual_ip) {
+      $internal_api_virtual_netmask = '64'
+    } else {
+      $internal_api_virtual_netmask = '32'
+    }
     # KEEPALIVE INTERNAL API NETWORK
     keepalived::instance { '53':
       interface    => $internal_api_virtual_interface,
-      virtual_ips  => [join([$internal_api_virtual_ip, ' dev ', $internal_api_virtual_interface])],
+      virtual_ips  => [join(["${internal_api_virtual_ip}/${internal_api_virtual_netmask}", ' dev ', $internal_api_virtual_interface])],
       state        => 'MASTER',
       track_script => ['haproxy'],
       priority     => 101,
@@ -125,10 +130,15 @@ class tripleo::keepalived (
 
   if $storage_virtual_ip and $storage_virtual_ip != $controller_virtual_ip {
     $storage_virtual_interface = interface_for_ip($storage_virtual_ip)
+    if is_ipv6_address($storage_virtual_ip) {
+      $storage_virtual_netmask = '64'
+    } else {
+      $storage_virtual_netmask = '32'
+    }
     # KEEPALIVE STORAGE NETWORK
     keepalived::instance { '54':
       interface    => $storage_virtual_interface,
-      virtual_ips  => [join([$storage_virtual_ip, ' dev ', $storage_virtual_interface])],
+      virtual_ips  => [join(["${storage_virtual_ip}/${storage_virtual_netmask}", ' dev ', $storage_virtual_interface])],
       state        => 'MASTER',
       track_script => ['haproxy'],
       priority     => 101,
@@ -137,10 +147,15 @@ class tripleo::keepalived (
 
   if $storage_mgmt_virtual_ip and $storage_mgmt_virtual_ip != $controller_virtual_ip {
     $storage_mgmt_virtual_interface = interface_for_ip($storage_mgmt_virtual_ip)
+    if is_ipv6_address($storage_mgmt_virtual_ip) {
+      $storage_mgmt_virtual_netmask = '64'
+    } else {
+      $storage_mgmt_virtual_netmask = '32'
+    }
     # KEEPALIVE STORAGE MANAGEMENT NETWORK
     keepalived::instance { '55':
       interface    => $storage_mgmt_virtual_interface,
-      virtual_ips  => [join([$storage_mgmt_virtual_ip, ' dev ', $storage_mgmt_virtual_interface])],
+      virtual_ips  => [join(["${storage_mgmt_virtual_ip}/${storage_mgmt_virtual_netmask}", ' dev ', $storage_mgmt_virtual_interface])],
       state        => 'MASTER',
       track_script => ['haproxy'],
       priority     => 101,
@@ -149,10 +164,15 @@ class tripleo::keepalived (
 
   if $redis_virtual_ip and $redis_virtual_ip != $controller_virtual_ip {
     $redis_virtual_interface = interface_for_ip($redis_virtual_ip)
+    if is_ipv6_address($redis_virtual_ip) {
+      $redis_virtual_netmask = '64'
+    } else {
+      $redis_virtual_netmask = '32'
+    }
     # KEEPALIVE STORAGE MANAGEMENT NETWORK
     keepalived::instance { '56':
       interface    => $redis_virtual_interface,
-      virtual_ips  => [join([$redis_virtual_ip, ' dev ', $redis_virtual_interface])],
+      virtual_ips  => [join(["${redis_virtual_ip}/${redis_virtual_netmask}", ' dev ', $redis_virtual_interface])],
       state        => 'MASTER',
       track_script => ['haproxy'],
       priority     => 101,
