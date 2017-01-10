@@ -87,7 +87,7 @@ class tripleo::profile::base::nova (
     $memcache_servers = suffix(hiera('memcached_node_ips'), ':11211')
   }
 
-  if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($messaging_use_ssl)))
     # TODO(ccamacho): remove sprintf once we properly type the port, needs
     # to be a string for the os_transport_url function.

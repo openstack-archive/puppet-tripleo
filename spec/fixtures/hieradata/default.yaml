@@ -24,3 +24,12 @@ ceph::profile::params::rgw_keystone_admin_password: 'keystone_admin_password'
 # cinder related items
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
+# nova related items
+nova::rabbit_password: 'password'
+nova::keystone::authtoken::password: 'password'
+nova::network::neutron::neutron_password: 'password'
+# memcache related items
+memcached_node_ips_v6:
+ - '::1'
+memcached_node_ips:
+ - '127.0.0.1'
