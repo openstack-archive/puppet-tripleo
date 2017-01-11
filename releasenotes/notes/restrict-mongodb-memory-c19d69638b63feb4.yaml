@@ -1,0 +1,6 @@
+---
+fixes:
+  - Add a way for mongodb to limit amount of memory it comsumes
+    with systemd. A new param memory_limit has been added to
+    tripleo::profile::base::database::mongodb class with
+    default limit of 20G.
