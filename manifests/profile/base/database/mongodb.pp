@@ -30,10 +30,15 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*memory_limit*]
+#   (Optional) Limit amount of memory mongodb can use
+#   Defaults to 20G
+#
 class tripleo::profile::base::database::mongodb (
   $mongodb_replset,
   $bootstrap_node = downcase(hiera('bootstrap_nodeid')),
   $step           = hiera('step'),
+  $memory_limit   = '20G',
 ) {
   if $step >= 2 {
 
@@ -56,5 +61,11 @@ class tripleo::profile::base::database::mongodb (
       }
     }
 
+    # Limit memory utilization
+    ::systemd::service_limits { 'mongod.service':
+      limits => {
+        'MemoryLimit' => $memory_limit
+      }
+    }
   }
 }
