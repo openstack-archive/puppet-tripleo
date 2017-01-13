@@ -59,9 +59,7 @@ class tripleo::profile::base::heat (
       manage_user   => false,
       manage_role   => false,
     }
-  }
 
-  if $step >= 4 {
     $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::heat' :
       notification_driver => $notification_driver,
