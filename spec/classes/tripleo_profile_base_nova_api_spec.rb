@@ -53,9 +53,11 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to contain_class('nova::db::sync_cell_v2').with(
-            :transport_url => 'rabbit://nova:foo@localhost:5672/?ssl=0')
-        is_expected.to contain_class('nova::keystone::authtoken')
+        #TODO(emilien): enable it again when it's fixed upstream in nova
+        # https://bugs.launchpad.net/tripleo/+bug/1649341
+        # is_expected.to contain_class('nova::db::sync_cell_v2').with(
+        #     :transport_url => 'rabbit://nova:foo@localhost:5672/?ssl=0')
+        # is_expected.to contain_class('nova::keystone::authtoken')
         is_expected.to contain_class('nova::api')
         is_expected.to contain_class('nova::wsgi::apache_api')
         is_expected.to contain_class('nova::network::neutron')
