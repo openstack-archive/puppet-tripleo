@@ -179,6 +179,9 @@ class tripleo::profile::base::database::mysql (
       include ::nova::db::mysql
       include ::nova::db::mysql_api
     }
+    if hiera('nova_placement_enabled', false) {
+      include ::nova::db::mysql_placement
+    }
     if hiera('sahara_api_enabled', false) {
       include ::sahara::db::mysql
     }
