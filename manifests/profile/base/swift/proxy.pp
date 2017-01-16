@@ -81,6 +81,8 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::container_quotas
     include ::swift::proxy::account_quotas
 
-    include ::swift::objectexpirer
+    class { '::swift::objectexpirer':
+      memcache_servers => $swift_memcache_servers
+    }
   }
 }
