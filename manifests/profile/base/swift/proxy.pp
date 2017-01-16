@@ -80,5 +80,7 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::copy
     include ::swift::proxy::container_quotas
     include ::swift::proxy::account_quotas
+
+    include ::swift::objectexpirer
   }
 }
