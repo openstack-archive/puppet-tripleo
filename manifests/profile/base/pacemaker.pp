@@ -31,7 +31,7 @@ class tripleo::profile::base::pacemaker (
     try_sleep => 3,
   }
 
-  if $::hostname == downcase(hiera('bootstrap_nodeid')) {
+  if $::hostname == downcase(hiera('pacemaker_short_bootstrap_node_name')) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

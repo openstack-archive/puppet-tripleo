@@ -38,7 +38,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('manila_share_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -50,7 +50,7 @@ class tripleo::profile::pacemaker::manila (
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $ceph_mds_enabled        = hiera('ceph_mds_enabled', false),
-  $bootstrap_node          = hiera('bootstrap_nodeid'),
+  $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
   $step                    = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {

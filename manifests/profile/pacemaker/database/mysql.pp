@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('mysql_short_bootstrap_node_name')
+#
 # [*bind_address*]
 #   (Optional) The address that the local mysql instance should bind to.
 #   Defaults to $::hostname
@@ -33,11 +37,12 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::database::mysql (
+  $bootstrap_node     = hiera('mysql_short_bootstrap_node_name'),
   $bind_address       = $::hostname,
   $gmcast_listen_addr = hiera('mysql_bind_host'),
   $step               = hiera('step'),
 ) {
-  if $::hostname == downcase(hiera('bootstrap_nodeid')) {
+  if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false
@@ -100,6 +105,7 @@ class tripleo::profile::pacemaker::database::mysql (
   }
 
   class { '::tripleo::profile::base::database::mysql':
+    bootstrap_node          => $bootstrap_node,
     manage_resources        => false,
     remove_default_accounts => $remove_default_accounts,
     mysql_server_options    => $mysqld_options,

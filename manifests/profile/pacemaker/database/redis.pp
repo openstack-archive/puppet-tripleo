@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('redis_short_bootstrap_node_name')
 #
 # [*enable_load_balancer*]
 #   (Optional) Whether load balancing is enabled for this cluster
@@ -37,7 +37,7 @@
 #   or 10240 (default in redis systemd limits)
 #
 class tripleo::profile::pacemaker::database::redis (
-  $bootstrap_node       = hiera('bootstrap_nodeid'),
+  $bootstrap_node       = hiera('redis_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
   $redis_file_limit     = hiera('redis_file_limit', 10240),

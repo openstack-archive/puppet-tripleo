@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('cinder_backup_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,7 +28,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::cinder::backup (
-  $bootstrap_node = hiera('bootstrap_nodeid'),
+  $bootstrap_node = hiera('cinder_backup_short_bootstrap_node_name'),
   $step           = hiera('step'),
 ) {
 

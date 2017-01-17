@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('haproxy_short_bootstrap_node_name')
 #
 # [*enable_load_balancer*]
 #   (Optional) Whether load balancing is enabled for this cluster
@@ -32,7 +32,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::haproxy (
-  $bootstrap_node       = hiera('bootstrap_nodeid'),
+  $bootstrap_node       = hiera('haproxy_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
 ) {

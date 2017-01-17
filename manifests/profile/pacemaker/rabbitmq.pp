@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('rabbitmq_short_bootstrap_node_name')
 #
 # [*erlang_cookie*]
 #   (Optional) Content of erlang cookie.
@@ -42,7 +42,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::rabbitmq (
-  $bootstrap_node = hiera('bootstrap_nodeid'),
+  $bootstrap_node = hiera('rabbitmq_short_bootstrap_node_name'),
   $erlang_cookie  = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues = hiera('rabbitmq::nr_ha_queues', 0),
   $rabbit_nodes   = hiera('rabbitmq_node_names'),
