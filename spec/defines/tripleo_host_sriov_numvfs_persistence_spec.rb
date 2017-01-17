@@ -12,7 +12,8 @@ describe 'tripleo::host::sriov::numvfs_persistence' do
       {
         :name           => 'persistence',
         :vf_defs        => ['eth0:10','eth1:8'],
-        :content_string => "Hashbang\n"
+        :content_string => "Hashbang\n",
+        :udev_rules     => ""
       }
     end
 
@@ -30,6 +31,14 @@ describe 'tripleo::host::sriov::numvfs_persistence' do
         :owner   => 'root',
         :content => '#!/bin/bash',
         :replace => false,
+      )
+      is_expected.to contain_file('/etc/udev/rules.d/70-tripleo-reset-sriov.rules').with(
+        :ensure  => 'file',
+        :content => "KERNEL==\"eth0\", RUN+=\"/etc/sysconfig/allocate_vfs %k\"\nKERNEL==\"eth1\", RUN+=\"/etc/sysconfig/allocate_vfs %k\"\n",
+        :group   => 'root',
+        :mode    => '0755',
+        :owner   => 'root',
+        :replace => true
       )
       is_expected.to contain_file_line('call_ifup-local').with(
         :path => '/sbin/ifup-local',
