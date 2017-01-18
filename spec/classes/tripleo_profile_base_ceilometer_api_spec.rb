@@ -32,26 +32,14 @@ describe 'tripleo::profile::base::ceilometer::api' do
       end
     end
 
-    context 'with step 4 and enable_legacy_api' do
+    context 'with step 4' do
       let(:params) { {
-        :step              => 4,
-	:enable_legacy_api => true,
+        :step            => 4,
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('ceilometer::api')
         is_expected.to contain_class('ceilometer::wsgi::apache')
-      end
-    end
-
-    context 'with step 4 and default enable_legacy_api' do
-      let(:params) { {
-	:step => 4,
-      } }
-
-      it 'should do nothing' do
-        is_expected.to_not contain_class('ceilometer::api')
-        is_expected.to_not contain_class('ceilometer::wsgi::apache')
       end
     end
   end
