@@ -380,6 +380,10 @@
 #  (optional) Specify the network nova_osapi is running on.
 #  Defaults to hiera('nova_api_network', undef)
 #
+# [*nova_placement_network*]
+#  (optional) Specify the network nova_placement is running on.
+#  Defaults to hiera('nova_placement_network', undef)
+#
 # [*opendaylight_network*]
 #  (optional) Specify the network opendaylight is running on.
 #  Defaults to hiera('opendaylight_api_network', undef)
@@ -558,6 +562,7 @@ class tripleo::haproxy (
   $nova_metadata_network       = hiera('nova_api_network', undef),
   $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', undef),
   $nova_osapi_network          = hiera('nova_api_network', undef),
+  $nova_placement_network      = hiera('nova_placement_network', undef),
   $panko_network               = hiera('panko_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $sahara_network              = hiera('sahara_api_network', undef),
@@ -952,7 +957,7 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
       public_ssl_port   => $ports[nova_placement_ssl_port],
-      service_network   => $nova_osapi_network,
+      service_network   => $nova_placement_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
