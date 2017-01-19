@@ -23,8 +23,13 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 class tripleo::profile::base::pacemaker (
-  $step = hiera('step'),
+  $step      = hiera('step'),
+  $pcs_tries = hiera('pcs_tries', 20),
 ) {
   Pcmk_resource <| |> {
     tries     => 10,
@@ -58,6 +63,7 @@ class tripleo::profile::base::pacemaker (
     }
     class { '::pacemaker::stonith':
       disable => !$enable_fencing,
+      tries   => $pcs_tries,
     }
     if $enable_fencing {
       include ::tripleo::fencing
