@@ -57,6 +57,7 @@ class tripleo::profile::base::cinder (
       rabbit_hosts => $rabbit_endpoints,
     }
     include ::cinder::config
+    include ::cinder::glance
   }
 
   if $step >= 5 {
