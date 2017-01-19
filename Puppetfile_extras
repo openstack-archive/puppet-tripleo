@@ -29,3 +29,6 @@ mod 'datacat',
   :git => 'https://github.com/richardc/puppet-datacat',
   :ref => '0.6.2'
 
+mod 'etcd',
+  :git => 'https://github.com/cristifalcas/puppet-etcd',
+  :ref => '1.10.0'
