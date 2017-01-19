@@ -110,6 +110,7 @@ class tripleo::profile::base::nova (
   }
 
   if $step >= 4 {
+    include ::nova::placement
     if $manage_migration {
       class { '::nova::migration::libvirt':
         configure_libvirt => $libvirt_enabled,
