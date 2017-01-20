@@ -36,7 +36,7 @@
 #
 # [*public_virtual_ip*]
 #  Address in which the proxy endpoint will be listening in the public network.
-#  If this service is internal only this should be ommited.
+#  If this service is internal only this should be ommitted.
 #  Defaults to undef.
 #
 # [*mode*]
