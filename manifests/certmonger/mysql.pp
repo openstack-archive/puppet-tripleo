@@ -31,11 +31,6 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
-# [*mysql_network*]
-#   (Optional) The network name where the mysql endpoint is listening on.
-#   This is set by t-h-t.
-#   Defaults to hiera('mysql_network', undef)
-#
 # [*principal*]
 #   (Optional) The haproxy service principal that is set for MySQL in kerberos.
 #   Defaults to undef
@@ -45,15 +40,10 @@ class tripleo::certmonger::mysql (
   $service_certificate,
   $service_key,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
-  $mysql_network = hiera('mysql_network', undef),
   $principal     = undef,
 ) {
   include ::certmonger
   include ::mysql::params
-
-  if !$mysql_network {
-    fail('mysql_network is not set in the hieradata.')
-  }
 
   $postsave_cmd        = "systemctl reload ${::mysql::params::service_name}"
   certmonger_certificate { 'mysql' :
