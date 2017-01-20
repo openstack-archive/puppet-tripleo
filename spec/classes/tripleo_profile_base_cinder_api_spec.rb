@@ -30,7 +30,6 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to_not contain_class('cinder::api')
         is_expected.to_not contain_class('cinder::ceilometer')
-        is_expected.to_not contain_class('cinder::glance')
       end
     end
 
@@ -43,7 +42,6 @@ describe 'tripleo::profile::base::cinder::api' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder::api')
         is_expected.to contain_class('cinder::ceilometer')
-        is_expected.to contain_class('cinder::glance')
       end
     end
 
@@ -56,7 +54,6 @@ describe 'tripleo::profile::base::cinder::api' do
       it 'should not trigger any configuration' do
         is_expected.to_not contain_class('cinder::api')
         is_expected.to_not contain_class('cinder::ceilometer')
-        is_expected.to_not contain_class('cinder::glance')
       end
     end
 
@@ -68,7 +65,6 @@ describe 'tripleo::profile::base::cinder::api' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder::api')
         is_expected.to contain_class('cinder::ceilometer')
-        is_expected.to contain_class('cinder::glance')
       end
     end
   end

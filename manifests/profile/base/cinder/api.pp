@@ -94,7 +94,6 @@ class tripleo::profile::base::cinder::api (
       ssl_key  => $tls_keyfile,
     }
     include ::cinder::ceilometer
-    include ::cinder::glance
   }
 
 }

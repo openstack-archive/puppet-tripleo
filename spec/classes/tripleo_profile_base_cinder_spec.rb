@@ -24,6 +24,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to_not contain_class('cinder')
         is_expected.to_not contain_class('cinder::config')
+        is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -41,6 +42,7 @@ describe 'tripleo::profile::base::cinder' do
           :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:#{params[:rabbit_port]}" }
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end
@@ -54,6 +56,7 @@ describe 'tripleo::profile::base::cinder' do
       it 'should not trigger any configuration' do
         is_expected.to_not contain_class('cinder')
         is_expected.to_not contain_class('cinder::config')
+        is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -71,6 +74,7 @@ describe 'tripleo::profile::base::cinder' do
           :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:#{params[:rabbit_port]}" }
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -87,6 +91,7 @@ describe 'tripleo::profile::base::cinder' do
           :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:5672" }
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::cron::db_purge')
       end
     end
@@ -104,6 +109,7 @@ describe 'tripleo::profile::base::cinder' do
           :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:5672" }
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end
