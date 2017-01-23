@@ -175,6 +175,14 @@
 #  (optional) Enable or not Nova novncproxy binding
 #  Defaults to hiera('nova_vnc_proxy_enabled', false)
 #
+# [*ec2_api*]
+#  (optional) Enable or not EC2 API binding
+#  Defaults to hiera('ec2_api_enabled', false)
+#
+# [*ec2_api_metadata*]
+#  (optional) Enable or not EC2 API metadata binding
+#  Defaults to hiera('ec2_api_enabled', false)
+#
 # [*ceilometer*]
 #  (optional) Enable or not Ceilometer API binding
 #  Defaults to hiera('ceilometer_api_enabled', false)
@@ -380,6 +388,14 @@
 #  (optional) Specify the network nova_placement is running on.
 #  Defaults to hiera('nova_placement_network', undef)
 #
+# [*ec2_api_network*]
+#  (optional) Specify the network ec2_api is running on.
+#  Defaults to hiera('ec2_api_network', undef)
+#
+# [*ec2_api_metadata_network*]
+#  (optional) Specify the network ec2_api_metadata is running on.
+#  Defaults to hiera('ec2_api_network', undef)
+#
 # [*opendaylight_network*]
 #  (optional) Specify the network opendaylight is running on.
 #  Defaults to hiera('opendaylight_api_network', undef)
@@ -507,6 +523,8 @@ class tripleo::haproxy (
   $nova_placement              = hiera('nova_placement_enabled', false),
   $nova_metadata               = hiera('nova_api_enabled', false),
   $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
+  $ec2_api                     = hiera('ec2_api_enabled', false),
+  $ec2_api_metadata            = hiera('ec2_api_enabled', false),
   $ceilometer                  = hiera('ceilometer_api_enabled', false),
   $aodh                        = hiera('aodh_api_enabled', false),
   $panko                       = hiera('panko_api_enabled', false),
@@ -559,6 +577,8 @@ class tripleo::haproxy (
   $nova_placement_network      = hiera('nova_placement_network', undef),
   $panko_network               = hiera('panko_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
+  $ec2_api_network             = hiera('ec2_api_network', undef),
+  $ec2_api_metadata_network    = hiera('ec2_api_network', undef),
   $sahara_network              = hiera('sahara_api_network', undef),
   $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
   $trove_network               = hiera('trove_api_network', undef),
@@ -613,6 +633,9 @@ class tripleo::haproxy (
     panko_api_ssl_port => 13779,
     ovn_nbdb_port => 6641,
     ovn_sbdb_port => 6642,
+    ec2_api_port => 8788,
+    ec2_api_ssl_port => 13788,
+    ec2_api_metadata_port => 8789,
     sahara_api_port => 8386,
     sahara_api_ssl_port => 13386,
     swift_proxy_port => 8080,
@@ -973,6 +996,34 @@ class tripleo::haproxy (
       },
       public_ssl_port   => $ports[nova_novnc_ssl_port],
       service_network   => $nova_novncproxy_network,
+    }
+  }
+
+  if $ec2_api {
+    ::tripleo::haproxy::endpoint { 'ec2_api':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('ec2_api_vip', $controller_virtual_ip),
+      service_port      => $ports[ec2_api_port],
+      ip_addresses      => hiera('ec2_api_node_ips', $controller_hosts_real),
+      server_names      => hiera('ec2_api_node_names', $controller_hosts_names_real),
+      mode              => 'http',
+      listen_options    => {
+          'http-request' => [
+            'set-header X-Forwarded-Proto https if { ssl_fc }',
+            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+      },
+      public_ssl_port   => $ports[ec2_api_ssl_port],
+      service_network   => $ec2_api_network,
+    }
+  }
+
+  if $ec2_api_metadata {
+    ::tripleo::haproxy::endpoint { 'ec2_api_metadata':
+      internal_ip     => hiera('ec2_api_vip', $controller_virtual_ip),
+      service_port    => $ports[ec2_api_metadata_port],
+      ip_addresses    => hiera('ec2_api_node_ips', $controller_hosts_real),
+      server_names    => hiera('ec2_api_node_names', $controller_hosts_names_real),
+      service_network => $ec2_api_metadata_network,
     }
   }
 
