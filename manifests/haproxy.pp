@@ -159,10 +159,6 @@
 #  (optional) Enable or not Glance API binding
 #  Defaults to hiera('glance_api_enabled', false)
 #
-# [*glance_registry*]
-#  (optional) Enable or not Glance registry binding
-#  Defaults to hiera('glance_registry_enabled', false)
-#
 # [*nova_osapi*]
 #  (optional) Enable or not Nova API binding
 #  Defaults to hiera('nova_api_enabled', false)
@@ -324,10 +320,6 @@
 #  (optional) Specify the network glance_api is running on.
 #  Defaults to hiera('glance_api_network', undef)
 #
-# [*glance_registry_network*]
-#  (optional) Specify the network glance_registry is running on.
-#  Defaults to hiera('glance_registry_network', undef)
-#
 # [*gnocchi_network*]
 #  (optional) Specify the network gnocchi is running on.
 #  Defaults to hiera('gnocchi_api_network', undef)
@@ -431,7 +423,6 @@
 #    'docker_registry_ssl_port' (Defaults to 13787)
 #    'glance_api_port' (Defaults to 9292)
 #    'glance_api_ssl_port' (Defaults to 13292)
-#    'glance_registry_port' (Defaults to 9191)
 #    'gnocchi_api_port' (Defaults to 8041)
 #    'gnocchi_api_ssl_port' (Defaults to 13041)
 #    'mistral_api_port' (Defaults to 8989)
@@ -512,7 +503,6 @@ class tripleo::haproxy (
   $sahara                      = hiera('sahara_api_enabled', false),
   $trove                       = hiera('trove_api_enabled', false),
   $glance_api                  = hiera('glance_api_enabled', false),
-  $glance_registry             = hiera('glance_registry_enabled', false),
   $nova_osapi                  = hiera('nova_api_enabled', false),
   $nova_placement              = hiera('nova_placement_enabled', false),
   $nova_metadata               = hiera('nova_api_enabled', false),
@@ -552,7 +542,6 @@ class tripleo::haproxy (
   $cinder_network              = hiera('cinder_api_network', undef),
   $docker_registry_network     = hiera('docker_registry_network', undef),
   $glance_api_network          = hiera('glance_api_network', undef),
-  $glance_registry_network     = hiera('glance_registry_network', undef),
   $gnocchi_network             = hiera('gnocchi_api_network', undef),
   $heat_api_network            = hiera('heat_api_network', undef),
   $heat_cfn_network            = hiera('heat_api_cfn_network', undef),
@@ -589,7 +578,6 @@ class tripleo::haproxy (
     docker_registry_ssl_port => 13787,
     glance_api_port => 9292,
     glance_api_ssl_port => 13292,
-    glance_registry_port => 9191,
     gnocchi_api_port => 8041,
     gnocchi_api_ssl_port => 13041,
     mistral_api_port => 8989,
@@ -919,16 +907,6 @@ class tripleo::haproxy (
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
       service_network   => $glance_api_network,
-    }
-  }
-
-  if $glance_registry {
-    ::tripleo::haproxy::endpoint { 'glance_registry':
-      internal_ip     => hiera('glance_registry_vip', $controller_virtual_ip),
-      service_port    => $ports[glance_registry_port],
-      ip_addresses    => hiera('glance_registry_node_ips', $controller_hosts_real),
-      server_names    => hiera('glance_registry_node_names', $controller_hosts_names_real),
-      service_network => $glance_registry_network,
     }
   }
 
