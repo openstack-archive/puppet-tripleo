@@ -4,7 +4,7 @@
 # === Parameters:
 #
 # [*vf_defs*]
-#   (required) Array of of <physical_interface>:<numvfs>.
+#   (required) Array of <physical_interface>:<numvfs>.
 #   Example: ['eth1:10','eth2:8']
 #
 # [*content_string*]
