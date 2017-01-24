@@ -24,9 +24,20 @@ describe 'tripleo::ui' do
 
     context 'with required parameters' do
       let(:params) { {
-        :servername   => facts[:hostname],
-        :bind_host    => '127.0.0.1',
-        :keystone_url => 'http://127.0.0.1:5000/'
+        :servername               => facts[:hostname],
+        :bind_host                => '127.0.0.1',
+        :endpoint_proxy_keystone  => 'http://127.0.0.1:5000',
+        :endpoint_proxy_zaqar     => 'ws://127.0.0.1:9000/zaqar',
+        :endpoint_proxy_heat      => 'http://127.0.0.1:8004',
+        :endpoint_proxy_ironic    => 'http://127.0.0.1:6385',
+        :endpoint_proxy_mistral   => 'http://127.0.0.1:8989',
+        :endpoint_proxy_swift     => 'http://127.0.0.1:8080',
+        :endpoint_config_keystone => 'https://127.0.0.1:443/keystone/v2.0',
+        :endpoint_config_zaqar    => 'wss://127.0.0.1:443/zaqar',
+        :endpoint_config_heat     => 'https://127.0.0.1:443/heat/v1/%(tenant_id)s',
+        :endpoint_config_ironic   => 'https://127.0.0.1:443/ironic',
+        :endpoint_config_mistral  => 'https://127.0.0.1:443/mistral/v2',
+        :endpoint_config_swift    => 'https://127.0.0.1:443/swift/v1/AUTH_%(tenant_id)s'
       } }
 
       it 'should configure tripleo ui' do
@@ -42,23 +53,34 @@ describe 'tripleo::ui' do
         )
         is_expected.to contain_file('/etc/httpd/conf.d/openstack-tripleo-ui.conf').with_content(/cleaned by Puppet/)
         is_expected.to contain_file('/var/www/openstack-tripleo-ui/dist/tripleo_ui_config.js')
-            .with_content(/"keystone": "http:\/\/127.0.0.1:5000\/"/)
+            .with_content(/"keystone": "https:\/\/127.0.0.1:443\/keystone\/v2.0"/)
+            .with_content(/"heat": "https:\/\/127.0.0.1:443\/heat\/v1\/%\(tenant_id\)s"/)
+            .with_content(/"zaqar-websocket": "wss:\/\/127.0.0.1:443\/zaqar"/)
+            .with_content(/"ironic": "https:\/\/127.0.0.1:443\/ironic"/)
+            .with_content(/"mistral": "https:\/\/127.0.0.1:443\/mistral\/v2"/)
+            .with_content(/"swift": "https:\/\/127.0.0.1:443\/swift\/v1\/AUTH_%\(tenant_id\)s"/)
             .with_content(/"zaqar_default_queue": "tripleo"/)
       end
     end
 
     context 'with all parameters' do
       let(:params) { {
-          :servername        => 'custom.example.com',
-        :bind_host           => '127.0.0.2',
-        :ui_port             => 3001,
-        :keystone_url        => 'http://127.0.0.1:1111/',
-        :heat_url            => 'http://127.0.0.1:2222/',
-        :ironic_url          => 'http://127.0.0.1:3333/',
-        :mistral_url         => 'http://127.0.0.1:4444/',
-        :swift_url           => 'http://127.0.0.1:5555/',
-        :zaqar_websocket_url => 'http://127.0.0.1:6666/',
-        :zaqar_default_queue => 'myqueue'
+          :servername             => 'custom.example.com',
+        :bind_host                => '127.0.0.2',
+        :ui_port                  => 3001,
+        :endpoint_proxy_keystone  => 'http://127.0.0.1:5000',
+        :endpoint_proxy_zaqar     => 'ws://127.0.0.1:9000/zaqar',
+        :endpoint_proxy_heat      => 'http://127.0.0.1:8004',
+        :endpoint_proxy_ironic    => 'http://127.0.0.1:6385',
+        :endpoint_proxy_mistral   => 'http://127.0.0.1:8989',
+        :endpoint_proxy_swift     => 'http://127.0.0.1:8080',
+        :endpoint_config_keystone => 'https://127.0.0.1:443/keystone/v2.0',
+        :endpoint_config_zaqar    => 'wss://127.0.0.1:443/zaqar',
+        :endpoint_config_heat     => 'https://127.0.0.1:443/heat/v1/%(tenant_id)s',
+        :endpoint_config_ironic   => 'https://127.0.0.1:443/ironic',
+        :endpoint_config_mistral  => 'https://127.0.0.1:443/mistral/v2',
+        :endpoint_config_swift    => 'https://127.0.0.1:443/swift/v1/AUTH_%(tenant_id)s',
+        :zaqar_default_queue      => 'tripleo'
       } }
 
       it 'should configure tripleo ui' do
@@ -74,13 +96,13 @@ describe 'tripleo::ui' do
         )
         is_expected.to contain_file('/etc/httpd/conf.d/openstack-tripleo-ui.conf').with_content(/cleaned by Puppet/)
         is_expected.to contain_file('/var/www/openstack-tripleo-ui/dist/tripleo_ui_config.js')
-            .with_content(/"keystone": "http:\/\/127.0.0.1:1111\/"/)
-            .with_content(/"heat": "http:\/\/127.0.0.1:2222\/"/)
-            .with_content(/"ironic": "http:\/\/127.0.0.1:3333\/"/)
-            .with_content(/"mistral": "http:\/\/127.0.0.1:4444\/"/)
-            .with_content(/"swift": "http:\/\/127.0.0.1:5555\/"/)
-            .with_content(/"zaqar-websocket": "http:\/\/127.0.0.1:6666\/"/)
-            .with_content(/"zaqar_default_queue": "myqueue"/)
+          .with_content(/"keystone": "https:\/\/127.0.0.1:443\/keystone\/v2.0"/)
+          .with_content(/"heat": "https:\/\/127.0.0.1:443\/heat\/v1\/%\(tenant_id\)s"/)
+          .with_content(/"zaqar-websocket": "wss:\/\/127.0.0.1:443\/zaqar"/)
+          .with_content(/"ironic": "https:\/\/127.0.0.1:443\/ironic"/)
+          .with_content(/"mistral": "https:\/\/127.0.0.1:443\/mistral\/v2"/)
+          .with_content(/"swift": "https:\/\/127.0.0.1:443\/swift\/v1\/AUTH_%\(tenant_id\)s"/)
+          .with_content(/"zaqar_default_queue": "tripleo"/)
       end
     end
 

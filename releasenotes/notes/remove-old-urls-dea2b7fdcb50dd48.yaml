@@ -1,0 +1,12 @@
+---
+upgrade:
+  - |
+    Removed the following URL configuration variables from tripleo::ui:
+
+    * keystone_url
+    * heat_url
+    * ironic_url
+    * mistral_url
+    * swift_url
+    * zaqar_websocket_url
+
