@@ -37,7 +37,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::pacemaker::ceph::rbdmirror (
-  $bootstrap_node = hiera('ceph_rbdmirror_bootstrap_short_node_name'),
+  $bootstrap_node = hiera('ceph_rbdmirror_short_bootstrap_node_name'),
   $client_name    = 'openstack',
   $stack_action   = hiera('stack_action'),
   $step           = hiera('step'),
