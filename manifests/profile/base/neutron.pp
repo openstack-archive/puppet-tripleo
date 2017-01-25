@@ -35,9 +35,22 @@ class tripleo::profile::base::neutron (
   $rabbit_hosts = hiera('rabbitmq_node_names', undef),
   $rabbit_port  = hiera('neutron::rabbit_port', 5672),
 ) {
+
+  # TODO(jaosorior): Remove this when we pass it via t-h-t
+  if hiera('enable_internal_tls', false) {
+    $bind_host = 'localhost'
+  } else {
+    # This is executed in all of the nodes that use something neutron-related,
+    # so we set the defalut, since the bind_host is only available in the
+    # controllers. Either way, this will be removed and set properly via t-h-t
+    # in a subsequent commit.
+    $bind_host = hiera('neutron::bind_host', $::os_service_default)
+  }
+
   if $step >= 3 {
     $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::neutron' :
+      bind_host    => $bind_host,
       rabbit_hosts => $rabbit_endpoints,
     }
     include ::neutron::config

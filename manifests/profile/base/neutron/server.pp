@@ -22,10 +22,34 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
+# [*certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Example with hiera:
+#     apache_certificates_specs:
+#       httpd-internal_api:
+#         hostname: <overcloud controller fqdn>
+#         service_certificate: <service certificate path>
+#         service_key: <service key path>
+#         principal: "haproxy/<overcloud controller fqdn>"
+#   Defaults to hiera('apache_certificate_specs', {}).
+#
+# [*dvr_enabled*]
+#   (Optional) Is dvr enabled, used when no override is passed to
+#   l3_ha_override to calculate enabling l3 HA.
+#   Defaults to  hiera('neutron::server::router_distributed') or false
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*generate_service_certificates*]
+#   (Optional) Whether or not certmonger will generate certificates for
+#   HAProxy. This could be as many as specified by the $certificates_specs
+#   variable.
+#   Note that this doesn't configure the certificates in haproxy, it merely
+#   creates the certificates.
+#   Defaults to hiera('generate_service_certificate', false).
 #
 # [*l3_ha_override*]
 #   (Optional) Override the calculated value for neutron::server::l3_ha
@@ -41,17 +65,31 @@
 #   (we need to default neutron_l3_short_node_names to an empty list
 #   because some neutron backends disable the l3 agent)
 #
-# [*dvr_enabled*]
-#   (Optional) Is dvr enabled, used when no override is passed to
-#   l3_ha_override to calculate enabling l3 HA.
-#   Defaults to  hiera('neutron::server::router_distributed') or false
+# [*neutron_network*]
+#   (Optional) The network name where the neutron endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('neutron_api_network', undef)
+#
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
+#
 class tripleo::profile::base::neutron::server (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
-  $l3_ha_override = '',
-  $l3_nodes       = hiera('neutron_l3_short_node_names', []),
-  $dvr_enabled    = hiera('neutron::server::router_distributed', false)
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $certificates_specs            = hiera('apache_certificates_specs', {}),
+  $dvr_enabled                   = hiera('neutron::server::router_distributed', false),
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $generate_service_certificates = hiera('generate_service_certificates', false),
+  $l3_ha_override                = '',
+  $l3_nodes                      = hiera('neutron_l3_short_node_names', []),
+  $neutron_network               = hiera('neutron_api_network', undef),
+  $step                          = hiera('step'),
 ) {
+  if $enable_internal_tls and $generate_service_certificates {
+    ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
+  }
+
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
@@ -74,6 +112,23 @@ class tripleo::profile::base::neutron::server (
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes
   if $step >= 4 and $sync_db or $step >= 5 and !$sync_db {
+    if $enable_internal_tls {
+      if !$neutron_network {
+        fail('neutron_api_network is not set in the hieradata.')
+      }
+      $tls_certfile = $certificates_specs["httpd-${neutron_network}"]['service_certificate']
+      $tls_keyfile = $certificates_specs["httpd-${neutron_network}"]['service_key']
+
+      ::tripleo::tls_proxy { 'neutron-api':
+        servername => hiera("fqdn_${neutron_network}"),
+        ip         => hiera('neutron::bind_host'),  # This will be cleaned out
+        port       => 9696,  # This will be cleaned out
+        tls_cert   => $tls_certfile,
+        tls_key    => $tls_keyfile,
+        notify     => Class['::neutron::server'],
+      }
+    }
+
     include ::neutron::server::notifications
     # We need to override the hiera value neutron::server::sync_db which is set
     # to true
