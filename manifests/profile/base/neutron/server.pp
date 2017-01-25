@@ -73,17 +73,10 @@ class tripleo::profile::base::neutron::server (
   # We start neutron-server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes
-  if $step >= 4 and $sync_db {
+  if $step >= 4 and $sync_db or $step >= 5 and !$sync_db {
     include ::neutron::server::notifications
     # We need to override the hiera value neutron::server::sync_db which is set
     # to true
-    class { '::neutron::server':
-      sync_db => $sync_db,
-      l3_ha   => $l3_ha,
-    }
-  }
-  if $step >= 5 and !$sync_db {
-    include ::neutron::server::notifications
     class { '::neutron::server':
       sync_db => $sync_db,
       l3_ha   => $l3_ha,
