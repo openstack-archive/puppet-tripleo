@@ -27,9 +27,14 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 class tripleo::profile::pacemaker::cinder::backup (
   $bootstrap_node = hiera('cinder_backup_short_bootstrap_node_name'),
   $step           = hiera('step'),
+  $pcs_tries      = hiera('pcs_tries', 20),
 ) {
 
   Service <| tag == 'cinder::backup' |> {
@@ -47,6 +52,15 @@ class tripleo::profile::pacemaker::cinder::backup (
 
   include ::tripleo::profile::base::cinder::backup
 
+  if $step >= 2 {
+    pacemaker::property { 'cinder-backup-role-node-property':
+      property => 'cinder-backup-role',
+      value    => true,
+      tries    => $pcs_tries,
+      node     => $::hostname,
+    }
+  }
+
   if $step >= 3 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
     Cinder_config<||>
     ~>
@@ -55,7 +69,13 @@ class tripleo::profile::pacemaker::cinder::backup (
 
   if $step >= 5 and $pacemaker_master {
     pacemaker::resource::service { $::cinder::params::backup_service :
-      op_params => 'start timeout=200s stop timeout=200s',
+      op_params     => 'start timeout=200s stop timeout=200s',
+      tries         => $pcs_tries,
+      location_rule => {
+        resource_discovery => 'exclusive',
+        score              => 0,
+        expression         => ['cinder-backup-role eq true'],
+      }
     }
   }
 

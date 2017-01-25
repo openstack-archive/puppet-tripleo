@@ -36,11 +36,16 @@
 #   for when redis is managed by pacemaker. Defaults to hiera('redis_file_limit')
 #   or 10240 (default in redis systemd limits)
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 class tripleo::profile::pacemaker::database::redis (
   $bootstrap_node       = hiera('redis_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
   $redis_file_limit     = hiera('redis_file_limit', 10240),
+  $pcs_tries            = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -71,14 +76,29 @@ class tripleo::profile::pacemaker::database::redis (
     }
   }
 
-  if $step >= 2 and $pacemaker_master {
-    pacemaker::resource::ocf { 'redis':
-      ocf_agent_name  => 'heartbeat:redis',
-      master_params   => '',
-      meta_params     => 'notify=true ordered=true interleave=true',
-      resource_params => 'wait_last_known_master=true',
-      op_params       => 'start timeout=200s stop timeout=200s',
-      require         => Class['::redis'],
+  if $step >= 2 {
+    pacemaker::property { 'redis-role-node-property':
+      property => 'redis-role',
+      value    => true,
+      tries    => $pcs_tries,
+      node     => $::hostname,
+    }
+    if $pacemaker_master {
+      pacemaker::resource::ocf { 'redis':
+        ocf_agent_name  => 'heartbeat:redis',
+        master_params   => '',
+        meta_params     => 'notify=true ordered=true interleave=true',
+        resource_params => 'wait_last_known_master=true',
+        op_params       => 'start timeout=200s stop timeout=200s',
+        tries           => $pcs_tries,
+        location_rule   => {
+          resource_discovery => 'exclusive',
+          score              => 0,
+          expression         => ['redis-role eq true'],
+        },
+        require         => [Class['::redis'],
+                            Pacemaker::Property['redis-role-node-property']],
+      }
     }
   }
 }

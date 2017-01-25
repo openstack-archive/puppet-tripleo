@@ -27,11 +27,35 @@
 #  (String) IP address on which HAProxy is colocated
 #  Required
 #
+# [*location_rule*]
+#  (optional) Add a location constraint before actually enabling
+#  the resource. Must be a hash like the following example:
+#  location_rule => {
+#    resource_discovery => 'exclusive',    # optional
+#    role               => 'master|slave', # optional
+#    score              => 0,              # optional
+#    score_attribute    => foo,            # optional
+#    # Multiple expressions can be used
+#    expression         => ['opsrole eq controller']
+#  }
+#  Defaults to undef
+#
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to 1
+#
 # [*ensure*]
 #  (Boolean) Create the all the resources only if true.  False won't
 #  destroy the resource, it will just not create them.
 #  Default to true
-define tripleo::pacemaker::haproxy_with_vip($vip_name, $ip_address, $ensure = true) {
+#
+define tripleo::pacemaker::haproxy_with_vip(
+  $vip_name,
+  $ip_address,
+  $location_rule = undef,
+  $pcs_tries     = 1,
+  $ensure        = true)
+{
   if($ensure) {
     if is_ipv6_address($ip_address) {
       $netmask = '64'
@@ -40,25 +64,29 @@ define tripleo::pacemaker::haproxy_with_vip($vip_name, $ip_address, $ensure = tr
     }
 
     pacemaker::resource::ip { "${vip_name}_vip":
-      ip_address   => $ip_address,
-      cidr_netmask => $netmask,
+      ip_address    => $ip_address,
+      cidr_netmask  => $netmask,
+      location_rule => $location_rule,
+      tries         => $pcs_tries,
     }
-    pacemaker::constraint::base { "${vip_name}_vip-then-haproxy":
-      constraint_type   => 'order',
+    pacemaker::constraint::order { "${vip_name}_vip-then-haproxy":
       first_resource    => "ip-${ip_address}",
       second_resource   => 'haproxy-clone',
       first_action      => 'start',
       second_action     => 'start',
       constraint_params => 'kind=Optional',
-      require           => [Pacemaker::Resource::Service['haproxy'],
-                            Pacemaker::Resource::Ip["${vip_name}_vip"]],
+      tries             => $pcs_tries,
     }
     pacemaker::constraint::colocation { "${vip_name}_vip-with-haproxy":
-      source  => "ip-${ip_address}",
-      target  => 'haproxy-clone',
-      score   => 'INFINITY',
-      require => [Pacemaker::Resource::Service['haproxy'],
-                  Pacemaker::Resource::Ip["${vip_name}_vip"]],
+      source => "ip-${ip_address}",
+      target => 'haproxy-clone',
+      score  => 'INFINITY',
+      tries  => $pcs_tries,
     }
+
+    Pacemaker::Resource::Ip["${vip_name}_vip"] ->
+      Pacemaker::Resource::Service['haproxy'] ->
+        Pacemaker::Constraint::Order["${vip_name}_vip-then-haproxy"] ->
+          Pacemaker::Constraint::Colocation["${vip_name}_vip-with-haproxy"]
   }
 }
