@@ -58,6 +58,7 @@ class tripleo::profile::pacemaker::ceph::rbdmirror (
   include ::tripleo::profile::base::ceph
 
   if $step >= 3 {
+    require ::ceph::profile::client
     ceph::mirror { $client_name:
       rbd_mirror_enable => false,
       rbd_mirror_ensure => 'stopped',
