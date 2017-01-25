@@ -22,19 +22,35 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
-# [*primary_node*]
-#   (Optional) The hostname of the first node of this role type
-#   Defaults to hiera('bootstrap_nodeid', undef)
+# [*odl_api_ips*]
+#   (Optional) List of OpenStack Controller IPs for ODL API
+#   Defaults to hiera('opendaylight_api_node_ips')
+#
+# [*node_name*]
+#   (Optional) The short hostname of node
+#   Defaults to hiera('bootstack_nodeid')
 #
 class tripleo::profile::base::neutron::opendaylight (
   $step         = hiera('step'),
-  $primary_node = hiera('bootstrap_nodeid', undef),
+  $odl_api_ips  = hiera('opendaylight_api_node_ips'),
+  $node_name    = hiera('bootstack_nodeid')
 ) {
 
   if $step >= 1 {
-    # Configure ODL only on first node of the role where this service is
-    # applied
-    if $primary_node == downcase($::hostname) {
+    validate_array($odl_api_ips)
+    if empty($odl_api_ips) {
+      fail('No IPs assigned to OpenDaylight Api Service')
+    } elsif size($odl_api_ips) == 2 {
+      fail('2 node OpenDaylight deployments are unsupported.  Use 1 or greater than 2')
+    } elsif size($odl_api_ips) > 2 {
+      $node_string = split($node_name, '-')
+      $ha_node_index = $node_string[-1] + 1
+      class { '::opendaylight':
+        enable_ha     => true,
+        ha_node_ips   => $odl_api_ips,
+        ha_node_index => $ha_node_index,
+      }
+    } else {
       include ::opendaylight
     }
   }

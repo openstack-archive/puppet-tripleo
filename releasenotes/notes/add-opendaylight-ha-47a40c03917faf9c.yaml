@@ -1,0 +1,5 @@
+---
+features:
+  - Adds OpenDaylight HA support.  Now when ODL is applied to three or
+    more nodes ODL will be deployed as a cluster in HA, rather than
+    the previous behavior of only running on the first node.

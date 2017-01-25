@@ -44,3 +44,7 @@ mod 'ntp',
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
   :ref => 'master'
+
+mod 'opendaylight',
+  :git => 'https://github.com/dfarrell07/puppet-opendaylight',
+  :ref => 'master'

@@ -30,6 +30,10 @@
 #   (Optional) List of OpenStack Controller IPs for ODL API
 #   Defaults to hiera('opendaylight_api_node_ips')
 #
+# [*odl_url_ip*]
+#   (Optional) Virtual IP address for ODL Api Service
+#   Defaults to hiera('opendaylight_api_vip')
+#
 # [*conn_proto*]
 #   (Optional) Protocol to use to for ODL REST access
 #   Defaults to hiera('opendaylight::nb_connection_protocol')
@@ -43,25 +47,25 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
   $odl_port      = hiera('opendaylight::odl_rest_port'),
   $odl_check_url = hiera('opendaylight_check_url'),
   $odl_api_ips   = hiera('opendaylight_api_node_ips'),
+  $odl_url_ip    = hiera('opendaylight_api_vip'),
   $conn_proto    = hiera('opendaylight::nb_connection_protocol'),
   $step          = hiera('step'),
 ) {
 
   if $step >= 4 {
-    $opendaylight_controller_ip = $odl_api_ips[0]
-    $odl_url_ip = hiera('opendaylight_api_vip')
-
-    if ! $opendaylight_controller_ip { fail('OpenDaylight Controller IP is Empty') }
+    if empty($odl_api_ips) { fail('No IPs assigned to OpenDaylight Api Service') }
 
     if ! $odl_url_ip { fail('OpenDaylight API VIP is Empty') }
 
     # Build URL to check if ODL is up before connecting OVS
     $opendaylight_url = "${conn_proto}://${odl_url_ip}:${odl_port}/${odl_check_url}"
 
+    $odl_ovsdb_str = join(regsubst($odl_api_ips, '.+', 'tcp:\0:6640'), ' ')
+
     class { '::neutron::plugins::ovs::opendaylight':
       tunnel_ip       => hiera('neutron::agents::ml2::ovs::local_ip'),
       odl_check_url   => $opendaylight_url,
-      odl_ovsdb_iface => "tcp:${opendaylight_controller_ip}:6640",
+      odl_ovsdb_iface => $odl_ovsdb_str,
     }
   }
 }
