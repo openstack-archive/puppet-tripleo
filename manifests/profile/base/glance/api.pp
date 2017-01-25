@@ -72,6 +72,21 @@
 #   IP port for rabbitmq service
 #   Defaults to hiera('glance::notify::rabbitmq::rabbit_port', 5672)
 #
+# [*tls_proxy_bind_ip*]
+#   IP on which the TLS proxy will listen on. Required only if
+#   enable_internal_tls is set.
+#   Defaults to undef
+#
+# [*tls_proxy_fqdn*]
+#   fqdn on which the tls proxy will listen on. required only used if
+#   enable_internal_tls is set.
+#   defaults to undef
+#
+# [*tls_proxy_port*]
+#   port on which the tls proxy will listen on. Only used if
+#   enable_internal_tls is set.
+#   defaults to 9292
+#
 class tripleo::profile::base::glance::api (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -83,6 +98,9 @@ class tripleo::profile::base::glance::api (
   $step                          = hiera('step'),
   $rabbit_hosts                  = hiera('rabbitmq_node_names', undef),
   $rabbit_port                   = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
+  $tls_proxy_bind_ip             = undef,
+  $tls_proxy_fqdn                = undef,
+  $tls_proxy_port                = 9292,
 ) {
   if $enable_internal_tls and $generate_service_certificates {
     ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
@@ -103,22 +121,23 @@ class tripleo::profile::base::glance::api (
       if !$glance_network {
         fail('glance_api_network is not set in the hieradata.')
       }
+      if !$tls_proxy_bind_ip {
+        fail('glance_api_tls_proxy_bind_ip is not set in the hieradata.')
+      }
+      if !$tls_proxy_fqdn {
+        fail('tls_proxy_fqdn is required if internal TLS is enabled.')
+      }
       $tls_certfile = $certificates_specs["httpd-${glance_network}"]['service_certificate']
       $tls_keyfile = $certificates_specs["httpd-${glance_network}"]['service_key']
 
       ::tripleo::tls_proxy { 'glance-api':
-        servername => hiera("fqdn_${glance_network}"),
-        ip         => hiera('glance::api::bind_host'),
-        port       => hiera('glance::api::bind_port'),
+        servername => $tls_proxy_fqdn,
+        ip         => $tls_proxy_bind_ip,
+        port       => $tls_proxy_port,
         tls_cert   => $tls_certfile,
         tls_key    => $tls_keyfile,
         notify     => Class['::glance::api'],
       }
-      # TODO(jaosorior): Remove this when we pass it via t-h-t
-      $bind_host = 'localhost'
-    } else {
-      # TODO(jaosorior): Remove this when we pass it via t-h-t
-      $bind_host = hiera('glance::api::bind_host')
     }
     case $glance_backend {
         'swift': { $backend_store = 'glance.store.swift.Store' }
@@ -134,9 +153,8 @@ class tripleo::profile::base::glance::api (
     include ::glance::config
     # TODO(jaosorior): Remove bind_host when we set it up conditionally in t-h-t
     class { '::glance::api':
-      bind_host => $bind_host,
-      stores    => $glance_store,
-      sync_db   => $sync_db,
+      stores  => $glance_store,
+      sync_db => $sync_db,
     }
     $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
     class { '::glance::notify::rabbitmq' :
