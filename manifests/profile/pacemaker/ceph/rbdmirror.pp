@@ -26,6 +26,10 @@
 #   (Optional) Name assigned to the RBD mirror client
 #   Defaults to 'rbd-mirror'
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
 # [*stack_action*]
 #   (Optional) Action executed on the stack. See tripleo-heat-templates
 #   for more details.
@@ -39,6 +43,7 @@
 class tripleo::profile::pacemaker::ceph::rbdmirror (
   $bootstrap_node = hiera('ceph_rbdmirror_short_bootstrap_node_name'),
   $client_name    = 'openstack',
+  $pcs_tries      = hiera('pcs_tries', 20),
   $stack_action   = hiera('stack_action'),
   $step           = hiera('step'),
 ) {
@@ -57,6 +62,15 @@ class tripleo::profile::pacemaker::ceph::rbdmirror (
 
   include ::tripleo::profile::base::ceph
 
+  if $step >= 2 {
+    pacemaker::property { 'ceph-rbdmirror-role-node-property':
+      property => 'ceph-rbdmirror-role',
+      value    => true,
+      tries    => $pcs_tries,
+      node     => $::hostname,
+    }
+  }
+
   if $step >= 3 {
     require ::ceph::profile::client
     ceph::mirror { $client_name:
@@ -67,7 +81,13 @@ class tripleo::profile::pacemaker::ceph::rbdmirror (
       # NOTE(gfidente): systemd uses the @ sign but it is an invalid
       # character in a pcmk resource name, so we need to use it only
       # for the name of the service
-      service_name => "ceph-rbd-mirror@${client_name}"
+      service_name  => "ceph-rbd-mirror@${client_name}",
+      tries         => $pcs_tries,
+      location_rule => {
+        resource_discovery => 'exclusive',
+        score              => 0,
+        expression         => ['ceph-rbdmirror-role eq true'],
+      }
     }
   }
 
