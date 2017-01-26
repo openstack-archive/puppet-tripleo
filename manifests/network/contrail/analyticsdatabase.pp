@@ -13,56 +13,76 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::network::contrail::database
+# == Class: tripleo::network::contrail::analyticsdatabase
 #
-# Configure Contrail Database services
+# Configure Contrail Analytics Database services
 #
 # == Parameters:
 #
-# [*admin_password*]
-#  (optional) admin password
-#  String value.
-#  Defaults to hiera('contrail::admin_password')
+# [*auth_host*]
+#  (optional) IPv4 VIP of Keystone
+#  String (IPv4) value
+#  Defaults to hiera('contrail::auth_host')
 #
-# [*admin_tenant_name*]
-#  (optional) admin tenant name.
-#  String value.
-#  Defaults to hiera('contrail::admin_tenant_name')
+# [*auth_port_ssl*]
+#  (optional) keystone ssl port.
+#  Integer value.
+#  Defaults to hiera('contrail::auth_port_ssl')
 #
-# [*admin_token*]
-#  (optional) admin token
+# [*auth_protocol*]
+#  (optional) authentication protocol.
 #  String value.
-#  Defaults to hiera('contrail::admin_token')
-#
-# [*admin_user*]
-#  (optional) admin user name.
-#  String value.
-#  Defaults to hiera('contrail::admin_user')
+#  Defaults to hiera('contrail::auth_protocol')
 #
 # [*api_server*]
-#  (optional) VIP of Config API
-#  String (IPv4) value.
+#  (optional) IPv4 VIP of Contrail Config API
+#  String (IPv4) value
 #  Defaults to hiera('contrail_config_vip')
 #
 # [*api_port*]
-#  (optional) Port of Config API
-#  String value.
+#  (optional) Port of Contrail Config API
+#  String value
 #  Defaults to hiera('contrail::api_port')
 #
-# [*auth_host*]
-#  (optional) keystone server ip address
-#  String (IPv4) value.
-#  Defaults to hiera('contrail::auth_host')
+# [*admin_password*]
+#  (optional) Keystone Admin password
+#  String value
+#  Defaults to hiera('contrail::admin_password')
+#
+# [*admin_tenant_name*]
+#  (optional) Keystone Admin tenant name
+#  String value
+#  Defaults to hiera('contrail::admin_tenant_name')
+#
+# [*admin_token*]
+#  (optional) Keystone Admin token
+#  String value
+#  Defaults to hiera('contrail::admin_token')
+#
+# [*admin_user*]
+#  (optional) Keystone Admin user
+#  String value
+#  Defaults to hiera('contrail::admin_user')
+#
+# [*ca_file*]
+#  (optional) ca file name
+#  String value.
+#  Defaults to hiera('contrail::service_certificate',false)
+#
+# [*cert_file*]
+#  (optional) cert file name
+#  String value.
+#  Defaults to hiera('contrail::service_certificate',false)
 #
 # [*cassandra_servers*]
-#  (optional) List IPs+port of Cassandra servers
-#  Array of strings value.
-#  Defaults to hiera('contrail_database_node_ips')
+#  (optional) List of analytics cassandra servers
+#  List (IPv4) value
+#  Defaults to hiera('contrail_analytics_database_node_ips')
 #
 # [*disc_server_ip*]
-#  (optional) IPv4 address of discovery server.
-#  String (IPv4) value.
-#  Defaults to hiera('contrail_config_vip'),
+#  (optional) IPv4 VIP of Contrail Discovery
+#  String (IPv4) value
+#  Defaults to hiera('contrail_config_vip')
 #
 # [*disc_server_port*]
 #  (optional) port Discovery server listens on.
@@ -70,62 +90,78 @@
 #  Defaults to hiera('contrail::disc_server_port')
 #
 # [*host_ip*]
-#  (required) host IP address of Database node
+#  (optional) host IP address of Database node
 #  String (IPv4) value.
+#  Defaults to hiera('contrail::analytics::database::host_ip')
 #
 # [*host_name*]
-#  (optional) host name of Database node
-#  String value.
+#  (optional) host name of database node
+#  String value
 #  Defaults to $::hostname
 #
+# [*kafka_hostnames*]
+#  (optional) list of kafka server hostnames
+#  List value
+#  Defaults to hiera('contrail_analytics_database_short_node_names', '')
+#
 # [*public_vip*]
-#  (optional) Public virtual ip
-#  String value.
+#  (optional) Public VIP
+#  String (IPv4) value
 #  Defaults to hiera('public_virtual_ip')
 #
 # [*step*]
-#  (optional) Step stack is in
-#  Integer value.
+#  (optional) step in the stack
+#  String value
 #  Defaults to hiera('step')
 #
-# [*zookeeper_client_ip*]
-#  (optional) Zookeeper listen address
-#  String (IPv4) value.
-#  Defaults to hiera('contrail::database::host_ip')
-#
-# [*zookeeper_hostnames*]
-#  (optional) Zookeeper hostname list
-#  Array of string value.
-#  Defaults to hiera('contrail_database_short_node_names')
-#
 # [*zookeeper_server_ips*]
-#  (optional) Zookeeper ip list
-#  Array of string (IPv4) values
+#  (optional) list of zookeeper server IPs
+#  List value
 #  Defaults to hiera('contrail_database_node_ips')
 #
-class tripleo::network::contrail::database(
+class tripleo::network::contrail::analyticsdatabase(
   $step                 = hiera('step'),
+  $auth_host            = hiera('contrail::auth_host'),
+  $api_server           = hiera('contrail_config_vip'),
+  $api_port             = hiera('contrail::api_port'),
   $admin_password       = hiera('contrail::admin_password'),
   $admin_tenant_name    = hiera('contrail::admin_tenant_name'),
   $admin_token          = hiera('contrail::admin_token'),
   $admin_user           = hiera('contrail::admin_user'),
-  $api_server           = hiera('contrail_config_vip'),
-  $api_port             = hiera('contrail::api_port'),
-  $auth_host            = hiera('contrail::auth_host'),
-  $cassandra_servers    = hiera('contrail_database_node_ips'),
+  $auth_port_ssl        = hiera('contrail::auth_port_ssl'),
+  $auth_protocol        = hiera('contrail::auth_protocol'),
+  $cassandra_servers    = hiera('contrail_analytics_database_node_ips'),
+  $ca_file              = hiera('contrail::service_certificate',false),
+  $cert_file            = hiera('contrail::service_certificate',false),
   $disc_server_ip       = hiera('contrail_config_vip'),
   $disc_server_port     = hiera('contrail::disc_server_port'),
-  $host_ip              = hiera('contrail::database::host_ip'),
+  $host_ip              = hiera('contrail::analytics::database::host_ip'),
   $host_name            = $::hostname,
+  $kafka_hostnames      = hiera('contrail_analytics_database_short_node_names', ''),
   $public_vip           = hiera('public_virtual_ip'),
-  $zookeeper_client_ip  = hiera('contrail::database::host_ip'),
-  $zookeeper_hostnames  = hiera('contrail_database_short_node_names'),
   $zookeeper_server_ips = hiera('contrail_database_node_ips'),
 )
 {
+  if $auth_protocol == 'https' {
+    $vnc_api_lib_config = {
+      'auth' => {
+        'AUTHN_SERVER'   => $public_vip,
+        'AUTHN_PORT'     => $auth_port_ssl,
+        'AUTHN_PROTOCOL' => $auth_protocol,
+        'certfile'       => $cert_file,
+        'cafile'         => $ca_file,
+      },
+    }
+  } else {
+    $vnc_api_lib_config = {
+      'auth' => {
+        'AUTHN_SERVER' => $public_vip,
+      },
+    }
+  }
   if $step == 2 {
-    class {'::contrail::database':
-      database_params => {
+    class {'::contrail::analyticsdatabase':
+      analyticsdatabase_params => {
         'auth_host'             => $auth_host,
         'api_server'            => $api_server,
         'admin_password'        => $admin_password,
@@ -136,8 +172,7 @@ class tripleo::network::contrail::database(
         'host_ip'               => $host_ip,
         'disc_server_ip'        => $disc_server_ip,
         'disc_server_port'      => $disc_server_port,
-        'zookeeper_client_ip'   => $zookeeper_client_ip,
-        'zookeeper_hostnames'   => $zookeeper_hostnames,
+        'kafka_hostnames'       => $kafka_hostnames,
         'zookeeper_server_ips'  => $zookeeper_server_ips,
         database_nodemgr_config => {
           'DEFAULT'   => {
@@ -148,6 +183,7 @@ class tripleo::network::contrail::database(
             'server' => $disc_server_ip,
           },
         },
+        vnc_api_lib_config      => $vnc_api_lib_config,
       }
     }
   }

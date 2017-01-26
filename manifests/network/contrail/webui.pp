@@ -19,18 +19,6 @@
 #
 # == Parameters:
 #
-# [*contrail_analytics_vip*]
-#  (required) VIP of Contrail Analytics
-#  String (IPv4) value.
-#
-# [*contrail_config_vip*]
-#  (required) VIP of Contrail Config
-#  String (IPv4) value.
-#
-# [*neutron_vip*]
-#  (required) VIP of Neutron
-#  String (IPv4) value.
-#
 # [*admin_password*]
 #  (optional) admin password
 #  String value.
@@ -56,10 +44,45 @@
 #  String (IPv4) value.
 #  Defaults to hiera('contrail::auth_host')
 #
+# [*auth_port_public*]
+#  (optional) keystone port.
+#  Integer value.
+#  Defaults to hiera('contrail::auth_port_public')
+#
+# [*auth_port_ssl*]
+#  (optional) keystone ssl port.
+#  Integer value.
+#  Defaults to hiera('contrail::auth_port_ssl')
+#
+# [*auth_port_ssl_public*]
+#  (optional) keystone public ssl port.
+#  Integer value.
+#  Defaults to hiera('contrail::auth_port_ssl_public')
+#
+# [*auth_protocol*]
+#  (optional) authentication protocol.
+#  String value.
+#  Defaults to hiera('contrail::auth_protocol')
+#
+# [*cert_file*]
+#  (optional) cert file name
+#  String value.
+#  Defaults to hiera('contrail::service_certificate',false)
+#
 # [*cassandra_server_list*]
 #  (optional) List IPs+port of Cassandra servers
 #  Array of strings value.
 #  Defaults to hiera('contrail::cassandra_server_list')
+#
+# [*contrail_analytics_vip*]
+#  (optional) VIP of Contrail Analytics
+#  String (IPv4) value.
+#  Defaults to hiera('contrail_analytics_vip')
+#
+# [*contrail_config_vip*]
+#  (optional) VIP of Contrail Config
+#  String (IPv4) value.
+#  Defaults to hiera('contrail_config_vip')
 #
 # [*contrail_webui_http_port*]
 #  (optional) Webui HTTP Port
@@ -71,38 +94,55 @@
 #  Integer value.
 #  Defaults to 8143
 #
+# [*neutron_vip*]
+#  (optional) VIP of Neutron
+#  String (IPv4) value.
+#  Defaults to hiera('neutron_api_vip')
+#
 # [*redis_ip*]
 #  (optional) IP of Redis
 #  String (IPv4) value.
 #  Defaults to '127.0.0.1'
 #
 class tripleo::network::contrail::webui(
-  $contrail_analytics_vip,
-  $contrail_config_vip,
-  $neutron_vip,
-  $admin_password = hiera('contrail::admin_password'),
-  $admin_tenant_name = hiera('contrail::admin_tenant_name'),
-  $admin_token = hiera('contrail::admin_token'),
-  $admin_user = hiera('contrail::admin_user'),
-  $auth_host = hiera('contrail::auth_host'),
-  $cassandra_server_list = hiera('contrail::cassandra_server_list'),
-  $contrail_webui_http_port = 8080,
-  $contrail_webui_https_port = 8143,
-  $redis_ip = '127.0.0.1',
+  $admin_password            = hiera('contrail::admin_password'),
+  $admin_tenant_name         = hiera('contrail::admin_tenant_name'),
+  $admin_token               = hiera('contrail::admin_token'),
+  $admin_user                = hiera('contrail::admin_user'),
+  $auth_host                 = hiera('contrail::auth_host'),
+  $auth_protocol             = hiera('contrail::auth_protocol'),
+  $auth_port_public          = hiera('contrail::auth_port_public'),
+  $auth_port_ssl_public      = hiera('contrail::auth_port_ssl_public'),
+  $cassandra_server_list     = hiera('contrail_database_node_ips'),
+  $cert_file                 = hiera('contrail::cert_file'),
+  $contrail_analytics_vip    = hiera('contrail_analytics_vip'),
+  $contrail_config_vip       = hiera('contrail_config_vip'),
+  $contrail_webui_http_port  = hiera('contrail::webui::http_port'),
+  $contrail_webui_https_port = hiera('contrail::webui::https_port'),
+  $neutron_vip               = hiera('neutron_api_vip'),
+  $redis_ip                  = hiera('contrail::webui::redis_ip'),
 )
 {
+  if $auth_protocol == 'https' {
+    $auth_port = $auth_port_ssl_public
+  } else {
+    $auth_port = $auth_port_public
+  }
   class {'::contrail::webui':
-    openstack_vip             => $auth_host,
-    contrail_config_vip       => $contrail_config_vip,
-    contrail_analytics_vip    => $contrail_analytics_vip,
-    neutron_vip               => $neutron_vip,
-    cassandra_ip              => $cassandra_server_list,
-    redis_ip                  => $redis_ip,
-    contrail_webui_http_port  => $contrail_webui_http_port,
-    contrail_webui_https_port => $contrail_webui_https_port,
     admin_user                => $admin_user,
     admin_password            => $admin_password,
     admin_token               => $admin_token,
     admin_tenant_name         => $admin_tenant_name,
+    auth_port                 => $auth_port,
+    auth_protocol             => $auth_protocol,
+    cassandra_ip              => $cassandra_server_list,
+    cert_file                 => $cert_file,
+    contrail_config_vip       => $contrail_config_vip,
+    contrail_analytics_vip    => $contrail_analytics_vip,
+    contrail_webui_http_port  => $contrail_webui_http_port,
+    contrail_webui_https_port => $contrail_webui_https_port,
+    neutron_vip               => $neutron_vip,
+    openstack_vip             => $auth_host,
+    redis_ip                  => $redis_ip,
   }
 }
