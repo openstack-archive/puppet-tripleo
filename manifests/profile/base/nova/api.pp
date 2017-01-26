@@ -85,25 +85,8 @@ class tripleo::profile::base::nova::api (
     $tls_keyfile = undef
   }
 
-  if ($step >= 3 and $sync_db) {
-    $messaging_hosts_real = any2array($::tripleo::profile::base::nova::messaging_hosts)
-    # TODO(aschultz): remove sprintf once we properly type the port, needs
-    # to be a string for the os_transport_url function.
-    $messaging_port_real = sprintf('%s', $::tripleo::profile::base::nova::messaging_port)
-    $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($::tripleo::profile::base::nova::messaging_use_ssl)))
-
-    #TODO(emilien): enable it again when it's fixed upstream in nova
-    # https://bugs.launchpad.net/tripleo/+bug/1649341
-    # class { '::nova::db::sync_cell_v2':
-    #   transport_url => os_transport_url({
-    #     'transport' => $::tripleo::profile::base::nova::messaging_driver,
-    #     'hosts'     => $messaging_hosts_real,
-    #     'port'      => $messaging_port_real,
-    #     'username'  => $::tripleo::profile::base::nova::messaging_username,
-    #     'password'  => $::tripleo::profile::base::nova::messaging_password,
-    #     'ssl'       => $messaging_use_ssl_real,
-    #     }),
-    # }
+  if $step >= 3 and $sync_db {
+    include ::nova::cell_v2::simple_setup
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
