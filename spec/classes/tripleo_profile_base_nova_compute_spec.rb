@@ -37,7 +37,7 @@ describe 'tripleo::profile::base::nova::compute' do
         <<-eos
         class { '::tripleo::profile::base::nova':
           step => #{params[:step]},
-          messaging_hosts => [ '127.0.0.1' ],
+          oslomsg_rpc_hosts => [ '127.0.0.1' ],
         }
 eos
       end

@@ -24,7 +24,7 @@
 #
 # [*ceilometer_messaging_driver*]
 #   Driver for messaging service.
-#   Defaults to hiera('messaging_service_name', 'rabbit')
+#   Defaults to hiera('messaging_notify_service_name', 'rabbit')
 #
 # [*ceilometer_messaging_hosts*]
 #   list of the messaging host fqdns
@@ -61,7 +61,7 @@
 #
 class tripleo::profile::base::swift::proxy (
   $ceilometer_enabled            = true,
-  $ceilometer_messaging_driver   = hiera('messaging_service_name', 'rabbit'),
+  $ceilometer_messaging_driver   = hiera('messaging_notify_service_name', 'rabbit'),
   $ceilometer_messaging_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
   $ceilometer_messaging_password = hiera('swift::proxy::ceilometer::rabbit_password', undef),
   $ceilometer_messaging_port     = hiera('tripleo::profile::base::swift::proxy::rabbit_port', '5672'),

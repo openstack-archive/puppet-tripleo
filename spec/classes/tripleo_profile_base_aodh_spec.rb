@@ -34,12 +34,14 @@ describe 'tripleo::profile::base::aodh' do
       let(:params) { {
         :step           => 3,
         :bootstrap_node => 'node.example.com',
-        :rabbit_hosts   => ['localhost1.localdomain', 'localhost2.localdomain']
+        :oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        :oslomsg_rpc_username => 'aodh',
+        :oslomsg_rpc_password => 'foo',
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh').with(
-          :rabbit_hosts => params[:rabbit_hosts].map { |h| h + ":5672" }
+          :default_transport_url => 'rabbit://aodh:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('aodh::auth')
         is_expected.to contain_class('aodh::config')
@@ -67,12 +69,14 @@ describe 'tripleo::profile::base::aodh' do
       let(:params) { {
         :step           => 4,
         :bootstrap_node => 'somethingelse.example.com',
-        :rabbit_hosts   => ['localhost1.localdomain', 'localhost2.localdomain']
+        :oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        :oslomsg_rpc_username => 'aodh',
+        :oslomsg_rpc_password => 'foo',
       } }
 
       it 'should trigger aodh configuration without mysql grant' do
         is_expected.to contain_class('aodh').with(
-          :rabbit_hosts => params[:rabbit_hosts].map { |h| h + ":5672" }
+          :default_transport_url => 'rabbit://aodh:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('aodh::auth')
         is_expected.to contain_class('aodh::config')

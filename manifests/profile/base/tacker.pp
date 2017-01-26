@@ -22,29 +22,29 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
-# [*messaging_driver*]
-#   Driver for messaging service.
-#   Defaults to hiera('messaging_service_name', 'rabbit')
+# [*oslomsg_rpc_proto*]
+#   Protocol driver for the oslo messaging rpc service
+#   Defaults to hiera('messaging_rpc_service_name', rabbit)
 #
-# [*messaging_hosts*]
-#   list of the messaging host fqdns
+# [*oslomsg_rpc_hosts*]
+#   list of the oslo messaging rpc host fqdns
 #   Defaults to hiera('rabbitmq_node_names')
 #
-# [*messaging_password*]
-#   Password for messaging nova queue
-#   Defaults to hiera('nova::rabbit_password')
+# [*oslomsg_rpc_port*]
+#   IP port for oslo messaging rpc service
+#   Defaults to hiera('tacker::rabbit_port', 5672)
 #
-# [*messaging_port*]
-#   IP port for messaging service
-#   Defaults to hiera('nova::rabbit_port', 5672)
+# [*oslomsg_rpc_username*]
+#   Username for oslo messaging rpc service
+#   Defaults to hiera('tacker::rabbit_userid', 'guest')
 #
-# [*messaging_username*]
-#   Username for messaging nova queue
-#   Defaults to hiera('nova::rabbit_userid', 'guest')
+# [*oslomsg_rpc_password*]
+#   Password for oslo messaging rpc service
+#   Defaults to hiera('tacker::rabbit_password')
 #
-# [*messaging_use_ssl*]
-#   Flag indicating ssl usage.
-#   Defaults to hiera('nova::rabbit_use_ssl', '0')
+# [*oslomsg_use_ssl*]
+#   Enable ssl oslo messaging services
+#   Defaults to hiera('tacker::rabbit_use_ssl', '0')
 #
 # [*step*]
 #   (Optional) The current step of the deployment
@@ -52,12 +52,12 @@
 
 class tripleo::profile::base::tacker (
   $bootstrap_node       = hiera('bootstrap_nodeid', undef),
-  $messaging_driver     = hiera('messaging_service_name', 'rabbit'),
-  $messaging_hosts      = any2array(hiera('rabbitmq_node_names', undef)),
-  $messaging_password   = hiera('tacker::rabbit_password'),
-  $messaging_port       = hiera('tacker::rabbit_port', '5672'),
-  $messaging_username   = hiera('tacker::rabbit_userid', 'guest'),
-  $messaging_use_ssl    = hiera('tacker::rabbit_use_ssl', '0'),
+  $oslomsg_rpc_proto    = hiera('messaging_rpc_service_name', 'rabbit'),
+  $oslomsg_rpc_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_rpc_password = hiera('tacker::rabbit_password'),
+  $oslomsg_rpc_port     = hiera('tacker::rabbit_port', '5672'),
+  $oslomsg_rpc_username = hiera('tacker::rabbit_userid', 'guest'),
+  $oslomsg_use_ssl      = hiera('tacker::rabbit_use_ssl', '0'),
   $step                 = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -67,16 +67,16 @@ class tripleo::profile::base::tacker (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db){
-    $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($messaging_use_ssl)))
+    $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
     class { '::tacker':
       sync_db               => $sync_db,
       default_transport_url => os_transport_url({
-        'transport' => $messaging_driver,
-        'hosts'     => $messaging_hosts,
-        'port'      => sprintf('%s', $messaging_port),
-        'username'  => $messaging_username,
-        'password'  => $messaging_password,
-        'ssl'       => $messaging_use_ssl_real,
+        'transport' => $oslomsg_rpc_proto,
+        'hosts'     => $oslomsg_rpc_hosts,
+        'port'      => sprintf('%s', $oslomsg_rpc_port),
+        'username'  => $oslomsg_rpc_username,
+        'password'  => $oslomsg_rpc_password,
+        'ssl'       => $oslomsg_use_ssl_real,
       }),
     }
 

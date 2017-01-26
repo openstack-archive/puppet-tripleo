@@ -19,7 +19,7 @@ require 'spec_helper'
 describe 'tripleo::profile::base::octavia' do
 
   let :params do
-    { :rabbit_hosts => ['some.server.com'],
+    { :oslomsg_rpc_hosts => ['some.server.com'],
       :step         => 5
     }
   end
@@ -44,7 +44,7 @@ describe 'tripleo::profile::base::octavia' do
 
       it 'should provide basic initialization' do
         is_expected.to contain_class('octavia').with(
-          :default_transport_url => 'rabbit://some.server.com:5672/'
+          :default_transport_url => 'rabbit://guest:password@some.server.com:5672/?ssl=0'
         )
         is_expected.to contain_class('octavia::config')
       end
@@ -52,24 +52,24 @@ describe 'tripleo::profile::base::octavia' do
 
     context 'with multiple hosts' do
       before do
-        params.merge!({ :rabbit_hosts => ['some.server.com', 'someother.server.com'] })
+        params.merge!({ :oslomsg_rpc_hosts => ['some.server.com', 'someother.server.com'] })
       end
 
       it 'should construct a multihost URL' do
         is_expected.to contain_class('octavia').with(
-          :default_transport_url => 'rabbit://some.server.com:5672,someother.server.com:5672/'
+          :default_transport_url => 'rabbit://guest:password@some.server.com:5672,guest:password@someother.server.com:5672/?ssl=0'
         )
       end
     end
 
     context 'with username provided' do
       before do
-        params.merge!({ :rabbit_user => 'bunny' })
+        params.merge!({ :oslomsg_rpc_username => 'bunny' })
       end
 
       it 'should construct URL with username' do
         is_expected.to contain_class('octavia').with(
-          :default_transport_url => 'rabbit://bunny@some.server.com:5672/'
+          :default_transport_url => 'rabbit://bunny:password@some.server.com:5672/?ssl=0'
         )
       end
     end
@@ -77,15 +77,15 @@ describe 'tripleo::profile::base::octavia' do
     context 'with username and password provided' do
       before do
         params.merge!(
-          { :rabbit_user      => 'bunny',
-            :rabbit_password  => 'carrot'
+          { :oslomsg_rpc_username  => 'bunny',
+            :oslomsg_rpc_password  => 'carrot'
           }
         )
       end
 
       it 'should construct URL with username and password' do
         is_expected.to contain_class('octavia').with(
-          :default_transport_url => 'rabbit://bunny:carrot@some.server.com:5672/'
+          :default_transport_url => 'rabbit://bunny:carrot@some.server.com:5672/?ssl=0'
         )
       end
     end
@@ -93,16 +93,16 @@ describe 'tripleo::profile::base::octavia' do
     context 'with multiple hosts and user info provided' do
       before do
         params.merge!(
-          { :rabbit_hosts     => ['some.server.com', 'someother.server.com'],
-            :rabbit_user      => 'bunny',
-            :rabbit_password  => 'carrot'
+          { :oslomsg_rpc_hosts     => ['some.server.com', 'someother.server.com'],
+            :oslomsg_rpc_username  => 'bunny',
+            :oslomsg_rpc_password  => 'carrot'
           }
         )
       end
 
       it 'should distributed user info across hosts URL' do
         is_expected.to contain_class('octavia').with(
-          :default_transport_url => 'rabbit://bunny:carrot@some.server.com:5672,bunny:carrot@someother.server.com:5672/'
+          :default_transport_url => 'rabbit://bunny:carrot@some.server.com:5672,bunny:carrot@someother.server.com:5672/?ssl=0'
         )
       end
     end

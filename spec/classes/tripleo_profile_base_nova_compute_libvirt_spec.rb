@@ -36,7 +36,7 @@ describe 'tripleo::profile::base::nova::compute::libvirt' do
         <<-eos
         class { '::tripleo::profile::base::nova':
           step => #{params[:step]},
-          messaging_hosts => [ '127.0.0.1' ],
+          oslomsg_rpc_hosts => [ '127.0.0.1' ],
         }
         class { '::tripleo::profile::base::nova::compute':
           step => #{params[:step]},

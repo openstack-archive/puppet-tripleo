@@ -19,7 +19,7 @@ require 'spec_helper'
 describe 'tripleo::profile::base::ceilometer::api' do
   shared_examples_for 'tripleo::profile::base::ceilometer::api' do
     let(:pre_condition) do
-      "class { '::tripleo::profile::base::ceilometer': step => #{params[:step]}, rabbit_hosts => ['localhost.localdomain'] }"
+      "class { '::tripleo::profile::base::ceilometer': step => #{params[:step]}, oslomsg_rpc_hosts => ['localhost.localdomain'] }"
     end
 
     context 'with step less than 4' do

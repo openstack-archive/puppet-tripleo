@@ -26,30 +26,6 @@
 #   (Optional) Whether keystone token flushing should be enabled
 #   Defaults to hiera('keystone_enable_db_purge', true)
 #
-# [*messaging_driver*]
-#   Driver for messaging service.
-#   Defaults to hiera('messaging_service_name', 'rabbit')
-#
-# [*messaging_hosts*]
-#   list of the messaging host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
-#
-# [*messaging_password*]
-#   Password for messaging heat queue
-#   Defaults to hiera('heat::rabbit_password')
-#
-# [*messaging_port*]
-#   IP port for messaging service
-#   Defaults to hiera('heat::rabbit_port', 5672)
-#
-# [*messaging_username*]
-#   Username for messaging heat queue
-#   Defaults to hiera('heat::rabbit_userid', 'guest')
-#
-# [*messaging_use_ssl*]
-#   Flag indicating ssl usage.
-#   Defaults to hiera('heat::rabbit_use_ssl', '0')
-#
 # [*notification_driver*]
 #   (Optional) Heat notification driver to use.
 #   Defaults to 'messaging'
@@ -59,18 +35,66 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*oslomsg_rpc_proto*]
+#   Protocol driver for the oslo messaging rpc service
+#   Defaults to hiera('messaging_rpc_service_name', rabbit)
+#
+# [*oslomsg_rpc_hosts*]
+#   list of the oslo messaging rpc host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
+#
+# [*oslomsg_rpc_port*]
+#   IP port for oslo messaging rpc service
+#   Defaults to hiera('heat::rabbit_port', 5672)
+#
+# [*oslomsg_rpc_username*]
+#   Username for oslo messaging rpc service
+#   Defaults to hiera('heat::rabbit_userid', 'guest')
+#
+# [*oslomsg_rpc_password*]
+#   Password for oslo messaging rpc service
+#   Defaults to hiera('heat::rabbit_password')
+#
+# [*oslomsg_notify_proto*]
+#   Protocol driver for the oslo messaging notify service
+#   Defaults to hiera('messaging_notify_service_name', rabbit)
+#
+# [*oslomsg_notify_hosts*]
+#   list of the oslo messaging notify host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
+#
+# [*oslomsg_notify_port*]
+#   IP port for oslo messaging notify service
+#   Defaults to hiera('heat::rabbit_port', 5672)
+#
+# [*oslomsg_notify_username*]
+#   Username for oslo messaging notify service
+#   Defaults to hiera('heat::rabbit_userid', 'guest')
+#
+# [*oslomsg_notify_password*]
+#   Password for oslo messaging notify service
+#   Defaults to hiera('heat::rabbit_password')
+#
+# [*oslomsg_use_ssl*]
+#   Enable ssl oslo messaging services
+#   Defaults to hiera('heat::rabbit_use_ssl', '0')
 
 class tripleo::profile::base::heat (
-  $bootstrap_node      = downcase(hiera('bootstrap_nodeid')),
-  $manage_db_purge     = hiera('heat_enable_db_purge', true),
-  $messaging_driver    = hiera('messaging_service_name', 'rabbit'),
-  $messaging_hosts     = any2array(hiera('rabbitmq_node_names', undef)),
-  $messaging_password  = hiera('heat::rabbit_password'),
-  $messaging_port      = hiera('heat::rabbit_port', '5672'),
-  $messaging_username  = hiera('heat::rabbit_userid', 'guest'),
-  $messaging_use_ssl   = hiera('heat::rabbit_use_ssl', '0'),
-  $notification_driver = 'messaging',
-  $step                = hiera('step'),
+  $bootstrap_node          = downcase(hiera('bootstrap_nodeid')),
+  $manage_db_purge         = hiera('heat_enable_db_purge', true),
+  $notification_driver     = 'messaging',
+  $step                    = hiera('step'),
+  $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
+  $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_rpc_password    = hiera('heat::rabbit_password'),
+  $oslomsg_rpc_port        = hiera('heat::rabbit_port', '5672'),
+  $oslomsg_rpc_username    = hiera('heat::rabbit_userid', 'guest'),
+  $oslomsg_notify_proto    = hiera('messaging_notify_service_name', 'rabbit'),
+  $oslomsg_notify_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_notify_password = hiera('heat::rabbit_password'),
+  $oslomsg_notify_port     = hiera('heat::rabbit_port', '5672'),
+  $oslomsg_notify_username = hiera('heat::rabbit_userid', 'guest'),
+  $oslomsg_use_ssl         = hiera('heat::rabbit_use_ssl', '0'),
 ) {
   # Domain resources will be created at step5 on the node running keystone.pp
   # configure heat.conf at step3 and 4 but actually create the domain later.
@@ -81,19 +105,27 @@ class tripleo::profile::base::heat (
       manage_role   => false,
     }
 
-    $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($messaging_use_ssl)))
+    $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
 
     # TODO(ccamacho): remove sprintf once we properly type the port, needs
     # to be a string for the os_transport_url function.
     class { '::heat' :
-      notification_driver   => $notification_driver,
-      default_transport_url => os_transport_url({
-        'transport' => $messaging_driver,
-        'hosts'     => $messaging_hosts,
-        'password'  => $messaging_password,
-        'port'      => sprintf('%s', $messaging_port),
-        'username'  => $messaging_username,
-        'ssl'       => $messaging_use_ssl_real,
+      notification_driver        => $notification_driver,
+      default_transport_url      => os_transport_url({
+        'transport' => $oslomsg_rpc_proto,
+        'hosts'     => $oslomsg_rpc_hosts,
+        'port'      => sprintf('%s', $oslomsg_rpc_port),
+        'username'  => $oslomsg_rpc_username,
+        'password'  => $oslomsg_rpc_password,
+        'ssl'       => $oslomsg_use_ssl_real,
+      }),
+      notification_transport_url => os_transport_url({
+        'transport' => $oslomsg_notify_proto,
+        'hosts'     => $oslomsg_notify_hosts,
+        'port'      => sprintf('%s', $oslomsg_notify_port),
+        'username'  => $oslomsg_notify_username,
+        'password'  => $oslomsg_notify_password,
+        'ssl'       => $oslomsg_use_ssl_real,
       }),
     }
     include ::heat::config

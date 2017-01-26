@@ -22,35 +22,50 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
-# [*rabbit_user*]
-# [*rabbit_password*]
-#  (Optional) RabbitMQ user details
-#  Defaults to undef
+# [*oslomsg_rpc_proto*]
+#   Protocol driver for the oslo messaging rpc service
+#   Defaults to hiera('messaging_rpc_service_name', rabbit)
 #
-# [*rabbit_hosts*]
-#   list of the rabbbit host fqdns
+# [*oslomsg_rpc_hosts*]
+#   list of the oslo messaging rpc host fqdns
 #   Defaults to hiera('rabbitmq_node_names')
 #
-# [*rabbit_port*]
-#   IP port for rabbitmq service
-#   Defaults to 5672.
+# [*oslomsg_rpc_port*]
+#   IP port for oslo messaging rpc service
+#   Defaults to hiera('octavia::rabbit_port', 5672)
 #
+# [*oslomsg_rpc_username*]
+#   Username for oslo messaging rpc service
+#   Defaults to hiera('octavia::rabbit_userid', 'guest')
+#
+# [*oslomsg_rpc_password*]
+#   Password for oslo messaging rpc service
+#   Defaults to hiera('octavia::rabbit_password')
+#
+# [*oslomsg_use_ssl*]
+#   Enable ssl oslo messaging services
+#   Defaults to hiera('octavia::rabbit_use_ssl', '0')
+
 class tripleo::profile::base::octavia (
-  $step            = hiera('step'),
-  $rabbit_user     = undef,
-  $rabbit_password = undef,
-  $rabbit_hosts    = hiera('rabbitmq_node_names', undef),
-  $rabbit_port     = '5672'
+  $step                 = hiera('step'),
+  $oslomsg_rpc_proto    = hiera('messaging_rpc_service_name', 'rabbit'),
+  $oslomsg_rpc_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_rpc_password = hiera('octavia::rabbit_password'),
+  $oslomsg_rpc_port     = hiera('octavia::rabbit_port', '5672'),
+  $oslomsg_rpc_username = hiera('octavia::rabbit_userid', 'guest'),
+  $oslomsg_use_ssl      = hiera('octavia::rabbit_use_ssl', '0'),
 ) {
   if $step >= 3 {
+    $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
     class { '::octavia' :
       default_transport_url => os_transport_url({
-        'transport' => 'rabbit',
-        'hosts'     => $rabbit_hosts,
-        'port'      => sprintf('%s', $rabbit_port),
-        'username'  => $rabbit_user,
-        'password'  => $rabbit_password
-        })
+        'transport' => $oslomsg_rpc_proto,
+        'hosts'     => $oslomsg_rpc_hosts,
+        'port'      => sprintf('%s', $oslomsg_rpc_port),
+        'username'  => $oslomsg_rpc_username,
+        'password'  => $oslomsg_rpc_password,
+        'ssl'       => $oslomsg_use_ssl_real,
+        }),
     }
     include ::octavia::config
   }
