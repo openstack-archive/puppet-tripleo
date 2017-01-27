@@ -75,6 +75,21 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*tls_proxy_bind_ip*]
+#   IP on which the TLS proxy will listen on. Required only if
+#   enable_internal_tls is set.
+#   Defaults to undef
+#
+# [*tls_proxy_fqdn*]
+#   fqdn on which the tls proxy will listen on. required only used if
+#   enable_internal_tls is set.
+#   defaults to undef
+#
+# [*tls_proxy_port*]
+#   port on which the tls proxy will listen on. Only used if
+#   enable_internal_tls is set.
+#   defaults to 9696
+#
 class tripleo::profile::base::neutron::server (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -85,6 +100,9 @@ class tripleo::profile::base::neutron::server (
   $l3_nodes                      = hiera('neutron_l3_short_node_names', []),
   $neutron_network               = hiera('neutron_api_network', undef),
   $step                          = hiera('step'),
+  $tls_proxy_bind_ip             = undef,
+  $tls_proxy_fqdn                = undef,
+  $tls_proxy_port                = 9696,
 ) {
   if $enable_internal_tls and $generate_service_certificates {
     ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
@@ -120,9 +138,9 @@ class tripleo::profile::base::neutron::server (
       $tls_keyfile = $certificates_specs["httpd-${neutron_network}"]['service_key']
 
       ::tripleo::tls_proxy { 'neutron-api':
-        servername => hiera("fqdn_${neutron_network}"),
-        ip         => hiera('neutron::bind_host'),  # This will be cleaned out
-        port       => 9696,  # This will be cleaned out
+        servername => $tls_proxy_fqdn,
+        ip         => $tls_proxy_bind_ip,
+        port       => $tls_proxy_port,
         tls_cert   => $tls_certfile,
         tls_key    => $tls_keyfile,
         notify     => Class['::neutron::server'],
