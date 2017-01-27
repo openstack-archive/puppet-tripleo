@@ -45,7 +45,7 @@ class tripleo::certmonger::mysql (
   include ::certmonger
   include ::mysql::params
 
-  $postsave_cmd        = "systemctl reload ${::mysql::params::service_name}"
+  $postsave_cmd        = "systemctl reload ${::mysql::params::server_service_name}"
   certmonger_certificate { 'mysql' :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -69,6 +69,6 @@ class tripleo::certmonger::mysql (
     require => Certmonger_certificate['mysql'],
   }
 
-  File[$service_certificate] ~> Service<| title == $::mysql::params::service_name |>
-  File[$service_key] ~> Service<| title == $::mysql::params::service_name |>
+  File[$service_certificate] ~> Service<| title == $::mysql::params::server_service_name |>
+  File[$service_key] ~> Service<| title == $::mysql::params::server_service_name |>
 }
