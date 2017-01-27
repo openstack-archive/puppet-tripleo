@@ -1,0 +1,4 @@
+---
+features:
+  - Adds the ability to manage auditd.service and enter audit.rules
+
