@@ -95,6 +95,9 @@ class tripleo::profile::base::database::mysql (
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
+
+    # Force users/grants created to use TLS connections
+    Openstacklib::Db::Mysql <||> { tls_options => ['SSL'] }
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
