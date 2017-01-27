@@ -19,21 +19,22 @@
 # === Parameters:
 #
 # [*registry_host*]
-#  (String) IP address on which the Docker registry is listening on
+#  (String) IP address or hostname the Docker registry binds to
 #  Defaults to hiera('controller_host')
 #
 # [*registry_port*]
 #  (Integer) The port on which the Docker registry is listening on
 #  Defaults to 8787
 #
-# [*controller_admin_vip*]
-#  (String) VIP of the host
-#  Defaults to hiera('controller_admin_vip')
+# [*registry_admin_host*]
+#  (String) IP address or hostname the Docker registry binds to in the admin
+#  network
+#  Defaults to hiera('controller_admin_host')
 #
 class tripleo::profile::base::docker_registry (
-  $registry_host        = hiera('controller_host'),
-  $registry_port        = 8787,
-  $controller_admin_vip = hiera('controller_admin_vip'),
+  $registry_host       = hiera('controller_host'),
+  $registry_port       = 8787,
+  $registry_admin_host = hiera('controller_admin_host'),
 ) {
   # We want a v2 registry
   package{'docker-registry':
@@ -55,7 +56,7 @@ class tripleo::profile::base::docker_registry (
     line    => join ([
       'INSECURE_REGISTRY="',
       '--insecure-registry ', $registry_host, ':', $registry_port, ' ',
-      '--insecure-registry ', $controller_admin_vip, ':', $registry_port, '"']),
+      '--insecure-registry ', $registry_admin_host, ':', $registry_port, '"']),
     match   => 'INSECURE_REGISTRY=',
     require => Package['docker'],
     notify  => Service['docker'],
