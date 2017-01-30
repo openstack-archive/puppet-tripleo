@@ -18,38 +18,58 @@
 #
 # === Parameters
 #
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
+# [*ceilometer_enabled*]
+#   Whether the ceilometer pipeline is enabled.
+#   Defaults to true
 #
-# [*memcache_servers*]
-#   (Optional) List of memcache servers
-#   Defaults to hiera('memcached_node_ips')
+# [*ceilometer_messaging_driver*]
+#   Driver for messaging service.
+#   Defaults to hiera('messaging_service_name', 'rabbit')
+#
+# [*ceilometer_messaging_hosts*]
+#   list of the messaging host fqdns
+#   Defaults to hiera('rabbitmq_node_names')
+#
+# [*ceilometer_messaging_password*]
+#   Password for messaging nova queue
+#   Defaults to hiera('swift::proxy::ceilometer::rabbit_password', undef)
+#
+# [*ceilometer_messaging_port*]
+#   IP port for messaging service
+#   Defaults to hiera('tripleo::profile::base::swift::proxy::rabbit_port', 5672)
+#
+# [*ceilometer_messaging_use_ssl*]
+#   Flag indicating ssl usage.
+#   Defaults to '0'
+#
+# [*ceilometer_messaging_username*]
+#   Username for messaging nova queue
+#   Defaults to hiera('swift::proxy::ceilometer::rabbit_user', 'guest')
 #
 # [*memcache_port*]
 #   (Optional) memcache port
 #   Defaults to 11211
 #
-# [*rabbit_hosts*]
-#   list of the rabbbit host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
+# [*memcache_servers*]
+#   (Optional) List of memcache servers
+#   Defaults to hiera('memcached_node_ips')
 #
-# [*rabbit_port*]
-#   IP port for rabbitmq service
-#   Defaults to 5672
-#
-# [*ceilometer_enabled*]
-#   Whether the ceilometer pipeline is enabled.
-#   Defaults to true
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step')
 #
 class tripleo::profile::base::swift::proxy (
-  $step               = hiera('step'),
-  $memcache_servers   = hiera('memcached_node_ips'),
-  $memcache_port      = 11211,
-  $rabbit_hosts       = hiera('rabbitmq_node_names', undef),
-  $rabbit_port        = 5672,
-  $ceilometer_enabled = true,
+  $ceilometer_enabled            = true,
+  $ceilometer_messaging_driver   = hiera('messaging_service_name', 'rabbit'),
+  $ceilometer_messaging_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
+  $ceilometer_messaging_password = hiera('swift::proxy::ceilometer::rabbit_password', undef),
+  $ceilometer_messaging_port     = hiera('tripleo::profile::base::swift::proxy::rabbit_port', '5672'),
+  $ceilometer_messaging_use_ssl  = '0',
+  $ceilometer_messaging_username = hiera('swift::proxy::ceilometer::rabbit_user', 'guest'),
+  $memcache_port                 = 11211,
+  $memcache_servers              = hiera('memcached_node_ips'),
+  $step                          = hiera('step'),
 ) {
   if $step >= 4 {
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
@@ -68,10 +88,17 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::tempurl
     include ::swift::proxy::formpost
     include ::swift::proxy::bulk
-    $swift_rabbit_hosts = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
+    $ceilometer_messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($ceilometer_messaging_use_ssl)))
     if $ceilometer_enabled {
       class { '::swift::proxy::ceilometer':
-        rabbit_hosts => $swift_rabbit_hosts,
+        default_transport_url => os_transport_url({
+          'transport' => $ceilometer_messaging_driver,
+          'hosts'     => $ceilometer_messaging_hosts,
+          'port'      => sprintf('%s', $ceilometer_messaging_port),
+          'username'  => $ceilometer_messaging_username,
+          'password'  => $ceilometer_messaging_password,
+          'ssl'       => $ceilometer_messaging_use_ssl_real,
+        }),
       }
     }
     include ::swift::proxy::versioned_writes
