@@ -40,6 +40,9 @@ describe 'tripleo::profile::base::octavia::api' do
       class { 'octavia::db::mysql':
         password => 'some_password'
       }
+      class { 'octavia::keystone::authtoken':
+        password => 'some_password'
+      }
 eos
     end
 
