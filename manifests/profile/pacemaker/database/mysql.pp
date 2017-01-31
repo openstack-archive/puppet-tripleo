@@ -75,6 +75,7 @@ class tripleo::profile::pacemaker::database::mysql (
       'default-storage-engine'        => 'innodb',
       'innodb_autoinc_lock_mode'      => '2',
       'innodb_locks_unsafe_for_binlog'=> '1',
+      'innodb_file_per_table'         => 'ON',
       'query_cache_size'              => '0',
       'query_cache_type'              => '0',
       'bind-address'                  => $bind_address,
