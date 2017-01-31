@@ -40,24 +40,13 @@ class tripleo::profile::base::nova::compute::libvirt (
       }
     }
 
-    # TODO(emilien): Some work needs to be done in puppet-nova to separate nova-compute config
-    # when running libvirt and libvirt itself, so we allow micro-services deployments.
-    if str2bool(hiera('nova::use_ipv6', false)) {
-      $vncserver_listen = '::0'
-    } else {
-      $vncserver_listen = '0.0.0.0'
-    }
-
     if $rbd_ephemeral_storage {
       class { '::nova::compute::libvirt':
         libvirt_disk_cachemodes => ['network=writeback'],
         libvirt_hw_disk_discard => 'unmap',
-        vncserver_listen        => $vncserver_listen,
       }
     } else {
-      class { '::nova::compute::libvirt' :
-        vncserver_listen => $vncserver_listen,
-      }
+      include ::nova::compute::libvirt
     }
 
   }
