@@ -1,0 +1,7 @@
+---
+features:
+  - Configure VNC server to be binded on internal network interface on compute nodes.
+    This value comes from tripleo-heat-templates and is configured by default to use
+    an IP address from the internal API network.
+    We use the ServiceNetMap in tripleo-heat-templates to compute the IP address, and we won't
+    configure 0.0.0.0 anymore as it used to open the binding to any network, which is unsecure.
