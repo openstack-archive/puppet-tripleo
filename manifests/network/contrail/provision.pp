@@ -19,10 +19,6 @@
 #
 # == Parameters:
 #
-# [*host_ip*]
-#  (required) host IP address of Control
-#  String (IPv4) value.
-#
 # [*admin_password*]
 #  (optional) admin password
 #  String value.
@@ -67,15 +63,15 @@
 #  Defaults to hiera('step')
 #
 class tripleo::network::contrail::provision(
-  $step             = hiera('step'),
-  $admin_password = hiera('contrail::admin_password'),
+  $admin_password    = hiera('contrail::admin_password'),
   $admin_tenant_name = hiera('contrail::admin_tenant_name'),
-  $admin_token = hiera('contrail::admin_token'),
-  $admin_user = hiera('contrail::admin_user'),
-  $auth_host = hiera('contrail::auth_host'),
-  $auth_port = hiera('contrail::auth_port'),
-  $auth_protocol = hiera('contrail::auth_protocol'),
-  $api_server = hiera('contrail_config_vip'),
+  $admin_token       = hiera('contrail::admin_token'),
+  $admin_user        = hiera('contrail::admin_user'),
+  $api_server        = hiera('contrail_config_vip'),
+  $auth_host         = hiera('contrail::auth_host'),
+  $auth_port         = hiera('contrail::auth_port'),
+  $auth_protocol     = hiera('contrail::auth_protocol'),
+  $step              = hiera('step'),
 )
 {
   if $step >= 5 {

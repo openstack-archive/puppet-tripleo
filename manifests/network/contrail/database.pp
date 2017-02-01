@@ -39,15 +39,15 @@
 #  String value.
 #  Defaults to hiera('contrail::admin_user')
 #
-# [*api_server*]
-#  (optional) VIP of Config API
-#  String (IPv4) value.
-#  Defaults to hiera('contrail_config_vip')
-#
 # [*api_port*]
 #  (optional) Port of Config API
 #  String value.
 #  Defaults to hiera('contrail::api_port')
+#
+# [*api_server*]
+#  (optional) VIP of Config API
+#  String (IPv4) value.
+#  Defaults to hiera('contrail_config_vip')
 #
 # [*auth_host*]
 #  (optional) keystone server ip address
@@ -104,13 +104,12 @@
 #  Defaults to hiera('contrail_database_node_ips')
 #
 class tripleo::network::contrail::database(
-  $step                 = hiera('step'),
   $admin_password       = hiera('contrail::admin_password'),
   $admin_tenant_name    = hiera('contrail::admin_tenant_name'),
   $admin_token          = hiera('contrail::admin_token'),
   $admin_user           = hiera('contrail::admin_user'),
-  $api_server           = hiera('contrail_config_vip'),
   $api_port             = hiera('contrail::api_port'),
+  $api_server           = hiera('contrail_config_vip'),
   $auth_host            = hiera('contrail::auth_host'),
   $cassandra_servers    = hiera('contrail_database_node_ips'),
   $disc_server_ip       = hiera('contrail_config_vip'),
@@ -118,6 +117,7 @@ class tripleo::network::contrail::database(
   $host_ip              = hiera('contrail::database::host_ip'),
   $host_name            = $::hostname,
   $public_vip           = hiera('public_virtual_ip'),
+  $step                 = hiera('step'),
   $zookeeper_client_ip  = hiera('contrail::database::host_ip'),
   $zookeeper_hostnames  = hiera('contrail_database_short_node_names'),
   $zookeeper_server_ips = hiera('contrail_database_node_ips'),

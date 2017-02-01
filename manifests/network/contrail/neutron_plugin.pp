@@ -22,15 +22,15 @@
 #  String value.
 #  Defaults to hiera('contrail::admin_user')
 #
-# [*api_server*]
-#  (optional) IP address of api server
-#  String value.
-#  Defaults to hiera('contrail_config_vip')
-#
 # [*api_port*]
 #  (optional) port of api server
 #  String value.
 #  Defaults to hiera('contrail::api_port')
+#
+# [*api_server*]
+#  (optional) IP address of api server
+#  String value.
+#  Defaults to hiera('contrail_config_vip')
 #
 # [*auth_host*]
 #  (optional) keystone server ip address
@@ -62,14 +62,6 @@
 #  String value.
 #  Defaults to hiera('contrail::service_certificate',false)
 #
-# [*api_server_ip*]
-#   IP address of the API Server
-#   Defaults to $::os_service_default
-#
-# [*api_server_port*]
-#   Port of the API Server.
-#   Defaults to $::os_service_default
-#
 # [*contrail_extensions*]
 #   Array of OpenContrail extensions to be supported
 #   Defaults to $::os_service_default
@@ -78,26 +70,6 @@
 #     class {'neutron::plugins::opencontrail' :
 #       contrail_extensions => ['ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam']
 #     }
-#
-# [*keystone_auth_url*]
-#   Url of the keystone auth server
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_user*]
-#   Admin user name
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_tenant_name*]
-#   Admin_tenant_name
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_password*]
-#   Admin password
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_token*]
-#   Admin token
-#   Defaults to $::os_service_default
 #
 # [*package_ensure*]
 #   (optional) Ensure state for package.
@@ -109,21 +81,21 @@
 #   Defaults to false.
 #
 class tripleo::network::contrail::neutron_plugin (
-  $contrail_extensions    = hiera('contrail::vrouter::contrail_extensions'),
-  $admin_password         = hiera('contrail::admin_password'),
-  $admin_tenant_name      = hiera('contrail::admin_tenant_name'),
-  $admin_token            = hiera('contrail::admin_token'),
-  $admin_user             = hiera('contrail::admin_user'),
-  $api_server             = hiera('contrail_config_vip'),
-  $api_port               = hiera('contrail::api_port'),
-  $auth_host              = hiera('contrail::auth_host'),
-  $auth_port              = hiera('contrail::auth_port'),
-  $auth_port_ssl          = hiera('contrail::auth_port_ssl'),
-  $auth_protocol          = hiera('contrail::auth_protocol'),
-  $ca_file                = hiera('tripleo::haproxy::service_certificate',false),
-  $cert_file              = hiera('tripleo::haproxy::service_certificate',false),
-  $purge_config           = false,
-  $package_ensure         = 'present',
+  $admin_password      = hiera('contrail::admin_password'),
+  $admin_tenant_name   = hiera('contrail::admin_tenant_name'),
+  $admin_token         = hiera('contrail::admin_token'),
+  $admin_user          = hiera('contrail::admin_user'),
+  $api_port            = hiera('contrail::api_port'),
+  $api_server          = hiera('contrail_config_vip'),
+  $auth_host           = hiera('contrail::auth_host'),
+  $auth_port           = hiera('contrail::auth_port'),
+  $auth_port_ssl       = hiera('contrail::auth_port_ssl'),
+  $auth_protocol       = hiera('contrail::auth_protocol'),
+  $ca_file             = hiera('tripleo::haproxy::service_certificate',false),
+  $cert_file           = hiera('tripleo::haproxy::service_certificate',false),
+  $contrail_extensions = hiera('contrail::vrouter::contrail_extensions'),
+  $package_ensure      = 'present',
+  $purge_config        = false,
 ) {
 
   include ::neutron::deps
