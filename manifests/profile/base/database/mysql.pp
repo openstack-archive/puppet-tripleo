@@ -119,14 +119,13 @@ class tripleo::profile::base::database::mysql (
     # MysqlNetwork and ControllerHostnameResolveNetwork in ServiceNetMap
     $mysql_server_default = {
       'mysqld' => {
-        'bind-address'          => $bind_address,
-        'max_connections'       => hiera('mysql_max_connections'),
-        'open_files_limit'      => '-1',
-        'innodb_file_per_table' => 'ON',
-        'ssl'                   => $enable_internal_tls,
-        'ssl-key'               => $tls_keyfile,
-        'ssl-cert'              => $tls_certfile,
-        'ssl-ca'                => undef,
+        'bind-address'     => $bind_address,
+        'max_connections'  => hiera('mysql_max_connections'),
+        'open_files_limit' => '-1',
+        'ssl'              => $enable_internal_tls,
+        'ssl-key'          => $tls_keyfile,
+        'ssl-cert'         => $tls_certfile,
+        'ssl-ca'           => undef,
       }
     }
     $mysql_server_options_real = deep_merge($mysql_server_default, $mysql_server_options)
