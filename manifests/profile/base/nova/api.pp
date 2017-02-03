@@ -49,6 +49,11 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('nova_api_network', undef)
 #
+# [*nova_api_wsgi_enabled*]
+#   (Optional) Whether or not deploy Nova API in WSGI with Apache.
+#   Nova Team discourages it.
+#   Defaults to hiera('nova_wsgi_enabled', false)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -60,6 +65,7 @@ class tripleo::profile::base::nova::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $generate_service_certificates = hiera('generate_service_certificates', false),
   $nova_api_network              = hiera('nova_api_network', undef),
+  $nova_api_wsgi_enabled         = hiera('nova_wsgi_enabled', false),
   $step                          = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -90,29 +96,31 @@ class tripleo::profile::base::nova::api (
       sync_db     => $sync_db,
       sync_db_api => $sync_db,
     }
-    # Temporarily disable Nova API deployed in WSGI
-    # https://bugs.launchpad.net/nova/+bug/1661360
-    if hiera('nova_wsgi_enabled', false) {
-      if $enable_internal_tls {
-        if $generate_service_certificates {
-          ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-        }
-
-        if !$nova_api_network {
-          fail('nova_api_network is not set in the hieradata.')
-        }
-        $tls_certfile = $certificates_specs["httpd-${nova_api_network}"]['service_certificate']
-        $tls_keyfile = $certificates_specs["httpd-${nova_api_network}"]['service_key']
-      } else {
-        $tls_certfile = undef
-        $tls_keyfile = undef
+    include ::nova::network::neutron
+  }
+  # Temporarily disable Nova API deployed in WSGI
+  # https://bugs.launchpad.net/nova/+bug/1661360
+  if $nova_api_wsgi_enabled {
+    if $enable_internal_tls {
+      if $generate_service_certificates {
+        ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
       }
+
+      if !$nova_api_network {
+        fail('nova_api_network is not set in the hieradata.')
+      }
+      $tls_certfile = $certificates_specs["httpd-${nova_api_network}"]['service_certificate']
+      $tls_keyfile = $certificates_specs["httpd-${nova_api_network}"]['service_key']
+    } else {
+      $tls_certfile = undef
+      $tls_keyfile = undef
+    }
+    if $step >= 4 or ($step >= 3 and $sync_db) {
       class { '::nova::wsgi::apache_api':
         ssl_cert => $tls_certfile,
         ssl_key  => $tls_keyfile,
       }
     }
-    include ::nova::network::neutron
   }
 
   if $step >= 5 {
