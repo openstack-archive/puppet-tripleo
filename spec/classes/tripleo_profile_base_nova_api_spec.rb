@@ -39,7 +39,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::keystone::authtoken')
         is_expected.to_not contain_class('nova::api')
-        is_expected.to_not contain_class('nova::wsgi::apache_api')
+        #is_expected.to_not contain_class('nova::wsgi::apache_api')
         is_expected.to_not contain_class('nova::network::neutron')
       }
     end
@@ -56,7 +56,7 @@ eos
         is_expected.to contain_class('nova::cell_v2::simple_setup')
         is_expected.to contain_class('nova::keystone::authtoken')
         is_expected.to contain_class('nova::api')
-        is_expected.to contain_class('nova::wsgi::apache_api')
+        #is_expected.to contain_class('nova::wsgi::apache_api')
         is_expected.to contain_class('nova::network::neutron')
       }
     end
@@ -73,7 +73,7 @@ eos
         is_expected.to_not contain_class('nova::db::sync_cell_v2')
         is_expected.to_not contain_class('nova::keystone::authtoken')
         is_expected.to_not contain_class('nova::api')
-        is_expected.to_not contain_class('nova::wsgi::apache_api')
+        #is_expected.to_not contain_class('nova::wsgi::apache_api')
         is_expected.to_not contain_class('nova::network::neutron')
       }
     end
@@ -88,7 +88,7 @@ eos
         is_expected.to_not contain_class('nova::db::sync_cell_v2')
         is_expected.to contain_class('nova::keystone::authtoken')
         is_expected.to contain_class('nova::api')
-        is_expected.to contain_class('nova::wsgi::apache_api')
+        #is_expected.to contain_class('nova::wsgi::apache_api')
         is_expected.to contain_class('nova::network::neutron')
       }
     end

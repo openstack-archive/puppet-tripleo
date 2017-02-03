@@ -70,21 +70,6 @@ class tripleo::profile::base::nova::api (
 
   include ::tripleo::profile::base::nova
 
-  if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-    }
-
-    if !$nova_api_network {
-      fail('nova_api_network is not set in the hieradata.')
-    }
-    $tls_certfile = $certificates_specs["httpd-${nova_api_network}"]['service_certificate']
-    $tls_keyfile = $certificates_specs["httpd-${nova_api_network}"]['service_key']
-  } else {
-    $tls_certfile = undef
-    $tls_keyfile = undef
-  }
-
   if $step >= 3 and $sync_db {
     include ::nova::cell_v2::simple_setup
   }
@@ -105,9 +90,25 @@ class tripleo::profile::base::nova::api (
       sync_db     => $sync_db,
       sync_db_api => $sync_db,
     }
-    class { '::nova::wsgi::apache_api':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if hiera('nova_wsgi_enabled', true) {
+      if $enable_internal_tls {
+        if $generate_service_certificates {
+          ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
+        }
+
+        if !$nova_api_network {
+          fail('nova_api_network is not set in the hieradata.')
+        }
+        $tls_certfile = $certificates_specs["httpd-${nova_api_network}"]['service_certificate']
+        $tls_keyfile = $certificates_specs["httpd-${nova_api_network}"]['service_key']
+      } else {
+        $tls_certfile = undef
+        $tls_keyfile = undef
+      }
+      class { '::nova::wsgi::apache_api':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
     include ::nova::network::neutron
   }
