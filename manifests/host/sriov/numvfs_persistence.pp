@@ -10,9 +10,16 @@
 # [*content_string*]
 #   (required) String which shall be written to the script file.
 #
+# [*udev_rules*]
+#   (required) String of lines to write to udev rules to ensure
+#   VFs are reconfigured if the PCI devices are removed and
+#   readded without rebooting (e.g. when physical functions were
+#   allocated to VMs)
+#
 define tripleo::host::sriov::numvfs_persistence(
   $vf_defs,
-  $content_string
+  $content_string,
+  $udev_rules
 ){
   # Since reduce isn't available, we use recursion to iterate each entries of
   # "physical_interface:vfs" and accumulate the content that needs to be
@@ -36,6 +43,16 @@ define tripleo::host::sriov::numvfs_persistence(
       replace => false
     }
 
+    file { '/etc/udev/rules.d/70-tripleo-reset-sriov.rules':
+      ensure  => file,
+      group   => 'root',
+      mode    => '0755',
+      owner   => 'root',
+      content => $udev_rules,
+      replace => true,
+    }
+
+
     file_line { 'call_ifup-local':
       path    => '/sbin/ifup-local',
       line    => '/etc/sysconfig/allocate_vfs $1',
@@ -46,9 +63,11 @@ define tripleo::host::sriov::numvfs_persistence(
     $interface = $vfspec[0]
     $count = $vfspec[1]
     $vfdef_str = "${content_string}[ \"${interface}\" == \"\$1\" ] && echo ${count} > /sys/class/net/${interface}/device/sriov_numvfs\n"
+    $udev_str = "${udev_rules}KERNEL==\"${interface}\", RUN+=\"/etc/sysconfig/allocate_vfs %k\"\n"
     tripleo::host::sriov::numvfs_persistence{"mapped ${interface}":
       vf_defs        => delete_at($vf_defs, 0),
-      content_string => $vfdef_str
+      content_string => $vfdef_str,
+      udev_rules     => $udev_str
     }
   }
 }
