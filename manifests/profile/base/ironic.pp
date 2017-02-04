@@ -54,6 +54,7 @@ class tripleo::profile::base::ironic (
       rabbit_hosts => $rabbit_endpoints,
     }
 
+    include ::ironic::config
     include ::ironic::cors
   }
 }
