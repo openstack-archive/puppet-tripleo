@@ -26,8 +26,8 @@
 #   (Optional) Whether to enable the hpelefthand backend
 #   Defaults to false
 #
-# [*cinder_enable_eqlx_backend*]
-#   (Optional) Whether to enable the eqlx backend
+# [*cinder_enable_dellps_backend*]
+#   (Optional) Whether to enable the dellps backend
 #   Defaults to true
 #
 # [*cinder_enable_iscsi_backend*]
@@ -58,7 +58,7 @@
 class tripleo::profile::base::cinder::volume (
   $cinder_enable_dellsc_backend      = false,
   $cinder_enable_hpelefthand_backend = false,
-  $cinder_enable_eqlx_backend        = false,
+  $cinder_enable_dellps_backend      = false,
   $cinder_enable_iscsi_backend       = true,
   $cinder_enable_netapp_backend      = false,
   $cinder_enable_nfs_backend         = false,
@@ -85,11 +85,11 @@ class tripleo::profile::base::cinder::volume (
       $cinder_hpelefthand_backend_name = undef
     }
 
-    if $cinder_enable_eqlx_backend {
-      include ::tripleo::profile::base::cinder::volume::eqlx
-      $cinder_eqlx_backend_name = hiera('cinder::backend::eqlx::volume_backend_name', 'tripleo_eqlx')
+    if $cinder_enable_dellps_backend {
+      include ::tripleo::profile::base::cinder::volume::dellps
+      $cinder_dellps_backend_name = hiera('cinder::backend::dellps::volume_backend_name', 'tripleo_dellps')
     } else {
-      $cinder_eqlx_backend_name = undef
+      $cinder_dellps_backend_name = undef
     }
 
     if $cinder_enable_iscsi_backend {
@@ -122,7 +122,7 @@ class tripleo::profile::base::cinder::volume (
 
     $backends = delete_undef_values([$cinder_iscsi_backend_name,
                                       $cinder_rbd_backend_name,
-                                      $cinder_eqlx_backend_name,
+                                      $cinder_dellps_backend_name,
                                       $cinder_dellsc_backend_name,
                                       $cinder_hpelefthand_backend_name,
                                       $cinder_netapp_backend_name,

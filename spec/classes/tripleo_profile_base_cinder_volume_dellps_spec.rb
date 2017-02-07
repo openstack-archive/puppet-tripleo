@@ -16,8 +16,8 @@
 
 require 'spec_helper'
 
-describe 'tripleo::profile::base::cinder::volume::eqlx' do
-  shared_examples_for 'tripleo::profile::base::cinder::volume::eqlx' do
+describe 'tripleo::profile::base::cinder::volume::dellps' do
+  shared_examples_for 'tripleo::profile::base::cinder::volume::dellps' do
     before :each do
       facts.merge!({ :step => params[:step] })
     end
@@ -26,10 +26,10 @@ describe 'tripleo::profile::base::cinder::volume::eqlx' do
       let(:params) { { :step => 3 } }
 
       it 'should do nothing' do
-        is_expected.to contain_class('tripleo::profile::base::cinder::volume::eqlx')
+        is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellps')
         is_expected.to contain_class('tripleo::profile::base::cinder::volume')
         is_expected.to contain_class('tripleo::profile::base::cinder')
-        is_expected.to_not contain_cinder__backend__eqlx('tripleo_eqlx')
+        is_expected.to_not contain_cinder__backend__eqlx('tripleo_dellps')
       end
     end
 
@@ -40,7 +40,7 @@ describe 'tripleo::profile::base::cinder::volume::eqlx' do
 
       it 'should trigger complete configuration' do
         # TODO(aschultz): check hiera parameters
-        is_expected.to contain_cinder__backend__eqlx('tripleo_eqlx')
+        is_expected.to contain_cinder__backend__eqlx('tripleo_dellps')
       end
     end
   end
@@ -52,7 +52,7 @@ describe 'tripleo::profile::base::cinder::volume::eqlx' do
         facts.merge({ :hostname => 'node.example.com' })
       end
 
-      it_behaves_like 'tripleo::profile::base::cinder::volume::eqlx'
+      it_behaves_like 'tripleo::profile::base::cinder::volume::dellps'
     end
   end
 end

@@ -12,23 +12,23 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::cinder::volume::eqlx
+# == Class: tripleo::profile::base::cinder::volume::dellps
 #
-# Cinder Volume eqlx profile for tripleo
+# Cinder Volume  for dellps profile tripleo
 #
 # === Parameters
 #
 # [*backend_name*]
 #   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_eqlx'
+#   Defaults to 'tripleo_dellps'
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::base::cinder::volume::eqlx (
-  $backend_name = hiera('cinder::backend::eqlx::volume_backend_name', 'tripleo_eqlx'),
+class tripleo::profile::base::cinder::volume::dellps (
+  $backend_name = hiera('cinder::backend::eqlx::volume_backend_name', 'tripleo_dellps'),
   $step         = hiera('step'),
 ) {
   include ::tripleo::profile::base::cinder::volume
