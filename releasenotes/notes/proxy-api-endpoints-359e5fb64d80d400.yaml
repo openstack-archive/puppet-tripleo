@@ -1,0 +1,6 @@
+---
+features:
+  - Added ability to proxy API service endpoints through
+    Apache mod_rewrite rules by creating ProxyPass and
+    ProxyPassReverse directives for each API service
+
