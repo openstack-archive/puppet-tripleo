@@ -43,7 +43,7 @@ eos
       end
 
       context 'default params' do
-        let(:params) { { :step => 5, } }
+        let(:params) { { :step => 4, } }
 
         it {
           is_expected.to contain_class('tripleo::profile::base::nova::compute')
@@ -58,7 +58,7 @@ eos
       end
 
       context 'cinder nfs backend' do
-        let(:params) { { :step => 5, :cinder_nfs_backend => true } }
+        let(:params) { { :step => 4, :cinder_nfs_backend => true } }
 
         it {
           is_expected.to contain_class('tripleo::profile::base::nova::compute')

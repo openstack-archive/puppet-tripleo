@@ -32,7 +32,7 @@ class tripleo::profile::base::nova::compute (
   $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
 ) {
 
-  if $step >= 5 {
+  if $step >= 4 {
     # deploy basic bits for nova
     include ::tripleo::profile::base::nova
 

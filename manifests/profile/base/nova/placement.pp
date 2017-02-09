@@ -85,7 +85,7 @@ class tripleo::profile::base::nova::placement (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 {
+  if $step >= 3 {
     class { '::nova::wsgi::apache_placement':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
