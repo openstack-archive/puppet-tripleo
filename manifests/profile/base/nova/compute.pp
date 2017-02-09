@@ -32,7 +32,7 @@ class tripleo::profile::base::nova::compute (
   $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
 ) {
 
-  if $step >= 4 {
+  if $step >= 5 {
     # deploy basic bits for nova
     include ::tripleo::profile::base::nova
 
@@ -41,6 +41,7 @@ class tripleo::profile::base::nova::compute (
     # If Service['nova-conductor'] is in catalog, make sure we start it
     # before nova-compute.
     Service<| title == 'nova-conductor' |> -> Service['nova-compute']
+
 
     # deploy bits to connect nova compute to neutron
     include ::nova::network::neutron

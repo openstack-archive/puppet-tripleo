@@ -19,7 +19,7 @@ require 'spec_helper'
 describe 'tripleo::profile::base::nova::compute' do
   shared_examples_for 'tripleo::profile::base::nova::compute' do
 
-    context 'with step less than 4' do
+    context 'with step less than 5' do
       let(:params) { { :step => 1, } }
 
       it {
@@ -32,7 +32,7 @@ describe 'tripleo::profile::base::nova::compute' do
       }
     end
 
-    context 'with step 4' do
+    context 'with step 5' do
       let(:pre_condition) do
         <<-eos
         class { '::tripleo::profile::base::nova':
@@ -43,7 +43,7 @@ eos
       end
 
       context 'default params' do
-        let(:params) { { :step => 4, } }
+        let(:params) { { :step => 5, } }
 
         it {
           is_expected.to contain_class('tripleo::profile::base::nova::compute')
@@ -58,7 +58,7 @@ eos
       end
 
       context 'cinder nfs backend' do
-        let(:params) { { :step => 4, :cinder_nfs_backend => true } }
+        let(:params) { { :step => 5, :cinder_nfs_backend => true } }
 
         it {
           is_expected.to contain_class('tripleo::profile::base::nova::compute')

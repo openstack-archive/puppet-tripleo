@@ -168,11 +168,11 @@ class tripleo::profile::base::keystone (
 
   }
 
-  if $step >= 5 and $manage_db_purge {
+  if $step >= 4 and $manage_db_purge {
     include ::keystone::cron::token_flush
   }
 
-  if $step >= 5 and $manage_domain {
+  if $step >= 4 and $manage_domain {
     if hiera('heat_engine_enabled', false) {
       # create these seperate and don't use ::heat::keystone::domain since
       # that class writes out the configs
@@ -193,7 +193,7 @@ class tripleo::profile::base::keystone (
     }
   }
 
-  if $step >= 5 and $manage_endpoint{
+  if $step >= 4 and $manage_endpoint{
     if hiera('aodh_api_enabled', false) {
       include ::aodh::keystone::auth
     }
