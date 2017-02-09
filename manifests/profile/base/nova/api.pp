@@ -90,7 +90,9 @@ class tripleo::profile::base::nova::api (
       sync_db     => $sync_db,
       sync_db_api => $sync_db,
     }
-    if hiera('nova_wsgi_enabled', true) {
+    # Temporarily disable Nova API deployed in WSGI
+    # https://bugs.launchpad.net/nova/+bug/1661360
+    if hiera('nova_wsgi_enabled', false) {
       if $enable_internal_tls {
         if $generate_service_certificates {
           ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
