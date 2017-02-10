@@ -1,0 +1,5 @@
+---
+features:
+  - The undercloud UI is available in multiple languages, which can now
+    be configured via the manifest. All available languages are enabled
+    by default.
