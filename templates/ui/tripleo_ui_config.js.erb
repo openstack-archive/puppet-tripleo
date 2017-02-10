@@ -1,11 +1,25 @@
 window.tripleOUiConfig = {
-  "keystone": "<%= @endpoint_config_keystone %>",
-  "heat": "<%= @endpoint_config_heat %>",
-  "ironic": "<%= @endpoint_config_ironic %>",
-  "mistral": "<%= @endpoint_config_mistral %>",
-  "swift": "<%= @endpoint_config_swift %>",
-  "zaqar-websocket": "<%= @endpoint_config_zaqar %>",
+  // Service URLs (defaults to UI host)
+  //
+  // A valid Keystone service URL is required. The other endpoints
+  // will then be obtained automatically from the Keystone catalog.
+  //
+  'keystone': '<%= @endpoint_config_keystone %>',
+  'heat': '<%= @endpoint_config_heat %>',
+  'ironic': '<%= @endpoint_config_ironic %>',
+  'mistral': '<%= @endpoint_config_mistral %>',
+  'swift': '<%= @endpoint_config_swift %>',
+  'zaqar-websocket': '<%= @endpoint_config_zaqar %>',
 
   // Default websocket queue name
-  "zaqar_default_queue": "<%= @zaqar_default_queue %>"
+  'zaqar_default_queue': '<%= @zaqar_default_queue %>'
+
+  // Languages
+  // If you choose more than one language, a language switcher will appear in
+  // the navigation bar.
+  // Only 'en' (English) is enabled by default.
+  // 'languages': ['en-GB', 'en', 'ja', 'ko-KR', 'zh-CN', 'es'],
+
+  // Logging
+  // 'loggers': ['console']
 };

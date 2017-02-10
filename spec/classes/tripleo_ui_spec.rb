@@ -53,13 +53,13 @@ describe 'tripleo::ui' do
         )
         is_expected.to contain_file('/etc/httpd/conf.d/openstack-tripleo-ui.conf').with_content(/cleaned by Puppet/)
         is_expected.to contain_file('/var/www/openstack-tripleo-ui/dist/tripleo_ui_config.js')
-            .with_content(/"keystone": "https:\/\/127.0.0.1:443\/keystone\/v2.0"/)
-            .with_content(/"heat": "https:\/\/127.0.0.1:443\/heat\/v1\/%\(tenant_id\)s"/)
-            .with_content(/"zaqar-websocket": "wss:\/\/127.0.0.1:443\/zaqar"/)
-            .with_content(/"ironic": "https:\/\/127.0.0.1:443\/ironic"/)
-            .with_content(/"mistral": "https:\/\/127.0.0.1:443\/mistral\/v2"/)
-            .with_content(/"swift": "https:\/\/127.0.0.1:443\/swift\/v1\/AUTH_%\(tenant_id\)s"/)
-            .with_content(/"zaqar_default_queue": "tripleo"/)
+            .with_content(/'keystone': 'https:\/\/127.0.0.1:443\/keystone\/v2.0'/)
+            .with_content(/'heat': 'https:\/\/127.0.0.1:443\/heat\/v1\/%\(tenant_id\)s'/)
+            .with_content(/'zaqar-websocket': 'wss:\/\/127.0.0.1:443\/zaqar'/)
+            .with_content(/'ironic': 'https:\/\/127.0.0.1:443\/ironic'/)
+            .with_content(/'mistral': 'https:\/\/127.0.0.1:443\/mistral\/v2'/)
+            .with_content(/'swift': 'https:\/\/127.0.0.1:443\/swift\/v1\/AUTH_%\(tenant_id\)s'/)
+            .with_content(/'zaqar_default_queue': 'tripleo'/)
       end
     end
 
@@ -96,13 +96,13 @@ describe 'tripleo::ui' do
         )
         is_expected.to contain_file('/etc/httpd/conf.d/openstack-tripleo-ui.conf').with_content(/cleaned by Puppet/)
         is_expected.to contain_file('/var/www/openstack-tripleo-ui/dist/tripleo_ui_config.js')
-          .with_content(/"keystone": "https:\/\/127.0.0.1:443\/keystone\/v2.0"/)
-          .with_content(/"heat": "https:\/\/127.0.0.1:443\/heat\/v1\/%\(tenant_id\)s"/)
-          .with_content(/"zaqar-websocket": "wss:\/\/127.0.0.1:443\/zaqar"/)
-          .with_content(/"ironic": "https:\/\/127.0.0.1:443\/ironic"/)
-          .with_content(/"mistral": "https:\/\/127.0.0.1:443\/mistral\/v2"/)
-          .with_content(/"swift": "https:\/\/127.0.0.1:443\/swift\/v1\/AUTH_%\(tenant_id\)s"/)
-          .with_content(/"zaqar_default_queue": "tripleo"/)
+          .with_content(/'keystone': 'https:\/\/127.0.0.1:443\/keystone\/v2.0'/)
+          .with_content(/'heat': 'https:\/\/127.0.0.1:443\/heat\/v1\/%\(tenant_id\)s'/)
+          .with_content(/'zaqar-websocket': 'wss:\/\/127.0.0.1:443\/zaqar'/)
+          .with_content(/'ironic': 'https:\/\/127.0.0.1:443\/ironic'/)
+          .with_content(/'mistral': 'https:\/\/127.0.0.1:443\/mistral\/v2'/)
+          .with_content(/'swift': 'https:\/\/127.0.0.1:443\/swift\/v1\/AUTH_%\(tenant_id\)s'/)
+          .with_content(/'zaqar_default_queue': 'tripleo'/)
       end
     end
 
