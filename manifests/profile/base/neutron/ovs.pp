@@ -28,7 +28,7 @@ class tripleo::profile::base::neutron::ovs(
 ) {
   include ::tripleo::profile::base::neutron
 
-  if $step >= 4 {
+  if $step >= 5 {
     include ::neutron::agents::ml2::ovs
 
     # Optional since manage_service may be false and neutron server may not be colocated.

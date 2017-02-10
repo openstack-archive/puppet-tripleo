@@ -119,6 +119,13 @@ class tripleo::profile::base::nova::api (
     if hiera('nova_enable_db_purge', true) {
       include ::nova::cron::archive_deleted_rows
     }
+    # At step 5, we consider all nova-compute services started and registred to nova-conductor
+    # So we want to update Nova Cells database to be aware of these hosts by executing the
+    # nova-cell_v2-discover_hosts command again.
+    # Doing it on a single nova-api node to avoid race condition.
+    if $sync_db {
+      Exec<| title == 'nova-cell_v2-discover_hosts' |> { refreshonly => false }
+    }
   }
 }
 
