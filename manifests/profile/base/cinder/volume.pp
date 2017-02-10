@@ -46,6 +46,10 @@
 #   (Optional) Whether to enable the rbd backend
 #   Defaults to true
 #
+# [*cinder_enable_scaleio_backend*]
+#   (Optional) Whether to enable the scaleio backend
+#   Defaults to true
+#
 # [*cinder_user_enabled_backends*]
 #   (Optional) List of additional backend stanzas to activate
 #   Defaults to hiera('cinder_user_enabled_backends')
@@ -63,6 +67,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_netapp_backend      = false,
   $cinder_enable_nfs_backend         = false,
   $cinder_enable_rbd_backend         = false,
+  $cinder_enable_scaleio_backend     = false,
   $cinder_user_enabled_backends      = hiera('cinder_user_enabled_backends', undef),
   $step                              = hiera('step'),
 ) {
@@ -120,6 +125,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_rbd_backend_name = undef
     }
 
+    if $cinder_enable_scaleio_backend {
+      include ::tripleo::profile::base::cinder::volume::scaleio
+      $cinder_scaleio_backend_name = hiera('cinder::backend::scaleio::volume_backend_name', 'tripleo_scaleio')
+    } else {
+      $cinder_scaleio_backend_name = undef
+    }
+
     $backends = delete_undef_values([$cinder_iscsi_backend_name,
                                       $cinder_rbd_backend_name,
                                       $cinder_dellps_backend_name,
@@ -127,6 +139,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_hpelefthand_backend_name,
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
+                                      $cinder_scaleio_backend_name,
                                       $cinder_user_enabled_backends])
     # NOTE(aschultz): during testing it was found that puppet 3 may incorrectly
     # include a "" in the previous array which is not removed by the
