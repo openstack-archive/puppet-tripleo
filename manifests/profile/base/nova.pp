@@ -107,10 +107,10 @@ class tripleo::profile::base::nova (
       backend          => 'oslo_cache.memcache_pool',
       memcache_servers => $memcache_servers,
     }
+    include ::nova::placement
   }
 
   if $step >= 4 {
-    include ::nova::placement
     if $manage_migration {
       class { '::nova::migration::libvirt':
         configure_libvirt => $libvirt_enabled,
