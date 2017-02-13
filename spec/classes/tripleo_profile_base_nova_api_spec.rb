@@ -26,6 +26,9 @@ describe 'tripleo::profile::base::nova::api' do
         oslomsg_rpc_username => 'nova',
         oslomsg_rpc_password => 'foo'
       }
+      class { '::tripleo::profile::base::nova::authtoken':
+        step => #{params[:step]},
+      }
 eos
     end
 

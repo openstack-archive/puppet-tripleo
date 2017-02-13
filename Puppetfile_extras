@@ -32,3 +32,7 @@ mod 'etcd',
 mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
   :ref => 'master'
+
+mod 'certmonger',
+  :git => 'https://github.com/earsdown/puppet-certmonger',
+  :ref => 'v1.1.1'

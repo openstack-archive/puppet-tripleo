@@ -69,6 +69,7 @@ class tripleo::profile::base::nova::placement (
   }
 
   include ::tripleo::profile::base::nova
+  include ::tripleo::profile::base::nova::authtoken
 
   if $enable_internal_tls {
     if $generate_service_certificates {
