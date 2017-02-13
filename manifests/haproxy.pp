@@ -1064,7 +1064,7 @@ class tripleo::haproxy (
       },
       public_ssl_port   => $ports[nova_placement_ssl_port],
       service_network   => $nova_placement_network,
-      #member_options    => union($haproxy_member_options, $internal_tls_member_options),
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
