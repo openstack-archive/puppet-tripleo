@@ -1,0 +1,64 @@
+---
+features:
+  - Add networking-fujitsu support to Neutron ML2 profile.
+  - Split OVN plugin and northd configuration.
+  - Introduce tripleo::tls_proxy used to set up a TLS proxy using
+    mod_proxy that redirects towards localhost.
+  - HPELeftHandISCSIDriver support for Cinder Volume profile.
+  - Add support for CollectD profile, for performance monitoring.
+  - Configure Nova Cells v2 database, required in Ocata.
+  - Configure the basic setup for Nova Cells v2.
+  - Support for opendalight_v2 mechanism_driver in Neutron ML2 profile.
+  - Support for Ceph MDS service profile.
+  - Add IPv6 support to Firewall rules. It will create both IPv4 & IPv6 rules
+    at the same time. It automatically converts icmp rules to ipv6-icmp. When
+    a source or destination is specified, it will only create rules to the
+    right version of IP that is needed.
+  - Add support for not using admin_token in Ceph/RGW profile.
+  - Add Docker Registry profile.
+  - Add Nova Placement API profile.
+  - Add NTP profile.
+  - Add etcd profile, used by networking-vpp ML2 plugin.
+  - Add profiles for Octavia services.
+  - Enable object-expirer on Swift proxy profile.
+  - Set memcache_servers in /etc/swift/object-expirer.conf.
+  - Add support for fence_ironic fencing agent.
+  - Add a noop_resource function, which allow to disable any resource type
+    in a catalog, with --tags option to puppet apply.
+  - Add Ceph RBD mirrog Pacemaker profile.
+  - Remove Glance Registry profile, not used anymore. Glance API v1 is not
+    available anymore.
+  - Add Nova EC2API profile.
+  - Add support for Pacemaker Remote with a new profile.
+  - Updates Pacemaker profiles for Composable HA architecture.
+  - Add Tacker profile.
+  - Add Congress profile.
+  - Add a default rule for dhcpv6 traffic.
+  - Re-organizes Contrail services to the correct roles.
+  - Set innodb_file_per_table to ON for MySQL / Galera
+  - Switch Nova / Libvirt VNC server binding to use the IP address
+    provided in Hiera instead of 0.0.0.0.
+  - Proxy API endpoints that TripleO UI uses.
+  - Rebranding of Eqlx to Dell EMC PS Series.
+  - Add support for ScaleIO backend in Cinder Volume profile.
+  - Add support to changing the Rabbitmq password on stack-update.
+deprecations:
+  - Remove tripleo::vip_hosts class, no longer used.
+security:
+  - CVE-2016-9599 Enforce Firewall TCP / UDP rules management, by
+    sanitizing dynamic HAproxy endpoints firewall rules, securing
+    firewall rules creations (disallow TCP/UDP rules without sport or
+    dport), but allow to open all traffic for TCP/UDP when actually
+    desired.
+fixes:
+  - Fixes `bug 1648736
+    <https://bugs.launchpad.net/tripleo/+bug/1648736>`__ so swift-proxy
+    is decoupled from ceilometer packages.
+  - Fixes `bug 1652107
+    <https://bugs.launchpad.net/tripleo/+bug/1652107>`__ so we ensure
+    package updates don't happen unexpectedly.
+  - Fixes `bug 1645898
+    <https://bugs.launchpad.net/tripleo/+bug/1645898>`__ so we ensure
+    to bind the rabbit inter-cluster to a specific interface.
+other:
+  - Introduce more Puppet rspec tests that improve testing quality.
