@@ -180,7 +180,7 @@ class tripleo::profile::pacemaker::database::mysql (
     # This step is to create a sysconfig clustercheck file with the root user and empty password
     # on the first install only (because later on the clustercheck db user will be used)
     # We are using exec and not file in order to not have duplicate definition errors in puppet
-    # when we later set the the file to contain the clustercheck data
+    # when we later set the file to contain the clustercheck data
     exec { 'create-root-sysconfig-clustercheck':
       command => "/bin/echo 'MYSQL_USERNAME=root\nMYSQL_PASSWORD=\'\'\nMYSQL_HOST=localhost\n' > /etc/sysconfig/clustercheck",
       unless  => '/bin/test -e /etc/sysconfig/clustercheck && grep -q clustercheck /etc/sysconfig/clustercheck',
