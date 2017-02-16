@@ -157,22 +157,13 @@ class tripleo::profile::base::keystone (
       ssl_key_admin  => $tls_keyfile_admin,
     }
     include ::keystone::cors
-
-    if $manage_roles {
-      include ::keystone::roles::admin
-    }
-
-    if $manage_endpoint {
-      include ::keystone::endpoint
-    }
-
   }
 
   if $step >= 4 and $manage_db_purge {
     include ::keystone::cron::token_flush
   }
 
-  if $step >= 3 and $manage_domain {
+  if $step == 3 and $manage_domain {
     if hiera('heat_engine_enabled', false) {
       # create these seperate and don't use ::heat::keystone::domain since
       # that class writes out the configs
@@ -193,7 +184,12 @@ class tripleo::profile::base::keystone (
     }
   }
 
-  if $step >= 3 and $manage_endpoint{
+  if $step == 3 and $manage_roles {
+    include ::keystone::roles::admin
+  }
+
+  if $step == 3 and $manage_endpoint {
+    include ::keystone::endpoint
     if hiera('aodh_api_enabled', false) {
       include ::aodh::keystone::auth
     }

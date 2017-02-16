@@ -30,7 +30,5 @@ class tripleo::profile::base::gnocchi::statsd (
 
   if $step >= 5 {
     include ::gnocchi::statsd
-    Keystone_endpoint<||> -> Service['gnocchi-statsd']
-    Keystone_user_role<||> -> Service['gnocchi-statsd']
   }
 }
