@@ -63,6 +63,12 @@
 #  Minimum amount of time before partitions can be moved.
 #  Defaults to undef
 #
+# [*swift_ring_get_tempurl*]
+# GET tempurl to fetch Swift rings from
+#
+# [*swift_ring_put_tempurl*]
+# PUT tempurl to upload Swift rings to
+#
 class tripleo::profile::base::swift::ringbuilder (
   $replicas,
   $build_ring  = true,
@@ -74,7 +80,23 @@ class tripleo::profile::base::swift::ringbuilder (
   $swift_storage_node_ips = hiera('swift_storage_node_ips', []),
   $part_power = undef,
   $min_part_hours = undef,
+  $swift_ring_get_tempurl = hiera('swift_ring_get_tempurl', ''),
+  $swift_ring_put_tempurl = hiera('swift_ring_put_tempurl', ''),
 ) {
+
+  if $step == 2 and $swift_ring_get_tempurl != '' {
+    exec{'fetch_swift_ring_tarball':
+      path    => ['/usr/bin'],
+      command => "curl --insecure --silent '${swift_ring_get_tempurl}' -o /tmp/swift-rings.tar.gz",
+      returns => [0, 3]
+    } ~>
+    exec{'extract_swift_ring_tarball':
+      path    => ['/bin'],
+      command => 'tar xzf /tmp/swift-rings.tar.gz -C /',
+      returns => [0, 2]
+    }
+  }
+
   if $step >= 2 {
     # pre-install swift here so we can build rings
     include ::swift
@@ -110,6 +132,20 @@ class tripleo::profile::base::swift::ringbuilder (
       Ring_object_device<| |> ~> Exec['rebalance_object']
       Ring_object_device<| |> ~> Exec['rebalance_account']
       Ring_object_device<| |> ~> Exec['rebalance_container']
+    }
+  }
+
+  if $step == 5 and $build_ring and $swift_ring_put_tempurl != '' {
+    exec{'create_swift_ring_tarball':
+      path    => ['/bin', '/usr/bin'],
+      command => 'tar cvzf /tmp/swift-rings.tar.gz /etc/swift/*.builder /etc/swift/*.ring.gz /etc/swift/backups/',
+      unless  => 'swift-recon --md5 | grep -q "doesn\'t match"'
+    } ~>
+    exec{'upload_swift_ring_tarball':
+      path        => ['/usr/bin'],
+      command     => "curl --insecure --silent -X PUT '${$swift_ring_put_tempurl}' --data-binary @/tmp/swift-rings.tar.gz",
+      require     => Exec['create_swift_ring_tarball'],
+      refreshonly => true,
     }
   }
 }
