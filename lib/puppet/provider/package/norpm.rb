@@ -17,6 +17,8 @@ require 'puppet/provider/package'
 Puppet::Type.type(:package).provide :norpm, :source => :rpm, :parent => :rpm do
   desc "RPM packaging provider that does not install anything."
 
+  has_feature :virtual_packages
+
   def latest
     @resource.fail "'latest' is unsupported by this provider."
   end
