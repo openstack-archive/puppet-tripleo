@@ -12,13 +12,13 @@ window.tripleOUiConfig = {
   'zaqar-websocket': '<%= @endpoint_config_zaqar %>',
 
   // Default websocket queue name
-  'zaqar_default_queue': '<%= @zaqar_default_queue %>'
+  'zaqar_default_queue': '<%= @zaqar_default_queue %>',
 
   // Languages
   // If you choose more than one language, a language switcher will appear in
   // the navigation bar.
   // Only 'en' (English) is enabled by default.
-  // 'languages': ['en-GB', 'en', 'ja', 'ko-KR', 'zh-CN', 'es'],
+  'languages': ['<%= @enabled_languages.join("', '") %>'],
 
   // Logging
   // 'loggers': ['console']

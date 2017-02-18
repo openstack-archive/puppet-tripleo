@@ -31,6 +31,11 @@
 #  The port on which the UI is listening.
 #  Defaults to 3000
 #
+# [*enabled_languages*]
+#  Which languages to show in the UI.
+#  An array.
+#  Defaults to ['en-GB', 'en', 'de', 'ja', 'ko-KR', 'zh-CN', 'es']
+#
 # [*endpoint_proxy_keystone*]
 #  The keystone proxy endpoint url
 #  Defaults to undef
@@ -89,6 +94,7 @@ class tripleo::ui (
   $bind_host                = hiera('controller_host'),
   $ui_port                  = 3000,
   $zaqar_default_queue      = 'tripleo',
+  $enabled_languages        = ['en-GB', 'en', 'de', 'ja', 'ko-KR', 'zh-CN', 'es'],
   $endpoint_proxy_zaqar     = undef,
   $endpoint_proxy_keystone  = undef,
   $endpoint_proxy_heat      = undef,
