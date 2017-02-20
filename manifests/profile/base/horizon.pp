@@ -25,11 +25,11 @@
 #
 # [*neutron_options*]
 #   (Optional) A hash of parameters to enable features specific to Neutron
-#   Defaults to hiera('horizon::neutron_options', undef)
+#   Defaults to hiera('horizon::neutron_options', {})
 #
 class tripleo::profile::base::horizon (
   $step            = hiera('step'),
-  $neutron_options = hiera('horizon::neutron_options', undef),
+  $neutron_options = hiera('horizon::neutron_options', {}),
 ) {
   if $step >= 4 {
     # Horizon
