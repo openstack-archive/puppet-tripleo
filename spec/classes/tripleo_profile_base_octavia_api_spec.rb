@@ -33,9 +33,9 @@ describe 'tripleo::profile::base::octavia::api' do
       <<-eos
       class { 'tripleo::profile::base::octavia' :
         step => #{params[:step]},
-        rabbit_user     => 'bugs',
-        rabbit_password => 'rabbits_R_c00l',
-        rabbit_hosts    => ['hole.field.com']
+        oslomsg_rpc_username => 'bugs',
+        oslomsg_rpc_password => 'rabbits_R_c00l',
+        oslomsg_rpc_hosts    => ['hole.field.com']
       }
       class { 'octavia::db::mysql':
         password => 'some_password'

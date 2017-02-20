@@ -3,14 +3,18 @@ my_hash:
   network: '127.0.0.1'
 not_hash: string
 # aodh profile required hieradata
+aodh::rabbit_password: 'password'
 aodh_redis_password: 'password'
 redis_vip: '127.0.0.1'
 aodh::auth::auth_password: 'password'
 aodh::db::mysql::password: 'password'
 aodh::keystone::authtoken::password: 'password'
 # babican profile required hieradata
+barbican::api::rabbit_password: 'password'
 barbican::db::mysql::password: 'password'
 barbican::keystone::authtoken::password: 'password'
+# ceilometer related items
+ceilometer::rabbit_password: 'password'
 ceilometer::keystone::authtoken::password: 'password'
 # ceph related items
 ceph::profile::params::mon_key: 'password'
@@ -33,3 +37,5 @@ memcached_node_ips_v6:
  - '::1'
 memcached_node_ips:
  - '127.0.0.1'
+# octavia related items
+octavia::rabbit_password: 'password'

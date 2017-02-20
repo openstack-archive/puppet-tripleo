@@ -19,7 +19,7 @@ require 'spec_helper'
 describe 'tripleo::profile::base::cinder::backup' do
   shared_examples_for 'tripleo::profile::base::cinder::backup' do
     let(:pre_condition) do
-      "class { '::tripleo::profile::base::cinder': step => #{params[:step]}, rabbit_hosts => ['127.0.0.1'] }"
+      "class { '::tripleo::profile::base::cinder': step => #{params[:step]}, oslomsg_rpc_hosts => ['127.0.0.1'] }"
     end
 
     context 'with step less than 4' do

@@ -22,9 +22,9 @@ describe 'tripleo::profile::base::nova::api' do
       <<-eos
       class { '::tripleo::profile::base::nova':
         step => #{params[:step]},
-        messaging_hosts    => [ 'localhost' ],
-        messaging_username => 'nova',
-        messaging_password => 'foo'
+        oslomsg_rpc_hosts    => [ 'localhost' ],
+        oslomsg_rpc_username => 'nova',
+        oslomsg_rpc_password => 'foo'
       }
 eos
     end

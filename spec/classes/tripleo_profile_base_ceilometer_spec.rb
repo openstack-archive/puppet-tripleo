@@ -30,12 +30,14 @@ describe 'tripleo::profile::base::ceilometer' do
     context 'with step 3' do
       let(:params) { {
         :step           => 3,
-        :rabbit_hosts   => ['localhost1.localdomain', 'localhost2.localdomain']
+        :oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        :oslomsg_rpc_username => 'ceilometer',
+        :oslomsg_rpc_password => 'foo',
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('ceilometer').with(
-          :rabbit_hosts => params[:rabbit_hosts].map{ |h| h + ':5672' }
+          :default_transport_url => 'rabbit://ceilometer:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('ceilometer::config')
       end

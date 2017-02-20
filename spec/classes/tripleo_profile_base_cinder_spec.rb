@@ -31,15 +31,17 @@ describe 'tripleo::profile::base::cinder' do
 
     context 'with step 3 on bootstrap node' do
       let(:params) { {
-        :step           => 3,
-        :bootstrap_node => 'node.example.com',
-        :rabbit_hosts   => ['127.0.0.1', '127.0.0.2'],
-        :rabbit_port    => '1234'
+        :step                 => 3,
+        :bootstrap_node       => 'node.example.com',
+        :oslomsg_rpc_hosts    => [ '127.0.0.1' ],
+        :oslomsg_rpc_username => 'cinder',
+        :oslomsg_rpc_password => 'foo',
+        :oslomsg_rpc_port     => '1234'
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder').with(
-          :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:#{params[:rabbit_port]}" }
+          :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:1234/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
@@ -63,15 +65,17 @@ describe 'tripleo::profile::base::cinder' do
 
     context 'with step 4 on other node' do
       let(:params) { {
-        :step           => 4,
-        :bootstrap_node => 'somethingelse.example.com',
-        :rabbit_hosts   => ['127.0.0.1', '127.0.0.2'],
-        :rabbit_port    => '5672'
+        :step                 => 4,
+        :bootstrap_node       => 'somethingelse.example.com',
+        :oslomsg_rpc_hosts    => [ '127.0.0.1' ],
+        :oslomsg_rpc_username => 'cinder',
+        :oslomsg_rpc_password => 'foo',
+        :oslomsg_rpc_port     => '5672',
       } }
 
       it 'should trigger cinder configuration without mysql grant' do
         is_expected.to contain_class('cinder').with(
-          :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:#{params[:rabbit_port]}" }
+          :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
@@ -81,14 +85,16 @@ describe 'tripleo::profile::base::cinder' do
 
     context 'with step 5' do
       let(:params) { {
-        :step           => 5,
-        :bootstrap_node => 'node.example.com',
-        :rabbit_hosts   => ['127.0.0.1', '127.0.0.2']
+        :step                 => 5,
+        :bootstrap_node       => 'node.example.com',
+        :oslomsg_rpc_hosts    => [ '127.0.0.1' ],
+        :oslomsg_rpc_username => 'cinder',
+        :oslomsg_rpc_password => 'foo',
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder').with(
-          :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:5672" }
+          :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
@@ -98,15 +104,17 @@ describe 'tripleo::profile::base::cinder' do
 
     context 'with step 5 without db_purge' do
       let(:params) { {
-        :step           => 5,
-        :bootstrap_node => 'node.example.com',
-        :rabbit_hosts   => ['127.0.0.1', '127.0.0.2'],
+        :step                   => 5,
+        :bootstrap_node         => 'node.example.com',
+        :oslomsg_rpc_hosts      => [ '127.0.0.1' ],
+        :oslomsg_rpc_username   => 'cinder',
+        :oslomsg_rpc_password   => 'foo',
         :cinder_enable_db_purge => false
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder').with(
-          :rabbit_hosts => params[:rabbit_hosts].map{ |h| "#{h}:5672" }
+          :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')

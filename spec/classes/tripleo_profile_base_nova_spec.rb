@@ -22,8 +22,8 @@ describe 'tripleo::profile::base::nova' do
     context 'with step less than 3' do
       let(:params) { {
         :step => 1,
-        :messaging_hosts => [ 'localhost' ],
-        :messaging_password => 'foo'
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_password => 'foo'
       } }
 
       it {
@@ -38,9 +38,9 @@ describe 'tripleo::profile::base::nova' do
       let(:params) { {
         :step => 3,
         :bootstrap_node => 'node.example.com',
-        :messaging_hosts => [ 'localhost' ],
-        :messaging_username => 'nova',
-        :messaging_password => 'foo',
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_username => 'nova',
+        :oslomsg_rpc_password => 'foo',
       } }
 
       it {
@@ -62,8 +62,8 @@ describe 'tripleo::profile::base::nova' do
       let(:params) { {
         :step           => 3,
         :bootstrap_node => 'other.example.com',
-        :messaging_hosts => [ 'localhost' ],
-        :messaging_password => 'foo'
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_password => 'foo'
       } }
 
       it {
@@ -79,8 +79,8 @@ describe 'tripleo::profile::base::nova' do
       let(:params) { {
         :step           => 4,
         :bootstrap_node => 'other.example.com',
-        :messaging_hosts => [ 'localhost' ],
-        :messaging_password => 'foo',
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_password => 'foo',
       } }
 
       it {
@@ -103,8 +103,8 @@ describe 'tripleo::profile::base::nova' do
         :manage_migration => true,
         :nova_compute_enabled => true,
         :bootstrap_node  => 'node.example.com',
-        :messaging_hosts => [ 'localhost' ],
-        :messaging_password => 'foo',
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_password => 'foo',
       } }
 
       it {
