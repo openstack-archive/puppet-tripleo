@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Add profiles for VPP service. Vector Packet Processing (VPP) is a high
+    performance packet processing stack that runs in user space in Linux.
+    VPP is used as an alternative to kernel networking stack for accelerated
+    network data path.
