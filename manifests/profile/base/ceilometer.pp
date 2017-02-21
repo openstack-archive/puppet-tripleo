@@ -88,7 +88,7 @@ class tripleo::profile::base::ceilometer (
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
-        'port'      => sprintf('%s', $oslomsg_rpc_port),
+        'port'      => $oslomsg_rpc_port,
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,
         'ssl'       => $oslomsg_use_ssl_real,
@@ -96,7 +96,7 @@ class tripleo::profile::base::ceilometer (
       notification_transport_url => os_transport_url({
         'transport' => $oslomsg_notify_proto,
         'hosts'     => $oslomsg_notify_hosts,
-        'port'      => sprintf('%s', $oslomsg_notify_port),
+        'port'      => $oslomsg_notify_port,
         'username'  => $oslomsg_notify_username,
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_use_ssl_real,
