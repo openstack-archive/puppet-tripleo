@@ -37,7 +37,8 @@ class tripleo::profile::base::docker_registry (
 ) {
   # We want a v2 registry
   package{'docker-registry':
-    ensure => absent,
+    ensure        => absent,
+    allow_virtual => false,
   }
   package{'docker-distribution': }
   package{'docker': }
