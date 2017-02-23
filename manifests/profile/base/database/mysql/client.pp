@@ -18,6 +18,11 @@
 #
 # === Parameters
 #
+# [*enable_ssl*]
+#   (Optional) Whether SSL should be used for the connection to the server or
+#   not.
+#   Defaults to false
+#
 # [*mysql_read_default_file*]
 #   (Optional) Name of the file that will be passed to pymysql connection strings
 #   Defaults to hiera('tripleo::profile::base:database::mysql::read_default_file', '/etc/my.cnf.d/tripleo.cnf')
@@ -36,10 +41,11 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::database::mysql::client (
+  $enable_ssl                = false,
   $mysql_read_default_file   = hiera('tripleo::profile::base:database::mysql::read_default_file', '/etc/my.cnf.d/tripleo.cnf'),
   $mysql_read_default_group  = hiera('tripleo::profile::base:database::mysql::read_default_group', 'tripleo'),
   $mysql_client_bind_address = hiera('tripleo::profile::base:database::mysql::client_bind_address', undef),
-  $step = hiera('step'),
+  $step                      = hiera('step'),
 ) {
   if $step >= 1 {
     # If the folder /etc/my.cnf.d does not exist (e.g. if mariadb is not
@@ -50,23 +56,38 @@ class tripleo::profile::base::database::mysql::client (
     # included on this node as well (we'd get duplicate declaration in such a
     # situation when using file)
     if $mysql_client_bind_address {
-      $changes = [
+      $client_bind_changes = [
         "set ${mysql_read_default_group}/bind-address '${mysql_client_bind_address}'"
       ]
     } else {
-      $changes = [
+      $client_bind_changes = [
         "rm ${mysql_read_default_group}/bind-address"
       ]
     }
+
+    if $enable_ssl {
+      $changes_ssl = [
+        "set ${mysql_read_default_group}/ssl '1'",
+        "set ${mysql_read_default_group}/ssl-ca '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'"
+      ]
+    } else {
+      $changes_ssl = [
+        "rm ${mysql_read_default_group}/ssl",
+        "rm ${mysql_read_default_group}/ssl-ca"
+      ]
+    }
+
+    $conf_changes = union($client_bind_changes, $changes_ssl)
+
     exec { 'directory-create-etc-my.cnf.d':
       command => 'mkdir -p /etc/my.cnf.d',
       path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     } ->
     # Create /etc/my.cnf.d/tripleo.cnf with the [tripleo]bind-address=<IP of the node in the mysql network>
-    augeas { 'mysql-bind-address':
+    augeas { 'tripleo-mysql-client-conf':
       incl    => $mysql_read_default_file,
       lens    => 'Puppet.lns',
-      changes => $changes,
+      changes => $conf_changes,
     }
   }
 }
