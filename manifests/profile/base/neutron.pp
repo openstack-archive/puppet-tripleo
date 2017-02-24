@@ -65,6 +65,19 @@
 # [*oslomsg_use_ssl*]
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('neutron::rabbit_use_ssl', '0')
+#
+# [*dhcp_agents_per_network*]
+#   (Optional) TripleO configured number of DHCP agents
+#   to use per network. If left to the default value, neutron will be
+#   configured with the number of DHCP agents being deployed.
+#   Defaults to undef
+#
+# [*dhcp_nodes*]
+#   (Optional) List of nodes running the DHCP agent. Used to
+#   set neutron's dhcp_agents_per_network value to the number
+#   of available agents.
+#   Defaults to hiera('neutron_dhcp_short_node_names') or []
+#
 
 class tripleo::profile::base::neutron (
   $step                    = hiera('step'),
@@ -79,9 +92,23 @@ class tripleo::profile::base::neutron (
   $oslomsg_notify_port     = hiera('neutron::rabbit_port', '5672'),
   $oslomsg_notify_username = hiera('neutron::rabbit_userid', 'guest'),
   $oslomsg_use_ssl         = hiera('neutron::rabbit_use_ssl', '0'),
+  $dhcp_agents_per_network = undef,
+  $dhcp_nodes              = hiera('neutron_dhcp_short_node_names', []),
 ) {
   if $step >= 3 {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
+
+    $dhcp_agent_count = size($dhcp_nodes)
+    if $dhcp_agents_per_network {
+      $dhcp_agents_per_net = $dhcp_agents_per_network
+      if ($dhcp_agents_per_net > $dhcp_agent_count) {
+        warning("dhcp_agents_per_network (${dhcp_agents_per_net}) is greater\
+ than the number of deployed dhcp agents (${dhcp_agent_count})")
+      }
+    }
+    elsif $dhcp_agent_count > 0 {
+      $dhcp_agents_per_net = $dhcp_agent_count
+    }
     class { '::neutron' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
@@ -99,6 +126,7 @@ class tripleo::profile::base::neutron (
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_use_ssl_real,
       }),
+      dhcp_agents_per_network    => $dhcp_agents_per_net,
     }
     include ::neutron::config
   }
