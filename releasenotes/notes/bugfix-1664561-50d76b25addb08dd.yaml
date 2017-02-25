@@ -1,0 +1,4 @@
+---
+fixes:
+  - Bugfix 1664561. Removing the string cast when using
+    the os_transport_url function.
