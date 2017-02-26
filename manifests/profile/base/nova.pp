@@ -114,8 +114,6 @@ class tripleo::profile::base::nova (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
-    # TODO(ccamacho): remove sprintf once we properly type the port, needs
-    # to be a string for the os_transport_url function.
     class { '::nova' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
