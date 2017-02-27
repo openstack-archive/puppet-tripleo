@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Enabled httpdchk in HAProxy for http based services to reduce situtations
+    where the port may be open but the service is not actively serving http
+    requests.
