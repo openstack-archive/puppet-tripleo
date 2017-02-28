@@ -167,6 +167,9 @@ class tripleo::profile::base::database::mysql (
     if hiera('ironic_api_enabled', false) {
       include ::ironic::db::mysql
     }
+    if hiera('ironic_inspector_enabled', false) {
+      include ::ironic::inspector::db::mysql
+    }
     if hiera('keystone_enabled', false) {
       include ::keystone::db::mysql
     }

@@ -282,6 +282,9 @@ class tripleo::profile::base::keystone (
     if hiera('ironic_api_enabled', false) {
       include ::ironic::keystone::auth
     }
+    if hiera('ironic_inspector_enabled', false) {
+      include ::ironic::keystone::auth_inspector
+    }
     if hiera('manila_api_enabled', false) {
       include ::manila::keystone::auth
     }
