@@ -6,8 +6,8 @@ mod 'haproxy',
   :ref => 'master'
 
 mod 'midonet',
-  :git => 'https://github.com/midonet/puppet-midonet',
-  :ref => 'v2015.06.7'
+  :git => 'https://git.openstack.org/openstack/puppet-midonet',
+  :ref => '9a54db9438cdfea77b5ef7cd151c166c5eca1847'
 
 mod 'tomcat',
   :git => 'https://github.com/puppetlabs/puppetlabs-tomcat',
