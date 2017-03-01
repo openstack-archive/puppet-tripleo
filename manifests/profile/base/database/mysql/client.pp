@@ -25,15 +25,15 @@
 #
 # [*mysql_read_default_file*]
 #   (Optional) Name of the file that will be passed to pymysql connection strings
-#   Defaults to hiera('tripleo::profile::base:database::mysql::read_default_file', '/etc/my.cnf.d/tripleo.cnf')
+#   Defaults to '/etc/my.cnf.d/tripleo.cnf'
 #
 # [*mysql_read_default_group*]
 #   (Optional) Name of the ini section to be passed to pymysql connection strings
-#   Defaults to hiera('tripleo::profile::base:database::mysql::read_default_group', 'tripleo')
+#   Defaults to 'tripleo'
 #
 # [*mysql_client_bind_address*]
 #   (Optional) Client IP address of the host that will be written in the mysql_read_default_file
-#   Defaults to hiera('tripleo::profile::base:database::mysql::client_bind_address', undef)
+#   Defaults to undef
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -42,9 +42,9 @@
 #
 class tripleo::profile::base::database::mysql::client (
   $enable_ssl                = false,
-  $mysql_read_default_file   = hiera('tripleo::profile::base:database::mysql::read_default_file', '/etc/my.cnf.d/tripleo.cnf'),
-  $mysql_read_default_group  = hiera('tripleo::profile::base:database::mysql::read_default_group', 'tripleo'),
-  $mysql_client_bind_address = hiera('tripleo::profile::base:database::mysql::client_bind_address', undef),
+  $mysql_read_default_file   = '/etc/my.cnf.d/tripleo.cnf',
+  $mysql_read_default_group  = 'tripleo',
+  $mysql_client_bind_address = undef,
   $step                      = hiera('step'),
 ) {
   if $step >= 1 {
@@ -79,11 +79,11 @@ class tripleo::profile::base::database::mysql::client (
 
     $conf_changes = union($client_bind_changes, $changes_ssl)
 
+    # Create /etc/my.cnf.d/tripleo.cnf
     exec { 'directory-create-etc-my.cnf.d':
       command => 'mkdir -p /etc/my.cnf.d',
       path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     } ->
-    # Create /etc/my.cnf.d/tripleo.cnf with the [tripleo]bind-address=<IP of the node in the mysql network>
     augeas { 'tripleo-mysql-client-conf':
       incl    => $mysql_read_default_file,
       lens    => 'Puppet.lns',
