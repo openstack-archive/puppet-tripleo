@@ -1,0 +1,3 @@
+---
+features:
+  - Add support for l2 gateway Neutron service plugin.
