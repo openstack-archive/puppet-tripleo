@@ -67,5 +67,7 @@ class tripleo::profile::base::swift::proxy (
       rabbit_hosts => $swift_rabbit_hosts,
     }
     include ::swift::proxy::versioned_writes
+
+    include ::swift::objectexpirer
   }
 }
