@@ -39,6 +39,10 @@
 #  (optional) The action policy associated to the rule.
 #  Defaults to 'accept'
 #
+# [*jump*]
+#  (optional) The chain to jump to.
+#  If present, overrides action
+#
 # [*state*]
 #  (optional) Array of states associated to the rule..
 #  Defaults to ['NEW']
@@ -75,6 +79,7 @@ define tripleo::firewall::rule (
   $chain       = 'INPUT',
   $destination = undef,
   $extras      = {},
+  $jump        = undef,
 ) {
 
   if $port == 'all' {
@@ -85,16 +90,25 @@ define tripleo::firewall::rule (
     $port_real = $port
   }
 
+  if $jump != undef {
+    $jump_real   = $jump
+    $action_real = undef
+  } else {
+    $jump_real   = undef
+    $action_real = $action
+  }
+
   $basic = {
     'port'        => $port_real,
     'dport'       => $dport,
     'sport'       => $sport,
     'proto'       => $proto,
-    'action'      => $action,
+    'action'      => $action_real,
     'source'      => $source,
     'iniface'     => $iniface,
     'chain'       => $chain,
     'destination' => $destination,
+    'jump'        => $jump_real,
   }
   if $proto != 'gre' {
     $state_rule = {

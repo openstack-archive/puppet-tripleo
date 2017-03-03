@@ -36,7 +36,7 @@ class tripleo::firewall::post(
   if $debug {
     warning('debug is enabled, the traffic is not blocked.')
   } else {
-    firewall { '998 log all':
+    tripleo::firewall::rule{ '998 log all':
       proto => 'all',
       jump  => 'LOG',
     }
