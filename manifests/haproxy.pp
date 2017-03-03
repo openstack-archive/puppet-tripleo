@@ -1265,6 +1265,7 @@ class tripleo::haproxy (
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_api_ssl_port],
       service_network   => $heat_api_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
@@ -1279,6 +1280,7 @@ class tripleo::haproxy (
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_cw_ssl_port],
       service_network   => $heat_cloudwatch_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
@@ -1293,6 +1295,7 @@ class tripleo::haproxy (
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_cfn_ssl_port],
       service_network   => $heat_cfn_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
