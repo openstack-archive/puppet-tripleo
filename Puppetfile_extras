@@ -28,3 +28,7 @@ mod 'datacat',
 mod 'etcd',
   :git => 'https://github.com/cristifalcas/puppet-etcd',
   :ref => '1.10.0'
+
+mod 'ntp',
+  :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
+  :ref => '4.2.x'
