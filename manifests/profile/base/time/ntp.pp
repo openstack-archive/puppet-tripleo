@@ -19,10 +19,12 @@
 #
 
 class tripleo::profile::base::time::ntp {
-  # if installed, we don't want chrony to conflict with ntp.
-  package { 'chrony':
-    ensure => 'purged',
-    before => Service['ntp'],
+  # If installed, we don't want chrony to conflict with ntp. LP#1665426
+  # It should be noted that this work even if the package is not installed
+  service { 'chronyd':
+    ensure => stopped,
+    enable => false,
+    before => Class['ntp']
   }
   include ::ntp
 }
