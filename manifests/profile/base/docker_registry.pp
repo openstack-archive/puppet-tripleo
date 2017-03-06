@@ -43,6 +43,7 @@ class tripleo::profile::base::docker_registry (
   }
   package{'docker-distribution': }
   package{'docker': }
+  package{'openstack-kolla': }
   file { '/etc/docker-distribution/registry/config.yml' :
     ensure  => file,
     content => template('tripleo/docker_distribution/registry_config.yml.erb'),
