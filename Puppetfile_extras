@@ -29,3 +29,6 @@ mod 'datacat',
   :git => 'https://github.com/richardc/puppet-datacat',
   :ref => '0.6.2'
 
+mod 'ntp',
+  :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
+  :ref => '4.2.x'
