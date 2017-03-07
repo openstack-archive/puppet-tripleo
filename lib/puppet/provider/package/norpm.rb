@@ -12,6 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+require 'puppet'
 require 'puppet/provider/package'
 
 Puppet::Type.type(:package).provide :norpm, :source => :rpm, :parent => :rpm do
@@ -24,18 +25,22 @@ Puppet::Type.type(:package).provide :norpm, :source => :rpm, :parent => :rpm do
   end
 
   def install
+    Puppet.warning("[norpm] Attempting to install #{name} but it will not be installed")
     true
   end
 
   def uninstall
+    Puppet.warning("[norpm] Attempting to uninstall #{name} but it will not be removed")
     true
   end
 
   def update
+    Puppet.warning("[norpm] Attempting to update #{name} but it will not be updated")
     true
   end
 
   def purge
+    Puppet.warning("[norpm] Attempting to purge #{name} but it will not be removed")
     true
   end
 
