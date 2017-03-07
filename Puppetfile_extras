@@ -36,3 +36,7 @@ mod 'fdio',
 mod 'certmonger',
   :git => 'https://github.com/earsdown/puppet-certmonger',
   :ref => 'v1.1.1'
+
+mod 'ntp',
+  :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
+  :ref => '4.2.x'
