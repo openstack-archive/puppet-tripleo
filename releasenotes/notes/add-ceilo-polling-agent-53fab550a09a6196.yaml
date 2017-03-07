@@ -1,6 +1,6 @@
 ---
 features:
-  - Add support for cielometer polling agent. The central, compute and ipmi
+  - Add support for ceilometer polling agent. The central, compute and ipmi
     agent services should use polling agent with namespace. This has been
     done in packaging already since few releases now. Let puppet do it
     correctly as well.
