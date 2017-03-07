@@ -114,5 +114,6 @@ class tripleo::profile::base::sahara (
         'ssl'       => $oslomsg_use_ssl_real,
       }),
     }
+    include ::sahara::keystone::authtoken
   }
 }
