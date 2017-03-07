@@ -18,7 +18,7 @@ window.tripleOUiConfig = {
   // If you choose more than one language, a language switcher will appear in
   // the navigation bar.
   // Only 'en' (English) is enabled by default.
-  'languages': ['<%= @enabled_languages.join("', '") %>'],
+  'languages': <%= @enabled_languages.to_json %>,
 
   // Logging
   // 'loggers': ['console']
