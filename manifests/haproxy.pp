@@ -808,7 +808,7 @@ class tripleo::haproxy (
       'ssl-default-bind-ciphers' => $ssl_cipher_suite,
       'ssl-default-bind-options' => $ssl_options,
       'stats'                    => [
-        'socket /var/run/haproxy.sock mode 600 level user',
+        'socket /var/lib/haproxy/stats mode 600 level user',
         'timeout 2m'
       ],
     },
