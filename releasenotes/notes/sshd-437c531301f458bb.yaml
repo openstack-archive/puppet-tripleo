@@ -1,3 +1,5 @@
 ---
 features:
-  - Added manifest and template to enable configuration of sshd_config
+  - Added /etc/issue & /etc/issue.net parameters
+  - Added MOTD banner parameters
+  - Added external module saz-ssh to allow management of sshd_config
