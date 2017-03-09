@@ -40,3 +40,7 @@ mod 'certmonger',
 mod 'ntp',
   :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
   :ref => '4.2.x'
+
+mod 'systemd',
+  :git => 'https://github.com/camptocamp/puppet-systemd',
+  :ref => 'master'
