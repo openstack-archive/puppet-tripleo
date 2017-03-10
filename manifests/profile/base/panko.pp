@@ -23,26 +23,12 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
 
 class tripleo::profile::base::panko (
-  $step           = hiera('step'),
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $step = hiera('step'),
 ) {
-
-  if $::hostname == downcase($bootstrap_node) {
-    $sync_db = true
-  } else {
-    $sync_db = false
-  }
-
-  if $step >= 4 or ($step >= 3 and $sync_db) {
+  if $step >= 3 {
     include ::panko
-    include ::panko::db
     include ::panko::config
-    include ::panko::db::sync
   }
-
 }

@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -53,12 +57,19 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::panko::api (
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $generate_service_certificates = hiera('generate_service_certificates', false),
   $panko_network                 = hiera('panko_api_network', undef),
   $step                          = hiera('step'),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
+
   include ::tripleo::profile::base::panko
 
   if $enable_internal_tls {
@@ -76,8 +87,11 @@ class tripleo::profile::base::panko::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 {
-    include ::panko::api
+  if $step >= 4  or ( $step >= 3 and $sync_db ) {
+    include ::panko::db
+    class { '::panko::api':
+      sync_db => $sync_db,
+    }
     class { '::panko::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
