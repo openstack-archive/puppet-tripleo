@@ -77,17 +77,10 @@ class tripleo::profile::base::heat::api (
   }
 
   if $step >= 4 {
-    class { '::heat::api':
-      service_name => 'httpd',  # TODO cleanup when this is passed by t-h-t.
-    }
-
+    include ::heat::api
     class { '::heat::wsgi::apache_api':
-      ssl_cert   => $tls_certfile,
-      ssl_key    => $tls_keyfile,
-      # TODO: The following are temporary and will be passed via t-h-t
-      ssl        => $enable_internal_tls,
-      servername => hiera("fqdn_${heat_api_network}"),
-      bind_host  => hiera('heat::api::bind_host'),
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
     }
   }
 }

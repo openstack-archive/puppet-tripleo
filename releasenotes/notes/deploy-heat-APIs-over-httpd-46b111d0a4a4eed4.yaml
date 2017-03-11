@@ -1,0 +1,3 @@
+---
+features:
+  - Heat APIs (api, cfn and cloudwatch) are now deployed over httpd.
