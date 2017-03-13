@@ -38,14 +38,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   HAProxy. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Note that this doesn't configure the certificates in haproxy, it merely
-#   creates the certificates.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*gnocchi_backend*]
 #   (Optional) Gnocchi backend string file, swift or rbd
 #   Defaults to swift
@@ -64,7 +56,6 @@ class tripleo::profile::base::gnocchi::api (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $gnocchi_backend               = downcase(hiera('gnocchi_backend', 'swift')),
   $gnocchi_network               = hiera('gnocchi_api_network', undef),
   $step                          = hiera('step'),
@@ -78,10 +69,6 @@ class tripleo::profile::base::gnocchi::api (
   include ::tripleo::profile::base::gnocchi
 
   if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-    }
-
     if !$gnocchi_network {
       fail('gnocchi_api_network is not set in the hieradata.')
     }

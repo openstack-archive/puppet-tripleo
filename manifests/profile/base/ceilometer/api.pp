@@ -39,14 +39,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   HAProxy. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Note that this doesn't configure the certificates in haproxy, it merely
-#   creates the certificates.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -56,16 +48,11 @@ class tripleo::profile::base::ceilometer::api (
   $ceilometer_network            = hiera('ceilometer_api_network', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $step                          = hiera('step'),
 ) {
   include ::tripleo::profile::base::ceilometer
 
   if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-    }
-
     if !$ceilometer_network {
       fail('ceilometer_api_network is not set in the hieradata.')
     }

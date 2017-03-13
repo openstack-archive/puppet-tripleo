@@ -36,14 +36,6 @@
 #   (Optional) Whether or not loadbalancer is enabled.
 #   Defaults to hiera('enable_load_balancer', true).
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   HAProxy. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Note that this doesn't configure the certificates in haproxy, it merely
-#   creates the certificates.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -52,18 +44,10 @@
 class tripleo::profile::base::haproxy (
   $certificates_specs            = {},
   $enable_load_balancer          = hiera('enable_load_balancer', true),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $step                          = hiera('step'),
 ) {
   if $step >= 1 {
     if $enable_load_balancer {
-      if str2bool($generate_service_certificates) {
-        ensure_resources('tripleo::certmonger::haproxy', $certificates_specs)
-        # The haproxy fronends (or listen resources) depend on the certificate
-        # existing and need to be refreshed if it changed.
-        Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
-      }
-
       class {'::tripleo::haproxy':
         internal_certificates_specs => $certificates_specs,
       }

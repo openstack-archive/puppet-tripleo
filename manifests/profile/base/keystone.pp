@@ -43,14 +43,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   HAProxy. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Note that this doesn't configure the certificates in haproxy, it merely
-#   creates the certificates.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*heat_admin_domain*]
 #   domain name for heat admin
 #   Defaults to undef
@@ -130,7 +122,6 @@ class tripleo::profile::base::keystone (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $heat_admin_domain             = undef,
   $heat_admin_email              = undef,
   $heat_admin_password           = undef,
@@ -163,10 +154,6 @@ class tripleo::profile::base::keystone (
   }
 
   if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-    }
-
     if !$public_endpoint_network {
       fail('keystone_public_api_network is not set in the hieradata.')
     }

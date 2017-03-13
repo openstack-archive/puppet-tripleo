@@ -42,12 +42,6 @@
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   MySQL. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*inet_dist_interface*]
 #   (Optional) Address to bind the inter-cluster interface
 #   to. It is the inet_dist_use_interface option in the kernel variables
@@ -87,7 +81,6 @@ class tripleo::profile::base::rabbitmq (
   $config_variables              = hiera('rabbitmq_config_variables'),
   $enable_internal_tls           = undef,  # TODO(jaosorior): pass this via t-h-t
   $environment                   = hiera('rabbitmq_environment'),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $inet_dist_interface           = hiera('rabbitmq::interface', undef),
   $ipv6                          = str2bool(hiera('rabbit_ipv6', false)),
   $kernel_variables              = hiera('rabbitmq_kernel_variables'),
@@ -98,9 +91,6 @@ class tripleo::profile::base::rabbitmq (
   $step                          = hiera('step'),
 ) {
   if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resource('class', 'tripleo::certmonger::rabbitmq', $certificate_specs)
-    }
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
   } else {

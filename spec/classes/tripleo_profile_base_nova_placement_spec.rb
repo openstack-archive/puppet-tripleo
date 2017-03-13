@@ -49,7 +49,6 @@ eos
       let(:params) { {
         :step                          => 1,
         :enable_internal_tls           => true,
-        :generate_service_certificates => true,
         :nova_placement_network        => 'bar',
         :certificates_specs            => {
             'httpd-bar' => {
@@ -63,7 +62,6 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::placement')
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to contain_tripleo__certmonger__httpd('httpd-bar')
         is_expected.to_not contain_class('nova::keystone::authtoken')
         is_expected.to_not contain_class('nova::wsgi::apache_placement')
       }
@@ -87,7 +85,6 @@ eos
       let(:params) { {
         :step => 3,
         :enable_internal_tls           => true,
-        :generate_service_certificates => false,
         :nova_placement_network        => 'bar',
         :certificates_specs            => {
             'httpd-bar' => {
@@ -102,7 +99,6 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::placement')
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to_not contain_tripleo__certmonger__httpd('foo')
         is_expected.to contain_class('nova::keystone::authtoken')
         is_expected.to contain_class('nova::wsgi::apache_placement').with(
           :ssl_cert => '/foo.pem',

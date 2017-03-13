@@ -43,14 +43,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   HAProxy. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Note that this doesn't configure the certificates in haproxy, it merely
-#   creates the certificates.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*l3_ha_override*]
 #   (Optional) Override the calculated value for neutron::server::l3_ha
 #   by default this is calculated to enable when DVR is not enabled
@@ -95,7 +87,6 @@ class tripleo::profile::base::neutron::server (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $dvr_enabled                   = hiera('neutron::server::router_distributed', false),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $l3_ha_override                = '',
   $l3_nodes                      = hiera('neutron_l3_short_node_names', []),
   $neutron_network               = hiera('neutron_api_network', undef),
@@ -104,10 +95,6 @@ class tripleo::profile::base::neutron::server (
   $tls_proxy_fqdn                = undef,
   $tls_proxy_port                = 9696,
 ) {
-  if $enable_internal_tls and $generate_service_certificates {
-    ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-  }
-
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {

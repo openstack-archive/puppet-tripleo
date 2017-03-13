@@ -47,12 +47,6 @@
 #   limit for the mysql service.
 #   Defaults to false
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   MySQL. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*manage_resources*]
 #   (Optional) Whether or not manage root user, root my.cnf, and service.
 #   Defaults to true
@@ -82,7 +76,6 @@ class tripleo::profile::base::database::mysql (
   $certificate_specs             = {},
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $generate_dropin_file_limit    = false,
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $manage_resources              = true,
   $mysql_server_options          = {},
   $mysql_max_connections         = hiera('mysql_max_connections', undef),
@@ -100,9 +93,6 @@ class tripleo::profile::base::database::mysql (
   validate_hash($certificate_specs)
 
   if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resource('class', 'tripleo::certmonger::mysql', $certificate_specs)
-    }
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
   } else {

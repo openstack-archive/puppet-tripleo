@@ -34,14 +34,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   HAProxy. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Note that this doesn't configure the certificates in haproxy, it merely
-#   creates the certificates.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*heat_api_cloudwatch_network*]
 #   (Optional) The network name where the heat cloudwatch endpoint is listening
 #   on. This is set by t-h-t.
@@ -55,17 +47,12 @@
 class tripleo::profile::base::heat::api_cloudwatch (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $heat_api_cloudwatch_network   = hiera('heat_api_cloudwatch_network', undef),
   $step                          = hiera('step'),
 ) {
   include ::tripleo::profile::base::heat
 
   if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-    }
-
     if !$heat_api_cloudwatch_network {
       fail('heat_api_cloudwatch_network is not set in the hieradata.')
     }

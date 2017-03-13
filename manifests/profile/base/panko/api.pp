@@ -38,14 +38,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*generate_service_certificates*]
-#   (Optional) Whether or not certmonger will generate certificates for
-#   HAProxy. This could be as many as specified by the $certificates_specs
-#   variable.
-#   Note that this doesn't configure the certificates in haproxy, it merely
-#   creates the certificates.
-#   Defaults to hiera('generate_service_certificate', false).
-#
 # [*panko_network*]
 #   (Optional) The network name where the panko endpoint is listening on.
 #   This is set by t-h-t.
@@ -60,7 +52,6 @@ class tripleo::profile::base::panko::api (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $generate_service_certificates = hiera('generate_service_certificates', false),
   $panko_network                 = hiera('panko_api_network', undef),
   $step                          = hiera('step'),
 ) {
@@ -73,10 +64,6 @@ class tripleo::profile::base::panko::api (
   include ::tripleo::profile::base::panko
 
   if $enable_internal_tls {
-    if $generate_service_certificates {
-      ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
-    }
-
     if !$panko_network {
       fail('panko_api_network is not set in the hieradata.')
     }
