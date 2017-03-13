@@ -27,10 +27,11 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::bgpvpn (
-  $step = hiera('step'),
+  $step           = hiera('step'),
 ) {
+  include ::tripleo::profile::base::neutron
+
   if $step >= 4 {
-    include ::tripleo::profile::base::neutron
     include ::neutron::services::bgpvpn
   }
 }
