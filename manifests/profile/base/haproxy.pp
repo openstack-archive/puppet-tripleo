@@ -32,10 +32,6 @@
 #         principal: "haproxy/<undercloud fqdn>"
 #   Defaults to {}.
 #
-# [*certmonger_ca*]
-#   (Optional) The CA that certmonger will use to generate the certificates.
-#   Defaults to hiera('certmonger_ca', 'local').
-#
 # [*enable_load_balancer*]
 #   (Optional) Whether or not loadbalancer is enabled.
 #   Defaults to hiera('enable_load_balancer', true).
@@ -55,7 +51,6 @@
 #
 class tripleo::profile::base::haproxy (
   $certificates_specs            = {},
-  $certmonger_ca                 = hiera('certmonger_ca', 'local'),
   $enable_load_balancer          = hiera('enable_load_balancer', true),
   $generate_service_certificates = hiera('generate_service_certificates', false),
   $step                          = hiera('step'),
@@ -63,22 +58,7 @@ class tripleo::profile::base::haproxy (
   if $step >= 1 {
     if $enable_load_balancer {
       if str2bool($generate_service_certificates) {
-        include ::certmonger
-        # This is only needed for certmonger's local CA. For any other CA this
-        # operation (trusting the CA) should be done by the deployer.
-        if $certmonger_ca == 'local' {
-          class { '::tripleo::certmonger::ca::local':
-            notify => Class['::tripleo::haproxy']
-          }
-        }
-
-        Certmonger_certificate {
-          ca          => $certmonger_ca,
-          ensure      => 'present',
-          wait        => true,
-          require     => Class['::certmonger'],
-        }
-        create_resources('::tripleo::certmonger::haproxy', $certificates_specs)
+        ensure_resources('tripleo::certmonger::haproxy', $certificates_specs)
         # The haproxy fronends (or listen resources) depend on the certificate
         # existing and need to be refreshed if it changed.
         Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>

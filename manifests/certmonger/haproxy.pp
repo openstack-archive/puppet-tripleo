@@ -52,14 +52,27 @@ define tripleo::certmonger::haproxy (
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $principal     = undef,
 ){
+    include ::certmonger
     include ::haproxy::params
+    # This is only needed for certmonger's local CA. For any other CA this
+    # operation (trusting the CA) should be done by the deployer.
+    if $certmonger_ca == 'local' {
+      class { '::tripleo::certmonger::ca::local':
+        notify => Class['::tripleo::haproxy']
+      }
+    }
+
     certmonger_certificate { "${title}-cert":
+      ensure       => 'present',
+      ca           => $certmonger_ca,
       hostname     => $hostname,
       dnsname      => $hostname,
       certfile     => $service_certificate,
       keyfile      => $service_key,
       postsave_cmd => $postsave_cmd,
       principal    => $principal,
+      wait         => true,
+      require      => Class['::certmonger'],
     }
     concat { $service_pem :
       ensure  => present,
