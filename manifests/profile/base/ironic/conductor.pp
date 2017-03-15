@@ -44,5 +44,12 @@ class tripleo::profile::base::ironic::conductor (
       include ::ironic::drivers::ilo
       include ::ironic::drivers::ipmi
       include ::ironic::drivers::ssh
+
+      # Configure access to other services
+      include ::ironic::drivers::inspector
+      include ::ironic::glance
+      include ::ironic::neutron
+      include ::ironic::service_catalog
+      include ::ironic::swift
   }
 }
