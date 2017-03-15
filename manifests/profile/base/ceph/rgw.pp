@@ -60,7 +60,7 @@ class tripleo::profile::base::ceph::rgw (
     $rgw_name = hiera('ceph::profile::params::rgw_name', 'radosgw.gateway')
     $civetweb_bind_ip_real = normalize_ip_for_uri($civetweb_bind_ip)
     include ::ceph::params
-    include ::ceph::profile::base
+    include ::ceph::profile::client
     ceph::rgw { $rgw_name:
       frontend_type => 'civetweb',
       rgw_frontends => "civetweb port=${civetweb_bind_ip_real}:${civetweb_bind_port}",
