@@ -208,6 +208,10 @@ class tripleo::profile::base::keystone (
       }),
     }
 
+    if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{
+      include ::keystone::messaging::amqp
+    }
+
     include ::keystone::config
     class { '::keystone::wsgi::apache':
       ssl_cert       => $tls_certfile,
