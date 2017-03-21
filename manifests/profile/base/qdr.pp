@@ -19,17 +19,21 @@
 # === Parameters
 #
 # [*qdr_username*]
-#   Username for the qrouter daemon
+#   Username for the qdrouter daemon
 #   Defaults to undef
 #
 # [*qdr_password*]
-#   Password for the qrouter daemon
+#   Password for the qdrouter daemon
 #   Defaults to undef
 #
 # [*qdr_listener_port*]
-#   Port for the listener (not that we do not use qdr::listener_port
+#   Port for the listener (note that we do not use qdr::listener_port
 #   directly because it requires a string and we have a number.
 #   Defaults to hiera('tripleo::profile::base::qdr::qdr_listener_port', 5672)
+#
+# [*qdr_node_names*]
+#   Set of nodes for qdr mesh deployment setup
+#   Defaults to hiera('rabbitmq_node_names')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -41,11 +45,69 @@ class tripleo::profile::base::qdr (
   $qdr_password      = undef,
   $qdr_listener_port = hiera('tripleo::profile::base::qdr::qdr_listener_port', 5672),
   $step              = Integer(hiera('step')),
+  $qdr_node_names    = pick(hiera('qdr_node_names',undef),hiera('rabbitmq_node_names')),
 ) {
   if $step >= 1 {
+    # For multi-node deployments of the dispatch router, a mesh of
+    # inter-router links is created. Bi-directional links must
+    # not be configured.
+    #
+    # Example: For nodes A, B, C
+    #    Node      Inter-Router Link
+    #     A:             []
+    #     B:             [A]
+    #     C:             [A,B]
+    #
+    # NB: puppet 4.8 introduces break(), which would be favord to
+    # the following
+    $connectors = $qdr_node_names.reduce([]) |$memo, $node| {
+      if $::hostname in $node {
+        $memo + true
+      } else {
+        if true in $memo {
+          $memo
+        } else {
+          $memo + [{'host' => $node,
+                    'role' => 'inter-router',
+                    'port' => '25672'}]
+        }
+      }
+    } - true
+
+    $router_mode = size($qdr_node_names) ? {
+      1       => 'standalone',
+      default => 'interior',
+    }
+
+    $extra_listeners = size($qdr_node_names) ? {
+      1       => [],
+      default => [{'host' => '0.0.0.0',
+                  'port' => '25672',
+                  'role' => 'inter-router'}],
+    }
+
+    $extra_addresses = [{'prefix'       => 'openstack.org/om/rpc/multicast',
+                        'distribution' => 'multicast'},
+                        {'prefix'       => 'openstack.org/om/rpc/unicast',
+                        'distribution' => 'closest'},
+                        {'prefix'       => 'openstack.org/om/rpc/anycast',
+                        'distribution' => 'balanced'},
+                        {'prefix'       => 'openstack.org/om/notify/multicast',
+                        'distribution' => 'multicast'},
+                        {'prefix'       => 'openstack.org/om/notify/unicast',
+                        'distribution' => 'closest'},
+                        {'prefix'       => 'openstack.org/om/notify/anycast',
+                        'distribution' => 'balanced'}]
+
     class { '::qdr':
-      listener_port => "${qdr_listener_port}",
-    } ->
+      listener_addr   => '0.0.0.0',
+      listener_port   => "${qdr_listener_port}",
+      router_mode     => $router_mode,
+      connectors      => $connectors,
+      extra_listeners => $extra_listeners,
+      extra_addresses => $extra_addresses,
+    }
+
     qdr_user { $qdr_username:
       ensure   => present,
       password => $qdr_password,
