@@ -160,6 +160,9 @@ class tripleo::profile::base::rabbitmq (
         ssl_key                 => $tls_keyfile,
       }
     }
+  }
+
+  if $step >= 2 {
     # In case of HA, starting of rabbitmq-server is managed by pacemaker, because of which, a dependency
     # to Service['rabbitmq-server'] will not work. Sticking with UPDATE action.
     if $stack_action == 'UPDATE' {
