@@ -48,10 +48,12 @@ class tripleo::profile::base::nova::compute (
 
     # When utilising images for deployment, we need to reset the iSCSI initiator name to make it unique
     # https://bugzilla.redhat.com/show_bug.cgi?id=1244328
+    ensure_resource('package', 'iscsi-initiator-utils', { ensure => 'present' })
     exec { 'reset-iscsi-initiator-name':
       command => '/bin/echo InitiatorName=$(/usr/sbin/iscsi-iname) > /etc/iscsi/initiatorname.iscsi',
       onlyif  => '/usr/bin/test ! -f /etc/iscsi/.initiator_reset',
       before  => File['/etc/iscsi/.initiator_reset'],
+      require => Package['iscsi-initiator-utils'],
     }
     file { '/etc/iscsi/.initiator_reset':
       ensure => present,
