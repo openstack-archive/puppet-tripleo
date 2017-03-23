@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Allows granular level of control over the `/etc/securetty` file.
+    By allowing operators to specify the values in securetty, they
+    can improve security by limiting root console access.
