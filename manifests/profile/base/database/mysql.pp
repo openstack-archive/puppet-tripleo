@@ -62,6 +62,10 @@
 #   Should be an hash.
 #   Defaults to {}
 #
+# [*mysql_max_connections*]
+#   (Optional) Maximum number of connections to MySQL.
+#   Defaults to hiera('mysql_max_connections', undef)
+#
 # [*remove_default_accounts*]
 #   (Optional) Whether or not remove default MySQL accounts.
 #   Defaults to true
@@ -81,6 +85,7 @@ class tripleo::profile::base::database::mysql (
   $generate_service_certificates = hiera('generate_service_certificates', false),
   $manage_resources              = true,
   $mysql_server_options          = {},
+  $mysql_max_connections         = hiera('mysql_max_connections', undef),
   $remove_default_accounts       = true,
   $step                          = hiera('step'),
 ) {
@@ -126,7 +131,7 @@ class tripleo::profile::base::database::mysql (
     $mysql_server_default = {
       'mysqld' => {
         'bind-address'          => $bind_address,
-        'max_connections'       => hiera('mysql_max_connections'),
+        'max_connections'       => $mysql_max_connections,
         'open_files_limit'      => '-1',
         'innodb_file_per_table' => 'ON',
         'ssl'                   => $enable_internal_tls,
@@ -146,11 +151,11 @@ class tripleo::profile::base::database::mysql (
       remove_default_accounts => $remove_default_accounts,
     }
 
-    if $generate_dropin_file_limit {
+    if $generate_dropin_file_limit and $manage_resources {
       # Raise the mysql file limit
       ::systemd::service_limits { 'mariadb.service':
         limits => {
-          LimitNOFILE => 16384
+          'LimitNOFILE' => 16384
         }
       }
     }
