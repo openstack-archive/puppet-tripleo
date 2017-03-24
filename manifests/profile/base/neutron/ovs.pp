@@ -23,12 +23,27 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*vhostuser_socket_dir*]
+#   (Optional) vhostuser socket dir, The directory where $vhostuser_socket_dir
+#   will be created with correct permissions, inorder to support vhostuser
+#   client mode.
+
 class tripleo::profile::base::neutron::ovs(
-  $step           = hiera('step'),
+  $step                 = hiera('step'),
+  $vhostuser_socket_dir = hiera('neutron::agents::ml2::ovs::vhostuser_socket_dir', undef)
 ) {
   include ::tripleo::profile::base::neutron
 
   if $step >= 5 {
+    if $vhostuser_socket_dir {
+      file { $vhostuser_socket_dir:
+        ensure => directory,
+        owner  => 'qemu',
+        group  => 'qemu',
+        mode   => '0775',
+      }
+    }
+
     include ::neutron::agents::ml2::ovs
 
     # Optional since manage_service may be false and neutron server may not be colocated.

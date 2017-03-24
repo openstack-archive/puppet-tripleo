@@ -4,6 +4,7 @@ vendor/
 spec/fixtures/
 .vagrant/
 .bundle/
+.bundle*/
 coverage/
 .idea/
 *.swp
