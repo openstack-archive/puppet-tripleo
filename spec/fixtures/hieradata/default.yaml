@@ -8,3 +8,5 @@ memcached_node_ips_v6:
 memcached_node_ips:
  - '127.0.0.1'
 service_names: ['sshd']
+#Neutron related
+neutron::rabbit_password: 'password'
