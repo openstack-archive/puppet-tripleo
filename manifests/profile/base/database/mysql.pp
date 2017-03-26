@@ -26,6 +26,11 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
+# [*generate_dropin_file_limit*]
+#   (Optional) Generate a systemd drop-in file to raise the file descriptor
+#   limit for the mysql service.
+#   Defaults to false
+#
 # [*manage_resources*]
 #   (Optional) Whether or not manage root user, root my.cnf, and service.
 #   Defaults to true
@@ -45,12 +50,13 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::database::mysql (
-  $bind_address            = $::hostname,
-  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
-  $manage_resources        = true,
-  $mysql_server_options    = {},
-  $remove_default_accounts = true,
-  $step                    = hiera('step'),
+  $bind_address               = $::hostname,
+  $bootstrap_node             = hiera('bootstrap_nodeid', undef),
+  $generate_dropin_file_limit = false,
+  $manage_resources           = true,
+  $mysql_server_options       = {},
+  $remove_default_accounts    = true,
+  $step                       = hiera('step'),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -95,6 +101,15 @@ class tripleo::profile::base::database::mysql (
       service_manage          => $manage_resources,
       service_enabled         => $manage_resources,
       remove_default_accounts => $remove_default_accounts,
+    }
+
+    if $generate_dropin_file_limit {
+      # Raise the mysql file limit
+      ::systemd::service_limits { 'mariadb.service':
+        limits => {
+          'LimitNOFILE' => 16384
+        }
+      }
     }
   }
 
