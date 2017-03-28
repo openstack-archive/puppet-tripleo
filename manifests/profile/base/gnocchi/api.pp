@@ -100,4 +100,13 @@ class tripleo::profile::base::gnocchi::api (
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
   }
+
+  # Re-run gnochci upgrade with storage as swift/ceph should be up at this
+  # stage.
+  if $step >= 5 and $sync_db {
+    exec {'run gnocchi upgrade with storage':
+      command => 'gnocchi-upgrade --config-file=/etc/gnocchi/gnocchi.conf',
+      path    => ['/usr/bin', '/usr/sbin'],
+    }
+  }
 }

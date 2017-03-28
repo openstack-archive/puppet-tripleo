@@ -1,0 +1,5 @@
+---
+fixes:
+  - Re-run gnocchi and ceilometer upgrade in step5. This is required
+    for gnocchi resource types to be created in ceilometer and gnocchi
+    to function properly.

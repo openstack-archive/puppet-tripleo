@@ -85,4 +85,12 @@ class tripleo::profile::base::ceilometer::collector (
     include ::ceilometer::dispatcher::gnocchi
   }
 
+  # Re-run ceilometer-upgrade again in step 5 so gnocchi resource types
+  # are created safely.
+  if $step >= 5 and $sync_db {
+    exec {'ceilometer-db-upgrade':
+      command => 'ceilometer-upgrade --skip-metering-database',
+      path    => ['/usr/bin', '/usr/sbin'],
+    }
+  }
 }
