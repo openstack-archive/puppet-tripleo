@@ -1,0 +1,4 @@
+---
+features:
+  - Include the amqp messaging class when the oslo.messaging rpc
+    protocol is enabled for AMQP 1.0.
