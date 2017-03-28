@@ -85,7 +85,12 @@ describe 'tripleo::profile::base::nova' do
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to contain_class('nova')
+        is_expected.to contain_class('nova').with(
+          :default_transport_url => /.+/,
+          :notification_transport_url => /.+/,
+          :nova_public_key => nil,
+          :nova_private_key => nil,
+        )
         is_expected.to contain_class('nova::config')
         is_expected.to contain_class('nova::cache')
         is_expected.to contain_class('nova::placement')
@@ -109,11 +114,120 @@ describe 'tripleo::profile::base::nova' do
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to contain_class('nova')
+        is_expected.to contain_class('nova').with(
+          :default_transport_url => /.+/,
+          :notification_transport_url => /.+/,
+          :nova_public_key => nil,
+          :nova_private_key => nil,
+        )
         is_expected.to contain_class('nova::config')
         is_expected.to contain_class('nova::placement')
         is_expected.to contain_class('nova::cache')
         is_expected.to contain_class('nova::migration::libvirt').with(
+          :transport         => 'ssh',
+          :configure_libvirt => params[:libvirt_enabled],
+          :configure_nova    => params[:nova_compute_enabled]
+        )
+      }
+    end
+
+    context 'with step 4 with libvirt TLS' do
+      let(:pre_condition) {
+        'include ::nova::compute::libvirt::services'
+      }
+      let(:params) { {
+        :step           => 4,
+        :libvirt_enabled => true,
+        :manage_migration => true,
+        :nova_compute_enabled => true,
+        :bootstrap_node  => 'node.example.com',
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_password => 'foo',
+        :libvirt_tls => true,
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova').with(
+          :default_transport_url => /.+/,
+          :notification_transport_url => /.+/,
+          :nova_public_key => nil,
+          :nova_private_key => nil,
+        )
+        is_expected.to contain_class('nova::config')
+        is_expected.to contain_class('nova::placement')
+        is_expected.to contain_class('nova::cache')
+        is_expected.to contain_class('nova::migration::libvirt').with(
+          :transport         => 'tls',
+          :configure_libvirt => params[:libvirt_enabled],
+          :configure_nova    => params[:nova_compute_enabled],
+        )
+      }
+    end
+
+    context 'with step 4 with libvirt and migration ssh key' do
+      let(:pre_condition) {
+        'include ::nova::compute::libvirt::services'
+      }
+      let(:params) { {
+        :step           => 4,
+        :libvirt_enabled => true,
+        :manage_migration => true,
+        :nova_compute_enabled => true,
+        :bootstrap_node  => 'node.example.com',
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_password => 'foo',
+        :migration_ssh_key => { 'private_key' => 'foo', 'public_key' => 'ssh-rsa bar'}
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova').with(
+          :default_transport_url => /.+/,
+          :notification_transport_url => /.+/,
+          :nova_public_key  => {'key' => 'bar', 'type' => 'ssh-rsa'},
+          :nova_private_key => {'key' => 'foo', 'type' => 'ssh-rsa'}
+        )
+        is_expected.to contain_class('nova::config')
+        is_expected.to contain_class('nova::placement')
+        is_expected.to contain_class('nova::cache')
+        is_expected.to contain_class('nova::migration::libvirt').with(
+          :transport         => 'ssh',
+          :configure_libvirt => params[:libvirt_enabled],
+          :configure_nova    => params[:nova_compute_enabled]
+        )
+      }
+    end
+
+    context 'with step 4 with libvirt TLS and migration ssh key' do
+      let(:pre_condition) {
+        'include ::nova::compute::libvirt::services'
+      }
+      let(:params) { {
+        :step           => 4,
+        :libvirt_enabled => true,
+        :manage_migration => true,
+        :nova_compute_enabled => true,
+        :bootstrap_node  => 'node.example.com',
+        :oslomsg_rpc_hosts => [ 'localhost' ],
+        :oslomsg_rpc_password => 'foo',
+        :libvirt_tls => true,
+        :migration_ssh_key => { 'private_key' => 'foo', 'public_key' => 'ssh-rsa bar'}
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova').with(
+          :default_transport_url => /.+/,
+          :notification_transport_url => /.+/,
+          :nova_public_key  => {'key' => 'bar', 'type' => 'ssh-rsa'},
+          :nova_private_key => {'key' => 'foo', 'type' => 'ssh-rsa'}
+        )
+        is_expected.to contain_class('nova::config')
+        is_expected.to contain_class('nova::placement')
+        is_expected.to contain_class('nova::cache')
+        is_expected.to contain_class('nova::migration::libvirt').with(
+          :transport         => 'tls',
           :configure_libvirt => params[:libvirt_enabled],
           :configure_nova    => params[:nova_compute_enabled]
         )
