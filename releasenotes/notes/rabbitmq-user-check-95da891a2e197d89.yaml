@@ -1,6 +1,6 @@
 ---
 fixes:
   - The rabbitmq user check is moved to step >= 2 from step >= 1. There
-    is no gaurantee that rabbitmq is running at step 1, especially if
+    is no guarantee that rabbitmq is running at step 1, especially if
     updating a failed stack that never made it past step 1 to begin
     with.
