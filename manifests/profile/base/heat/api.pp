@@ -63,7 +63,7 @@ class tripleo::profile::base::heat::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 {
+  if $step >= 3 {
     include ::heat::api
     class { '::heat::wsgi::apache_api':
       ssl_cert => $tls_certfile,

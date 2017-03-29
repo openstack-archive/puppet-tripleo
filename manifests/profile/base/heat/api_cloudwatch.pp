@@ -63,7 +63,7 @@ class tripleo::profile::base::heat::api_cloudwatch (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 {
+  if $step >= 3 {
     include ::heat::api_cloudwatch
 
     class { '::heat::wsgi::apache_api_cloudwatch':
