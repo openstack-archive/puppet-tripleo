@@ -31,5 +31,6 @@ class tripleo::profile::base::nova::ec2api (
     include ::ec2api::api
     include ::ec2api::db::sync
     include ::ec2api::metadata
+    include ::ec2api::keystone::authtoken
   }
 }
