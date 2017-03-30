@@ -30,10 +30,12 @@
 #
 class tripleo::profile::base::securetty (
   $step = hiera('step'),
-  $tty_list = hiera('tty_list)', []),
+  $tty_list = hiera('tty_list', []),
 ) {
+  validate_array($tty_list)
+
   if $step >=1 {
-    $ttys = join( $tty_list, "\n")
+    $ttys = join($tty_list, "\n")
 
     file { '/etc/securetty':
       ensure  => file,
