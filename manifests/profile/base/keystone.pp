@@ -67,6 +67,15 @@
 #   heat admin user name
 #   Defaults to undef
 #
+# [*ldap_backends_config*]
+#   Configuration for keystone::ldap_backend. This takes a hash that will
+#   create each backend specified.
+#   Defaults to undef
+#
+# [*ldap_backend_enable*]
+#   Enables creating per-domain LDAP backends for keystone.
+#   Default to false
+#
 # [*manage_db_purge*]
 #   (Optional) Whether keystone token flushing should be enabled
 #   Defaults to hiera('keystone_enable_db_purge', true)
@@ -100,6 +109,8 @@ class tripleo::profile::base::keystone (
   $heat_admin_email              = undef,
   $heat_admin_password           = undef,
   $heat_admin_user               = undef,
+  $ldap_backends_config          = undef,
+  $ldap_backend_enable           = false,
   $manage_db_purge               = hiera('keystone_enable_db_purge', true),
   $public_endpoint_network       = hiera('keystone_public_api_network', undef),
   $rabbit_hosts                  = hiera('rabbitmq_node_names', undef),
@@ -157,6 +168,11 @@ class tripleo::profile::base::keystone (
       ssl_key_admin  => $tls_keyfile_admin,
     }
     include ::keystone::cors
+
+    if $ldap_backend_enable {
+      validate_hash($ldap_backends_config)
+      create_resources('::keystone::ldap_backend', $ldap_backends_config)
+    }
   }
 
   if $step >= 4 and $manage_db_purge {
