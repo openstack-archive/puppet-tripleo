@@ -32,6 +32,18 @@
 #   Configure a registry-mirror in the /etc/docker/daemon.json file.
 #   (defaults to false)
 #
+# [*docker_options*]
+#   OPTIONS that are used to startup the docker service.  NOTE:
+#   --selinux-enabled is dropped due to recommendations here:
+#   https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/7.2_Release_Notes/technology-preview-file_systems.html
+#   Defaults to '--log-driver=journald --signature-verification=false'
+#
+# [*configure_storage*]
+#   Boolean. Whether to configure a docker storage backend. Defaults to true.
+#
+# [*storage_options*]
+#   Storage options to configure. Defaults to '-s overlay2'
+#
 # [*step*]
 #   step defaults to hiera('step')
 #
@@ -39,6 +51,9 @@ class tripleo::profile::base::docker (
   $docker_namespace = undef,
   $insecure_registry = false,
   $registry_mirror = false,
+  $docker_options = '--log-driver=journald --signature-verification=false',
+  $configure_storage = true,
+  $storage_options = '-s overlay2',
   $step = hiera('step'),
 ) {
   if $step >= 1 {
@@ -57,9 +72,11 @@ class tripleo::profile::base::docker (
         fail('You must provide a $docker_namespace in order to configure insecure registry')
       }
       $namespace = strip($docker_namespace.split('/')[0])
-      $changes = [ "set INSECURE_REGISTRY '\"--insecure-registry ${namespace}\"'", ]
+      $changes = [ "set INSECURE_REGISTRY '\"--insecure-registry ${namespace}\"'",
+                    "set OPTIONS '\"${docker_options}\"'" ]
     } else {
-      $changes = [ 'rm INSECURE_REGISTRY', ]
+      $changes = [ 'rm INSECURE_REGISTRY',
+                    "set OPTIONS '\"${docker_options}\"'" ]
     }
 
     augeas { 'docker-sysconfig':
@@ -94,6 +111,20 @@ class tripleo::profile::base::docker (
       subscribe => Package['docker'],
       notify    => Service['docker'],
       require   => File['/etc/docker/daemon.json'],
+    }
+    if $configure_storage {
+      if $storage_options == undef {
+        fail('You must provide a $storage_options in order to configure storage')
+      }
+      $storage_changes = [ "set DOCKER_STORAGE_OPTIONS '\" ${storage_options}\"'", ]
+    } else {
+      $storage_changes = [ 'rm DOCKER_STORAGE_OPTIONS', ]
+    }
+
+    augeas { 'docker-sysconfig-storage':
+      lens    => 'Shellvars.lns',
+      incl    => '/etc/sysconfig/docker-storage',
+      changes => $storage_changes,
     }
 
   }
