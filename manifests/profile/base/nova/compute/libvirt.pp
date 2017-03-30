@@ -49,6 +49,8 @@ class tripleo::profile::base::nova::compute::libvirt (
       include ::nova::compute::libvirt
     }
 
+    include ::nova::compute::libvirt::qemu
+
   }
 
 }
