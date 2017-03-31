@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Add a tunnel timeout to the HAProxy tripleo-ui configuration to ensure 
+    Zaqar WebSocket tunnels persist longer than two minutes
+    https://bugs.launchpad.net/tripleo/+bug/1672826
