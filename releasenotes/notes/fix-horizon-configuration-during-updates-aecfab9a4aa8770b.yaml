@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes horizon getting temporarily deconfigured during a stack update due
+    to the apache configuration occuring in step 3 but the horizon
+    configuration not occuring until step 4.
