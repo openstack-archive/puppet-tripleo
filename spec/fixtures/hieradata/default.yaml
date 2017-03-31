@@ -39,3 +39,4 @@ memcached_node_ips:
  - '127.0.0.1'
 # octavia related items
 octavia::rabbit_password: 'password'
+horizon::secret_key: 'secrete'
