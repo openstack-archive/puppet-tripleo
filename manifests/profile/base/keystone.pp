@@ -246,7 +246,10 @@ class tripleo::profile::base::keystone (
     if hiera('barbican_api_enabled', false) {
       include ::barbican::keystone::auth
     }
-    if hiera('ceilometer_api_enabled', false) {
+    # ceilometer user is needed even when ceilometer api
+    # not running, so it can authenticate with keystone
+    # and dispatch data.
+    if hiera('ceilometer_auth_enabled', false) {
       include ::ceilometer::keystone::auth
     }
     if hiera('ceph_rgw_enabled', false) {
