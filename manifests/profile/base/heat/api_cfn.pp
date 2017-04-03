@@ -63,7 +63,7 @@ class tripleo::profile::base::heat::api_cfn (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 {
+  if $step >= 3 {
     include ::heat::api_cfn
 
     class { '::heat::wsgi::apache_api_cfn':
