@@ -33,6 +33,8 @@ class tripleo::profile::base::neutron::sriov(
   $mechanism_drivers  = hiera('neutron::plugins::ml2::mechanism_drivers'),
 ) {
 
+  include ::tripleo::profile::base::neutron
+
   if $step >= 4 {
     if 'sriovnicswitch' in $mechanism_drivers  {
       include ::neutron::agents::ml2::sriov
