@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    Out-of-box support for Ironic ``*_ssh`` drivers was removed. These drivers
+    were deprecated in the Newton release.

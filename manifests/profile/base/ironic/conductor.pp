@@ -43,7 +43,10 @@ class tripleo::profile::base::ironic::conductor (
       include ::ironic::drivers::drac
       include ::ironic::drivers::ilo
       include ::ironic::drivers::ipmi
-      include ::ironic::drivers::ssh
+      # TODO: deprecated code cleanup, remove in Queens
+      ironic_config {
+        'ssh/libvirt_uri': ensure => absent;
+      }
 
       # Configure access to other services
       include ::ironic::drivers::inspector
