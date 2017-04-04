@@ -55,6 +55,14 @@
 #   (Optional) Number of seconds to sleep between remote creation tries
 #   Defaults to hiera('pacemaker_remote_try_sleep', 60)
 #
+# [*cluster_recheck_interval*]
+#   (Optional) Set the cluster-wide cluster-recheck-interval property
+#   If the hiera key does not exist or if it is set to undef, the property
+#   won't be changed from its default value when there are no pacemaker_remote
+#   nodes. In presence of pacemaker_remote nodes and an undef value it will
+#   be set to 60s.
+#   Defaults to hiera('pacemaker_cluster_recheck_interval', undef)
+#
 class tripleo::profile::base::pacemaker (
   $step                      = hiera('step'),
   $pcs_tries                 = hiera('pcs_tries', 20),
@@ -65,6 +73,7 @@ class tripleo::profile::base::pacemaker (
   $remote_monitor_interval   = hiera('pacemaker_remote_monitor_interval', 20),
   $remote_tries              = hiera('pacemaker_remote_tries', 5),
   $remote_try_sleep          = hiera('pacemaker_remote_try_sleep', 60),
+  $cluster_recheck_interval  = hiera('pacemaker_cluster_recheck_interval', undef),
 ) {
 
   if count($remote_short_node_names) != count($remote_node_ips) {
@@ -136,6 +145,22 @@ class tripleo::profile::base::pacemaker (
   if $step >= 2 {
     if $pacemaker_master {
       include ::pacemaker::resource_defaults
+      # When we have a non-zero number of pacemaker remote nodes we
+      # want to set the cluster-recheck-interval property to something
+      # lower (unless the operator has explicitely set a value)
+      if count($remote_short_node_names) > 0 and $cluster_recheck_interval == undef {
+        pacemaker::property{ 'cluster-recheck-interval-property':
+          property => 'cluster-recheck-interval',
+          value    => '60s',
+          tries    => $pcs_tries,
+        }
+      } elsif $cluster_recheck_interval != undef {
+        pacemaker::property{ 'cluster-recheck-interval-property':
+          property => 'cluster-recheck-interval',
+          value    => $cluster_recheck_interval,
+          tries    => $pcs_tries,
+        }
+      }
     }
   }
 
