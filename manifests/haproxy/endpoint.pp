@@ -147,7 +147,7 @@ define tripleo::haproxy::endpoint (
     server_names      => $server_names,
     options           => $member_options,
   }
-  if hiera('manage_firewall', true) {
+  if hiera('tripleo::firewall::manage_firewall', true) {
     include ::tripleo::firewall
     # This block will construct firewall rules only when we specify
     # a port for the regular service and also the ssl port for the service.
