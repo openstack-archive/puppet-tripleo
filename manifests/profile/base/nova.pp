@@ -82,6 +82,15 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*migration_ssh_key*]
+#   (Optional) SSH key pair for migration SSH tunnel.
+#   Expects a hash with keys 'private_key' and 'public_key'.
+#   Defaults to {}
+#
+# [*libvirt_tls*]
+#   (Optional) Whether or not libvird TLS service is enabled.
+#   Defaults to false
+
 class tripleo::profile::base::nova (
   $bootstrap_node          = hiera('bootstrap_nodeid', undef),
   $libvirt_enabled         = false,
@@ -99,6 +108,8 @@ class tripleo::profile::base::nova (
   $oslomsg_use_ssl         = hiera('nova::rabbit_use_ssl', '0'),
   $nova_compute_enabled    = false,
   $step                    = hiera('step'),
+  $migration_ssh_key       = {},
+  $libvirt_tls             = false
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -114,7 +125,62 @@ class tripleo::profile::base::nova (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
-    class { '::nova' :
+    include ::nova::config
+    class { '::nova::cache':
+      enabled          => true,
+      backend          => 'oslo_cache.memcache_pool',
+      memcache_servers => $memcache_servers,
+    }
+    include ::nova::placement
+
+    if $step >= 4 and $manage_migration {
+
+      # Libvirt setup (live-migration)
+      if $libvirt_tls {
+        class { '::nova::migration::libvirt':
+          transport         => 'tls',
+          configure_libvirt => $libvirt_enabled,
+          configure_nova    => $nova_compute_enabled,
+        }
+      } else {
+        # Reuse the cold-migration SSH tunnel when TLS is not enabled
+        class { '::nova::migration::libvirt':
+          transport          => 'ssh',
+          configure_libvirt  => $libvirt_enabled,
+          configure_nova     => $nova_compute_enabled,
+          client_user        => 'nova',
+          client_extraparams => {'keyfile' => '/var/lib/nova/.ssh/id_rsa'}
+        }
+      }
+
+      if $migration_ssh_key != {} {
+        # Nova SSH tunnel setup (cold-migration)
+
+        #TODO: Remove me when https://review.rdoproject.org/r/#/c/4008 lands
+        user { 'nova':
+          ensure => present,
+          shell  => '/bin/bash',
+        }
+
+        $private_key_parts = split($migration_ssh_key['public_key'], ' ')
+        $nova_public_key = {
+          type => $private_key_parts[0],
+          key  => $private_key_parts[1]
+        }
+        $nova_private_key = {
+          type => $private_key_parts[0],
+          key  => $migration_ssh_key['private_key']
+        }
+      } else {
+        $nova_public_key = undef
+        $nova_private_key = undef
+      }
+    } else {
+      $nova_public_key = undef
+      $nova_private_key = undef
+    }
+
+    class { '::nova':
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
@@ -131,23 +197,8 @@ class tripleo::profile::base::nova (
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_use_ssl_real,
       }),
-    }
-    include ::nova::config
-    class { '::nova::cache':
-      enabled          => true,
-      backend          => 'oslo_cache.memcache_pool',
-      memcache_servers => $memcache_servers,
-    }
-    include ::nova::placement
-  }
-
-  if $step >= 4 {
-    if $manage_migration {
-      class { '::nova::migration::libvirt':
-        configure_libvirt => $libvirt_enabled,
-        configure_nova    => $nova_compute_enabled,
-      }
+      nova_public_key            => $nova_public_key,
+      nova_private_key           => $nova_private_key,
     }
   }
-
 }
