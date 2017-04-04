@@ -1236,6 +1236,7 @@ class tripleo::haproxy (
       listen_options    => $swift_proxy_server_listen_options,
       public_ssl_port   => $ports[swift_proxy_ssl_port],
       service_network   => $swift_proxy_server_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
