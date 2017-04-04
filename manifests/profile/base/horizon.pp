@@ -26,7 +26,7 @@
 class tripleo::profile::base::horizon (
   $step = hiera('step'),
 ) {
-  if $step >= 4 {
+  if $step >= 3 {
     # Horizon
     include ::apache::mod::remoteip
     include ::apache::mod::status

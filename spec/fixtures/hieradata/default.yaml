@@ -1,3 +1,4 @@
 my_hash:
   network: '127.0.0.1'
 not_hash: string
+horizon::secret_key: 'secrete'
