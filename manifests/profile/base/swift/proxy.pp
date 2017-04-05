@@ -46,6 +46,22 @@
 #   Username for messaging nova queue
 #   Defaults to hiera('swift::proxy::ceilometer::rabbit_user', 'guest')
 #
+# [*certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Example with hiera:
+#     apache_certificates_specs:
+#       httpd-internal_api:
+#         hostname: <overcloud controller fqdn>
+#         service_certificate: <service certificate path>
+#         service_key: <service key path>
+#         principal: "haproxy/<overcloud controller fqdn>"
+#   Defaults to hiera('apache_certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*memcache_port*]
 #   (Optional) memcache port
 #   Defaults to 11211
@@ -59,6 +75,26 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*swift_proxy_network*]
+#   (Optional) The network name where the swift proxy endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('swift_proxy_network', undef)
+#
+# [*tls_proxy_bind_ip*]
+#   IP on which the TLS proxy will listen on. Required only if
+#   enable_internal_tls is set.
+#   Defaults to hiera('swift::proxy::proxy_local_net_ip')
+#
+# [*tls_proxy_fqdn*]
+#   fqdn on which the tls proxy will listen on. required only used if
+#   enable_internal_tls is set.
+#   defaults to undef
+#
+# [*tls_proxy_port*]
+#   port on which the tls proxy will listen on. Only used if
+#   enable_internal_tls is set.
+#   defaults to 8080
+#
 class tripleo::profile::base::swift::proxy (
   $ceilometer_enabled            = true,
   $ceilometer_messaging_driver   = hiera('messaging_notify_service_name', 'rabbit'),
@@ -67,14 +103,45 @@ class tripleo::profile::base::swift::proxy (
   $ceilometer_messaging_port     = hiera('tripleo::profile::base::swift::proxy::rabbit_port', '5672'),
   $ceilometer_messaging_use_ssl  = '0',
   $ceilometer_messaging_username = hiera('swift::proxy::ceilometer::rabbit_user', 'guest'),
+  $certificates_specs            = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
   $memcache_port                 = 11211,
   $memcache_servers              = hiera('memcached_node_ips'),
   $step                          = hiera('step'),
+  $swift_proxy_network           = hiera('swift_proxy_network', undef),
+  # FIXME(jaosorior): This will be undef when we pass this to t-h-t
+  $tls_proxy_bind_ip             = hiera('swift::proxy::proxy_local_net_ip', '127.0.0.1'),
+  $tls_proxy_fqdn                = undef,
+  $tls_proxy_port                = 8080,
 ) {
   if $step >= 4 {
+    if $enable_internal_tls {
+      if !$swift_proxy_network {
+        fail('swift_proxy_network is not set in the hieradata.')
+      }
+      $tls_certfile = $certificates_specs["httpd-${swift_proxy_network}"]['service_certificate']
+      $tls_keyfile = $certificates_specs["httpd-${swift_proxy_network}"]['service_key']
+
+      ::tripleo::tls_proxy { 'swift-proxy-api':
+        # FIXME(jaosorior): This will be cleaned up in a subsequent commit.
+        servername => hiera("fqdn_${swift_proxy_network}", $tls_proxy_fqdn),
+        ip         => $tls_proxy_bind_ip,
+        port       => $tls_proxy_port,
+        tls_cert   => $tls_certfile,
+        tls_key    => $tls_keyfile,
+        notify     => Class['::neutron::server'],
+      }
+      # FIXME(jaosorior): This will be cleaned up when we pass it via t-h-t
+      $proxy_bind_ip = 'localhost'
+    } else {
+      # FIXME(jaosorior): This will be cleaned up when we pass it via t-h-t
+      $proxy_bind_ip = $tls_proxy_bind_ip
+    }
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
     include ::swift::config
-    include ::swift::proxy
+    class { '::swift::proxy' :
+      proxy_local_net_ip => $proxy_bind_ip,
+    }
     include ::swift::proxy::proxy_logging
     include ::swift::proxy::healthcheck
     class { '::swift::proxy::cache':
