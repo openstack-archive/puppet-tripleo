@@ -31,10 +31,6 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
-# [*file_owner*]
-#   (Optional) The user which the certificate and key files belong to.
-#   Defaults to 'root'
-#
 # [*principal*]
 #   (Optional) The service principal that is set for the service in kerberos.
 #   Defaults to undef
