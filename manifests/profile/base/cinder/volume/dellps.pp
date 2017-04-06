@@ -41,9 +41,9 @@ class tripleo::profile::base::cinder::volume::dellps (
       san_thin_provision => hiera('cinder::backend::eqlx::san_thin_provision', undef),
       eqlx_group_name    => hiera('cinder::backend::eqlx::eqlx_group_name', undef),
       eqlx_pool          => hiera('cinder::backend::eqlx::eqlx_pool', undef),
-      eqlx_use_chap      => hiera('cinder::backend::eqlx::eqlx_use_chap', undef),
-      eqlx_chap_login    => hiera('cinder::backend::eqlx::eqlx_chap_login', undef),
-      eqlx_chap_password => hiera('cinder::backend::eqlx::eqlx_chap_password', undef),
+      use_chap_auth      => hiera('cinder::backend::eqlx::eqlx_use_chap', undef),
+      chap_username      => hiera('cinder::backend::eqlx::eqlx_chap_login', undef),
+      chap_password      => hiera('cinder::backend::eqlx::eqlx_chap_password', undef),
     }
   }
 
