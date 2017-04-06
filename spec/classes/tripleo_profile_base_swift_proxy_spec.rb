@@ -27,7 +27,10 @@ describe 'tripleo::profile::base::swift::proxy' do
       "class { '::swift':
          swift_hash_path_prefix => 'foo',
        }
-       include ::memcached"
+       include ::memcached
+       class { '::swift::proxy':
+         proxy_local_net_ip => '127.0.0.1',
+       }"
     end
 
     context 'with ipv4 memcache servers' do

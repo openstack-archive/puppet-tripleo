@@ -83,7 +83,7 @@
 # [*tls_proxy_bind_ip*]
 #   IP on which the TLS proxy will listen on. Required only if
 #   enable_internal_tls is set.
-#   Defaults to hiera('swift::proxy::proxy_local_net_ip')
+#   Defaults to undef
 #
 # [*tls_proxy_fqdn*]
 #   fqdn on which the tls proxy will listen on. required only used if
@@ -109,8 +109,7 @@ class tripleo::profile::base::swift::proxy (
   $memcache_servers              = hiera('memcached_node_ips'),
   $step                          = hiera('step'),
   $swift_proxy_network           = hiera('swift_proxy_network', undef),
-  # FIXME(jaosorior): This will be undef when we pass this to t-h-t
-  $tls_proxy_bind_ip             = hiera('swift::proxy::proxy_local_net_ip', '127.0.0.1'),
+  $tls_proxy_bind_ip             = undef,
   $tls_proxy_fqdn                = undef,
   $tls_proxy_port                = 8080,
 ) {
@@ -123,25 +122,17 @@ class tripleo::profile::base::swift::proxy (
       $tls_keyfile = $certificates_specs["httpd-${swift_proxy_network}"]['service_key']
 
       ::tripleo::tls_proxy { 'swift-proxy-api':
-        # FIXME(jaosorior): This will be cleaned up in a subsequent commit.
-        servername => hiera("fqdn_${swift_proxy_network}", $tls_proxy_fqdn),
+        servername => $tls_proxy_fqdn,
         ip         => $tls_proxy_bind_ip,
         port       => $tls_proxy_port,
         tls_cert   => $tls_certfile,
         tls_key    => $tls_keyfile,
         notify     => Class['::neutron::server'],
       }
-      # FIXME(jaosorior): This will be cleaned up when we pass it via t-h-t
-      $proxy_bind_ip = 'localhost'
-    } else {
-      # FIXME(jaosorior): This will be cleaned up when we pass it via t-h-t
-      $proxy_bind_ip = $tls_proxy_bind_ip
     }
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
     include ::swift::config
-    class { '::swift::proxy' :
-      proxy_local_net_ip => $proxy_bind_ip,
-    }
+    include ::swift::proxy
     include ::swift::proxy::proxy_logging
     include ::swift::proxy::healthcheck
     class { '::swift::proxy::cache':
