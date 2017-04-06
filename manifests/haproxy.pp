@@ -1592,6 +1592,12 @@ class tripleo::haproxy (
       server_names      => $controller_hosts_names_real,
       mode              => 'http',
       public_ssl_port   => $ports[ui_ssl_port],
+      listen_options    => {
+        # NOTE(dtrainor): in addition to the zaqar_ws endpoint, the HTTPS
+        # (443/tcp) endpoint that answers for the UI must also use a long-lived
+        # tunnel timeout for the same reasons mentioned above.
+        'timeout' => ['tunnel 3600s'],
+      },
     }
   }
   if $contrail_config {
