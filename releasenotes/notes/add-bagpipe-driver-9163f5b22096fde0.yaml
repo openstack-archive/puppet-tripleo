@@ -1,0 +1,3 @@
+---
+features:
+  - Add support for Bagpipe Neutron driver as backend in BGPVPN scenarios
