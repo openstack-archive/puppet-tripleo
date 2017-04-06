@@ -82,6 +82,7 @@ class tripleo::profile::base::database::mysql::client (
     # Create /etc/my.cnf.d/tripleo.cnf
     exec { 'directory-create-etc-my.cnf.d':
       command => 'mkdir -p /etc/my.cnf.d',
+      unless  => 'test -d /etc/my.cnf.d',
       path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     } ->
     augeas { 'tripleo-mysql-client-conf':
