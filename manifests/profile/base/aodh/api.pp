@@ -35,7 +35,7 @@ class tripleo::profile::base::aodh::api (
 
   include ::tripleo::profile::base::aodh
 
-  if $step >= 4 {
+  if $step >= 3 {
     include ::aodh::api
     include ::aodh::wsgi::apache
 
