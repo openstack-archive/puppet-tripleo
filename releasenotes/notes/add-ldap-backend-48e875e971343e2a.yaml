@@ -1,0 +1,5 @@
+---
+features:
+  - Add keystone::ldap_backend call as resource when is trigged to setup a LDAP
+    backend as keystone domain. This allows per-domain LDAP backends for
+    keystone.
