@@ -34,6 +34,7 @@ class tripleo::profile::base::ironic::conductor (
 
   if $step >= 4 {
       include ::ironic::conductor
+      include ::ironic::drivers::interfaces
       include ::ironic::drivers::pxe
       if $manage_pxe {
           include ::ironic::pxe
