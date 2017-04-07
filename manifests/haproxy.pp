@@ -750,7 +750,7 @@ class tripleo::haproxy (
       'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
       'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
-      'option'       => 'forwardfor',
+      'option'       => [ 'forwardfor', 'httpchk' ],
       'http-request' => [
           'set-header X-Forwarded-Proto https if { ssl_fc }',
           'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
@@ -762,7 +762,7 @@ class tripleo::haproxy (
     }
     $horizon_options = {
       'cookie' => 'SERVERID insert indirect nocache',
-      'option' => 'forwardfor',
+      'option' => [ 'forwardfor', 'httpchk' ],
     }
   }
 
@@ -821,12 +821,20 @@ class tripleo::haproxy (
     },
   }
 
+
+  $default_listen_options = {
+    'option'       => [ 'httpchk', ],
+    'http-request' => [
+      'set-header X-Forwarded-Proto https if { ssl_fc }',
+      'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+  }
   Tripleo::Haproxy::Endpoint {
     haproxy_listen_bind_param   => $haproxy_listen_bind_param,
     member_options              => $haproxy_member_options,
     public_certificate          => $service_certificate,
     use_internal_certificates   => $use_internal_certificates,
     internal_certificates_specs => $internal_certificates_specs,
+    listen_options              => $default_listen_options,
   }
 
   $stats_base = ['enable', 'uri /']
@@ -852,11 +860,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
       server_names      => hiera('keystone_admin_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
+      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /v3' ] }),
       public_ssl_port   => $ports[keystone_admin_api_ssl_port],
       service_network   => $keystone_admin_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -864,11 +868,6 @@ class tripleo::haproxy (
   }
 
   if $keystone_public {
-    $keystone_listen_opts = {
-      'http-request' => [
-        'set-header X-Forwarded-Proto https if { ssl_fc }',
-        'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-    }
     if $service_certificate {
       $keystone_public_tls_listen_opts = {
         'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
@@ -877,7 +876,9 @@ class tripleo::haproxy (
         'option'       => 'forwardfor',
       }
     } else {
-      $keystone_public_tls_listen_opts = {}
+      $keystone_public_tls_listen_opts = {
+        'option' => [ 'httpchk GET /v3', ],
+      }
     }
     ::tripleo::haproxy::endpoint { 'keystone_public':
       public_virtual_ip => $public_virtual_ip,
@@ -886,7 +887,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('keystone_public_api_node_ips', $controller_hosts_real),
       server_names      => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($keystone_listen_opts, $keystone_public_tls_listen_opts),
+      listen_options    => merge($default_listen_options, $keystone_public_tls_listen_opts),
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
       service_network   => $keystone_public_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -901,11 +902,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[neutron_api_ssl_port],
       service_network   => $neutron_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -920,11 +916,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
       server_names      => hiera('cinder_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[cinder_api_ssl_port],
       service_network   => $cinder_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -939,11 +930,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('congress_node_ips', $controller_hosts_real),
       server_names      => hiera('congress_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[congress_api_ssl_port],
       service_network   => $congress_network,
     }
@@ -957,11 +943,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('manila_api_node_ips', $controller_hosts_real),
       server_names      => hiera('manila_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[manila_api_ssl_port],
       service_network   => $manila_network,
     }
@@ -987,11 +968,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('tacker_node_ips', $controller_hosts_real),
       server_names      => hiera('tacker_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[tacker_api_ssl_port],
       service_network   => $tacker_network,
     }
@@ -1018,11 +994,7 @@ class tripleo::haproxy (
       server_names      => hiera('glance_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[glance_api_ssl_port],
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
+      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /healthcheck', ]}),
       service_network   => $glance_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -1037,11 +1009,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => hiera('nova_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[nova_api_ssl_port],
       service_network   => $nova_osapi_network,
       #member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1057,11 +1024,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('nova_placement_node_ips', $controller_hosts_real),
       server_names      => hiera('nova_placement_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[nova_placement_ssl_port],
       service_network   => $nova_placement_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1074,6 +1036,9 @@ class tripleo::haproxy (
       service_port    => $ports[nova_metadata_port],
       ip_addresses    => hiera('nova_metadata_node_ips', $controller_hosts_real),
       server_names    => hiera('nova_metadata_node_names', $controller_hosts_names_real),
+      listen_options  => {
+        'option'  => [ 'httpchk', ],
+      },
       service_network => $nova_metadata_network,
     }
   }
@@ -1085,10 +1050,11 @@ class tripleo::haproxy (
       service_port      => $ports[nova_novnc_port],
       ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => hiera('nova_api_node_names', $controller_hosts_names_real),
-      listen_options    => {
+      listen_options    => merge($default_listen_options, {
+        'option'  => [ 'tcpka' ],
         'balance' => 'source',
         'timeout' => [ 'tunnel 1h' ],
-      },
+      }),
       public_ssl_port   => $ports[nova_novnc_ssl_port],
       service_network   => $nova_novncproxy_network,
     }
@@ -1102,11 +1068,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ec2_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ec2_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[ec2_api_ssl_port],
       service_network   => $ec2_api_network,
     }
@@ -1130,11 +1091,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ceilometer_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ceilometer_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[ceilometer_api_ssl_port],
       service_network   => $ceilometer_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1149,11 +1105,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
       server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[aodh_api_ssl_port],
       service_network   => $aodh_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1167,11 +1118,6 @@ class tripleo::haproxy (
       service_port      => $ports[panko_api_port],
       ip_addresses      => hiera('panko_api_node_ips', $controller_hosts_real),
       server_names      => hiera('panko_api_node_names', $controller_hosts_names_real),
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[panko_api_ssl_port],
       service_network   => $panko_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1199,11 +1145,6 @@ class tripleo::haproxy (
       ip_addresses      => hiera('gnocchi_api_node_ips', $controller_hosts_real),
       server_names      => hiera('gnocchi_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => {
-          'http-request' => [
-            'set-header X-Forwarded-Proto https if { ssl_fc }',
-            'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-      },
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
       service_network   => $gnocchi_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1224,6 +1165,7 @@ class tripleo::haproxy (
 
   if $swift_proxy_server {
     $swift_proxy_server_listen_options = {
+      'option'         => [ 'httpchk GET /healthcheck', ],
       'timeout client' => '2m',
       'timeout server' => '2m',
     }
@@ -1242,17 +1184,13 @@ class tripleo::haproxy (
 
   $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
   $heat_ip_addresses = hiera('heat_api_node_ips', $controller_hosts_real)
-  $heat_base_options = {
-    'http-request' => [
-      'set-header X-Forwarded-Proto https if { ssl_fc }',
-      'set-header X-Forwarded-Proto http if !{ ssl_fc }']}
   if $service_certificate {
     $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
     }
-    $heat_options = merge($heat_base_options, $heat_ssl_options)
+    $heat_options = merge($default_listen_options, $heat_ssl_options)
   } else {
-    $heat_options = $heat_base_options
+    $heat_options = $default_listen_options
   }
 
   if $heat_api {
@@ -1515,6 +1453,7 @@ class tripleo::haproxy (
       server_names      => hiera('ceph_rgw_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
+      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk HEAD /' ] }),
     }
   }
 
