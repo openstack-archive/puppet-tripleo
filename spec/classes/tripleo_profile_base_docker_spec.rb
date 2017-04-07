@@ -54,6 +54,21 @@ describe 'tripleo::profile::base::docker' do
 
       it_raises 'a Puppet::Error', /You must provide a \$docker_namespace in order to configure insecure registry/
     end
+
+    context 'with step 1 and registry_mirror configured' do
+      let(:params) { {
+          :registry_mirror => 'http://foo/bar',
+          :step              => 1,
+      } }
+
+      it { is_expected.to contain_class('tripleo::profile::base::docker') }
+      it { is_expected.to contain_package('docker') }
+      it { is_expected.to contain_service('docker') }
+      it {
+        is_expected.to contain_augeas('docker-daemon.json').with_changes(['set dict/entry[. = "registry-mirrors"] "registry-mirrors', "set dict/entry[. = \"registry-mirrors\"]/array/string \"http://foo/bar\""])
+      }
+    end
+
   end
 
   on_supported_os.each do |os, facts|
