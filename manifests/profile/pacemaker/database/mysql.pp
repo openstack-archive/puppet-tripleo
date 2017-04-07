@@ -120,7 +120,7 @@ class tripleo::profile::pacemaker::database::mysql (
   if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
     tripleo::pacemaker::resource_restart_flag { 'galera-master':
       subscribe => File['mysql-config-file'],
-    }
+    } ~> Exec<| title == 'galera-ready' |>
   }
 
   if $step >= 2 {
@@ -145,7 +145,7 @@ class tripleo::profile::pacemaker::database::mysql (
         },
         require         => [Class['::mysql::server'],
                             Pacemaker::Property['galera-role-node-property']],
-        before          => Exec['galera-ready'],
+        notify          => Exec['galera-ready'],
       }
       exec { 'galera-ready' :
         command     => '/usr/bin/clustercheck >/dev/null',
@@ -153,6 +153,7 @@ class tripleo::profile::pacemaker::database::mysql (
         tries       => 180,
         try_sleep   => 10,
         environment => ['AVAILABLE_WHEN_READONLY=0'],
+        refreshonly => true,
         require     => Exec['create-root-sysconfig-clustercheck'],
       }
       # We add a clustercheck db user and we will switch /etc/sysconfig/clustercheck
