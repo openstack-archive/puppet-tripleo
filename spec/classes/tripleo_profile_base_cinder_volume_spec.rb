@@ -56,6 +56,25 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
+      context 'with only pure' do
+        before :each do
+          params.merge!({
+            :cinder_enable_pure_backend  => true,
+            :cinder_enable_iscsi_backend => false,
+          })
+        end
+        it 'should configure only pure' do
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::pure')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume')
+          is_expected.to contain_class('tripleo::profile::base::cinder')
+          is_expected.to contain_class('cinder::volume')
+          is_expected.to contain_class('cinder::backends').with(
+            :enabled_backends => ['tripleo_pure']
+          )
+        end
+      end
+
       context 'with only dellsc' do
         before :each do
           params.merge!({
@@ -116,8 +135,8 @@ describe 'tripleo::profile::base::cinder::volume' do
       context 'with only nfs' do
         before :each do
           params.merge!({
-            :cinder_enable_nfs_backend => true,
-            :cinder_enable_iscsi_backend  => false,
+            :cinder_enable_nfs_backend   => true,
+            :cinder_enable_iscsi_backend => false,
           })
         end
         it 'should configure only nfs' do
@@ -135,8 +154,8 @@ describe 'tripleo::profile::base::cinder::volume' do
       context 'with only rbd' do
         before :each do
           params.merge!({
-            :cinder_enable_rbd_backend => true,
-            :cinder_enable_iscsi_backend  => false,
+            :cinder_enable_rbd_backend   => true,
+            :cinder_enable_iscsi_backend => false,
           })
         end
         it 'should configure only ceph' do
@@ -160,6 +179,7 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
         it 'should configure only user backend' do
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::pure')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellps')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::netapp')
@@ -177,16 +197,18 @@ describe 'tripleo::profile::base::cinder::volume' do
       context 'with all tripleo backends' do
         before :each do
           params.merge!({
+            :cinder_enable_nfs_backend    => true,
+            :cinder_enable_rbd_backend    => true,
             :cinder_enable_iscsi_backend  => true,
+            :cinder_enable_pure_backend   => true,
             :cinder_enable_dellsc_backend => true,
             :cinder_enable_dellps_backend => true,
             :cinder_enable_netapp_backend => true,
-            :cinder_enable_nfs_backend => true,
-            :cinder_enable_rbd_backend => true,
           })
         end
         it 'should configure all backends' do
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::pure')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellps')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::netapp')
@@ -196,7 +218,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('tripleo::profile::base::cinder')
           is_expected.to contain_class('cinder::volume')
           is_expected.to contain_class('cinder::backends').with(
-            :enabled_backends => ['tripleo_iscsi', 'tripleo_ceph', 'tripleo_dellps', 
+            :enabled_backends => ['tripleo_iscsi', 'tripleo_ceph', 'tripleo_pure', 'tripleo_dellps',
                                   'tripleo_dellsc', 'tripleo_netapp','tripleo_nfs']
           )
         end
@@ -206,7 +228,7 @@ describe 'tripleo::profile::base::cinder::volume' do
 
 
   on_supported_os.each do |os, facts|
-    context "on #{os}" do
+    context 'on #{os}' do
       let(:facts) do
         facts.merge({ :hostname => 'node.example.com' })
       end

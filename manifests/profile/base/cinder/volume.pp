@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*cinder_enable_pure_backend*]
+#   (Optional) Whether to enable the pure backend
+#   Defaults to true
+#
 # [*cinder_enable_dellsc_backend*]
 #   (Optional) Whether to enable the delsc backend
 #   Defaults to true
@@ -60,6 +64,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::volume (
+  $cinder_enable_pure_backend        = false,
   $cinder_enable_dellsc_backend      = false,
   $cinder_enable_hpelefthand_backend = false,
   $cinder_enable_dellps_backend      = false,
@@ -75,6 +80,13 @@ class tripleo::profile::base::cinder::volume (
 
   if $step >= 4 {
     include ::cinder::volume
+
+    if $cinder_enable_pure_backend {
+      include ::tripleo::profile::base::cinder::volume::pure
+      $cinder_pure_backend_name = hiera('cinder::backend::pure::volume_backend_name', 'tripleo_pure')
+    } else {
+      $cinder_pure_backend_name = undef
+    }
 
     if $cinder_enable_dellsc_backend {
       include ::tripleo::profile::base::cinder::volume::dellsc
@@ -134,6 +146,7 @@ class tripleo::profile::base::cinder::volume (
 
     $backends = delete_undef_values([$cinder_iscsi_backend_name,
                                       $cinder_rbd_backend_name,
+                                      $cinder_pure_backend_name,
                                       $cinder_dellps_backend_name,
                                       $cinder_dellsc_backend_name,
                                       $cinder_hpelefthand_backend_name,
