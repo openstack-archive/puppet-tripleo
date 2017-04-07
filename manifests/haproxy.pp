@@ -1353,6 +1353,7 @@ class tripleo::haproxy (
       ip_addresses    => hiera('etcd_node_ips', $controller_hosts_real),
       server_names    => hiera('etcd_node_names', $controller_hosts_names_real),
       service_network => $etcd_network,
+      member_options  => union($haproxy_member_options, $internal_tls_member_options),
       listen_options  => {
         'balance' => 'source',
       }

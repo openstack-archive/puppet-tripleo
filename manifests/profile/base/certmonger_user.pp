@@ -58,12 +58,18 @@
 #   it will create.
 #   Defaults to hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}).
 #
+# [*etcd_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('tripleo::profile::base::etcd::certificate_specs', {}).
+#
 class tripleo::profile::base::certmonger_user (
   $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
   $haproxy_certificates_specs = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
   $libvirt_certificates_specs = hiera('libvirt_certificates_specs', {}),
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
+  $etcd_certificate_specs     = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
 ) {
   include ::tripleo::certmonger::ca::libvirt
 
@@ -85,5 +91,8 @@ class tripleo::profile::base::certmonger_user (
   }
   unless empty($rabbitmq_certificate_specs) {
     ensure_resource('class', 'tripleo::certmonger::rabbitmq', $rabbitmq_certificate_specs)
+  }
+  unless empty($etcd_certificate_specs) {
+    ensure_resource('class', 'tripleo::certmonger::etcd', $etcd_certificate_specs)
   }
 }
