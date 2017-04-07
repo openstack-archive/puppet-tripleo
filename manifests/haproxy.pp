@@ -1587,6 +1587,10 @@ class tripleo::haproxy (
       ip_addresses      => hiera('contrail_config_node_ips'),
       server_names      => hiera('contrail_config_node_ips'),
       public_ssl_port   => $ports[contrail_webui_https_port],
+      listen_options    => {
+          'balance'   => 'source',
+          'hash-type' => 'consistent',
+      }
     }
   }
 }
