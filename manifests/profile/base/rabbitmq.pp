@@ -84,7 +84,7 @@ class tripleo::profile::base::rabbitmq (
   if $inet_dist_interface {
     $real_kernel_variables = merge(
       $kernel_variables,
-      { 'inet_dist_use_interface' => ip_to_erl_format($inet_dist_interface) },
+      { 'inet_dist_use_interface' => ip_to_erl_format($inet_dist_interface) }
     )
   } else {
     $real_kernel_variables = $kernel_variables
