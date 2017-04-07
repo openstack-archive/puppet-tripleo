@@ -310,6 +310,9 @@ class tripleo::profile::base::keystone (
     if hiera('nova_placement_enabled', false) {
       include ::nova::keystone::auth_placement
     }
+    if hiera('octavia_api_enabled', false) {
+      include ::octavia::keystone::auth
+    }
     if hiera('panko_api_enabled', false) {
       include ::panko::keystone::auth
     }
