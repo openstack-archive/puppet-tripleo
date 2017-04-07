@@ -38,7 +38,6 @@
 #  {
 #    'de'    => 'German',
 #    'en'    => 'English',
-#    'en-GB' => 'British English',
 #    'es'    => 'Spanish',
 #    'ja'    => 'Japanese',
 #    'ko-KR' => 'Korean',
@@ -106,7 +105,6 @@ class tripleo::ui (
   $enabled_languages        = {
     'de'    => 'German',
     'en'    => 'English',
-    'en-GB' => 'British English',
     'es'    => 'Spanish',
     'ja'    => 'Japanese',
     'ko-KR' => 'Korean',
