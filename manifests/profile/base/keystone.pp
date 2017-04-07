@@ -221,7 +221,9 @@ class tripleo::profile::base::keystone (
 
     if $ldap_backend_enable {
       validate_hash($ldap_backends_config)
-      create_resources('::keystone::ldap_backend', $ldap_backends_config)
+      create_resources('::keystone::ldap_backend', $ldap_backends_config, {
+        create_domain_entry => $manage_domain,
+      })
     }
   }
 
