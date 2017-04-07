@@ -59,6 +59,12 @@
 #  A string.
 #  Defaults to false
 #
+# [*ovndbs_virtual_ip*]
+#  Virtual IP on the OVNDBs service.
+#  A string.
+#  Defaults to false
+#
+
 class tripleo::keepalived (
   $controller_virtual_ip,
   $control_virtual_interface,
@@ -68,6 +74,7 @@ class tripleo::keepalived (
   $storage_virtual_ip      = false,
   $storage_mgmt_virtual_ip = false,
   $redis_virtual_ip        = false,
+  $ovndbs_virtual_ip       = false,
 ) {
 
   case $::osfamily {
@@ -173,6 +180,17 @@ class tripleo::keepalived (
     keepalived::instance { '56':
       interface    => $redis_virtual_interface,
       virtual_ips  => [join(["${redis_virtual_ip}/${redis_virtual_netmask}", ' dev ', $redis_virtual_interface])],
+      state        => 'MASTER',
+      track_script => ['haproxy'],
+      priority     => 101,
+    }
+  }
+  if $ovndbs_virtual_ip and $ovndbs_virtual_ip != $controller_virtual_ip {
+    $ovndbs_virtual_interface = interface_for_ip($ovndbs_virtual_ip)
+    # KEEPALIVE OVNDBS MANAGEMENT NETWORK
+    keepalived::instance { '57':
+      interface    => $ovndbs_virtual_interface,
+      virtual_ips  => [join([$ovndbs_virtual_ip, ' dev ', $ovndbs_virtual_interface])],
       state        => 'MASTER',
       track_script => ['haproxy'],
       priority     => 101,
