@@ -428,6 +428,10 @@
 #  (optional) Specify the network ec2_api_metadata is running on.
 #  Defaults to hiera('ec2_api_network', undef)
 #
+# [*etcd_network*]
+#  (optional) Specify the network etcd is running on.
+#  Defaults to hiera('etcd_network', undef)
+#
 # [*opendaylight_network*]
 #  (optional) Specify the network opendaylight is running on.
 #  Defaults to hiera('opendaylight_api_network', undef)
@@ -623,6 +627,7 @@ class tripleo::haproxy (
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $ec2_api_network             = hiera('ec2_api_network', undef),
   $ec2_api_metadata_network    = hiera('ec2_api_network', undef),
+  $etcd_network                = hiera('etcd_network', undef),
   $sahara_network              = hiera('sahara_api_network', undef),
   $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
   $tacker_network              = hiera('tacker_api_network', undef),
@@ -651,6 +656,7 @@ class tripleo::haproxy (
     contrail_webui_https_port => 8143,
     docker_registry_port => 8787,
     docker_registry_ssl_port => 13787,
+    etcd_port => 2379,
     glance_api_port => 9292,
     glance_api_ssl_port => 13292,
     gnocchi_api_port => 8041,
@@ -789,11 +795,6 @@ class tripleo::haproxy (
   $redis_vip = hiera('redis_vip', $controller_virtual_ip)
   $redis_bind_opts = {
     "${redis_vip}:6379" => $haproxy_listen_bind_param,
-  }
-
-  $etcd_vip = hiera('etcd_vip', $controller_virtual_ip)
-  $etcd_bind_opts = {
-    "${etcd_vip}:2379" => $haproxy_listen_bind_param,
   }
 
   class { '::haproxy':
@@ -1346,19 +1347,15 @@ class tripleo::haproxy (
   }
 
   if $etcd {
-    haproxy::listen { 'etcd':
-      bind             => $etcd_bind_opts,
-      options          => {
+    ::tripleo::haproxy::endpoint { 'etcd':
+      internal_ip     => hiera('etcd_vip', $controller_virtual_ip),
+      service_port    => $ports[etcd_port],
+      ip_addresses    => hiera('etcd_node_ips', $controller_hosts_real),
+      server_names    => hiera('etcd_node_names', $controller_hosts_names_real),
+      service_network => $etcd_network,
+      listen_options  => {
         'balance' => 'source',
-      },
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'etcd':
-      listening_service => 'etcd',
-      ports             => '2379',
-      ipaddresses       => hiera('etcd_node_ips', $controller_hosts_real),
-      server_names      => hiera('etcd_node_names', $controller_hosts_names_real),
-      options           => $haproxy_member_options,
+      }
     }
   }
 
