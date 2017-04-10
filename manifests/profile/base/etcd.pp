@@ -46,7 +46,7 @@ class tripleo::profile::base::etcd (
   $nodes       = hiera('etcd_node_names', []),
   $step        = hiera('step'),
 ) {
-  if $step >= 1 {
+  if $step >= 2 {
     class {'::etcd':
       listen_client_urls          => "http://${bind_ip}:${client_port}",
       advertise_client_urls       => "http://${bind_ip}:${client_port}",
