@@ -28,12 +28,17 @@
 #   Set docker_namespace to INSECURE_REGISTRY, used when a local registry
 #   is enabled (defaults to false)
 #
+# [*registry_mirror*]
+#   Configure a registry-mirror in the /etc/docker/daemon.json file.
+#   (defaults to false)
+#
 # [*step*]
 #   step defaults to hiera('step')
 #
 class tripleo::profile::base::docker (
   $docker_namespace = undef,
   $insecure_registry = false,
+  $registry_mirror = false,
   $step = hiera('step'),
 ) {
   if $step >= 1 {
@@ -64,5 +69,23 @@ class tripleo::profile::base::docker (
       subscribe => Package['docker'],
       notify    => Service['docker'],
     }
+
+    if $registry_mirror {
+      $mirror_changes = [
+        'set dict/entry[. = "registry-mirrors"] "registry-mirrors',
+        "set dict/entry[. = \"registry-mirrors\"]/array/string \"${registry_mirror}\""
+      ]
+    } else {
+      $mirror_changes = [ 'rm dict/entry[. = "registry-mirrors"]', ]
+    }
+
+    augeas { 'docker-daemon.json':
+      lens      => 'Json.lns',
+      incl      => '/etc/docker/daemon.json',
+      changes   => $mirror_changes,
+      subscribe => Package['docker'],
+      notify    => Service['docker'],
+    }
+
   }
 }
