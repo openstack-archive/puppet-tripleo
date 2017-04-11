@@ -39,6 +39,7 @@
 #    'de'    => 'German',
 #    'en'    => 'English',
 #    'es'    => 'Spanish',
+#    'id'    => 'Indonesian',
 #    'ja'    => 'Japanese',
 #    'ko-KR' => 'Korean',
 #    'zh-CN' => 'Simplified Chinese'
@@ -106,6 +107,7 @@ class tripleo::ui (
     'de'    => 'German',
     'en'    => 'English',
     'es'    => 'Spanish',
+    'id'    => 'Indonesian',
     'ja'    => 'Japanese',
     'ko-KR' => 'Korean',
     'zh-CN' => 'Simplified Chinese'
