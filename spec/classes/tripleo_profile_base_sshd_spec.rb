@@ -24,7 +24,7 @@ describe 'tripleo::profile::base::sshd' do
 
     context 'it should do nothing' do
       it do
-        is_expected.to contain_class('ssh')
+        is_expected.to contain_class('ssh::server')
         is_expected.to_not contain_file('/etc/issue')
         is_expected.to_not contain_file('/etc/issue.net')
         is_expected.to_not contain_file('/etc/motd')
