@@ -36,13 +36,15 @@ class tripleo::profile::base::docker_registry (
   $registry_port       = 8787,
   $registry_admin_host = hiera('controller_admin_host'),
 ) {
+
+  include ::tripleo::profile::base::docker
+
   # We want a v2 registry
   package{'docker-registry':
     ensure        => absent,
     allow_virtual => false,
   }
   package{'docker-distribution': }
-  package{'docker': }
   package{'openstack-kolla': }
   file { '/etc/docker-distribution/registry/config.yml' :
     ensure  => file,
@@ -67,10 +69,5 @@ class tripleo::profile::base::docker_registry (
     ensure  => running,
     enable  => true,
     require => Package['docker-distribution'],
-  }
-  service { 'docker':
-    ensure  => running,
-    enable  => true,
-    require => Package['docker'],
   }
 }
