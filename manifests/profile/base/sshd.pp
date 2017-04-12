@@ -32,7 +32,7 @@ class tripleo::profile::base::sshd (
   $motd = hiera('MOTD', undef),
 ) {
 
-  include ::ssh
+  include ::ssh::server
 
   if $bannertext {
     $filelist = [ '/etc/issue', '/etc/issue.net', ]
