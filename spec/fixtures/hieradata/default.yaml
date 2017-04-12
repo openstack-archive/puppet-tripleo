@@ -24,6 +24,8 @@ ceph::profile::params::rgw_keystone_admin_password: 'keystone_admin_password'
 # cinder related items
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
+# gnocchi related items
+gnocchi::keystone::authtoken::password: 'password'
 # nova related items
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
