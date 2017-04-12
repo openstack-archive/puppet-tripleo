@@ -55,6 +55,7 @@ define tripleo::certmonger::httpd (
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
     wait         => true,
+    tag          => 'apache-cert',
     require      => Class['::certmonger'],
   }
 

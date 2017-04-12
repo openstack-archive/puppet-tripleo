@@ -68,6 +68,7 @@ class tripleo::profile::base::certmonger_user (
   include ::tripleo::certmonger::ca::libvirt
 
   unless empty($apache_certificates_specs) {
+    include ::tripleo::certmonger::apache_dirs
     ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs)
   }
   unless empty($libvirt_certificates_specs) {
