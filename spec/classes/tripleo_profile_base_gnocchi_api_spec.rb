@@ -23,7 +23,11 @@ describe 'tripleo::profile::base::gnocchi::api' do
     end
 
     context 'with step less than 3' do
-      let(:params) { { :step => 2 } }
+      let(:params) { {
+        :step => 2,
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1'
+      } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
@@ -36,6 +40,8 @@ describe 'tripleo::profile::base::gnocchi::api' do
       let(:params) { {
         :step => 3,
         :bootstrap_node => 'node.example.com',
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1'
       } }
 
       it {
@@ -48,6 +54,8 @@ describe 'tripleo::profile::base::gnocchi::api' do
     context 'with step 3' do
       let(:params) { {
         :step => 3,
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1'
       } }
 
       it {
@@ -57,35 +65,76 @@ describe 'tripleo::profile::base::gnocchi::api' do
       }
     end
 
-    # TODO(aschultz): fix profile class to not include hiera look ups in the
-    # step 4 so we can properly test it
-    #context 'with step 4' do
-    #  let(:params) { {
-    #    :step            => 4,
-    #  } }
-    #
-    #  it {
-    #    is_expected.to contain_class('gnocchi::api')
-    #    is_expected.to contain_class('gnocchi::wsgi::apache')
-    #    is_expected.to contain_class('gnocchi::storage')
-    #  }
-    #end
-    #
-    #context 'with step 5 on bootstrap' do
-    #  let(:params) { {
-    #    :step => 5,
-    #    :bootstrap_node => 'node.example.com'
-    #  } }
-    #
-    #  it {
-    #    is_expected.to contain_class('gnocchi::api')
-    #    is_expected.to contain_class('gnocchi::wsgi::apache')
-    #    is_expected.to contain_exec('run gnocchi upgrade with storage').with(
-    #      :command => 'gnocchi-upgrade --config-file=/etc/gnocchi/gnocchi.conf',
-    #      :path    => ['/usr/bin', '/usr/sbin']
-    #    )
-    #  }
-    #end
+    context 'with step 4' do
+      let(:params) { {
+        :step => 4,
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1'
+      } }
+
+      it {
+        is_expected.to contain_class('gnocchi::api')
+        is_expected.to contain_class('gnocchi::wsgi::apache')
+        is_expected.to contain_class('gnocchi::storage').with(
+          :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
+        )
+        is_expected.to contain_class('gnocchi::storage::swift')
+      }
+    end
+
+    context 'with step 4 with file backend' do
+      let(:params) { {
+        :step => 4,
+        :gnocchi_backend => 'file',
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1'
+      } }
+
+      it {
+        is_expected.to contain_class('gnocchi::api')
+        is_expected.to contain_class('gnocchi::wsgi::apache')
+        is_expected.to contain_class('gnocchi::storage').with(
+          :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
+        )
+        is_expected.to contain_class('gnocchi::storage::file')
+      }
+    end
+
+    context 'with step 4 with ceph backend' do
+      let(:params) { {
+        :step => 4,
+        :gnocchi_backend => 'rbd',
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1'
+      } }
+
+      it {
+        is_expected.to contain_class('gnocchi::api')
+        is_expected.to contain_class('gnocchi::wsgi::apache')
+        is_expected.to contain_class('gnocchi::storage').with(
+          :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
+        )
+        is_expected.to contain_class('gnocchi::storage::ceph')
+      }
+    end
+
+    context 'with step 5 on bootstrap' do
+      let(:params) { {
+        :step => 5,
+        :bootstrap_node => 'node.example.com',
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1'
+      } }
+
+      it {
+        is_expected.to contain_class('gnocchi::api')
+        is_expected.to contain_class('gnocchi::wsgi::apache')
+        is_expected.to contain_exec('run gnocchi upgrade with storage').with(
+          :command => 'gnocchi-upgrade --config-file=/etc/gnocchi/gnocchi.conf',
+          :path    => ['/usr/bin', '/usr/sbin']
+        )
+      }
+    end
   end
 
 
