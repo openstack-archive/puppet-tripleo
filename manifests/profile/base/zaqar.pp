@@ -50,6 +50,7 @@ class tripleo::profile::base::zaqar (
       uri => $database_connection,
     }
     include ::zaqar::transport::websocket
+    include ::apache::mod::ssl
     include ::zaqar::transport::wsgi
 
     # TODO (bcrochet): At some point, the transports should be split out to

@@ -98,6 +98,7 @@ class tripleo::profile::base::gnocchi::api (
 
   if $step >= 4 {
     include ::gnocchi::api
+    include ::apache::mod::ssl
     class { '::gnocchi::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

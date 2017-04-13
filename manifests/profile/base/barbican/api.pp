@@ -99,6 +99,7 @@ class tripleo::profile::base::barbican::api (
     include ::barbican::api::logging
     include ::barbican::keystone::notification
     include ::barbican::quota
+    include ::apache::mod::ssl
     class { '::barbican::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
