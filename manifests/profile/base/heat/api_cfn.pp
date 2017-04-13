@@ -66,6 +66,7 @@ class tripleo::profile::base::heat::api_cfn (
   if $step >= 3 {
     include ::heat::api_cfn
 
+    include ::apache::mod::ssl
     class { '::heat::wsgi::apache_api_cfn':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

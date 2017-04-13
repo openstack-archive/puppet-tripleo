@@ -94,6 +94,7 @@ class tripleo::profile::base::nova::api (
       $tls_keyfile = undef
     }
     if $step >= 4 or ($step >= 3 and $sync_db) {
+      include ::apache::mod::ssl
       class { '::nova::wsgi::apache_api':
         ssl_cert => $tls_certfile,
         ssl_key  => $tls_keyfile,

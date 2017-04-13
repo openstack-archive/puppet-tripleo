@@ -68,6 +68,7 @@ class tripleo::profile::base::aodh::api (
 
   if $step >= 3 {
     include ::aodh::api
+    include ::apache::mod::ssl
     class { '::aodh::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

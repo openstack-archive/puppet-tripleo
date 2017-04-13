@@ -66,6 +66,7 @@ class tripleo::profile::base::heat::api_cloudwatch (
   if $step >= 3 {
     include ::heat::api_cloudwatch
 
+    include ::apache::mod::ssl
     class { '::heat::wsgi::apache_api_cloudwatch':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
