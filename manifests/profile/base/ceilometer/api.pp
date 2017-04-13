@@ -30,6 +30,7 @@ class tripleo::profile::base::ceilometer::api (
 
   if $step >= 4 {
     include ::ceilometer::api
+    include ::apache::mod::ssl
     include ::ceilometer::wsgi::apache
   }
 }

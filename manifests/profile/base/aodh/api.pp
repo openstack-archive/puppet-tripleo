@@ -37,6 +37,7 @@ class tripleo::profile::base::aodh::api (
 
   if $step >= 3 {
     include ::aodh::api
+    include ::apache::mod::ssl
     include ::aodh::wsgi::apache
 
     #NOTE: Combination alarms are deprecated in newton and disabled by default.

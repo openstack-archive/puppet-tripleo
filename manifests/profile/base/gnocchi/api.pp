@@ -50,6 +50,7 @@ class tripleo::profile::base::gnocchi::api (
 
   if $step >= 4 {
     include ::gnocchi::api
+    include ::apache::mod::ssl
     include ::gnocchi::wsgi::apache
 
     class { '::gnocchi::storage':
