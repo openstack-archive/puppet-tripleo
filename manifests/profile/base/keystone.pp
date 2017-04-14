@@ -321,7 +321,7 @@ class tripleo::profile::base::keystone (
     if hiera('sahara_api_enabled', false) {
       include ::sahara::keystone::auth
     }
-    if hiera('swift_proxy_enabled', false) {
+    if hiera('swift_proxy_enabled', false) or hiera('external_swift_proxy_enabled',false) {
       include ::swift::keystone::auth
     }
     if hiera('tacker_enabled', false) {
