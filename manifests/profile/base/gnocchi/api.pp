@@ -83,13 +83,15 @@ class tripleo::profile::base::gnocchi::api (
     include ::gnocchi::db::sync
   }
 
-  if $step >= 4 {
+  if $step >= 3 {
     include ::gnocchi::api
     class { '::gnocchi::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }
+  }
 
+  if $step >= 4 {
     class { '::gnocchi::storage':
       coordination_url => join(['redis://:', hiera('gnocchi_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/']),
     }
