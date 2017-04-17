@@ -1185,13 +1185,17 @@ class tripleo::haproxy (
 
   $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
   $heat_ip_addresses = hiera('heat_api_node_ips', $controller_hosts_real)
+  $heat_timeout_options = {
+    'timeout client' => '10m',
+    'timeout server' => '10m',
+  }
   if $service_certificate {
     $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
     }
-    $heat_options = merge($default_listen_options, $heat_ssl_options)
+    $heat_options = merge($default_listen_options, $heat_ssl_options, $heat_timeout_options)
   } else {
-    $heat_options = $default_listen_options
+    $heat_options = merge($default_listen_options, $heat_timeout_options)
   }
 
   if $heat_api {

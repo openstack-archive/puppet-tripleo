@@ -1,0 +1,5 @@
+---
+fixes:
+  - For Heat API, increase the HAproxy timeout from 2 minutes to 10 minutes so
+    we give a chance to Heat to use the rpc_response_timeout value which is set
+    to 600 by default in TripleO.
