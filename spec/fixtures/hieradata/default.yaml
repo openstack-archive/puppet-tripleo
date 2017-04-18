@@ -33,6 +33,9 @@ cinder::keystone::authtoken::password: 'password'
 gnocchi::keystone::authtoken::password: 'password'
 gnocchi::storage::ceph::ceph_username: 'gnocchi'
 gnocchi::storage::ceph::ceph_secret: 'password'
+# haproxy related items
+mysql_enabled: true
+controller_node_ips: '10.1.0.1,10.1.0.2'
 # nova related items
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
