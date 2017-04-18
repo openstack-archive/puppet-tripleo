@@ -27,14 +27,19 @@
 #   The text used within SSH Banner
 #   Defaults to hiera('MOTD')
 #
+# [*options*]
+#   Hash of SSHD options to set. See the puppet-ssh module documentation for
+#   details.
+#   Defaults to {}
+
 class tripleo::profile::base::sshd (
   $bannertext = hiera('BannerText', undef),
   $motd = hiera('MOTD', undef),
+  $options = {}
 ) {
 
-  include ::ssh::server
-
-  if $bannertext {
+  if $bannertext and $bannertext != '' {
+    $sshd_options_banner = {'Banner' => '/etc/issue.net'}
     $filelist = [ '/etc/issue', '/etc/issue.net', ]
     file { $filelist:
       ensure  => file,
@@ -44,9 +49,12 @@ class tripleo::profile::base::sshd (
       group   => 'root',
       mode    => '0644'
     }
+  } else {
+    $sshd_options_banner = {}
   }
 
-  if $motd {
+  if $motd and $motd != '' {
+    $sshd_options_motd = {'PrintMotd' => 'yes'}
     file { '/etc/motd':
       ensure  => file,
       backup  => false,
@@ -55,5 +63,23 @@ class tripleo::profile::base::sshd (
       group   => 'root',
       mode    => '0644'
     }
+  } else {
+    $sshd_options_motd = {}
+  }
+
+  $sshd_options = merge(
+    $options,
+    $sshd_options_banner,
+    $sshd_options_motd
+  )
+
+  # NB (owalsh) in puppet-ssh hiera takes precedence over the class param
+  # we need to control this, so error if it's set in hiera
+  if hiera('ssh:server::options', undef) {
+    err('ssh:server::options must not be set, use tripleo::profile::base::sshd::options')
+  }
+  class { '::ssh::server':
+    storeconfigs_enabled => false,
+    options              => $sshd_options
   }
 }
