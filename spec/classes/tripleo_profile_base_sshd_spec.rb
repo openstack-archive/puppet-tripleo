@@ -24,7 +24,23 @@ describe 'tripleo::profile::base::sshd' do
 
     context 'it should do nothing' do
       it do
-        is_expected.to contain_class('ssh::server')
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {}
+        })
+        is_expected.to_not contain_file('/etc/issue')
+        is_expected.to_not contain_file('/etc/issue.net')
+        is_expected.to_not contain_file('/etc/motd')
+      end
+    end
+
+    context 'it should do nothing with empty strings' do
+      let(:params) {{ :bannertext => '', :motd => '' }}
+      it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {}
+        })
         is_expected.to_not contain_file('/etc/issue')
         is_expected.to_not contain_file('/etc/issue.net')
         is_expected.to_not contain_file('/etc/motd')
@@ -34,6 +50,12 @@ describe 'tripleo::profile::base::sshd' do
     context 'with issue and issue.net configured' do
       let(:params) {{ :bannertext => 'foo' }}
       it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'Banner' => '/etc/issue.net'
+          }
+        })
         is_expected.to contain_file('/etc/issue').with({
           'content' => 'foo',
           'owner'   => 'root',
@@ -53,6 +75,12 @@ describe 'tripleo::profile::base::sshd' do
     context 'with motd configured' do
       let(:params) {{ :motd => 'foo' }}
       it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'PrintMotd' => 'yes'
+          }
+        })
         is_expected.to contain_file('/etc/motd').with({
           'content' => 'foo',
           'owner'   => 'root',
@@ -61,6 +89,94 @@ describe 'tripleo::profile::base::sshd' do
           })
         is_expected.to_not contain_file('/etc/issue')
         is_expected.to_not contain_file('/etc/issue.net')
+      end
+    end
+
+    context 'with options configured' do
+      let(:params) {{ :options => {'X11Forwarding' => 'no'} }}
+      it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'X11Forwarding' => 'no'
+          }
+        })
+        is_expected.to_not contain_file('/etc/motd')
+        is_expected.to_not contain_file('/etc/issue')
+        is_expected.to_not contain_file('/etc/issue.net')
+      end
+    end
+
+    context 'with motd and issue configured' do
+      let(:params) {{
+        :bannertext => 'foo',
+        :motd => 'foo'
+      }}
+      it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'Banner' => '/etc/issue.net',
+            'PrintMotd' => 'yes'
+          }
+        })
+        is_expected.to contain_file('/etc/motd').with({
+          'content' => 'foo',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          })
+        is_expected.to contain_file('/etc/issue').with({
+          'content' => 'foo',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          })
+        is_expected.to contain_file('/etc/issue.net').with({
+          'content' => 'foo',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          })
+      end
+    end
+
+    context 'with motd and issue and options configured' do
+      let(:params) {{
+        :bannertext => 'foo',
+        :motd => 'foo',
+        :options => {
+          'PrintMotd' => 'no', # this should be overridden
+          'X11Forwarding' => 'no'
+        }
+      }}
+      it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'Banner' => '/etc/issue.net',
+            'PrintMotd' => 'yes',
+            'X11Forwarding' => 'no'
+          }
+        })
+        is_expected.to contain_file('/etc/motd').with({
+          'content' => 'foo',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          })
+        is_expected.to contain_file('/etc/issue').with({
+          'content' => 'foo',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          })
+        is_expected.to contain_file('/etc/issue.net').with({
+          'content' => 'foo',
+          'owner'   => 'root',
+          'group'   => 'root',
+          'mode'    => '0644',
+          })
       end
     end
   end
