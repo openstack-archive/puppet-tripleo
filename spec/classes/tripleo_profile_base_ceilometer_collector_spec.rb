@@ -128,32 +128,6 @@ describe 'tripleo::profile::base::ceilometer::collector' do
         is_expected.to contain_class('ceilometer::dispatcher::gnocchi')
       end
     end
-
-    context 'with step 5 on bootstrap node' do
-      let(:params) { {
-        :step             => 5,
-        :bootstrap_node   => 'node.example.com',
-        :mongodb_node_ips => ['127.0.0.1',],
-        :mongodb_replset  => 'replicaset'
-      } }
-
-      it 'should trigger complete configuration' do
-        is_expected.to contain_exec('ceilometer-db-upgrade')
-      end
-    end
-
-    context 'with step 5 not on bootstrap node' do
-      let(:params) { {
-        :step             => 5,
-        :bootstrap_node   => 'somethingelse.example.com',
-        :mongodb_node_ips => ['127.0.0.1',],
-        :mongodb_replset  => 'replicaset'
-      } }
-
-      it 'should trigger complete configuration' do
-        is_expected.to_not contain_exec('ceilometer-db-upgrade')
-      end
-    end
   end
 
 

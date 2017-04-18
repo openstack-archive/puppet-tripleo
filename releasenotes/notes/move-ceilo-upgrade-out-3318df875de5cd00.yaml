@@ -1,0 +1,6 @@
+---
+fixes:
+  - Since collector is deprecated, move the ceilo upgrade in step5
+    out of collector profile and into cielometer base. This way
+    ceilo upgrade can run even when collector is disabled which is
+    the default in pike.

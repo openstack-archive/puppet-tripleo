@@ -42,6 +42,31 @@ describe 'tripleo::profile::base::ceilometer' do
         is_expected.to contain_class('ceilometer::config')
       end
     end
+
+    context 'with step 5 with bootstrap node' do
+      let(:params) { {
+        :bootstrap_node => 'node.example.com',
+        :step             => 5,
+        :oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        :oslomsg_rpc_username => 'ceilometer',
+        :oslomsg_rpc_password => 'foo',
+      } }
+
+      it 'should trigger complete configuration' do
+        is_expected.to contain_exec('ceilometer-db-upgrade')
+      end
+    end
+
+    context 'with step 5 without bootstrap node' do
+      let(:params) { {
+        :bootstrap_node => 'somethingelse.example.com',
+        :step             => 5,
+      } }
+
+      it 'should trigger complete configuration' do
+        is_expected.to_not contain_exec('ceilometer-db-upgrade')
+      end
+    end
   end
 
 
