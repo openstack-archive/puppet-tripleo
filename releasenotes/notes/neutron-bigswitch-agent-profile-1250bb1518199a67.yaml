@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Moves bigswitch neutron agent configuration to a new tripleo profile
+    tripleo::profile::base::neutron::agents::bigswitch
