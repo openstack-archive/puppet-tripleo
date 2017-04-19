@@ -7,3 +7,4 @@ memcached_node_ips_v6:
  - '::1'
 memcached_node_ips:
  - '127.0.0.1'
+service_names: ['sshd']
