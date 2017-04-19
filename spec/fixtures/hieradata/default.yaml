@@ -36,3 +36,4 @@ memcached_node_ips_v6:
 memcached_node_ips:
  - '127.0.0.1'
 horizon::secret_key: 'secrete'
+service_names: ['sshd']
