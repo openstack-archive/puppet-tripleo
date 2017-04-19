@@ -79,12 +79,21 @@ class tripleo::profile::base::docker (
       $mirror_changes = [ 'rm dict/entry[. = "registry-mirrors"]', ]
     }
 
+    file { '/etc/docker/daemon.json':
+      ensure  => 'present',
+      content => '{}',
+      mode    => '0644',
+      replace => false,
+      require => Package['docker']
+    }
+
     augeas { 'docker-daemon.json':
       lens      => 'Json.lns',
       incl      => '/etc/docker/daemon.json',
       changes   => $mirror_changes,
       subscribe => Package['docker'],
       notify    => Service['docker'],
+      require   => File['/etc/docker/daemon.json'],
     }
 
   }
