@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Restrict nova migration ssh tunnel
+    * The ssh authorized_keys file is only writeable by root.
+    * Creates a new user for migration instead of using root/nova.
+    * Disables SSH forwarding for this user.
+    * Restricts the networks that this user can connect from.
+    * Uses an ssh wrapper command to whitelist the commands that this user can run over ssh.
+    Adds new parameter "tripleo::profile::base::nova::migration_ssh_localaddrs" to specify which incoming IPs are allow for SSH tunnel connections.
