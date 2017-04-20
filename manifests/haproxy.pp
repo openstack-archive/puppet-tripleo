@@ -718,6 +718,9 @@ class tripleo::haproxy (
 
   if $enable_internal_tls {
     $internal_tls_member_options = ['ssl', 'verify required', "ca-file ${ca_bundle}"]
+    Haproxy::Balancermember {
+      verifyhost => true
+    }
   } else {
     $internal_tls_member_options = []
   }
