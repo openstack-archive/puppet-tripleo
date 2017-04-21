@@ -49,6 +49,10 @@
 #  The IPv4, IPv6 or filesystem socket path of the syslog server.
 #  Defaults to '/dev/log'
 #
+# [*haproxy_daemon*]
+#  Should haproxy run in daemon mode or not
+#  Defaults to true
+#
 # [*controller_hosts*]
 #  IPs of host or group of hosts to load-balance the services
 #  Can be a string or an array.
@@ -539,6 +543,7 @@ class tripleo::haproxy (
   $haproxy_listen_bind_param   = [ 'transparent' ],
   $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address         = '/dev/log',
+  $haproxy_daemon              = true,
   $haproxy_stats_user          = 'admin',
   $haproxy_stats_password      = undef,
   $controller_hosts            = hiera('controller_node_ips'),
@@ -800,22 +805,30 @@ class tripleo::haproxy (
     "${redis_vip}:6379" => $haproxy_listen_bind_param,
   }
 
+  $haproxy_global_options = {
+    'log'                      => "${haproxy_log_address} local0",
+    'pidfile'                  => '/var/run/haproxy.pid',
+    'user'                     => 'haproxy',
+    'group'                    => 'haproxy',
+    'maxconn'                  => $haproxy_global_maxconn,
+    'ssl-default-bind-ciphers' => $ssl_cipher_suite,
+    'ssl-default-bind-options' => $ssl_options,
+    'stats'                    => [
+      'socket /var/lib/haproxy/stats mode 600 level user',
+      'timeout 2m'
+    ],
+  }
+  if $haproxy_daemon == true {
+    $haproxy_daemonize = {
+      'daemon' => '',
+    }
+  } else {
+    $haproxy_daemonize = {}
+  }
+
   class { '::haproxy':
     service_manage   => $haproxy_service_manage,
-    global_options   => {
-      'log'                      => "${haproxy_log_address} local0",
-      'pidfile'                  => '/var/run/haproxy.pid',
-      'user'                     => 'haproxy',
-      'group'                    => 'haproxy',
-      'daemon'                   => '',
-      'maxconn'                  => $haproxy_global_maxconn,
-      'ssl-default-bind-ciphers' => $ssl_cipher_suite,
-      'ssl-default-bind-options' => $ssl_options,
-      'stats'                    => [
-        'socket /var/lib/haproxy/stats mode 600 level user',
-        'timeout 2m'
-      ],
-    },
+    global_options   => merge($haproxy_global_options, $haproxy_daemonize),
     defaults_options => {
       'mode'    => 'tcp',
       'log'     => 'global',
