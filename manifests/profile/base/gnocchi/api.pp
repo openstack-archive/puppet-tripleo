@@ -47,6 +47,14 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('gnocchi_api_network', undef)
 #
+# [*gnocchi_redis_password*]
+#  (Required) Password for the gnocchi redis user for the coordination url
+#  Defaults to hiera('gnocchi_redis_password')
+#
+# [*redis_vip*]
+#  (Required) Redis ip address for the coordination url
+#  Defaults to hiera('redis_vip')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -58,6 +66,8 @@ class tripleo::profile::base::gnocchi::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $gnocchi_backend               = downcase(hiera('gnocchi_backend', 'swift')),
   $gnocchi_network               = hiera('gnocchi_api_network', undef),
+  $gnocchi_redis_password        = hiera('gnocchi_redis_password'),
+  $redis_vip                     = hiera('redis_vip'),
   $step                          = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -94,7 +104,7 @@ class tripleo::profile::base::gnocchi::api (
 
   if $step >= 4 {
     class { '::gnocchi::storage':
-      coordination_url => join(['redis://:', hiera('gnocchi_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/']),
+      coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
     }
     case $gnocchi_backend {
       'swift': { include ::gnocchi::storage::swift }
