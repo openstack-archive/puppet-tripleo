@@ -1,3 +1,4 @@
 ---
 features:
   - Add support for Bagpipe Neutron driver as backend in BGPVPN scenarios
+  - Add ML2 plugin configuration for Bagpipe BGPVPN extension
