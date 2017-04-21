@@ -22,8 +22,8 @@ describe 'tripleo::profile::base::ceilometer::api' do
       "class { '::tripleo::profile::base::ceilometer': step => #{params[:step]}, rabbit_hosts => ['localhost.localdomain'] }"
     end
 
-    context 'with step less than 4' do
-      let(:params) { { :step => 3 } }
+    context 'with step less than 2' do
+      let(:params) { { :step => 2 } }
 
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer::api')
@@ -32,9 +32,9 @@ describe 'tripleo::profile::base::ceilometer::api' do
       end
     end
 
-    context 'with step 4' do
+    context 'with step 3' do
       let(:params) { {
-        :step            => 4,
+        :step            => 3,
       } }
 
       it 'should trigger complete configuration' do

@@ -76,7 +76,7 @@ class tripleo::profile::base::ceilometer::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 {
+  if $step >= 3 {
     include ::ceilometer::api
     include ::apache::mod::ssl
     class { '::ceilometer::wsgi::apache':
