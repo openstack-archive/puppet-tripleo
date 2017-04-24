@@ -40,6 +40,11 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
+# [*dnsnames*]
+#   (Optional) The DNS names that will be added for the SubjectAltNames entry
+#   in the certificate. If left unset, the value will be set to the $hostname.
+#   Defaults to undef
+#
 # [*principal*]
 #   The haproxy service principal that is set for HAProxy in kerberos.
 #
@@ -50,6 +55,7 @@ define tripleo::certmonger::haproxy (
   $hostname,
   $postsave_cmd,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
+  $dnsnames      = undef,
   $principal     = undef,
 ){
     include ::certmonger
@@ -62,11 +68,17 @@ define tripleo::certmonger::haproxy (
       }
     }
 
+    if $dnsnames {
+      $dnsnames_real = $dnsnames
+    } else {
+      $dnsnames_real = $hostname
+    }
+
     certmonger_certificate { "${title}-cert":
       ensure       => 'present',
       ca           => $certmonger_ca,
       hostname     => $hostname,
-      dnsname      => $hostname,
+      dnsname      => $dnsnames_real,
       certfile     => $service_certificate,
       keyfile      => $service_key,
       postsave_cmd => $postsave_cmd,
