@@ -15,47 +15,45 @@
 #
 # == Class: tripleo::profile::base::sshd
 #
-# SSH profile for tripleo
+# SSH composable service for TripleO
 #
 # === Parameters
 #
 # [*bannertext*]
-#   The text used within SSH Banner
+#   The text used within /etc/issue and /etc/issue.net
 #   Defaults to hiera('BannerText')
+#
+# [*motd*]
+#   The text used within SSH Banner
+#   Defaults to hiera('MOTD')
 #
 class tripleo::profile::base::sshd (
   $bannertext = hiera('BannerText', undef),
+  $motd = hiera('MOTD', undef),
 ) {
 
+  include ::ssh
+
   if $bannertext {
-    $action = 'set'
-  } else {
-    $action = 'rm'
+    $filelist = [ '/etc/issue', '/etc/issue.net', ]
+    file { $filelist:
+      ensure  => file,
+      backup  => false,
+      content => $bannertext,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644'
+    }
   }
 
-  package {'openssh-server':
-    ensure => installed,
-  }
-
-  augeas { 'sshd_config_banner':
-    context => '/files/etc/ssh/sshd_config',
-    changes => [ "${action} Banner /etc/issue"  ],
-    notify  => Service['sshd']
-  }
-
-  file { '/etc/issue':
-    ensure  => file,
-    backup  => false,
-    content => $bannertext,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0600'
-  }
-
-  service { 'sshd':
-    ensure    => 'running',
-    enable    => true,
-    hasstatus => false,
-    require   => Package['openssh-server'],
+  if $motd {
+    file { '/etc/motd':
+      ensure  => file,
+      backup  => false,
+      content => $motd,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644'
+    }
   }
 }

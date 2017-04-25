@@ -36,3 +36,7 @@ mod 'ntp',
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
   :ref => 'master'
+
+mod 'ssh',
+  :git => 'https://github.com/saz/puppet-ssh',
+  :ref => 'v3.0.1'
