@@ -54,8 +54,11 @@ class tripleo::profile::base::zaqar (
     include ::zaqar::transport::wsgi
 
     # TODO (bcrochet): At some point, the transports should be split out to
-    # seperate services.
-    include ::zaqar::server
+    # separate services.
+    class { '::zaqar::server':
+      service_name => 'httpd', # TODO cleanup when passed by t-h-t.
+    }
+    include ::zaqar::wsgi::apache
     zaqar::server_instance{ '1':
       transport => 'websocket'
     }
