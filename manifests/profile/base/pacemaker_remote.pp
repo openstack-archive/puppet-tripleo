@@ -22,6 +22,14 @@
 #   Authkey for pacemaker remote nodes
 #   Defaults to unset
 #
+# [*pcs_tries*]
+#   (Optional) The number of times pcs commands should be retried.
+#   Defaults to hiera('pcs_tries', 20)
+#
+# [*enable_fencing*]
+#   (Optional) Whether or not to manage stonith devices for nodes
+#   Defaults to hiera('enable_fencing', false)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -29,9 +37,28 @@
 #
 class tripleo::profile::base::pacemaker_remote (
   $remote_authkey,
+  $pcs_tries      = hiera('pcs_tries', 20),
+  $enable_fencing = hiera('enable_fencing', false),
   $step           = hiera('step'),
 ) {
   class { '::pacemaker::remote':
     remote_authkey => $remote_authkey,
+  }
+  $enable_fencing_real = str2bool($enable_fencing) and $step >= 5
+
+  class { '::pacemaker::stonith':
+    disable => !$enable_fencing_real,
+    tries   => $pcs_tries,
+  }
+
+  if $enable_fencing_real {
+    include ::tripleo::fencing
+
+    # enable stonith after all Pacemaker resources have been created
+    Pcmk_resource<||> -> Class['tripleo::fencing']
+    Pcmk_constraint<||> -> Class['tripleo::fencing']
+    Exec <| tag == 'pacemaker_constraint' |> -> Class['tripleo::fencing']
+    # enable stonith after all fencing devices have been created
+    Class['tripleo::fencing'] -> Class['pacemaker::stonith']
   }
 }
