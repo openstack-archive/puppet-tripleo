@@ -27,7 +27,7 @@ mod 'datacat',
 
 mod 'etcd',
   :git => 'https://github.com/cristifalcas/puppet-etcd',
-  :ref => '1.10.0'
+  :ref => '1.11.0'
 
 mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
