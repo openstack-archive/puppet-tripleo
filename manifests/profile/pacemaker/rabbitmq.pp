@@ -30,7 +30,7 @@
 #   (Optional) The number of HA queues in to be configured in rabbitmq
 #   Defaults to hiera('rabbitmq::nr_ha_queues'), which is usually 0 meaning
 #   that the queues number will be CEIL(N/2) where N is the number of rabbitmq
-#   nodes.
+#   nodes. The special value of -1 represents the mode 'ha-mode: all'
 #
 # [*rabbit_nodes*]
 #   (Optional) The list of rabbitmq nodes names
@@ -90,12 +90,16 @@ class tripleo::profile::pacemaker::rabbitmq (
       if $user_ha_queues == 0 {
         $nr_rabbit_nodes = size($rabbit_nodes)
         $nr_ha_queues = $nr_rabbit_nodes / 2 + ($nr_rabbit_nodes % 2)
+        $params = "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'"
+      } elsif $user_ha_queues == -1 {
+        $params = 'set_policy=\'ha-all ^(?!amq\.).* {"ha-mode":"all"}\''
       } else {
         $nr_ha_queues = $user_ha_queues
+        $params = "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'"
       }
       pacemaker::resource::ocf { 'rabbitmq':
         ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
-        resource_params => "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'",
+        resource_params => $params,
         clone_params    => 'ordered=true interleave=true',
         meta_params     => 'notify=true',
         op_params       => 'start timeout=200s stop timeout=200s',
