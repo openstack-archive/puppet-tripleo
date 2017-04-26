@@ -75,19 +75,11 @@ class tripleo::profile::base::mistral::api (
   }
 
   if $step >= 3 {
-    # TODO: Cleanup when this passes t-h-t
-    class { '::mistral::api':
-      service_name => 'httpd',
-    }
-
+    include ::mistral::api
     include ::apache::mod::ssl
     class { '::mistral::wsgi::apache':
-      ssl_cert   => $tls_certfile,
-      ssl_key    => $tls_keyfile,
-      # The following are temporary and will be passed via t-h-t
-      ssl        => $enable_internal_tls,
-      servername => hiera("fqdn_${mistral_api_network}"),
-      bind_host  => hiera('mistral::api::bind_host'),
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
     }
   }
 }
