@@ -127,7 +127,7 @@ class tripleo::profile::base::swift::proxy (
         port       => $tls_proxy_port,
         tls_cert   => $tls_certfile,
         tls_key    => $tls_keyfile,
-        notify     => Class['::neutron::server'],
+        notify     => Class['::swift::proxy'],
       }
     }
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
