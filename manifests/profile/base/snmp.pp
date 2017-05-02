@@ -42,7 +42,6 @@ class tripleo::profile::base::snmp (
       authpass => $snmpd_password,
     }
     class { '::snmp':
-      agentaddress => ['udp:161','udp6:[::1]:161'],
       snmpd_config => [ join(['createUser ', $snmpd_user, ' MD5 "', $snmpd_password, '"']),
                         join(['rouser ', $snmpd_user]),
                         'proc  cron',
