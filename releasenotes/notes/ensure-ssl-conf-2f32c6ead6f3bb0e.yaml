@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    With having package mod_ssl by default installed in images we introduced
+    issue with mod_ssl package update. In case of SSL not being used or
+    provided by HAproxy the puppet-apache module by default purges the
+    ssl.conf file. The package update then recreates the file with default
+    Listen 443 option. This causes conflict on 443 port during httpd restart.
+    If we include ::apache::mod::ssl the ssl.conf file will be configured and
+    the Listen option will be used only if there is vhost set to use SSL.

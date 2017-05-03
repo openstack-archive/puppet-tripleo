@@ -87,6 +87,7 @@ class tripleo::profile::base::keystone (
     }
 
     include ::keystone::config
+    include ::apache::mod::ssl
     include ::keystone::wsgi::apache
     include ::keystone::cors
 
