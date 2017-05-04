@@ -44,3 +44,4 @@ memcached_node_ips:
 # octavia related items
 octavia::rabbit_password: 'password'
 horizon::secret_key: 'secrete'
+service_names: ['sshd']
