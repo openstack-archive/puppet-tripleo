@@ -35,6 +35,10 @@
 #   (Optional) Client IP address of the host that will be written in the mysql_read_default_file
 #   Defaults to undef
 #
+# [*ssl_ca*]
+#   (Optional) The SSL CA file to use to verify the MySQL server's certificate.
+#   Defaults to '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -45,6 +49,7 @@ class tripleo::profile::base::database::mysql::client (
   $mysql_read_default_file   = '/etc/my.cnf.d/tripleo.cnf',
   $mysql_read_default_group  = 'tripleo',
   $mysql_client_bind_address = undef,
+  $ssl_ca                    = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
   $step                      = hiera('step'),
 ) {
   if $step >= 1 {
@@ -68,7 +73,7 @@ class tripleo::profile::base::database::mysql::client (
     if $enable_ssl {
       $changes_ssl = [
         "set ${mysql_read_default_group}/ssl '1'",
-        "set ${mysql_read_default_group}/ssl-ca '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'"
+        "set ${mysql_read_default_group}/ssl-ca '${ssl_ca}'"
       ]
     } else {
       $changes_ssl = [
