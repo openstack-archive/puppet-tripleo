@@ -1,0 +1,6 @@
+---
+security:
+  - If the crl_file parameter is given to the ::tripleo::haproxy resource and
+    TLS is enabled in the internal network, it will configure the CRL file for
+    all the nodes it's proxying and thus properly handle revocation of the
+    server certificates.

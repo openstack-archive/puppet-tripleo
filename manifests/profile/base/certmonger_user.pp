@@ -77,6 +77,16 @@ class tripleo::profile::base::certmonger_user (
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
   $etcd_certificate_specs     = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
 ) {
+  unless empty($haproxy_certificates_specs) {
+    $reload_haproxy = ['systemctl reload haproxy']
+    Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>
+    Class['::tripleo::certmonger::ca::crl'] ~> Class['::haproxy']
+  } else {
+    $reload_haproxy = []
+  }
+  class { '::tripleo::certmonger::ca::crl' :
+    reload_cmds => $reload_haproxy,
+  }
   include ::tripleo::certmonger::ca::libvirt
 
   unless empty($apache_certificates_specs) {
