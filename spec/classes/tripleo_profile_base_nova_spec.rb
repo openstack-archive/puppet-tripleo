@@ -95,9 +95,8 @@ describe 'tripleo::profile::base::nova' do
         is_expected.to contain_class('nova::cache')
         is_expected.to contain_class('nova::placement')
         is_expected.to_not contain_class('nova::migration::libvirt')
-        is_expected.to contain_package('openstack-nova-migration').with(
-          :ensure => 'absent'
-        )
+        is_expected.to_not contain_file('/etc/nova/migration/authorized_keys')
+        is_expected.to_not contain_file('/etc/nova/migration/identity')
       }
     end
 
@@ -132,7 +131,22 @@ describe 'tripleo::profile::base::nova' do
           :configure_nova    => params[:nova_compute_enabled]
         )
         is_expected.to contain_package('openstack-nova-migration').with(
-          :ensure => 'absent'
+          :ensure => 'present'
+        )
+        is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
+          :content => '# Migration over SSH disabled by TripleO',
+          :mode    => '0640',
+          :owner   => 'root',
+          :group   => 'nova_migration',
+        )
+        is_expected.to contain_file('/etc/nova/migration/identity').with(
+          :content => '# Migration over SSH disabled by TripleO',
+          :mode    => '0600',
+          :owner   => 'nova',
+          :group   => 'nova',
+        )
+        is_expected.to contain_user('nova_migration').with(
+          :shell => '/sbin/nologin'
         )
       }
     end
@@ -169,7 +183,22 @@ describe 'tripleo::profile::base::nova' do
           :configure_nova    => params[:nova_compute_enabled],
         )
         is_expected.to contain_package('openstack-nova-migration').with(
-          :ensure => 'absent'
+          :ensure => 'present'
+        )
+        is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
+          :content => '# Migration over SSH disabled by TripleO',
+          :mode    => '0640',
+          :owner   => 'root',
+          :group   => 'nova_migration',
+        )
+        is_expected.to contain_file('/etc/nova/migration/identity').with(
+          :content => '# Migration over SSH disabled by TripleO',
+          :mode    => '0600',
+          :owner   => 'nova',
+          :group   => 'nova',
+        )
+        is_expected.to contain_user('nova_migration').with(
+          :shell => '/sbin/nologin'
         )
       }
     end
@@ -223,6 +252,9 @@ describe 'tripleo::profile::base::nova' do
           }
         )
         is_expected.to_not contain_ssh__server__match_block('nova_migration deny')
+        is_expected.to contain_package('openstack-nova-migration').with(
+          :ensure => 'present'
+        )
         is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
           :content => 'ssh-rsa bar',
           :mode => '0640',
@@ -235,8 +267,8 @@ describe 'tripleo::profile::base::nova' do
           :owner => 'nova',
           :group => 'nova',
         )
-        is_expected.to contain_package('openstack-nova-migration').with(
-          :ensure => 'installed'
+        is_expected.to contain_user('nova_migration').with(
+          :shell => '/bin/bash'
         )
       }
     end
@@ -297,6 +329,9 @@ describe 'tripleo::profile::base::nova' do
             'DenyUsers' => 'nova_migration'
           }
         )
+        is_expected.to contain_package('openstack-nova-migration').with(
+          :ensure => 'present'
+        )
         is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
           :content => 'ssh-rsa bar',
           :mode => '0640',
@@ -309,8 +344,8 @@ describe 'tripleo::profile::base::nova' do
           :owner => 'nova',
           :group => 'nova',
         )
-        is_expected.to contain_package('openstack-nova-migration').with(
-          :ensure => 'installed'
+        is_expected.to contain_user('nova_migration').with(
+          :shell => '/bin/bash'
         )
       }
     end
@@ -365,6 +400,9 @@ describe 'tripleo::profile::base::nova' do
           }
         )
         is_expected.to_not contain_ssh__server__match_block('nova_migration deny')
+        is_expected.to contain_package('openstack-nova-migration').with(
+          :ensure => 'present'
+        )
         is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
           :content => 'ssh-rsa bar',
           :mode => '0640',
@@ -377,8 +415,8 @@ describe 'tripleo::profile::base::nova' do
           :owner => 'nova',
           :group => 'nova',
         )
-        is_expected.to contain_package('openstack-nova-migration').with(
-          :ensure => 'installed'
+        is_expected.to contain_user('nova_migration').with(
+          :shell => '/bin/bash'
         )
       }
     end

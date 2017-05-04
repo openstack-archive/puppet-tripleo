@@ -185,31 +185,42 @@ class tripleo::profile::base::nova (
           notify  => Service['sshd']
         }
 
-        file { '/etc/nova/migration/authorized_keys':
-          content => $migration_ssh_key['public_key'],
-          mode    => '0640',
-          owner   => 'root',
-          group   => 'nova_migration',
-          require => Package['openstack-nova-migration'],
-        }
-
-        # Client side
-        file { '/etc/nova/migration/identity':
-          content => $migration_ssh_key['private_key'],
-          mode    => '0600',
-          owner   => 'nova',
-          group   => 'nova',
-          require => Package['openstack-nova-migration'],
-        }
-        $migration_pkg_ensure = installed
-      } else {
-        $migration_pkg_ensure = absent
+        $migration_authorized_keys = $migration_ssh_key['public_key']
+        $migration_identity = $migration_ssh_key['private_key']
+        $migration_user_shell = '/bin/bash'
       }
-    } else {
-      $migration_pkg_ensure = absent
-    }
-    package {'openstack-nova-migration':
-      ensure => $migration_pkg_ensure
+      else {
+        # Remove the keys and prevent login when migration over SSH is not enabled
+        $migration_authorized_keys = '# Migration over SSH disabled by TripleO'
+        $migration_identity = '# Migration over SSH disabled by TripleO'
+        $migration_user_shell = '/sbin/nologin'
+      }
+
+      package { 'openstack-nova-migration':
+        ensure => present,
+        tag    => ['openstack', 'nova-package'],
+      }
+
+      file { '/etc/nova/migration/authorized_keys':
+        content => $migration_authorized_keys,
+        mode    => '0640',
+        owner   => 'root',
+        group   => 'nova_migration',
+        require => Package['openstack-nova-migration']
+      }
+
+      file { '/etc/nova/migration/identity':
+        content => $migration_identity,
+        mode    => '0600',
+        owner   => 'nova',
+        group   => 'nova',
+        require => Package['openstack-nova-migration']
+      }
+
+      user {'nova_migration':
+        shell   => $migration_user_shell,
+        require => Package['openstack-nova-migration']
+      }
     }
   }
 }
