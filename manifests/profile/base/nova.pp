@@ -104,6 +104,10 @@ class tripleo::profile::base::nova (
     $memcache_servers = suffix(hiera('memcached_node_ips'), ':11211')
   }
 
+  validate_array($migration_ssh_localaddrs)
+  $migration_ssh_localaddrs.each |$x| { validate_ip_address($x) }
+  $migration_ssh_localaddrs_real = unique($migration_ssh_localaddrs)
+
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($messaging_use_ssl)))
     include ::nova::config
@@ -151,10 +155,10 @@ class tripleo::profile::base::nova (
         # Nova SSH tunnel setup (cold-migration)
 
         # Server side
-        if !empty($migration_ssh_localaddrs) {
-          $allow_type = sprintf('LocalAddress %s User', join($migration_ssh_localaddrs,','))
+        if !empty($migration_ssh_localaddrs_real) {
+          $allow_type = sprintf('LocalAddress %s User', join($migration_ssh_localaddrs_real,','))
           $deny_type = 'LocalAddress'
-          $deny_name = sprintf('!%s', join($migration_ssh_localaddrs,',!'))
+          $deny_name = sprintf('!%s', join($migration_ssh_localaddrs_real,',!'))
 
           ssh::server::match_block { 'nova_migration deny':
             name    => $deny_name,
