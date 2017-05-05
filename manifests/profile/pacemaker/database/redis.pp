@@ -32,9 +32,12 @@
 #   Defaults to hiera('step')
 #
 # [*redis_file_limit*]
-#   (Optional) The file limit to put in /etc/security/limits.d/redis.conf
+#   (Deprecated) The file limit to put in /etc/security/limits.d/redis.conf
 #   for when redis is managed by pacemaker. Defaults to hiera('redis_file_limit')
-#   or 10240 (default in redis systemd limits)
+#   or 10240 (default in redis systemd limits). Note this option is deprecated
+#   since puppet-redis grew support for ulimits in cluster configurations.
+#   https://github.com/arioch/puppet-redis/pull/192. Set redis::ulimit via hiera
+#   to control this limit.
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
@@ -44,7 +47,7 @@ class tripleo::profile::pacemaker::database::redis (
   $bootstrap_node       = hiera('redis_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $step                 = hiera('step'),
-  $redis_file_limit     = hiera('redis_file_limit', 10240),
+  $redis_file_limit     = undef,
   $pcs_tries            = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -54,19 +57,17 @@ class tripleo::profile::pacemaker::database::redis (
   }
 
   if $step >= 1 {
-    include ::redis
-    # Until puppet-redis grows support for /etc/security/limits.conf/redis.conf
-    # https://github.com/arioch/puppet-redis/issues/130
-    # we best explicitely set the file limit only in the pacemaker profile
-    # (the base profile does not need it as it is using systemd which has
-    # the limits set there)
-    file { '/etc/security/limits.d/redis.conf':
-      content => inline_template("redis soft nofile <%= @redis_file_limit %>\nredis hard nofile <%= @redis_file_limit %>\n"),
-      owner   => '0',
-      group   => '0',
-      mode    => '0644',
+    # If the old hiera key exists we use that to set the ulimit in order not to break
+    # operators which set it. We might remove this in a later release (post pike anyway)
+    $old_redis_file_limit = hiera('redis_file_limit', undef)
+    if $old_redis_file_limit != undef {
+      warning('redis_file_limit parameter is deprecated, use redis::ulimit in hiera.')
+      class { '::redis':
+        ulimit => $old_redis_file_limit,
+      }
+    } else {
+      include ::redis
     }
-
     if $pacemaker_master and hiera('stack_action') == 'UPDATE' {
       tripleo::pacemaker::resource_restart_flag { 'redis-master':
         # ouch, but trying to stay close how notification works in

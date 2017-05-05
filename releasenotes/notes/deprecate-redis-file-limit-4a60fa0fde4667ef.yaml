@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+     The redis_file_limit hiera parameter is now deprecated. Use the
+     redis::ulimit parameter instead.
