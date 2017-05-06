@@ -136,6 +136,7 @@ class tripleo::profile::base::pacemaker (
         remote_address     => $remotes_hash[$title],
         reconnect_interval => $remote_reconnect_interval,
         op_params          => "monitor interval=${remote_monitor_interval}",
+        verify_on_create   => true,
         tries              => $remote_tries,
         try_sleep          => $remote_try_sleep,
       }
