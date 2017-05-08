@@ -46,7 +46,7 @@ mod 'systemd',
   :ref => 'master'
 
 mod 'opendaylight',
-  :git => 'https://github.com/dfarrell07/puppet-opendaylight',
+  :git => 'https://git.opendaylight.org/gerrit/integration/packaging/puppet-opendaylight',
   :ref => 'master'
 
 mod 'ssh',
