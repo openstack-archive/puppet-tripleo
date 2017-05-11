@@ -29,6 +29,23 @@
 #   (Optional) List of mount options for the NFS share
 #   Defaults to ''
 #
+# [*cinder_nas_secure_file_operations*]
+#   (Optional) Allow network-attached storage systems to operate in a secure
+#   environment where root level access is not permitted. If set to False,
+#   access is as the root user and insecure. If set to True, access is not as
+#   root. If set to auto, a check is done to determine if this is a new
+#   installation: True is used if so, otherwise False. Default is auto.
+#   Defaults to $::os_service_default
+#
+# [*cinder_nas_secure_file_permissions*]
+#   (Optional) Set more secure file permissions on network-attached storage
+#   volume files to restrict broad other/world access. If set to False,
+#   volumes are created with open permissions. If set to True, volumes are
+#   created with permissions for the cinder user and group (660). If set to
+#   auto, a check is done to determine if this is a new installation: True is
+#   used if so, otherwise False. Default is auto.
+#   Defaults to $::os_service_default
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -36,9 +53,11 @@
 #
 class tripleo::profile::base::cinder::volume::nfs (
   $cinder_nfs_servers,
-  $backend_name             = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs'),
-  $cinder_nfs_mount_options = '',
-  $step                     = hiera('step'),
+  $backend_name                       = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs'),
+  $cinder_nfs_mount_options           = '',
+  $cinder_nas_secure_file_operations  = $::os_service_default,
+  $cinder_nas_secure_file_permissions = $::os_service_default,
+  $step                               = hiera('step'),
 ) {
   include ::tripleo::profile::base::cinder::volume
 
@@ -52,9 +71,11 @@ class tripleo::profile::base::cinder::volume::nfs (
 
     package {'nfs-utils': } ->
     cinder::backend::nfs { $backend_name :
-      nfs_servers       => $cinder_nfs_servers,
-      nfs_mount_options => $cinder_nfs_mount_options,
-      nfs_shares_config => '/etc/cinder/shares-nfs.conf',
+      nfs_servers                 => $cinder_nfs_servers,
+      nfs_mount_options           => $cinder_nfs_mount_options,
+      nfs_shares_config           => '/etc/cinder/shares-nfs.conf',
+      nas_secure_file_operations  => $cinder_nas_secure_file_operations,
+      nas_secure_file_permissions => $cinder_nas_secure_file_permissions,
     }
   }
 
