@@ -63,7 +63,7 @@ class tripleo::firewall(
     # anyone can add your own rules
     # example with Hiera:
     #
-    # tripleo::firewall::rules:
+    # tripleo::firewall::firewall_rules:
     #   '300 allow custom application 1':
     #     port: 999
     #     proto: udp
