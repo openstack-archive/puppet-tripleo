@@ -27,7 +27,10 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
       it {
-          is_expected.to contain_augeas('docker-sysconfig').with_changes(['rm INSECURE_REGISTRY'])
+          is_expected.to contain_augeas('docker-sysconfig').with_changes([
+            'rm INSECURE_REGISTRY',
+            "set OPTIONS '\"--log-driver=journald --signature-verification=false\"'",
+          ])
       }
     end
 
@@ -42,7 +45,10 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
       it {
-        is_expected.to contain_augeas('docker-sysconfig').with_changes(["set INSECURE_REGISTRY '\"--insecure-registry foo:8787\"'"])
+        is_expected.to contain_augeas('docker-sysconfig').with_changes([
+          "set INSECURE_REGISTRY '\"--insecure-registry foo:8787\"'",
+          "set OPTIONS '\"--log-driver=journald --signature-verification=false\"'",
+        ])
       }
     end
 
@@ -66,6 +72,55 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_service('docker') }
       it {
         is_expected.to contain_augeas('docker-daemon.json').with_changes(['set dict/entry[. = "registry-mirrors"] "registry-mirrors', "set dict/entry[. = \"registry-mirrors\"]/array/string \"http://foo/bar\""])
+      }
+    end
+
+    context 'with step 1 and docker_options configured' do
+      let(:params) { {
+          :docker_options    => '--log-driver=syslog',
+          :step              => 1,
+      } }
+
+      it { is_expected.to contain_class('tripleo::profile::base::docker') }
+      it { is_expected.to contain_package('docker') }
+      it { is_expected.to contain_service('docker') }
+      it {
+        is_expected.to contain_augeas('docker-sysconfig').with_changes([
+          "rm INSECURE_REGISTRY",
+          "set OPTIONS '\"--log-driver=syslog\"'",
+        ])
+      }
+    end
+
+    context 'with step 1 and storage_options configured' do
+      let(:params) { {
+          :step              => 1,
+          :storage_options   => '-s devicemapper',
+      } }
+
+      it { is_expected.to contain_class('tripleo::profile::base::docker') }
+      it { is_expected.to contain_package('docker') }
+      it { is_expected.to contain_service('docker') }
+      it {
+        is_expected.to contain_augeas('docker-sysconfig-storage').with_changes([
+          "set DOCKER_STORAGE_OPTIONS '\" #{params[:storage_options]}\"'",
+        ])
+      }
+    end
+
+    context 'with step 1 and configure_storage disabled' do
+      let(:params) { {
+          :step              => 1,
+          :configure_storage => false,
+      } }
+
+      it { is_expected.to contain_class('tripleo::profile::base::docker') }
+      it { is_expected.to contain_package('docker') }
+      it { is_expected.to contain_service('docker') }
+      it {
+        is_expected.to contain_augeas('docker-sysconfig-storage').with_changes([
+          "rm DOCKER_STORAGE_OPTIONS",
+        ])
       }
     end
 
