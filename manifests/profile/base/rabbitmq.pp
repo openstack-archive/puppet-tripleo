@@ -88,7 +88,7 @@ class tripleo::profile::base::rabbitmq (
   $rabbitmq_pass                 = hiera('rabbitmq::default_pass'),
   $rabbitmq_user                 = hiera('rabbitmq::default_user'),
   $stack_action                  = hiera('stack_action'),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']

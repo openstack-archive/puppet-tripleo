@@ -55,7 +55,7 @@ class tripleo::profile::pacemaker::manila (
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $ceph_mds_enabled        = hiera('ceph_mds_enabled', false),
   $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
-  $step                    = hiera('step'),
+  $step                    = Integer(hiera('step')),
   $pcs_tries               = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {

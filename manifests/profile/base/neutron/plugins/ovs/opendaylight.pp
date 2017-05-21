@@ -49,7 +49,7 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
   $odl_api_ips   = hiera('opendaylight_api_node_ips'),
   $odl_url_ip    = hiera('opendaylight_api_vip'),
   $conn_proto    = hiera('opendaylight::nb_connection_protocol'),
-  $step          = hiera('step'),
+  $step          = Integer(hiera('step')),
 ) {
 
   if $step >= 4 {

@@ -120,7 +120,7 @@
 #  Defaults to hiera('contrail_database_node_ips')
 #
 class tripleo::network::contrail::analyticsdatabase(
-  $step                 = hiera('step'),
+  $step                 = Integer(hiera('step')),
   $auth_host            = hiera('contrail::auth_host'),
   $api_server           = hiera('contrail_config_vip'),
   $api_port             = hiera('contrail::api_port'),

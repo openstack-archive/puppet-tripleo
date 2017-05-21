@@ -35,7 +35,7 @@
 #   Defaults to hiera('memcached_node_ips', ['127.0.0.1'])
 #
 class tripleo::profile::base::nova::authtoken (
-  $step                = hiera('step'),
+  $step                = Integer(hiera('step')),
   $use_ipv6            = hiera('nova::use_ipv6', false),
   $memcache_nodes_ipv6 = hiera('memcached_node_ips_v6', ['::1']),
   $memcache_nodes_ipv4 = hiera('memcached_node_ips', ['127.0.0.1']),

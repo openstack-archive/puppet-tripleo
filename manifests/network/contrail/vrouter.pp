@@ -143,7 +143,7 @@
 #  Defaults to hiera('contrail::vrouter::is_tsn',false)
 #
 class tripleo::network::contrail::vrouter (
-  $step               = hiera('step'),
+  $step               = Integer(hiera('step')),
   $admin_password     = hiera('contrail::admin_password'),
   $admin_tenant_name  = hiera('contrail::admin_tenant_name'),
   $admin_token        = hiera('contrail::admin_token'),

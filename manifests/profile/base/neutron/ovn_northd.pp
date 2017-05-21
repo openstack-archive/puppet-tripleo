@@ -27,7 +27,7 @@
 #
 class tripleo::profile::base::neutron::ovn_northd (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     # Note this only runs on the first node in the cluster when

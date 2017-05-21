@@ -29,7 +29,7 @@
 #
 class tripleo::profile::base::cinder::volume::scaleio (
   $backend_name = hiera('cinder::backend::scaleio::volume_backend_name', 'tripleo_scaleio'),
-  $step         = hiera('step'),
+  $step         = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 

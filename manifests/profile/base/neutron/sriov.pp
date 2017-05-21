@@ -25,7 +25,7 @@
 #
 
 class tripleo::profile::base::neutron::sriov(
-  $step               = hiera('step')
+  $step               = Integer(hiera('step'))
 ) {
 
   include ::tripleo::profile::base::neutron

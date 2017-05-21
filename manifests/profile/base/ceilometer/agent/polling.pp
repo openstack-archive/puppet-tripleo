@@ -47,7 +47,7 @@ class tripleo::profile::base::ceilometer::agent::polling (
   $ipmi_namespace            = hiera('ipmi_namespace', false),
   $ceilometer_redis_password = hiera('ceilometer_redis_password', undef),
   $redis_vip                 = hiera('redis_vip', undef),
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::ceilometer
 

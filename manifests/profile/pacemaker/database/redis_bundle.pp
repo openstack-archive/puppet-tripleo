@@ -45,7 +45,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $redis_docker_image        = hiera('tripleo::profile::pacemaker::database::redis_bundle::redis_docker_image', undef),
   $redis_docker_control_port = hiera('tripleo::profile::pacemaker::database::redis_bundle::control_port', '3124'),
   $pcs_tries                 = hiera('pcs_tries', 20),
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true

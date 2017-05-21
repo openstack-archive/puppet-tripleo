@@ -68,7 +68,7 @@ class tripleo::profile::base::gnocchi::api (
   $gnocchi_network               = hiera('gnocchi_api_network', undef),
   $gnocchi_redis_password        = hiera('gnocchi_redis_password'),
   $redis_vip                     = hiera('redis_vip'),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

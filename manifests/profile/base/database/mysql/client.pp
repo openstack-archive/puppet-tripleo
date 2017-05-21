@@ -50,7 +50,7 @@ class tripleo::profile::base::database::mysql::client (
   $mysql_read_default_group  = 'tripleo',
   $mysql_client_bind_address = undef,
   $ssl_ca                    = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
 ) {
   if $step >= 1 {
     # If the folder /etc/my.cnf.d does not exist (e.g. if mariadb is not

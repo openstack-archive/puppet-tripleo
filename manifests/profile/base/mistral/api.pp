@@ -53,7 +53,7 @@ class tripleo::profile::base::mistral::api (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $mistral_api_network           = hiera('mistral_api_network', undef),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

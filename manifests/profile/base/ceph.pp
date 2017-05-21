@@ -39,7 +39,7 @@ class tripleo::profile::base::ceph (
   $ceph_mon_initial_members = hiera('ceph_mon_short_node_names', undef),
   $ceph_mon_host            = hiera('ceph_mon_node_ips', '127.0.0.1'),
   $enable_ceph_storage      = false,
-  $step                     = hiera('step'),
+  $step                     = Integer(hiera('step')),
 ) {
   if ! $ceph_mon_initial_members {
     $ceph_mon_initial_members_real = hiera('ceph_mon_node_names', undef)

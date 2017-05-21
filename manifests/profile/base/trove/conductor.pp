@@ -24,7 +24,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::trove::conductor (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 ) {
 
   if $step >= 4 {

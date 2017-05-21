@@ -24,7 +24,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::backup (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 ) {
 
   include ::tripleo::profile::base::cinder

@@ -53,7 +53,7 @@ class tripleo::profile::base::cinder::volume::hpelefthand (
   $cinder_hpelefthand_api_url            = hiera('cinder::backend::hpelefthand_iscsi::hpelefthand_api_url', undef),
   $cinder_hpelefthand_iscsi_chap_enabled = hiera('cinder::backend::hpelefthand_iscsi::hpelefthand_iscsi_chap_enabled', undef),
   $cinder_hpelefthand_debug              = hiera('cinder::backend::hpelefthand_iscsi::hpelefthand_debug', undef),
-  $step                                  = hiera('step'),
+  $step                                  = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 

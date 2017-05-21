@@ -33,7 +33,7 @@
 class tripleo::profile::base::neutron::agents::midonet (
   $midonet_libvirt_qemu_data = hiera('midonet_libvirt_qemu_data', ''),
   $neutron_api_node_ips      = hiera('neutron_api_node_ips', ''),
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     # TODO(devvesa) provide non-controller ips for these services

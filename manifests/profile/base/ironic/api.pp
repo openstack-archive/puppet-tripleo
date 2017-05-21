@@ -23,7 +23,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ironic::api (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::ironic
 

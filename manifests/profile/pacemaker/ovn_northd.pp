@@ -46,7 +46,7 @@
 
 class tripleo::profile::pacemaker::ovn_northd (
   $pacemaker_master = hiera('ovn_dbs_short_bootstrap_node_name'),
-  $step             = hiera('step'),
+  $step             = Integer(hiera('step')),
   $pcs_tries        = hiera('pcs_tries', 20),
   $ovn_dbs_vip      = hiera('ovn_dbs_vip'),
   $nb_db_port       = 6641,

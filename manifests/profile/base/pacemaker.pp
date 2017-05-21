@@ -64,7 +64,7 @@
 #   Defaults to hiera('pacemaker_cluster_recheck_interval', undef)
 #
 class tripleo::profile::base::pacemaker (
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
   $pcs_tries                 = hiera('pcs_tries', 20),
   $remote_short_node_names   = hiera('pacemaker_remote_short_node_names', []),
   $remote_node_ips           = hiera('pacemaker_remote_node_ips', []),

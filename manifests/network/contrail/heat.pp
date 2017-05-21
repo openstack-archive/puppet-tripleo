@@ -60,7 +60,7 @@ class tripleo::network::contrail::heat(
   $api_port       = 8082,
   $api_server     = hiera('contrail_config_vip'),
   $auth_host      = hiera('contrail::auth_host'),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
   $use_ssl        = 'False',
 )
 {

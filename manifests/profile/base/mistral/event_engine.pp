@@ -29,7 +29,7 @@
 #
 class tripleo::profile::base::mistral::event_engine (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

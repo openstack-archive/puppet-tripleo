@@ -29,7 +29,7 @@
 #
 class tripleo::profile::base::cinder::volume::netapp (
   $backend_name = hiera('cinder::backend::netapp::volume_backend_name', 'tripleo_netapp'),
-  $step         = hiera('step'),
+  $step         = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 

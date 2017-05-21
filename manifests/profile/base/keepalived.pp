@@ -49,7 +49,7 @@ class tripleo::profile::base::keepalived (
   $control_virtual_ip        = hiera('tripleo::keepalived::controller_virtual_ip'),
   $public_virtual_interface  = hiera('tripleo::keepalived::public_virtual_interface', false),
   $public_virtual_ip         = hiera('tripleo::keepalived::public_virtual_ip'),
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
 ) {
   if $step >= 1 {
     if $enable_load_balancer and hiera('enable_keepalived', true){

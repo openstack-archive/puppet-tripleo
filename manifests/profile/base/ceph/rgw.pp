@@ -51,7 +51,7 @@ class tripleo::profile::base::ceph::rgw (
   $civetweb_bind_ip            = '127.0.0.1',
   $civetweb_bind_port          = '8080',
   $rgw_keystone_version        = 'v2.0',
-  $step                        = hiera('step'),
+  $step                        = Integer(hiera('step')),
 ) {
 
   include ::tripleo::profile::base::ceph

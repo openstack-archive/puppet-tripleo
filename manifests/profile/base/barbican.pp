@@ -25,7 +25,7 @@
 #
 
 class tripleo::profile::base::barbican (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 ) {
 
   if $step >= 3 {

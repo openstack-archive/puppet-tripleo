@@ -46,7 +46,7 @@
 class tripleo::profile::pacemaker::database::redis (
   $bootstrap_node       = hiera('redis_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
-  $step                 = hiera('step'),
+  $step                 = Integer(hiera('step')),
   $redis_file_limit     = undef,
   $pcs_tries            = hiera('pcs_tries', 20),
 ) {

@@ -34,7 +34,7 @@
 class tripleo::profile::base::neutron::n1k (
   $n1kv_source  = hiera('n1kv_vem_source', undef),
   $n1kv_version = hiera('n1kv_vem_version', undef),
-  $step         = hiera('step'),
+  $step         = Integer(hiera('step')),
 ) {
   include ::neutron::plugins::ml2::cisco::nexus1000v
   include ::tripleo::profile::base::neutron

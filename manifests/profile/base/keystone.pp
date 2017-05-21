@@ -150,7 +150,7 @@ class tripleo::profile::base::keystone (
   $oslomsg_notify_port           = hiera('keystone::rabbit_port', '5672'),
   $oslomsg_notify_username       = hiera('keystone::rabbit_userid', 'guest'),
   $oslomsg_use_ssl               = hiera('keystone::rabbit_use_ssl', '0'),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

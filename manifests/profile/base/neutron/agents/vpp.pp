@@ -32,7 +32,7 @@
 #   Defaults to 2379
 #
 class tripleo::profile::base::neutron::agents::vpp(
-  $step      = hiera('step'),
+  $step      = Integer(hiera('step')),
   $etcd_host = hiera('etcd_vip'),
   $etcd_port = 2379,
 ) {

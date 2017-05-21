@@ -80,7 +80,7 @@ class tripleo::profile::base::database::mysql (
   $mysql_server_options          = {},
   $mysql_max_connections         = hiera('mysql_max_connections', undef),
   $remove_default_accounts       = true,
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {

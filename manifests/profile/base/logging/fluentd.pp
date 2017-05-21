@@ -59,7 +59,7 @@
 #   (Optional, default 42185) Port on which fluentd should listen if
 #   $fluentd_listen_syslog is true.
 class tripleo::profile::base::logging::fluentd (
-  $step = hiera('step', undef),
+  $step = Integer(hiera('step')),
   $fluentd_sources = undef,
   $fluentd_filters = undef,
   $fluentd_servers = undef,

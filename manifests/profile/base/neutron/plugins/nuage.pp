@@ -27,7 +27,7 @@
 #
 class tripleo::profile::base::neutron::plugins::nuage (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

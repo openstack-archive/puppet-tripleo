@@ -37,7 +37,7 @@ class tripleo::profile::base::neutron::plugins::ml2::ovn (
   $ovn_db_host = hiera('ovn_dbs_vip'),
   $ovn_nb_port = hiera('ovn::northbound::port'),
   $ovn_sb_port = hiera('ovn::southbound::port'),
-  $step        = hiera('step')
+  $step        = Integer(hiera('step'))
 ) {
   if $step >= 4 {
     class { '::neutron::plugins::ml2::ovn':

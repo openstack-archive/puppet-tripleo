@@ -29,7 +29,7 @@
 #
 class tripleo::profile::base::ceph::osd (
   $ceph_osd_selinux_permissive = false,
-  $step                        = hiera('step'),
+  $step                        = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::ceph
 

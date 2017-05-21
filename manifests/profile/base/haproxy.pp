@@ -44,7 +44,7 @@
 class tripleo::profile::base::haproxy (
   $certificates_specs            = {},
   $enable_load_balancer          = hiera('enable_load_balancer', true),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $step >= 1 {
     if $enable_load_balancer {

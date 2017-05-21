@@ -33,7 +33,7 @@
 #
 class tripleo::profile::pacemaker::cinder::volume (
   $bootstrap_node = hiera('cinder_volume_short_bootstrap_node_name'),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
   $pcs_tries      = hiera('pcs_tries', 20),
 ) {
   Service <| tag == 'cinder::volume' |> {

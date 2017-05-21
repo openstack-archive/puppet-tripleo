@@ -72,7 +72,7 @@
 #   Defaults to hiera('aodh::rabbit_use_ssl', '0')
 
 class tripleo::profile::base::aodh (
-  $step                    = hiera('step'),
+  $step                    = Integer(hiera('step')),
   $bootstrap_node          = hiera('bootstrap_nodeid', undef),
   $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),

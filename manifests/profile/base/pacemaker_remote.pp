@@ -39,7 +39,7 @@ class tripleo::profile::base::pacemaker_remote (
   $remote_authkey,
   $pcs_tries      = hiera('pcs_tries', 20),
   $enable_fencing = hiera('enable_fencing', false),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
 ) {
   class { '::pacemaker::remote':
     remote_authkey => $remote_authkey,

@@ -34,7 +34,7 @@
 class tripleo::profile::base::neutron::plugins::ml2 (
   $bootstrap_node    = hiera('bootstrap_nodeid', undef),
   $mechanism_drivers = hiera('neutron::plugins::ml2::mechanism_drivers'),
-  $step              = hiera('step'),
+  $step              = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

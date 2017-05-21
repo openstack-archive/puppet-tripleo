@@ -63,7 +63,7 @@ class tripleo::profile::base::novajoin (
   $oslomsg_rpc_port          = '5672',
   $oslomsg_rpc_username      = 'guest',
   $oslomsg_use_ssl           = '0',
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
 ) {
   if $step >= 3 {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
