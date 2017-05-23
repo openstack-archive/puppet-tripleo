@@ -338,5 +338,8 @@ class tripleo::profile::base::keystone (
     if hiera('ec2_api_enabled', false) {
       include ::ec2api::keystone::auth
     }
+    if hiera('novajoin_enabled', false) {
+      include ::nova::metadata::novajoin::auth
+    }
   }
 }
