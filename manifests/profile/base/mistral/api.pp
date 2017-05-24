@@ -18,6 +18,27 @@
 #
 # === Parameters
 #
+# [*certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Example with hiera:
+#     apache_certificates_specs:
+#       httpd-internal_api:
+#         hostname: <overcloud controller fqdn>
+#         service_certificate: <service certificate path>
+#         service_key: <service key path>
+#         principal: "haproxy/<overcloud controller fqdn>"
+#   Defaults to hiera('apache_certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*mistral_api_network*]
+#   (Optional) The network name where the mistral API endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('mistral_api_network', undef)
+#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
@@ -28,8 +49,11 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::mistral::api (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $certificates_specs            = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $mistral_api_network           = hiera('mistral_api_network', undef),
+  $step                          = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -39,8 +63,32 @@ class tripleo::profile::base::mistral::api (
 
   include ::tripleo::profile::base::mistral
 
-  if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::mistral::api
+  if $enable_internal_tls {
+    if !$mistral_api_network {
+      fail('mistral_api_network is not set in the hieradata.')
+    }
+    $tls_certfile = $certificates_specs["httpd-${mistral_api_network}"]['service_certificate']
+    $tls_keyfile = $certificates_specs["httpd-${mistral_api_network}"]['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
+  }
+
+  if $step >= 3 {
+    # TODO: Cleanup when this passes t-h-t
+    class { '::mistral::api':
+      service_name => 'httpd',
+    }
+
+    include ::apache::mod::ssl
+    class { '::mistral::wsgi::apache':
+      ssl_cert   => $tls_certfile,
+      ssl_key    => $tls_keyfile,
+      # The following are temporary and will be passed via t-h-t
+      ssl        => $enable_internal_tls,
+      servername => hiera("fqdn_${mistral_api_network}"),
+      bind_host  => hiera('mistral::api::bind_host'),
+    }
   }
 }
 
