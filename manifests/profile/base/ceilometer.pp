@@ -18,10 +18,6 @@
 #
 # === Parameters
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -72,7 +68,6 @@
 #   Defaults to hiera('ceilometer::rabbit_use_ssl', '0')
 
 class tripleo::profile::base::ceilometer (
-  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
   $step                    = hiera('step'),
   $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
@@ -86,11 +81,6 @@ class tripleo::profile::base::ceilometer (
   $oslomsg_notify_username = hiera('ceilometer::rabbit_userid', 'guest'),
   $oslomsg_use_ssl         = hiera('ceilometer::rabbit_use_ssl', '0'),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
-    $sync_db = true
-  } else {
-    $sync_db = false
-  }
 
   if $step >= 3 {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
@@ -113,14 +103,5 @@ class tripleo::profile::base::ceilometer (
       }),
     }
     include ::ceilometer::config
-  }
-
-  # Run ceilometer-upgrade in step 5 so gnocchi resource types
-  # are created safely.
-  if $step >= 5 and $sync_db {
-    exec {'ceilometer-db-upgrade':
-      command => 'ceilometer-upgrade --skip-metering-database',
-      path    => ['/usr/bin', '/usr/sbin'],
-    }
   }
 }
