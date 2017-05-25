@@ -102,12 +102,11 @@ class tripleo::profile::base::gnocchi::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 3 and $sync_db {
+  if $step >= 4 and $sync_db {
     include ::gnocchi::db::sync
   }
 
-  if $step >= 3 {
-    include ::gnocchi::api
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::apache::mod::ssl
     class { '::gnocchi::wsgi::apache':
       ssl_cert => $tls_certfile,
@@ -120,19 +119,20 @@ class tripleo::profile::base::gnocchi::api (
       coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
     }
     case $gnocchi_backend {
-      'swift': { include ::gnocchi::storage::swift }
+      'swift': {
+        include ::gnocchi::storage::swift
+        if $sync_db {
+          include ::swift::deps
+          # Ensure we have swift proxy available before running gnocchi-upgrade
+          # as storage is initialized at this point.
+          Anchor<| title == 'swift::service::end' |> ~> Class['Gnocchi::db::sync']
+        }
+      }
       'file': { include ::gnocchi::storage::file }
       'rbd': { include ::gnocchi::storage::ceph }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
+    include ::gnocchi::api
   }
 
-  # Re-run gnochci upgrade with storage as swift/ceph should be up at this
-  # stage.
-  if $step >= 5 and $sync_db {
-    exec {'run gnocchi upgrade with storage':
-      command => 'gnocchi-upgrade --config-file=/etc/gnocchi/gnocchi.conf',
-      path    => ['/usr/bin', '/usr/sbin'],
-    }
-  }
 }
