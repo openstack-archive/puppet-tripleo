@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixes the step conditions in the Swift ring building process and
+    also chains the tarball creation to the rebalance. Adds an option to
+    disable the recon check before uploading modified rings. These fixes
+    are required to properly manage rings when used in containerized
+    environments.

@@ -69,6 +69,10 @@
 # [*swift_ring_put_tempurl*]
 # PUT tempurl to upload Swift rings to
 #
+# [*skip_consistency_check*]
+# If set to true, skip the recon check to ensure rings are identical on all
+# nodes. Defaults to false
+#
 class tripleo::profile::base::swift::ringbuilder (
   $replicas,
   $build_ring  = true,
@@ -82,9 +86,10 @@ class tripleo::profile::base::swift::ringbuilder (
   $min_part_hours = undef,
   $swift_ring_get_tempurl = hiera('swift_ring_get_tempurl', ''),
   $swift_ring_put_tempurl = hiera('swift_ring_put_tempurl', ''),
+  $skip_consistency_check = false,
 ) {
 
-  if $step == 2 and $swift_ring_get_tempurl != '' {
+  if $step >= 2 and $swift_ring_get_tempurl != '' {
     exec{'fetch_swift_ring_tarball':
       path    => ['/usr/bin'],
       command => "curl --insecure --silent '${swift_ring_get_tempurl}' -o /tmp/swift-rings.tar.gz",
@@ -135,17 +140,30 @@ class tripleo::profile::base::swift::ringbuilder (
     }
   }
 
-  if $step == 5 and $build_ring and $swift_ring_put_tempurl != '' {
-    exec{'create_swift_ring_tarball':
-      path    => ['/bin', '/usr/bin'],
-      command => 'tar cvzf /tmp/swift-rings.tar.gz /etc/swift/*.builder /etc/swift/*.ring.gz /etc/swift/backups/',
-      unless  => 'swift-recon --md5 | grep -q "doesn\'t match"'
-    } ~>
+  if $step >= 5 and $build_ring and $swift_ring_put_tempurl != '' {
+    if $skip_consistency_check {
+      exec{'create_swift_ring_tarball':
+        path    => ['/bin', '/usr/bin'],
+        command => 'tar cvzf /tmp/swift-rings.tar.gz /etc/swift/*.builder /etc/swift/*.ring.gz /etc/swift/backups/',
+      }
+    } else {
+      exec{'create_swift_ring_tarball':
+        path    => ['/bin', '/usr/bin'],
+        command => 'tar cvzf /tmp/swift-rings.tar.gz /etc/swift/*.builder /etc/swift/*.ring.gz /etc/swift/backups/',
+        unless  => 'swift-recon --md5 | grep -q "doesn\'t match"',
+      }
+    }
     exec{'upload_swift_ring_tarball':
       path        => ['/usr/bin'],
       command     => "curl --insecure --silent -X PUT '${$swift_ring_put_tempurl}' --data-binary @/tmp/swift-rings.tar.gz",
       require     => Exec['create_swift_ring_tarball'],
       refreshonly => true,
     }
+
+    Exec['rebalance_account'] ~> Exec['create_swift_ring_tarball']
+    Exec['rebalance_container'] ~> Exec['create_swift_ring_tarball']
+    Exec['rebalance_object'] ~> Exec['create_swift_ring_tarball']
+
+    Exec['create_swift_ring_tarball'] ~> Exec['upload_swift_ring_tarball']
   }
 }
