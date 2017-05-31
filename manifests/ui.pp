@@ -65,8 +65,16 @@
 #  The ironic proxy endpoint url
 #  Defaults to undef
 #
+# [*endpoint_proxy_ironic_inspector*]
+#  The ironic inspector proxy endpoint url
+#  Defaults to undef
+#
 # [*endpoint_config_ironic*]
 #  The ironic config endpoint url
+#  Defaults to undef
+#
+# [*endpoint_config_ironic_inspector*]
+#  The ironic inspector config endpoint url
 #  Defaults to undef
 #
 # [*endpoint_proxy_mistral*]
@@ -112,18 +120,20 @@ class tripleo::ui (
     'ko-KR' => 'Korean',
     'zh-CN' => 'Simplified Chinese'
   },
-  $endpoint_proxy_zaqar     = undef,
-  $endpoint_proxy_keystone  = undef,
-  $endpoint_proxy_heat      = undef,
-  $endpoint_proxy_ironic    = undef,
-  $endpoint_proxy_mistral   = undef,
-  $endpoint_proxy_swift     = undef,
-  $endpoint_config_zaqar    = undef,
-  $endpoint_config_keystone = undef,
-  $endpoint_config_heat     = undef,
-  $endpoint_config_ironic   = undef,
-  $endpoint_config_mistral  = undef,
-  $endpoint_config_swift    = undef,
+  $endpoint_proxy_zaqar             = undef,
+  $endpoint_proxy_keystone          = undef,
+  $endpoint_proxy_heat              = undef,
+  $endpoint_proxy_ironic            = undef,
+  $endpoint_proxy_ironic_inspector  = undef,
+  $endpoint_proxy_mistral           = undef,
+  $endpoint_proxy_swift             = undef,
+  $endpoint_config_zaqar            = undef,
+  $endpoint_config_keystone         = undef,
+  $endpoint_config_heat             = undef,
+  $endpoint_config_ironic           = undef,
+  $endpoint_config_ironic_inspector = undef,
+  $endpoint_config_mistral          = undef,
+  $endpoint_config_swift            = undef,
 
 ) {
 
@@ -158,6 +168,11 @@ class tripleo::ui (
       'path'         => '/ironic',
       'url'          => $endpoint_proxy_ironic,
       'reverse_urls' => $endpoint_proxy_ironic
+    },
+    {
+      'path'         => '/ironic-inspector',
+      'url'          => $endpoint_proxy_ironic_inspector,
+      'reverse_urls' => $endpoint_proxy_ironic_inspector
     },
     {
       'path'         => '/mistral',
