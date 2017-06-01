@@ -125,6 +125,8 @@ class tripleo::profile::base::docker (
       lens    => 'Shellvars.lns',
       incl    => '/etc/sysconfig/docker-storage',
       changes => $storage_changes,
+      notify  => Service['docker'],
+      require => Package['docker'],
     }
 
   }
