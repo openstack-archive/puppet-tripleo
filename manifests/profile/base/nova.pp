@@ -45,6 +45,15 @@
 # [*rabbit_port*]
 #   IP port for rabbitmq service
 #   Defaults to hiera('nova::rabbit_port', 5672)
+#
+# [*migration_ssh_key*]
+#   (Optional) SSH key pair for migration SSH tunnel.
+#   Expects a hash with keys 'private_key' and 'public_key'.
+#   Defaults to {}
+#
+# [*libvirt_tls*]
+#   (Optional) Whether or not libvird TLS service is enabled.
+#   Defaults to false
 
 class tripleo::profile::base::nova (
   $bootstrap_node       = hiera('bootstrap_nodeid', undef),
@@ -54,6 +63,8 @@ class tripleo::profile::base::nova (
   $step                 = hiera('step'),
   $rabbit_hosts         = hiera('rabbitmq_node_ips', undef),
   $rabbit_port          = hiera('nova::rabbit_port', 5672),
+  $migration_ssh_key    = {},
+  $libvirt_tls          = false
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -67,26 +78,68 @@ class tripleo::profile::base::nova (
     $memcache_servers = suffix(hiera('memcached_node_ips'), ':11211')
   }
 
-  if hiera('step') >= 4 or (hiera('step') >= 3 and $sync_db) {
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
-    class { '::nova' :
-      rabbit_hosts => $rabbit_endpoints,
-    }
     include ::nova::config
     class { '::nova::cache':
       enabled          => true,
       backend          => 'oslo_cache.memcache_pool',
       memcache_servers => $memcache_servers,
     }
-  }
 
-  if $step >= 4 {
-    if $manage_migration {
-      class { '::nova::migration::libvirt':
-        configure_libvirt => $libvirt_enabled,
-        configure_nova    => $nova_compute_enabled,
+    if $step >= 4 and $manage_migration {
+
+      # Libvirt setup (live-migration)
+      if $libvirt_tls {
+        class { '::nova::migration::libvirt':
+          transport         => 'tls',
+          configure_libvirt => $libvirt_enabled,
+          configure_nova    => $nova_compute_enabled,
+        }
+      } else {
+        # Reuse the cold-migration SSH tunnel when TLS is not enabled
+        class { '::nova::migration::libvirt':
+          transport          => 'ssh',
+          configure_libvirt  => $libvirt_enabled,
+          configure_nova     => $nova_compute_enabled,
+          client_user        => 'nova',
+          client_extraparams => {
+            'keyfile' => '/var/lib/nova/.ssh/id_rsa'
+          }
+        }
       }
+
+      if $migration_ssh_key != {} {
+        # Nova SSH tunnel setup (cold-migration)
+
+        #TODO: Remove me when https://review.rdoproject.org/r/#/c/4008 lands
+        user { 'nova':
+          ensure => present,
+          shell  => '/bin/bash',
+        }
+
+        $private_key_parts = split($migration_ssh_key['public_key'], ' ')
+        $nova_public_key = {
+          'type' => $private_key_parts[0],
+          key    => $private_key_parts[1]
+        }
+        $nova_private_key = {
+          'type' => $private_key_parts[0],
+          key    => $migration_ssh_key['private_key']
+        }
+      } else {
+        $nova_public_key = undef
+        $nova_private_key = undef
+      }
+    } else {
+      $nova_public_key = undef
+      $nova_private_key = undef
+    }
+
+    class { '::nova' :
+      rabbit_hosts     => $rabbit_endpoints,
+      nova_public_key  => $nova_public_key,
+      nova_private_key => $nova_private_key,
     }
   }
-
 }

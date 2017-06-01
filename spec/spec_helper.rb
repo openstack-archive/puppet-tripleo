@@ -19,6 +19,8 @@ RSpec.configure do |c|
 
   # custom global facts for all rspec tests
   add_custom_fact :concat_basedir, '/var/lib/puppet/concat'
+  # needed for testing Puppet Openstack modules
+  add_custom_fact :os_service_default, '<SERVICE DEFAULT>'
 end
 
 at_exit { RSpec::Puppet::Coverage.report! }
