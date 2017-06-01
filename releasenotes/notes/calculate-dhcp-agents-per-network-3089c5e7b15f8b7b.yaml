@@ -1,5 +1,6 @@
 ---
-features: |
-  - Unless a non-default value is provided, the dhcp_agents_per_network
+features:
+  - |
+    Unless a non-default value is provided, the dhcp_agents_per_network
     neutron configuration variable is set to the number of deployed
     neutron dhcp agents.
