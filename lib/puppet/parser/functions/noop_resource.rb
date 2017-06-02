@@ -46,7 +46,6 @@ module Puppet::Parser::Functions
         Puppet::Type.type(arg[0].downcase.to_sym).provide(:noop, :parent => Puppet::Provider::Noop) do
            defaultfor :osfamily => :redhat
         end
-    else
     end
     return true
   end
