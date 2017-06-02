@@ -69,6 +69,12 @@ define tripleo::pacemaker::haproxy_with_vip(
       $ipv6_addrlabel = ''
     }
 
+    $haproxy_in_container = hiera('haproxy_docker', false)
+    $constraint_target_name = $haproxy_in_container ? {
+      true => 'haproxy-bundle',
+      default => 'haproxy-clone'
+    }
+
     pacemaker::resource::ip { "${vip_name}_vip":
       ip_address     => $ip_address,
       cidr_netmask   => $netmask,
@@ -77,9 +83,10 @@ define tripleo::pacemaker::haproxy_with_vip(
       location_rule  => $location_rule,
       tries          => $pcs_tries,
     }
+
     pacemaker::constraint::order { "${vip_name}_vip-then-haproxy":
       first_resource    => "ip-${ip_address}",
-      second_resource   => 'haproxy-clone',
+      second_resource   => $constraint_target_name,
       first_action      => 'start',
       second_action     => 'start',
       constraint_params => 'kind=Optional',
@@ -87,13 +94,18 @@ define tripleo::pacemaker::haproxy_with_vip(
     }
     pacemaker::constraint::colocation { "${vip_name}_vip-with-haproxy":
       source => "ip-${ip_address}",
-      target => 'haproxy-clone',
+      target => $constraint_target_name,
       score  => 'INFINITY',
       tries  => $pcs_tries,
     }
 
+    $service_resource = $haproxy_in_container ? {
+      true => Pacemaker::Resource::Bundle['haproxy-bundle'],
+      default => Pacemaker::Resource::Service['haproxy']
+    }
+
     Pacemaker::Resource::Ip["${vip_name}_vip"] ->
-      Pacemaker::Resource::Service['haproxy'] ->
+      $service_resource ->
         Pacemaker::Constraint::Order["${vip_name}_vip-then-haproxy"] ->
           Pacemaker::Constraint::Colocation["${vip_name}_vip-with-haproxy"]
   }
