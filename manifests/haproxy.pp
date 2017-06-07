@@ -518,7 +518,7 @@
 #    'nova_novnc_port' (Defaults to 6080)
 #    'nova_novnc_ssl_port' (Defaults to 13080)
 #    'opendaylight_api_port' (Defaults to 8081)
-#    'panko_api_port' (Defaults to 8779)
+#    'panko_api_port' (Defaults to 8977)
 #    'panko_api_ssl_port' (Defaults to 13779)
 #    'ovn_nbdb_port' (Defaults to 6641)
 #    'ovn_sbdb_port' (Defaults to 6642)
@@ -701,7 +701,7 @@ class tripleo::haproxy (
     nova_novnc_port => 6080,
     nova_novnc_ssl_port => 13080,
     opendaylight_api_port => 8081,
-    panko_api_port => 8779,
+    panko_api_port => 8977,
     panko_api_ssl_port => 13779,
     ovn_nbdb_port => 6641,
     ovn_sbdb_port => 6642,
