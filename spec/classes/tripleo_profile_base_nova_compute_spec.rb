@@ -40,6 +40,12 @@ describe 'tripleo::profile::base::nova::compute' do
           step => #{params[:step]},
           oslomsg_rpc_hosts => [ '127.0.0.1' ],
         }
+        class { '::tripleo::profile::base::nova::migration':
+          step => #{params[:step]}
+        }
+        class { '::tripleo::profile::base::nova::migration::client':
+          step => #{params[:step]}
+        }
 eos
       end
 

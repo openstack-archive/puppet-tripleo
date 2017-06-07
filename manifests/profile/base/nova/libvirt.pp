@@ -28,6 +28,7 @@ class tripleo::profile::base::nova::libvirt (
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::nova
+    include ::tripleo::profile::base::nova::migration::client
     include ::nova::compute::libvirt::services
 
     file { ['/etc/libvirt/qemu/networks/autostart/default.xml',

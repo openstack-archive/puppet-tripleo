@@ -41,6 +41,12 @@ describe 'tripleo::profile::base::nova::compute::libvirt' do
         class { '::tripleo::profile::base::nova::compute':
           step => #{params[:step]},
         }
+        class { '::tripleo::profile::base::nova::migration':
+          step => #{params[:step]}
+        }
+        class { '::tripleo::profile::base::nova::migration::client':
+          step => #{params[:step]}
+        }
 eos
       end
 
