@@ -23,23 +23,15 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*mechanism_drivers*]
-#   (Optional) The mechanism drivers to use with the Ml2 plugin
-#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
-#
 
 class tripleo::profile::base::neutron::sriov(
-  $step               = hiera('step'),
-  $mechanism_drivers  = hiera('neutron::plugins::ml2::mechanism_drivers'),
+  $step               = hiera('step')
 ) {
 
   include ::tripleo::profile::base::neutron
 
   if $step >= 4 {
-    if 'sriovnicswitch' in $mechanism_drivers  {
-      include ::neutron::agents::ml2::sriov
-      include ::tripleo::host::sriov
-    }
+    include ::neutron::agents::ml2::sriov
+    include ::tripleo::host::sriov
   }
-
 }
