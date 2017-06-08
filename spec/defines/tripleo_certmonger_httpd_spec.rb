@@ -20,6 +20,8 @@ require 'spec_helper'
 
 describe 'tripleo::certmonger::httpd' do
 
+  let(:title) { 'httpd-cert' }
+
   shared_examples_for 'tripleo::certmonger::httpd' do
     let :params do
       {
