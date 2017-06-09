@@ -51,6 +51,7 @@ class tripleo::profile::base::ironic::conductor (
       }
 
       # Configure access to other services
+      include ::ironic::cinder
       include ::ironic::drivers::inspector
       include ::ironic::glance
       include ::ironic::neutron
