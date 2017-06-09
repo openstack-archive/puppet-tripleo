@@ -1,0 +1,4 @@
+---
+features:
+  - The resource ::tripleo::certmonger::ca::crl was added. The purpose of this
+    resource is to fetch a CRL file and set up a cron job to refresh that file.
