@@ -146,6 +146,10 @@
 #  the servers it balances
 #  Defaults to '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'
 #
+# [*crl_file*]
+#  Path to the CRL file to be used for checking revoked certificates.
+#  Defaults to undef
+#
 # [*haproxy_stats_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the haproxy stats endpoint using the specified file.
@@ -565,6 +569,7 @@ class tripleo::haproxy (
   $ssl_cipher_suite            = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
   $ssl_options                 = 'no-sslv3',
   $ca_bundle                   = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
+  $crl_file                    = undef,
   $haproxy_stats_certificate   = undef,
   $keystone_admin              = hiera('keystone_enabled', false),
   $keystone_public             = hiera('keystone_enabled', false),
@@ -728,7 +733,13 @@ class tripleo::haproxy (
   $ports = merge($default_service_ports, $service_ports)
 
   if $enable_internal_tls {
-    $internal_tls_member_options = ['ssl', 'verify required', "ca-file ${ca_bundle}"]
+    $base_internal_tls_member_options = ['ssl', 'verify required', "ca-file ${ca_bundle}"]
+
+    if $crl_file {
+      $internal_tls_member_options = concat($base_internal_tls_member_options, "crl-file ${crl_file}")
+    } else {
+      $internal_tls_member_options = $base_internal_tls_member_options
+    }
     Haproxy::Balancermember {
       verifyhost => true
     }
