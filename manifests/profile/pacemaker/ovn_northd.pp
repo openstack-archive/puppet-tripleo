@@ -32,7 +32,8 @@
 #   Defaults to hiera('pcs_tries', 20)
 #
 # [*ovn_dbs_vip*]
-#   (Optional) The OVN database virtual IP to be managed by the pacemaker.
+#   (Optional) The vip to be used for OVN DB servers. It is expected that
+#   the vip resource to be created before calling this class.
 #   Defaults to hiera('ovn_dbs_vip')
 #
 # [*nb_db_port*]
@@ -67,21 +68,9 @@ class tripleo::profile::pacemaker::ovn_northd (
     $ovndb_servers_ocf_name      = 'ovn:ovndb-servers'
     $ovndb_vip_resource_name     = "ip-${ovn_dbs_vip}"
 
-    if is_ipv6_address($ovn_dbs_vip) {
-      $netmask = '128'
-      $nic     = interface_for_ip($ovn_dbs_vip)
-    } else {
-      $netmask = '32'
-      $nic     = ''
-    }
-
-    pacemaker::resource::ip { "${ovndb_vip_resource_name}":
-      ip_address   => $ovn_dbs_vip,
-      cidr_netmask => $netmask,
-      nic          => $nic,
-      tries        => $pcs_tries,
-    }
-
+    # By step 3, all the VIPs would have been created.
+    # After creating ovn ocf resource, colocate it with the
+    # VIP - ip-${ovn_dbs_vip}.
     pacemaker::resource::ocf { "${ovndb_servers_resource_name}":
       ocf_agent_name  => "${ovndb_servers_ocf_name}",
       master_params   => '',
@@ -96,15 +85,6 @@ class tripleo::profile::pacemaker::ovn_northd (
       meta_params     => 'notify=true'
     }
 
-    pacemaker::constraint::order { "${ovndb_vip_resource_name}-then-${ovndb_servers_resource_name}":
-      first_resource    => "${ovndb_vip_resource_name}",
-      second_resource   => "${ovndb_servers_resource_name}-master",
-      first_action      => 'start',
-      second_action     => 'start',
-      constraint_params => 'kind=Mandatory',
-      tries             => $pcs_tries,
-    }
-
     pacemaker::constraint::colocation { "${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}":
       source       => "${ovndb_vip_resource_name}",
       target       => "${ovndb_servers_resource_name}-master",
@@ -113,9 +93,7 @@ class tripleo::profile::pacemaker::ovn_northd (
       tries        => $pcs_tries,
     }
 
-    Pacemaker::Resource::Ip["${ovndb_vip_resource_name}"] ->
-      Pacemaker::Resource::Ocf["${ovndb_servers_resource_name}"] ->
-        Pacemaker::Constraint::Order["${ovndb_vip_resource_name}-then-${ovndb_servers_resource_name}"] ->
-          Pacemaker::Constraint::Colocation["${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}"]
+    Pacemaker::Resource::Ocf["${ovndb_servers_resource_name}"] ->
+      Pacemaker::Constraint::Colocation["${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}"]
   }
 }
