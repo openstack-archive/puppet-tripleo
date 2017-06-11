@@ -100,6 +100,15 @@ class tripleo::profile::pacemaker::database::mysql (
     }
   }
 
+  # since we are configuring rsync for wsrep_sst_method, we ought to make sure
+  # it's installed. We only includ this at step 2 since puppet-rsync may be
+  # included later and also adds the package resource.
+  if $step == 2 {
+      if ! defined(Package['rsync']) {
+          package {'rsync':}
+      }
+  }
+
   # remove_default_accounts parameter will execute some mysql commands
   # to remove the default accounts created by MySQL package.
   # We need MySQL running to run the commands successfully, so better to

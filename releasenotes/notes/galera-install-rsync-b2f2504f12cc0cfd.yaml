@@ -1,0 +1,6 @@
+---
+fixes:
+  - The mysql pacemaker profile now makes sure that the
+    rsync package is installed since it configures
+    wsrep_sst_method for galera to use rsync. See
+    https://bugs.launchpad.net/tripleo/+bug/1693003
