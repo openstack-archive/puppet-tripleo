@@ -53,20 +53,22 @@ class tripleo::profile::pacemaker::database::mysql (
     $pacemaker_master = false
   }
 
-  # use only mysql_node_names when we land a patch in t-h-t that
-  # switches to autogenerating these values from composable services
-  # The galera node names need to match the pacemaker node names... so if we
-  # want to use FQDNs for this, the cluster will not finish bootstrapping,
-  # since all the nodes will be marked as slaves. For now, we'll stick to the
-  # short name which is already registered in pacemaker until we get around
-  # this issue.
-  $galera_node_names_lookup = hiera('mysql_short_node_names', hiera('mysql_node_names', $::hostname))
+  $galera_node_names_lookup = hiera('mysql_short_node_names', $::hostname)
+  $galera_fqdns_names_lookup = hiera('mysql_node_names', $::hostname)
+
   if is_array($galera_node_names_lookup) {
-    $galera_nodes = downcase(join($galera_node_names_lookup, ','))
+    $galera_nodes_count = length($galera_node_names_lookup)
+    $galera_nodes = downcase(join($galera_fqdns_names_lookup, ','))
+    $galera_name_pairs = zip($galera_node_names_lookup, $galera_fqdns_names_lookup)
   } else {
+    $galera_nodes_count = 1
     $galera_nodes = downcase($galera_node_names_lookup)
+    $galera_name_pairs = [[$galera_node_names_lookup, $galera_fqdns_names_lookup]]
   }
-  $galera_nodes_count = count(split($galera_nodes, ','))
+
+  # NOTE(jaosorior): The usage of cluster_host_map requires resource-agents-3.9.5-82.el7_3.11
+  $processed_galera_name_pairs = $galera_name_pairs.map |$pair| { join($pair, ':') }
+  $cluster_host_map = join($processed_galera_name_pairs, ';')
 
   $mysqld_options = {
     'mysqld' => {
@@ -145,7 +147,7 @@ class tripleo::profile::pacemaker::database::mysql (
         op_params       => 'promote timeout=300s on-fail=block',
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true",
-        resource_params => "additional_parameters='--open-files-limit=16384' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}'",
+        resource_params => "additional_parameters='--open-files-limit=16384' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map}'",
         tries           => $pcs_tries,
         location_rule   => {
           resource_discovery => 'exclusive',
