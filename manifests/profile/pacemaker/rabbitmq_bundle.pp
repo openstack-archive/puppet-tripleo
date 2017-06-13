@@ -105,6 +105,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       pacemaker::resource::bundle { 'rabbitmq-bundle':
         image             => $rabbitmq_docker_image,
         replicas          => $rabbitmq_nodes_count,
+        location_rule     => {
+          resource_discovery => 'exclusive',
+          score              => 0,
+          expression         => ['rabbitmq-role eq true'],
+        },
         container_options => 'network=host',
         options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',

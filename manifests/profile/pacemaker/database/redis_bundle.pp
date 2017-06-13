@@ -73,6 +73,11 @@ class tripleo::profile::pacemaker::database::redis_bundle (
         image             => $redis_docker_image,
         replicas          => $redis_nodes_count,
         masters           => 1,
+        location_rule     => {
+          resource_discovery => 'exclusive',
+          score              => 0,
+          expression         => ['redis-role eq true'],
+        },
         container_options => 'network=host',
         options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',

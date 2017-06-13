@@ -87,6 +87,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
       pacemaker::resource::bundle { 'haproxy-bundle':
         image             => $haproxy_docker_image,
         replicas          => $haproxy_nodes_count,
+        location_rule     => $haproxy_location_rule,
         container_options => 'network=host',
         options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
