@@ -1,0 +1,6 @@
+---
+features: 
+  - |
+    Added variables for endpoint_proxy_ironic_inspector,
+    endpoint_config_ironic_inspector, and Apache mod_proxy configuration to
+    proxy ironic-inspector service just like similar services
