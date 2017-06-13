@@ -130,8 +130,8 @@ class tripleo::profile::base::swift::ringbuilder (
       }
 
       Ring_object_device<| |> ~> Exec['rebalance_object']
-      Ring_object_device<| |> ~> Exec['rebalance_account']
-      Ring_object_device<| |> ~> Exec['rebalance_container']
+      Ring_account_device<| |> ~> Exec['rebalance_account']
+      Ring_container_device<| |> ~> Exec['rebalance_container']
     }
   }
 
