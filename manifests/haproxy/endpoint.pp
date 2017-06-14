@@ -108,9 +108,20 @@ define tripleo::haproxy::endpoint (
     # service exposed to the public network
 
     if $public_certificate {
+      if $mode == 'http' {
+        $tls_listen_options = {
+          'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
+          'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
+          'option'       => 'forwardfor',
+        }
+        $listen_options_real = merge($tls_listen_options, $listen_options)
+      } else {
+        $listen_options_real = $listen_options
+      }
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${public_ssl_port}"),
                                         union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
     } else {
+      $listen_options_real = $listen_options
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${service_port}"), $haproxy_listen_bind_param)
     }
   } else {
@@ -138,7 +149,7 @@ define tripleo::haproxy::endpoint (
     bind             => $bind_opts,
     collect_exported => false,
     mode             => $mode,
-    options          => $listen_options,
+    options          => $listen_options_real,
   }
   haproxy::balancermember { "${name}":
     listening_service => $name,

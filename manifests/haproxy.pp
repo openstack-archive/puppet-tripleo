@@ -902,17 +902,8 @@ class tripleo::haproxy (
   }
 
   if $keystone_public {
-    if $service_certificate {
-      $keystone_public_tls_listen_opts = {
-        'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
-        # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
-        'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
-        'option'       => 'forwardfor',
-      }
-    } else {
-      $keystone_public_tls_listen_opts = {
-        'option' => [ 'httpchk GET /v3', ],
-      }
+    $keystone_listen_opts = {
+      'option' => [ 'httpchk GET /v3', ],
     }
     ::tripleo::haproxy::endpoint { 'keystone_public':
       public_virtual_ip => $public_virtual_ip,
@@ -921,7 +912,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('keystone_public_api_node_ips', $controller_hosts_real),
       server_names      => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($default_listen_options, $keystone_public_tls_listen_opts),
+      listen_options    => merge($default_listen_options, $keystone_listen_opts),
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
       service_network   => $keystone_public_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
