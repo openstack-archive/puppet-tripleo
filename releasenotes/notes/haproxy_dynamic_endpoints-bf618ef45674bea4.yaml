@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    This change allows to dynamically create new service endpoints, either using hiera
+    in heat, or with some new service profile you can then include in the roles_data.yml
+fixes:
+  - |
+    Allow to add custom backends in HAProxy (1721832)

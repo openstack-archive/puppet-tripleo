@@ -851,6 +851,9 @@ class tripleo::haproxy (
     manage_firewall             => $manage_firewall,
   }
 
+  $service_names = hiera('enabled_services', [])
+  tripleo::haproxy::service_endpoints { $service_names: }
+
   if $haproxy_stats {
     if $haproxy_stats_certificate {
       $haproxy_stats_certificate_real = $haproxy_stats_certificate
