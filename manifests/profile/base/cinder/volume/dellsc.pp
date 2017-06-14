@@ -44,6 +44,7 @@ class tripleo::profile::base::cinder::volume::dellsc (
       dell_sc_api_port      => hiera('cinder::backend::dellsc_iscsi::dell_sc_api_port', undef),
       dell_sc_server_folder => hiera('cinder::backend::dellsc_iscsi::dell_sc_server_folder', undef),
       dell_sc_volume_folder => hiera('cinder::backend::dellsc_iscsi::dell_sc_volume_folder', undef),
+      excluded_domain_ip    => hiera('cinder::backend::dellsc_iscsi::excluded_domain_ip', undef),
     }
   }
 
