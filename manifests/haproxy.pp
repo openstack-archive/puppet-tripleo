@@ -780,7 +780,7 @@ class tripleo::haproxy (
       'cookie'       => 'SERVERID insert indirect nocache',
       'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
-      'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
+      'redirect'     => 'scheme https code 301 if !{ ssl_fc }',
       'option'       => [ 'forwardfor', 'httpchk' ],
       'http-request' => [
           'set-header X-Forwarded-Proto https if { ssl_fc }',
