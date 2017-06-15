@@ -1,0 +1,9 @@
+---
+issues:
+  - |
+    Ignore failures if nf_conntrack_proto_sctp module failed to load.
+    Since RHEL 7.4, nf_conntrack_proto_sctp module is compiled into the
+    kernel instead of as a module as the sctp support.
+    TripleO will still try to load the module to support RHEL 7.3, but
+    in the future will remove the module management and rely on the kernel
+    provided in newer versions of RHEL.
