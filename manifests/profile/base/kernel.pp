@@ -17,14 +17,32 @@
 #
 # Load and configure Kernel modules.
 #
-class tripleo::profile::base::kernel {
+# === Parameters
+#
+# [*module_list*]
+#   (Optional) List of kernel modules to load.
+#   Defaults to hiera('kernel_modules')
+#
+# [*sysctl_settings*]
+#   (Optional) List of sysctl settings to load.
+#   Defaults to hiera('sysctl_settings')
+#
+class tripleo::profile::base::kernel (
+  $module_list     = hiera('kernel_modules', undef),
+  $sysctl_settings = hiera('sysctl_settings', undef),
+) {
 
-  if hiera('kernel_modules', undef) {
-    create_resources(kmod::load, hiera('kernel_modules'), { })
+  if $module_list {
+    create_resources(kmod::load, $module_list, { })
   }
-  if hiera('sysctl_settings', undef) {
-    create_resources(sysctl::value, hiera('sysctl_settings'), { })
+  if $sysctl_settings {
+    create_resources(sysctl::value, $sysctl_settings, { })
   }
   Exec <| tag == 'kmod::load' |> -> Sysctl <| |>
 
+  # RHEL 7.4+ workaround where this functionality is built into the
+  # kernel instead of being built as a module.
+  # That way, we can support both 7.3 and 7.4 RHEL versions.
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1387537
+  Exec <| title == 'modprobe nf_conntrack_proto_sctp' |> { returns => [0,1] }
 }
