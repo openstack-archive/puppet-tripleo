@@ -136,13 +136,16 @@ class tripleo::ui (
   $endpoint_config_swift            = undef,
 
 ) {
+  package {'openstack-tripleo-ui': }
 
+  include ::apache
   include ::apache::mod::proxy
   include ::apache::mod::proxy_http
   include ::apache::mod::proxy_wstunnel
 
   ::apache::vhost { 'tripleo-ui':
     ensure           => 'present',
+    require          => Package['openstack-tripleo-ui'],
     servername       => $servername,
     ip               => $bind_host,
     port             => $ui_port,
