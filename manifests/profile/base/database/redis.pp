@@ -37,7 +37,7 @@ class tripleo::profile::base::database::redis (
   $step             = hiera('step'),
 ) {
   if $step >= 2 {
-    if $bootstrap_nodeid == $::hostname {
+    if downcase($bootstrap_nodeid) == $::hostname {
       $slaveof = undef
     } else {
       $slaveof = "${bootstrap_nodeid} 6379"

@@ -6,6 +6,7 @@ not_hash: string
 aodh::rabbit_password: 'password'
 aodh_redis_password: 'password'
 redis_vip: '127.0.0.1'
+redis::bind: '10.0.0.1'
 aodh::auth::auth_password: 'password'
 aodh::db::mysql::password: 'password'
 aodh::keystone::authtoken::password: 'password'
