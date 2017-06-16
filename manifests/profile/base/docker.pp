@@ -66,7 +66,7 @@ class tripleo::profile::base::docker (
   $docker_options = '--log-driver=journald --signature-verification=false',
   $configure_storage = true,
   $storage_options = '-s overlay2',
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
   $configure_libvirt_polkit = undef,
   $docker_nova_uid = 42436,
   $services_enabled = hiera('service_names', [])

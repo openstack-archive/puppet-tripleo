@@ -69,7 +69,7 @@ class tripleo::profile::base::neutron::midonet (
   $neutron_api_node_ips  = hiera('neutron_api_node_ips', ''),
   $neutron_auth_password = hiera('neutron::keystone::authtoken::password', ''),
   $neutron_auth_tenant   = hiera('neutron::keystone::authtoken::project_name', ''),
-  $step                  = hiera('step'),
+  $step                  = Integer(hiera('step')),
   $vip                   = hiera('public_virtual_ip'),
   $zk_on_controller      = hiera('enable_zookeeper_on_controller', ''),
   $zookeeper_client_ip   = hiera('neutron::bind_host', ''),

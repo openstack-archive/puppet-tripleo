@@ -117,7 +117,7 @@ class tripleo::network::contrail::database(
   $host_ip              = hiera('contrail::database::host_ip'),
   $host_name            = $::hostname,
   $public_vip           = hiera('public_virtual_ip'),
-  $step                 = hiera('step'),
+  $step                 = Integer(hiera('step')),
   $zookeeper_client_ip  = hiera('contrail::database::host_ip'),
   $zookeeper_hostnames  = hiera('contrail_database_short_node_names'),
   $zookeeper_server_ips = hiera('contrail_database_node_ips'),

@@ -44,7 +44,7 @@ class tripleo::profile::pacemaker::database::mysql (
   $bootstrap_node     = hiera('mysql_short_bootstrap_node_name'),
   $bind_address       = $::hostname,
   $gmcast_listen_addr = hiera('mysql_bind_host'),
-  $step               = hiera('step'),
+  $step               = Integer(hiera('step')),
   $pcs_tries          = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {

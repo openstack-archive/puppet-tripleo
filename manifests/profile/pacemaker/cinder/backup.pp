@@ -33,7 +33,7 @@
 #
 class tripleo::profile::pacemaker::cinder::backup (
   $bootstrap_node = hiera('cinder_backup_short_bootstrap_node_name'),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
   $pcs_tries      = hiera('pcs_tries', 20),
 ) {
 

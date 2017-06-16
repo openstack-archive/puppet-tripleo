@@ -40,7 +40,7 @@ class tripleo::profile::base::qdr (
   $qdr_username      = undef,
   $qdr_password      = undef,
   $qdr_listener_port = hiera('tripleo::profile::base::qdr::qdr_listener_port', 5672),
-  $step              = hiera('step'),
+  $step              = Integer(hiera('step')),
 ) {
   if $step >= 1 {
     class { '::qdr':

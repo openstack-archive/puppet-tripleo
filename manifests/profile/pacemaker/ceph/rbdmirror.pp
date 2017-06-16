@@ -45,7 +45,7 @@ class tripleo::profile::pacemaker::ceph::rbdmirror (
   $client_name    = 'openstack',
   $pcs_tries      = hiera('pcs_tries', 20),
   $stack_action   = hiera('stack_action'),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
 ) {
   Service <| tag == 'ceph-rbd-mirror' |> {
     hasrestart => true,

@@ -24,7 +24,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::metadata (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::neutron

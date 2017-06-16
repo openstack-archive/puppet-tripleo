@@ -112,7 +112,7 @@ class tripleo::profile::base::nova (
   $oslomsg_notify_username  = hiera('nova::rabbit_userid', 'guest'),
   $oslomsg_use_ssl          = hiera('nova::rabbit_use_ssl', '0'),
   $nova_compute_enabled     = false,
-  $step                     = hiera('step'),
+  $step                     = Integer(hiera('step')),
   $migration_ssh_key        = {},
   $migration_ssh_localaddrs = [],
   $libvirt_tls              = false

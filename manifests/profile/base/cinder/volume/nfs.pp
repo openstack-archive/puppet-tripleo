@@ -57,7 +57,7 @@ class tripleo::profile::base::cinder::volume::nfs (
   $cinder_nfs_mount_options           = '',
   $cinder_nas_secure_file_operations  = $::os_service_default,
   $cinder_nas_secure_file_permissions = $::os_service_default,
-  $step                               = hiera('step'),
+  $step                               = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 

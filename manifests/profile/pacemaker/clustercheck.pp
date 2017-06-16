@@ -32,7 +32,7 @@
 #
 #
 class tripleo::profile::pacemaker::clustercheck (
-  $step                  = hiera('step'),
+  $step                  = Integer(hiera('step')),
   $clustercheck_password = hiera('mysql::server::root_password'),
   $bind_address          = hiera('mysql_bind_host'),
 ) {

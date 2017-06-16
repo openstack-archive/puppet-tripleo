@@ -28,7 +28,7 @@
 #   Defaults to hiera('cinder_enable_nfs_backend', false)
 #
 class tripleo::profile::base::nova::compute (
-  $step               = hiera('step'),
+  $step               = Integer(hiera('step')),
   $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
 ) {
 

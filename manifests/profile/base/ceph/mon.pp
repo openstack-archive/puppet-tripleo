@@ -35,7 +35,7 @@
 #
 class tripleo::profile::base::ceph::mon (
   $ceph_pools = {},
-  $step       = hiera('step'),
+  $step       = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::ceph
 

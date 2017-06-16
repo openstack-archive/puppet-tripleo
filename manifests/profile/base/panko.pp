@@ -25,7 +25,7 @@
 #
 
 class tripleo::profile::base::panko (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 ) {
   if $step >= 3 {
     include ::panko

@@ -49,7 +49,7 @@ class tripleo::profile::base::cinder::volume::rbd (
   $cinder_rbd_pool_name    = 'volumes',
   $cinder_rbd_secret_uuid  = hiera('ceph::profile::params::fsid', undef),
   $cinder_rbd_user_name    = 'openstack',
-  $step                    = hiera('step'),
+  $step                    = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 

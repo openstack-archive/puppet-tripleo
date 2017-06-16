@@ -51,7 +51,7 @@ class tripleo::profile::base::nova::placement (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $nova_placement_network        = hiera('nova_placement_network', undef),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

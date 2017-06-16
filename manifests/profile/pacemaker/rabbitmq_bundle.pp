@@ -61,7 +61,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
   $rabbit_nodes                 = hiera('rabbitmq_node_names'),
   $pcs_tries                    = hiera('pcs_tries', 20),
-  $step                         = hiera('step'),
+  $step                         = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true

@@ -31,7 +31,7 @@
 #   Defaults to hiera('bootstack_nodeid')
 #
 class tripleo::profile::base::neutron::opendaylight (
-  $step         = hiera('step'),
+  $step         = Integer(hiera('step')),
   $odl_api_ips  = hiera('opendaylight_api_node_ips'),
   $node_name    = hiera('bootstack_nodeid')
 ) {

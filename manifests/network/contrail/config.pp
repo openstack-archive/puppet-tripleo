@@ -216,7 +216,7 @@
 #  Defaults to hiera('contrail_database_node_ips')
 #
 class tripleo::network::contrail::config(
-  $step  = hiera('step'),
+  $step  = Integer(hiera('step')),
   $aaa_mode               = hiera('contrail::aaa_mode'),
   $admin_password         = hiera('contrail::admin_password'),
   $admin_tenant_name      = hiera('contrail::admin_tenant_name'),

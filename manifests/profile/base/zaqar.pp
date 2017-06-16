@@ -28,7 +28,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::zaqar (
-  $step             = hiera('step'),
+  $step             = Integer(hiera('step')),
 ) {
   if $step >= 4  {
     include ::zaqar

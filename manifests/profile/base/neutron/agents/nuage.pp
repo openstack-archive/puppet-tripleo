@@ -43,7 +43,7 @@ class tripleo::profile::base::neutron::agents::nuage (
   $nova_metadata_ip    = hiera('nova_metadata_node_ips', ''),
   $nova_os_password    = hiera('nova_password', ''),
   $nova_os_tenant_name = hiera('nova::api::admin_tenant_name', ''),
-  $step                = hiera('step'),
+  $step                = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     include ::nuage::vrs

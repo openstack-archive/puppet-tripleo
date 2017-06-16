@@ -58,7 +58,7 @@ class tripleo::profile::base::tacker (
   $oslomsg_rpc_port     = hiera('tacker::rabbit_port', '5672'),
   $oslomsg_rpc_username = hiera('tacker::rabbit_userid', 'guest'),
   $oslomsg_use_ssl      = hiera('tacker::rabbit_use_ssl', '0'),
-  $step                 = hiera('step'),
+  $step                 = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

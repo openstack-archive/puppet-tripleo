@@ -28,7 +28,7 @@
 #   Defaults to hiera('bootstrap_nodeid')
 #
 class tripleo::profile::pacemaker::neutron::lbaas (
-  $step             = hiera('step'),
+  $step             = Integer(hiera('step')),
   $pacemaker_master = hiera('bootstrap_nodeid'),
 ) {
 

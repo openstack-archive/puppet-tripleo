@@ -71,7 +71,7 @@ class tripleo::network::contrail::provision(
   $auth_host         = hiera('contrail::auth_host'),
   $auth_port         = hiera('contrail::auth_port'),
   $auth_protocol     = hiera('contrail::auth_protocol'),
-  $step              = hiera('step'),
+  $step              = Integer(hiera('step')),
 )
 {
   if $step >= 5 {

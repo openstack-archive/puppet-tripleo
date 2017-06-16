@@ -24,7 +24,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::nova::ec2api (
-  $step    = hiera('step')
+  $step    = Integer(hiera('step'))
 ) {
   if $step >= 4 {
     include ::ec2api

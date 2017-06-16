@@ -37,7 +37,7 @@
 class tripleo::profile::base::database::mongodb (
   $mongodb_replset,
   $bootstrap_node = downcase(hiera('bootstrap_nodeid')),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
   $memory_limit   = '20G',
 ) {
   if $step >= 2 {

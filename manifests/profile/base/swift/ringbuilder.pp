@@ -77,7 +77,7 @@ class tripleo::profile::base::swift::ringbuilder (
   $replicas,
   $build_ring  = true,
   $devices     = undef,
-  $step        = hiera('step'),
+  $step        = Integer(hiera('step')),
   $swift_zones = '1',
   $raw_disk_prefix = 'r1z1-',
   $raw_disks = [],

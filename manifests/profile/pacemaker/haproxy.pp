@@ -38,7 +38,7 @@
 class tripleo::profile::pacemaker::haproxy (
   $bootstrap_node       = hiera('haproxy_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
-  $step                 = hiera('step'),
+  $step                 = Integer(hiera('step')),
   $pcs_tries            = hiera('pcs_tries', 20),
 ) {
   include ::tripleo::profile::base::haproxy

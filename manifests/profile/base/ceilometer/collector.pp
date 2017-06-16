@@ -46,7 +46,7 @@
 #
 class tripleo::profile::base::ceilometer::collector (
   $bootstrap_node     = hiera('bootstrap_nodeid', undef),
-  $step               = hiera('step'),
+  $step               = Integer(hiera('step')),
   $ceilometer_backend = hiera('ceilometer_backend', 'mongodb'),
   $mongodb_ipv6       = hiera('mongodb::server::ipv6', false),
   $mongodb_node_ips   = hiera('mongodb_node_ips', []),

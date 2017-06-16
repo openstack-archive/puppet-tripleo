@@ -22,7 +22,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::auditd (
-  $step  = hiera('step'),
+  $step  = Integer(hiera('step')),
 ) {
   if $step >= 4 {
       include ::auditd

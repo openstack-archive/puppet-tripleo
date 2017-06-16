@@ -62,7 +62,7 @@ class tripleo::profile::base::etcd (
   $nodes               = hiera('etcd_node_names', []),
   $certificate_specs   = {},
   $enable_internal_tls = hiera('enable_internal_tls', false),
-  $step                = hiera('step'),
+  $step                = Integer(hiera('step')),
 ) {
 
   validate_hash($certificate_specs)

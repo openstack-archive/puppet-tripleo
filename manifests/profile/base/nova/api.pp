@@ -57,7 +57,7 @@ class tripleo::profile::base::nova::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $nova_api_network              = hiera('nova_api_network', undef),
   $nova_api_wsgi_enabled         = hiera('nova_wsgi_enabled', false),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

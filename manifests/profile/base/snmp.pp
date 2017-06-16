@@ -34,7 +34,7 @@
 class tripleo::profile::base::snmp (
   $snmpd_password = hiera('snmpd_readonly_user_password'),
   $snmpd_user     = hiera('snmpd_readonly_user_name'),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     snmp::snmpv3_user { $snmpd_user:

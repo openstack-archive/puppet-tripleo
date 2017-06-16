@@ -90,7 +90,7 @@ class tripleo::profile::base::neutron::server (
   $l3_ha_override                = '',
   $l3_nodes                      = hiera('neutron_l3_short_node_names', []),
   $neutron_network               = hiera('neutron_api_network', undef),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
   $tls_proxy_bind_ip             = undef,
   $tls_proxy_fqdn                = undef,
   $tls_proxy_port                = 9696,

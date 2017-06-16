@@ -73,7 +73,7 @@
 
 class tripleo::profile::base::mistral (
   $bootstrap_node          = hiera('bootstrap_nodeid', undef),
-  $step                    = hiera('step'),
+  $step                    = Integer(hiera('step')),
   $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
   $oslomsg_rpc_password    = hiera('mistral::rabbit_password'),

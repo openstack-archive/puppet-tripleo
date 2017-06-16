@@ -48,7 +48,7 @@ class tripleo::profile::base::cinder::volume::iscsi (
   $cinder_iscsi_helper         = 'tgtadm',
   $cinder_iscsi_protocol       = 'iscsi',
   $cinder_lvm_loop_device_size = '10280',
-  $step                        = hiera('step'),
+  $step                        = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 

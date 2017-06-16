@@ -29,7 +29,7 @@
 #   client mode.
 
 class tripleo::profile::base::neutron::ovs(
-  $step                 = hiera('step'),
+  $step                 = Integer(hiera('step')),
   $vhostuser_socket_dir = hiera('neutron::agents::ml2::ovs::vhostuser_socket_dir', undef)
 ) {
   include ::tripleo::profile::base::neutron

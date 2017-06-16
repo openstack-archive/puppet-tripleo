@@ -23,9 +23,9 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::monitoring::uchiwa (
-  $step = hiera('step', undef),
+  $step = Integer(hiera('step')),
 ) {
-  if $step == undef or $step >= 3 {
+  if $step >= 3 {
     include ::uchiwa
   }
 }

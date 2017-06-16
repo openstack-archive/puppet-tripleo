@@ -74,7 +74,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_rbd_backend         = false,
   $cinder_enable_scaleio_backend     = false,
   $cinder_user_enabled_backends      = hiera('cinder_user_enabled_backends', undef),
-  $step                              = hiera('step'),
+  $step                              = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder
 

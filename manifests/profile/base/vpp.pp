@@ -24,7 +24,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::vpp (
-  $step        = hiera('step'),
+  $step        = Integer(hiera('step')),
 ) {
   if $step >= 1 {
     include ::fdio

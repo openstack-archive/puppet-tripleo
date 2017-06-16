@@ -40,7 +40,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
   $bootstrap_node             = hiera('cinder_backup_short_bootstrap_node_name'),
   $cinder_backup_docker_image = hiera('tripleo::profile::pacemaker::cinder::backup_bundle::cinder_backup_docker_image', undef),
   $pcs_tries                  = hiera('pcs_tries', 20),
-  $step                       = hiera('step'),
+  $step                       = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true

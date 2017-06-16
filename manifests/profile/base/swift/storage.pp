@@ -30,7 +30,7 @@
 class tripleo::profile::base::swift::storage (
   # Deprecated conditional to support ControllerEnableSwiftStorage parameter
   $enable_swift_storage = true,
-  $step                 = hiera('step'),
+  $step                 = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     if $enable_swift_storage {

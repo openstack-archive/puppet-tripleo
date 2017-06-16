@@ -83,7 +83,7 @@ class tripleo::profile::base::heat (
   $bootstrap_node          = downcase(hiera('bootstrap_nodeid')),
   $manage_db_purge         = hiera('heat_enable_db_purge', true),
   $notification_driver     = 'messaging',
-  $step                    = hiera('step'),
+  $step                    = Integer(hiera('step')),
   $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
   $oslomsg_rpc_password    = hiera('heat::rabbit_password'),

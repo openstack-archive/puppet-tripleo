@@ -117,7 +117,7 @@
 #  Defaults to hiera('step')
 #
 class tripleo::network::contrail::control(
-  $step              = hiera('step'),
+  $step              = Integer(hiera('step')),
   $admin_password    = hiera('contrail::admin_password'),
   $admin_tenant_name = hiera('contrail::admin_tenant_name'),
   $admin_user        = hiera('contrail::admin_user'),

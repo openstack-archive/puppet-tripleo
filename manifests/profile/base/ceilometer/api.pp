@@ -48,7 +48,7 @@ class tripleo::profile::base::ceilometer::api (
   $ceilometer_network            = hiera('ceilometer_api_network', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::ceilometer
 

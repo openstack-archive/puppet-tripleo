@@ -28,7 +28,7 @@
 #   Defaults to hiera('horizon::neutron_options', {})
 #
 class tripleo::profile::base::horizon (
-  $step            = hiera('step'),
+  $step            = Integer(hiera('step')),
   $neutron_options = hiera('horizon::neutron_options', {}),
 ) {
   if $step >= 3 {

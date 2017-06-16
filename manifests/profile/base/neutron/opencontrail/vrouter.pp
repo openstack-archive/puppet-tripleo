@@ -23,7 +23,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::opencontrail::vrouter (
-  $step                      = hiera('step'),
+  $step                      = Integer(hiera('step')),
 ) {
 
   if $step >= 4 {

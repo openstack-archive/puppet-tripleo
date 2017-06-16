@@ -47,7 +47,7 @@
 #   deployment. This is used to look up service-specific plugins that
 #   need to be installed.
 class tripleo::profile::base::metrics::collectd (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 
   $collectd_server = undef,
   $collectd_port = undef,

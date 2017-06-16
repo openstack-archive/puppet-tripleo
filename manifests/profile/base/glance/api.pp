@@ -86,7 +86,7 @@ class tripleo::profile::base::glance::api (
   $glance_backend                = downcase(hiera('glance_backend', 'swift')),
   $glance_network                = hiera('glance_api_network', undef),
   $glance_nfs_enabled            = false,
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
   $rabbit_hosts                  = hiera('rabbitmq_node_names', undef),
   $rabbit_port                   = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
   $tls_proxy_bind_ip             = undef,

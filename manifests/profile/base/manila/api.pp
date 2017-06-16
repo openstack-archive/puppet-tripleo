@@ -44,7 +44,7 @@ class tripleo::profile::base::manila::api (
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $bootstrap_node          = hiera('bootstrap_nodeid', undef),
-  $step                    = hiera('step'),
+  $step                    = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

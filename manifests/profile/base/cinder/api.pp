@@ -53,7 +53,7 @@ class tripleo::profile::base::cinder::api (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $cinder_api_network            = hiera('cinder_api_network', undef),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true

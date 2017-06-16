@@ -27,7 +27,7 @@
 #   Defaults to true
 #
 class tripleo::profile::base::ironic::conductor (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
   $manage_pxe = true,
 ) {
   include ::tripleo::profile::base::ironic

@@ -34,7 +34,7 @@
 class tripleo::profile::base::database::redis (
   $bootstrap_nodeid = hiera('bootstrap_nodeid'),
   $redis_node_ips   = hiera('redis_node_ips'),
-  $step             = hiera('step'),
+  $step             = Integer(hiera('step')),
 ) {
   if $step >= 2 {
     if downcase($bootstrap_nodeid) == $::hostname {

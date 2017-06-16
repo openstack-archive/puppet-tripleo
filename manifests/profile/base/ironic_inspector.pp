@@ -28,7 +28,7 @@
 
 class tripleo::profile::base::ironic_inspector (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
-  $step           = hiera('step'),
+  $step           = Integer(hiera('step')),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {

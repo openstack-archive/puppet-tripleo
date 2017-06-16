@@ -48,7 +48,7 @@ class tripleo::profile::base::heat::api_cloudwatch (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $heat_api_cloudwatch_network   = hiera('heat_api_cloudwatch_network', undef),
-  $step                          = hiera('step'),
+  $step                          = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::heat
 

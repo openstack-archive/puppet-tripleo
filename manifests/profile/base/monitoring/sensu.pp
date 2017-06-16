@@ -23,7 +23,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::monitoring::sensu (
-  $step = hiera('step', undef),
+  $step = Integer(hiera('step')),
 ) {
   include ::sensu
   package { 'osops-tools-monitoring-oschecks':

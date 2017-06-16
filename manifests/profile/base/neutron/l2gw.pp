@@ -27,7 +27,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::l2gw (
-  $step = hiera('step'),
+  $step = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::neutron
 

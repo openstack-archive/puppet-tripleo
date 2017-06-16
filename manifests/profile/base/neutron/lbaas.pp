@@ -29,7 +29,7 @@
 #
 class tripleo::profile::base::neutron::lbaas(
   $manage_haproxy_package = hiera('manage_haproxy_package', false),
-  $step                   = hiera('step'),
+  $step                   = Integer(hiera('step')),
 ) {
 
   include ::tripleo::profile::base::neutron
