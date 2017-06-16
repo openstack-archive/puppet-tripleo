@@ -111,9 +111,11 @@ class tripleo::profile::base::pacemaker (
       cluster_setup_extras => $cluster_setup_extras,
       remote_authkey       => $remote_authkey,
     }
-    class { '::pacemaker::stonith':
-      disable => !$enable_fencing,
-      tries   => $pcs_tries,
+    if $pacemaker_master {
+      class { '::pacemaker::stonith':
+        disable => !$enable_fencing,
+        tries   => $pcs_tries,
+      }
     }
     if $enable_fencing {
       include ::tripleo::fencing
