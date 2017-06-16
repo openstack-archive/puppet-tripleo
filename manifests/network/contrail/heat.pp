@@ -24,20 +24,30 @@
 #  String value.
 #  Defaults to hiera('contrail::admin_password')
 #
+# [*admin_tenant_name*]
+#  (optional) admin tenant name.
+#  String value.
+#  Defaults to hiera('contrail::admin_tenant_name')
+#
+# [*admin_token*]
+#  (optional) admin token
+#  String value.
+#  Defaults to hiera('contrail::admin_token')
+#
 # [*admin_user*]
 #  (optional) admin user name.
 #  String value.
 #  Defaults to hiera('contrail::admin_user')
 #
+# [*api_server*]
+#  (optional) IP address of api server
+#  String value.
+#  Defaults to hiera('contrail_config_vip',hiera('internal_api_virtual_ip'))
+#
 # [*api_port*]
 #  (optional) port of api server
 #  String value.
 #  Defaults to hiera('contrail::api_port')
-#
-# [*api_server*]
-#  (optional) IP address of api server
-#  String value.
-#  Defaults to hiera('contrail_config_vip')
 #
 # [*auth_host*]
 #  (optional) keystone server ip address
@@ -56,14 +66,16 @@
 #
 class tripleo::network::contrail::heat(
   $admin_password = hiera('contrail::admin_password'),
+  $admin_token    = hiera('contrail::admin_token'),
   $admin_user     = hiera('contrail::admin_user'),
+  $api_server     = hiera('contrail_config_vip',hiera('internal_api_virtual_ip')),
   $api_port       = 8082,
-  $api_server     = hiera('contrail_config_vip'),
   $auth_host      = hiera('contrail::auth_host'),
   $step           = Integer(hiera('step')),
   $use_ssl        = 'False',
 )
 {
+
   class {'::contrail::heat':
     heat_config            => {
       'clients_contrail' => {

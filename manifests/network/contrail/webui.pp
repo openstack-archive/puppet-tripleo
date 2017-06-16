@@ -49,16 +49,6 @@
 #  Integer value.
 #  Defaults to hiera('contrail::auth_port_public')
 #
-# [*auth_port_ssl*]
-#  (optional) keystone ssl port.
-#  Integer value.
-#  Defaults to hiera('contrail::auth_port_ssl')
-#
-# [*auth_port_ssl_public*]
-#  (optional) keystone public ssl port.
-#  Integer value.
-#  Defaults to hiera('contrail::auth_port_ssl_public')
-#
 # [*auth_protocol*]
 #  (optional) authentication protocol.
 #  String value.
@@ -77,12 +67,12 @@
 # [*contrail_analytics_vip*]
 #  (optional) VIP of Contrail Analytics
 #  String (IPv4) value.
-#  Defaults to hiera('contrail_analytics_vip')
+#  Defaults to hiera('contrail_analytics_vip',hiera('internal_api_virtual_ip'))
 #
 # [*contrail_config_vip*]
 #  (optional) VIP of Contrail Config
 #  String (IPv4) value.
-#  Defaults to hiera('contrail_config_vip')
+#  Defaults to hiera('contrail_config_vip',hiera('internal_api_virtual_ip'))
 #
 # [*contrail_webui_http_port*]
 #  (optional) Webui HTTP Port
@@ -97,7 +87,7 @@
 # [*neutron_vip*]
 #  (optional) VIP of Neutron
 #  String (IPv4) value.
-#  Defaults to hiera('neutron_api_vip')
+#  Defaults to hiera('internal_api_virtual_ip')
 #
 # [*redis_ip*]
 #  (optional) IP of Redis
@@ -109,31 +99,25 @@ class tripleo::network::contrail::webui(
   $admin_tenant_name         = hiera('contrail::admin_tenant_name'),
   $admin_token               = hiera('contrail::admin_token'),
   $admin_user                = hiera('contrail::admin_user'),
-  $auth_host                 = hiera('contrail::auth_host'),
+  $auth_host                 = hiera('internal_api_virtual_ip'),
   $auth_protocol             = hiera('contrail::auth_protocol'),
   $auth_port_public          = hiera('contrail::auth_port_public'),
-  $auth_port_ssl_public      = hiera('contrail::auth_port_ssl_public'),
   $cassandra_server_list     = hiera('contrail_database_node_ips'),
-  $cert_file                 = hiera('contrail::cert_file'),
-  $contrail_analytics_vip    = hiera('contrail_analytics_vip'),
-  $contrail_config_vip       = hiera('contrail_config_vip'),
+  $cert_file                 = hiera('contrail::service_certificate',false),
+  $contrail_analytics_vip    = hiera('contrail_analytics_vip',hiera('internal_api_virtual_ip')),
+  $contrail_config_vip       = hiera('contrail_config_vip',hiera('internal_api_virtual_ip')),
   $contrail_webui_http_port  = hiera('contrail::webui::http_port'),
   $contrail_webui_https_port = hiera('contrail::webui::https_port'),
-  $neutron_vip               = hiera('neutron_api_vip'),
+  $neutron_vip               = hiera('internal_api_virtual_ip'),
   $redis_ip                  = hiera('contrail::webui::redis_ip'),
 )
 {
-  if $auth_protocol == 'https' {
-    $auth_port = $auth_port_ssl_public
-  } else {
-    $auth_port = $auth_port_public
-  }
   class {'::contrail::webui':
     admin_user                => $admin_user,
     admin_password            => $admin_password,
     admin_token               => $admin_token,
     admin_tenant_name         => $admin_tenant_name,
-    auth_port                 => $auth_port,
+    auth_port                 => $auth_port_public,
     auth_protocol             => $auth_protocol,
     cassandra_ip              => $cassandra_server_list,
     cert_file                 => $cert_file,
