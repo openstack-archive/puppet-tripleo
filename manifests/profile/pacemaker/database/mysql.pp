@@ -26,6 +26,27 @@
 #   (Optional) The address that the local mysql instance should bind to.
 #   Defaults to $::hostname
 #
+# [*ca_file*]
+#   (Optional) The path to the CA file that will be used for the TLS
+#   configuration. It's only used if internal TLS is enabled.
+#   Defaults to undef
+#
+# [*certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate
+#   it will create. Note that the certificate nickname must be 'mysql' in
+#   the case of this service.
+#   Example with hiera:
+#     tripleo::profile::base::database::mysql::certificate_specs:
+#       hostname: <overcloud controller fqdn>
+#       service_certificate: <service certificate path>
+#       service_key: <service key path>
+#       principal: "mysql/<overcloud controller fqdn>"
+#   Defaults to hiera('tripleo::profile::base::database::mysql::certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*gmcast_listen_addr*]
 #   (Optional) This variable defines the address on which the node listens to
 #   connections from other nodes in the cluster.
@@ -41,11 +62,14 @@
 #   Defaults to hiera('pcs_tries', 20)
 #
 class tripleo::profile::pacemaker::database::mysql (
-  $bootstrap_node     = hiera('mysql_short_bootstrap_node_name'),
-  $bind_address       = $::hostname,
-  $gmcast_listen_addr = hiera('mysql_bind_host'),
-  $step               = Integer(hiera('step')),
-  $pcs_tries          = hiera('pcs_tries', 20),
+  $bootstrap_node      = hiera('mysql_short_bootstrap_node_name'),
+  $bind_address        = $::hostname,
+  $ca_file             = undef,
+  $certificate_specs   = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
+  $enable_internal_tls = hiera('enable_internal_tls', false),
+  $gmcast_listen_addr  = hiera('mysql_bind_host'),
+  $step                = Integer(hiera('step')),
+  $pcs_tries           = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -69,6 +93,19 @@ class tripleo::profile::pacemaker::database::mysql (
   # NOTE(jaosorior): The usage of cluster_host_map requires resource-agents-3.9.5-82.el7_3.11
   $processed_galera_name_pairs = $galera_name_pairs.map |$pair| { join($pair, ':') }
   $cluster_host_map = join($processed_galera_name_pairs, ';')
+
+  if $enable_internal_tls {
+    $tls_certfile = $certificate_specs['service_certificate']
+    $tls_keyfile = $certificate_specs['service_key']
+    if $ca_file {
+      $tls_ca_options = "socket.ssl_ca=${ca_file}"
+    } else {
+      $tls_ca_options = ''
+    }
+    $tls_options = "socket.ssl_key=${tls_keyfile};socket.ssl_cert=${tls_certfile};${tls_ca_options};"
+  } else {
+    $tls_options = ''
+  }
 
   $mysqld_options = {
     'mysqld' => {
@@ -98,7 +135,7 @@ class tripleo::profile::pacemaker::database::mysql (
       'wsrep_drupal_282555_workaround'=> '0',
       'wsrep_causal_reads'            => '0',
       'wsrep_sst_method'              => 'rsync',
-      'wsrep_provider_options'        => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;",
+      'wsrep_provider_options'        => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}",
     }
   }
 
