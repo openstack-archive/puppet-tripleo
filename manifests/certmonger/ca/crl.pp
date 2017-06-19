@@ -49,7 +49,7 @@
 #   (optional) Defaults to '0'.
 #
 #  [*hour*]
-#   (optional) Defaults to '1'.
+#   (optional) Defaults to '*/2'.
 #
 #  [*monthday*]
 #   (optional) Defaults to '*'.
@@ -78,10 +78,10 @@ class tripleo::certmonger::ca::crl (
   $crl_preprocessed           = '/etc/pki/CA/crl/overcloud-crl.bin',
   $crl_preprocessed_format    = 'DER',
   $minute                     = '0',
-  $hour                       = '1',
+  $hour                       = '*/2',
   $monthday                   = '*',
   $month                      = '*',
-  $weekday                    = '6',
+  $weekday                    = '*',
   $maxdelay                   = 0,
   $reload_cmds                = [],
 ) {
