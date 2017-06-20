@@ -155,6 +155,10 @@
 #  When set, enables SSL on the haproxy stats endpoint using the specified file.
 #  Defaults to undef
 #
+# [*haproxy_stats*]
+#  (optional) Enable or not the haproxy stats interface
+#  Defaults to true
+#
 # [*keystone_admin*]
 #  (optional) Enable or not Keystone Admin API binding
 #  Defaults to hiera('keystone_enabled', false)
@@ -571,6 +575,7 @@ class tripleo::haproxy (
   $ca_bundle                   = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
   $crl_file                    = undef,
   $haproxy_stats_certificate   = undef,
+  $haproxy_stats               = true,
   $keystone_admin              = hiera('keystone_enabled', false),
   $keystone_public             = hiera('keystone_enabled', false),
   $neutron                     = hiera('neutron_api_enabled', false),
@@ -871,19 +876,21 @@ class tripleo::haproxy (
     listen_options              => $default_listen_options,
   }
 
-  $stats_base = ['enable', 'uri /']
-  if $haproxy_stats_password {
-    $stats_config = union($stats_base, ["auth ${haproxy_stats_user}:${haproxy_stats_password}"])
-  } else {
-    $stats_config = $stats_base
-  }
-  haproxy::listen { 'haproxy.stats':
-    bind             => $haproxy_stats_bind_opts,
-    mode             => 'http',
-    options          => {
-      'stats' => $stats_config,
-    },
-    collect_exported => false,
+  if $haproxy_stats {
+    $stats_base = ['enable', 'uri /']
+    if $haproxy_stats_password {
+      $stats_config = union($stats_base, ["auth ${haproxy_stats_user}:${haproxy_stats_password}"])
+    } else {
+      $stats_config = $stats_base
+    }
+    haproxy::listen { 'haproxy.stats':
+      bind             => $haproxy_stats_bind_opts,
+      mode             => 'http',
+      options          => {
+        'stats' => $stats_config,
+      },
+      collect_exported => false,
+    }
   }
 
   if $keystone_admin {
