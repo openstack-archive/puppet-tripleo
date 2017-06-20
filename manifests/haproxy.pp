@@ -279,6 +279,10 @@
 #  (optional) Enable check via clustercheck for mysql
 #  Defaults to false
 #
+# [*mysql_max_conn*]
+#  (optional) Set the maxconn parameter for mysql
+#  Defaults to undef
+#
 # [*mysql_member_options*]
 #  The options to use for the mysql HAProxy balancer members.
 #  If this parameter is undefined, the actual value configured will depend
@@ -602,6 +606,7 @@ class tripleo::haproxy (
   $ironic_inspector            = hiera('ironic_inspector_enabled', false),
   $mysql                       = hiera('mysql_enabled', false),
   $mysql_clustercheck          = false,
+  $mysql_max_conn              = undef,
   $mysql_member_options        = undef,
   $rabbitmq                    = false,
   $etcd                        = hiera('etcd_enabled', false),
@@ -1314,6 +1319,7 @@ class tripleo::haproxy (
       'timeout server' => '90m',
       'stick-table'    => 'type ip size 1000',
       'stick'          => 'on dst',
+      'maxconn'        => $mysql_max_conn
     }
     if $mysql_member_options {
         $mysql_member_options_real = $mysql_member_options
@@ -1324,6 +1330,7 @@ class tripleo::haproxy (
     $mysql_listen_options = {
       'timeout client' => '90m',
       'timeout server' => '90m',
+      'maxconn'        => $mysql_max_conn
     }
     if $mysql_member_options {
         $mysql_member_options_real = $mysql_member_options

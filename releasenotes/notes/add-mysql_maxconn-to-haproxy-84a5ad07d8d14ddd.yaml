@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Added new parameter mysql_maxconn to the tripleo::haproxy class,
+    allowing haproxy maxconn to be configured for the MySQL server.
