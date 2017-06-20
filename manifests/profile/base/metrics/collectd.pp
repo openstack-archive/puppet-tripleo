@@ -23,6 +23,11 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*enable_file_logging*]
+#   (Optional) Boolean. Whether to enable logfile plugin.
+#   which we should send metrics.
+#   Defaults to false
+#
 # [*collectd_server*]
 #   (Optional) String. The name or address of a collectd server to
 #   which we should send metrics.
@@ -49,6 +54,7 @@
 class tripleo::profile::base::metrics::collectd (
   $step = Integer(hiera('step')),
 
+  $enable_file_logging = false,
   $collectd_server = undef,
   $collectd_port = undef,
   $collectd_username = undef,
@@ -58,6 +64,9 @@ class tripleo::profile::base::metrics::collectd (
 ) {
   if $step >= 3 {
     include ::collectd
+    if $enable_file_logging {
+      include ::collectd::plugin::logfile
+    }
 
     if ! ($collectd_securitylevel in [undef, 'None', 'Sign', 'Encrypt']) {
       fail('collectd_securitylevel must be one of (None, Sign, Encrypt).')
