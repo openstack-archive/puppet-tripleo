@@ -347,5 +347,8 @@ class tripleo::profile::base::keystone (
     if hiera('novajoin_enabled', false) {
       include ::nova::metadata::novajoin::auth
     }
+    if hiera('veritas_hyperscale_controller_enabled', false) {
+      include ::veritas_hyperscale::hs_keystone
+    }
   }
 }

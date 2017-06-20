@@ -20,11 +20,11 @@
 #
 # [*cinder_enable_pure_backend*]
 #   (Optional) Whether to enable the pure backend
-#   Defaults to true
+#   Defaults to false
 #
 # [*cinder_enable_dellsc_backend*]
 #   (Optional) Whether to enable the delsc backend
-#   Defaults to true
+#   Defaults to false
 #
 # [*cinder_enable_hpelefthand_backend*]
 #   (Optional) Whether to enable the hpelefthand backend
@@ -32,7 +32,7 @@
 #
 # [*cinder_enable_dellps_backend*]
 #   (Optional) Whether to enable the dellps backend
-#   Defaults to true
+#   Defaults to false
 #
 # [*cinder_enable_iscsi_backend*]
 #   (Optional) Whether to enable the iscsi backend
@@ -40,19 +40,23 @@
 #
 # [*cinder_enable_netapp_backend*]
 #   (Optional) Whether to enable the netapp backend
-#   Defaults to true
+#   Defaults to false
 #
 # [*cinder_enable_nfs_backend*]
 #   (Optional) Whether to enable the nfs backend
-#   Defaults to true
+#   Defaults to false
 #
 # [*cinder_enable_rbd_backend*]
 #   (Optional) Whether to enable the rbd backend
-#   Defaults to true
+#   Defaults to false
 #
 # [*cinder_enable_scaleio_backend*]
 #   (Optional) Whether to enable the scaleio backend
-#   Defaults to true
+#   Defaults to false
+#
+#[*cinder_enable_vrts_hs_backend*]
+#   (Optional) Whether to enable the Veritas HyperScale backend
+#   Defaults to false
 #
 # [*cinder_user_enabled_backends*]
 #   (Optional) List of additional backend stanzas to activate
@@ -73,6 +77,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_nfs_backend         = false,
   $cinder_enable_rbd_backend         = false,
   $cinder_enable_scaleio_backend     = false,
+  $cinder_enable_vrts_hs_backend     = false,
   $cinder_user_enabled_backends      = hiera('cinder_user_enabled_backends', undef),
   $step                              = Integer(hiera('step')),
 ) {
@@ -144,6 +149,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_scaleio_backend_name = undef
     }
 
+    if $cinder_enable_vrts_hs_backend {
+      include ::tripleo::profile::base::cinder::volume::veritas_hyperscale
+      $cinder_veritas_hyperscale_backend_name = 'Veritas_HyperScale'
+    } else {
+      $cinder_veritas_hyperscale_backend_name = undef
+    }
+
     $backends = delete_undef_values([$cinder_iscsi_backend_name,
                                       $cinder_rbd_backend_name,
                                       $cinder_pure_backend_name,
@@ -153,6 +165,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
                                       $cinder_scaleio_backend_name,
+                                      $cinder_veritas_hyperscale_backend_name,
                                       $cinder_user_enabled_backends])
     # NOTE(aschultz): during testing it was found that puppet 3 may incorrectly
     # include a "" in the previous array which is not removed by the
