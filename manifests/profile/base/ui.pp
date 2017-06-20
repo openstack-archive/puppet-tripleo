@@ -17,10 +17,6 @@
 # UI profile for tripleo
 #
 class tripleo::profile::base::ui () {
-  package {'openstack-tripleo-ui': }
-
-  include ::apache
-
   include ::tripleo::ui
 }
 
