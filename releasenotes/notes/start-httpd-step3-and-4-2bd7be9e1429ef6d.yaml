@@ -1,0 +1,5 @@
+---
+fixes:
+  - In order to avoid service restarts, all services deploy their httpd
+    configuration at the same time. Thus, httpd now starts in step 3 for the
+    bootstrap nodes, and step 4 for all other nodes.

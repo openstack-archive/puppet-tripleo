@@ -56,9 +56,9 @@ class tripleo::profile::base::mistral::api (
   $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
-    $sync_db = true
+    $is_bootstrap = true
   } else {
-    $sync_db = false
+    $is_bootstrap = false
   }
 
   include ::tripleo::profile::base::mistral
@@ -74,7 +74,7 @@ class tripleo::profile::base::mistral::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 3 {
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::mistral::api
     include ::apache::mod::ssl
     class { '::mistral::wsgi::apache':

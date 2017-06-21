@@ -23,15 +23,26 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*neutron_options*]
 #   (Optional) A hash of parameters to enable features specific to Neutron
 #   Defaults to hiera('horizon::neutron_options', {})
 #
 class tripleo::profile::base::horizon (
   $step            = Integer(hiera('step')),
+  $bootstrap_node  = hiera('bootstrap_nodeid', undef),
   $neutron_options = hiera('horizon::neutron_options', {}),
 ) {
-  if $step >= 3 {
+  if $::hostname == downcase($bootstrap_node) {
+    $is_bootstrap = true
+  } else {
+    $is_bootstrap = false
+  }
+
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     # Horizon
     include ::apache::mod::remoteip
     include ::apache::mod::status

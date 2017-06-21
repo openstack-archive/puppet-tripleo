@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -45,11 +49,18 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::heat::api_cfn (
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $heat_api_cfn_network          = hiera('heat_api_cfn_network', undef),
   $step                          = Integer(hiera('step')),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $is_bootstrap = true
+  } else {
+    $is_bootstrap = false
+  }
+
   include ::tripleo::profile::base::heat
 
   if $enable_internal_tls {
@@ -63,7 +74,7 @@ class tripleo::profile::base::heat::api_cfn (
     $tls_keyfile = undef
   }
 
-  if $step >= 3 {
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::heat::api_cfn
 
     include ::apache::mod::ssl

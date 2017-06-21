@@ -23,6 +23,10 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('aodh_api_network', undef)
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -47,10 +51,16 @@
 
 class tripleo::profile::base::aodh::api (
   $aodh_network                  = hiera('aodh_api_network', undef),
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $step                          = Integer(hiera('step')),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $is_bootstrap = true
+  } else {
+    $is_bootstrap = false
+  }
 
   include ::tripleo::profile::base::aodh
 
@@ -66,7 +76,7 @@ class tripleo::profile::base::aodh::api (
   }
 
 
-  if $step >= 3 {
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::aodh::api
     include ::apache::mod::ssl
     class { '::aodh::wsgi::apache':

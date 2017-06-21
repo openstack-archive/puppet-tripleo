@@ -54,9 +54,9 @@ class tripleo::profile::base::nova::placement (
   $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
-    $sync_db = true
+    $is_bootstrap = true
   } else {
-    $sync_db = false
+    $is_bootstrap = false
   }
 
   include ::tripleo::profile::base::nova
@@ -73,7 +73,7 @@ class tripleo::profile::base::nova::placement (
     $tls_keyfile = undef
   }
 
-  if $step >= 3 {
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::apache::mod::ssl
     class { '::nova::wsgi::apache_placement':
       ssl_cert => $tls_certfile,

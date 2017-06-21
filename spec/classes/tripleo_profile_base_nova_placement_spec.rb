@@ -67,10 +67,23 @@ eos
       }
     end
 
-
-    context 'with step 3' do
+    context 'with step 3 and not bootstrap' do
       let(:params) { {
         :step => 3,
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::placement')
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::keystone::authtoken')
+        is_expected.not_to contain_class('nova::wsgi::apache_placement')
+      }
+    end
+
+    context 'with step 3 and bootstrap' do
+      let(:params) { {
+        :step           => 3,
+        :bootstrap_node => 'node.example.com'
       } }
 
       it {
@@ -81,11 +94,12 @@ eos
       }
     end
 
-    context 'with step 3 with enable_internal_tls and skip generate certs' do
+    context 'with step 3 and bootstrap with enable_internal_tls and skip generate certs' do
       let(:params) { {
         :step => 3,
         :enable_internal_tls           => true,
         :nova_placement_network        => 'bar',
+        :bootstrap_node                => 'node.example.com',
         :certificates_specs            => {
             'httpd-bar' => {
                  'hostname'           => 'foo',
