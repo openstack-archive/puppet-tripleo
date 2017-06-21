@@ -31,6 +31,12 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
+# [*dnsnames*]
+#   (Optional) The DNS names that will be added for the SubjectAltNames entry
+#   in the certificate. If left unset, the value will be set to the $hostname.
+#   This parameter can take both a string or an array of strings.
+#   Defaults to $hostname
+#
 # [*principal*]
 #   (Optional) The haproxy service principal that is set for MySQL in kerberos.
 #   Defaults to undef
@@ -40,6 +46,7 @@ class tripleo::certmonger::mysql (
   $service_certificate,
   $service_key,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
+  $dnsnames      = $hostname,
   $principal     = undef,
 ) {
   include ::certmonger
@@ -51,7 +58,7 @@ class tripleo::certmonger::mysql (
     certfile     => $service_certificate,
     keyfile      => $service_key,
     hostname     => $hostname,
-    dnsname      => $hostname,
+    dnsname      => $dnsnames,
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
