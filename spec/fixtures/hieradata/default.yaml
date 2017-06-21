@@ -26,6 +26,8 @@ cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
 # gnocchi related items
 gnocchi::keystone::authtoken::password: 'password'
+gnocchi::storage::ceph::ceph_username: 'gnocchi'
+gnocchi::storage::ceph::ceph_secret: 'password'
 # nova related items
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
