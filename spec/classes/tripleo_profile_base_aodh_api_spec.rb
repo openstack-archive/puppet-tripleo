@@ -33,9 +33,32 @@ describe 'tripleo::profile::base::aodh::api' do
       end
     end
 
-    context 'with step 3' do
+    context 'with step 3 and not bootstrap' do
       let(:params) { {
         :step => 3,
+      } }
+
+      it 'should trigger complete configuration' do
+        is_expected.not_to contain_class('aodh::api')
+        is_expected.not_to contain_class('aodh::wsgi::apache')
+      end
+    end
+
+    context 'with step 3 and bootstrap' do
+      let(:params) { {
+        :step           => 3,
+        :bootstrap_node => 'node.example.com'
+      } }
+
+      it 'should trigger complete configuration' do
+        is_expected.to contain_class('aodh::api')
+        is_expected.to contain_class('aodh::wsgi::apache')
+      end
+    end
+
+    context 'with step 4' do
+      let(:params) { {
+        :step => 4,
       } }
 
       it 'should trigger complete configuration' do

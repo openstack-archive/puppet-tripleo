@@ -18,9 +18,9 @@
 #
 # === Parameters
 #
-# [*sync_db*]
-#   (Optional) Whether to run db sync
-#   Defaults to true
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,9 +28,16 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::zaqar (
+  $bootstrap_node   = hiera('bootstrap_nodeid', undef),
   $step             = hiera('step'),
 ) {
-  if $step >= 4  {
+  if $::hostname == downcase($bootstrap_node) {
+    $is_bootstrap = true
+  } else {
+    $is_bootstrap = false
+  }
+
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::zaqar
 
     if str2bool(hiera('mongodb::server::ipv6', false)) {

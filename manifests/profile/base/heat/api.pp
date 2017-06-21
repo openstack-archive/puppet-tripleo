@@ -18,17 +18,28 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::heat::api (
-  $step = hiera('step'),
+  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $step           = hiera('step'),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $is_bootstrap = true
+  } else {
+    $is_bootstrap = false
+  }
+
   include ::tripleo::profile::base::heat
 
-  if $step >= 4 {
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::heat::api
   }
 }

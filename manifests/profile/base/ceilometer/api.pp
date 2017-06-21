@@ -23,6 +23,10 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('ceilometer_api_network', undef)
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -53,12 +57,19 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ceilometer::api (
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $ceilometer_network            = hiera('ceilometer_api_network', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $generate_service_certificates = hiera('generate_service_certificates', false),
   $step                          = hiera('step'),
 ) {
+  if $::hostname == downcase($bootstrap_node) {
+    $is_bootstrap = true
+  } else {
+    $is_bootstrap = false
+  }
+
   include ::tripleo::profile::base::ceilometer
 
   if $enable_internal_tls {
@@ -76,7 +87,7 @@ class tripleo::profile::base::ceilometer::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 3 {
+  if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::ceilometer::api
     include ::apache::mod::ssl
     class { '::ceilometer::wsgi::apache':
