@@ -22,6 +22,14 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
+# [*management_store*]
+#   (Optional) The management store for Zaqar.
+#   Defaults to 'mongodb'
+#
+# [*messaging_store*]
+#   (Optional) The messaging store for Zaqar.
+#   Defaults to 'mongodb'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -29,6 +37,8 @@
 #
 class tripleo::profile::base::zaqar (
   $bootstrap_node   = hiera('bootstrap_nodeid', undef),
+  $management_store = 'mongodb',
+  $messaging_store  = 'mongodb',
   $step             = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -40,22 +50,39 @@ class tripleo::profile::base::zaqar (
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::zaqar
 
-    if str2bool(hiera('mongodb::server::ipv6', false)) {
-      $mongo_node_ips_with_port_prefixed = prefix(hiera('mongodb_node_ips'), '[')
-      $mongo_node_ips_with_port = suffix($mongo_node_ips_with_port_prefixed, ']:27017')
-    } else {
-      $mongo_node_ips_with_port = suffix(hiera('mongodb_node_ips'), ':27017')
+    if $messaging_store == 'mongodb' or $management_store == 'mongodb' {
+      if str2bool(hiera('mongodb::server::ipv6', false)) {
+        $mongo_node_ips_with_port_prefixed = prefix(hiera('mongodb_node_ips'), '[')
+        $mongo_node_ips_with_port = suffix($mongo_node_ips_with_port_prefixed, ']:27017')
+      } else {
+        $mongo_node_ips_with_port = suffix(hiera('mongodb_node_ips'), ':27017')
+      }
+      $mongodb_replset = hiera('mongodb::server::replset')
+      $mongo_node_string = join($mongo_node_ips_with_port, ',')
+      $mongo_database_connection = "mongodb://${mongo_node_string}/zaqar?replicaSet=${mongodb_replset}"
     }
-    $mongodb_replset = hiera('mongodb::server::replset')
-    $mongo_node_string = join($mongo_node_ips_with_port, ',')
-    $database_connection = "mongodb://${mongo_node_string}/zaqar?replicaSet=${mongodb_replset}"
 
-    class { '::zaqar::management::mongodb':
-      uri => $database_connection,
+
+    if $messaging_store == 'swift' {
+      include ::zaqar::messaging::swift
+    } elsif $messaging_store == 'mongodb' {
+      class {'::zaqar::messaging::mongodb':
+        uri => $mongo_database_connection,
+      }
+    } else {
+      fail("unsupported Zaqar messaging_store set: ${messaging_store}")
     }
-    class {'::zaqar::messaging::mongodb':
-      uri => $database_connection,
+
+    if $management_store == 'sqlalchemy' {
+      include ::zaqar::management::sqlalchemy
+    } elsif $management_store == 'mongodb' {
+      class { '::zaqar::management::mongodb':
+        uri => $mongo_database_connection,
+      }
+    } else {
+      fail("unsupported Zaqar management_store set: ${management_store}")
     }
+
     include ::zaqar::transport::websocket
     include ::apache::mod::ssl
     include ::zaqar::transport::wsgi
