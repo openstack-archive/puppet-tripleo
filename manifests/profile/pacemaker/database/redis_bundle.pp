@@ -83,77 +83,62 @@ class tripleo::profile::pacemaker::database::redis_bundle (
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${redis_docker_control_port}",
         storage_maps      => {
-          'redis-cfg-files'                  => {
+          'redis-cfg-files'               => {
             'source-dir' => '/var/lib/kolla/config_files/redis.json',
             'target-dir' => '/var/lib/kolla/config_files/config.json',
             'options'    => 'ro',
           },
-          'redis-cfg-data-redis'             => {
-            'source-dir' => '/var/lib/config-data/redis/etc/redis',
-            'target-dir' => '/etc/redis',
+          'redis-cfg-data-redis'          => {
+            'source-dir' => '/var/lib/config-data/puppet-generated/redis/',
+            'target-dir' => '/var/lib/kolla/config_files/src',
             'options'    => 'ro',
           },
-          'redis-cfg-data-redis-conf'        => {
-            'source-dir' => '/var/lib/config-data/redis/etc/redis.conf',
-            'target-dir' => '/etc/redis.conf',
-            'options'    => 'ro',
-          },
-          'redis-cfg-data-redis-conf-puppet' => {
-            'source-dir' => '/var/lib/config-data/redis/etc/redis.conf.puppet',
-            'target-dir' => '/etc/redis.conf.puppet',
-            'options'    => 'ro',
-          },
-          'redis-cfg-data-redis-sentinel'    => {
-            'source-dir' => '/var/lib/config-data/redis/etc/redis-sentinel.conf',
-            'target-dir' => '/etc/redis-sentinel.conf',
-            'options'    => 'ro',
-          },
-          'redis-hosts'                      => {
+          'redis-hosts'                   => {
             'source-dir' => '/etc/hosts',
             'target-dir' => '/etc/hosts',
             'options'    => 'ro',
           },
-          'redis-localtime'                  => {
+          'redis-localtime'               => {
             'source-dir' => '/etc/localtime',
             'target-dir' => '/etc/localtime',
             'options'    => 'ro',
           },
-          'redis-lib'                        => {
+          'redis-lib'                     => {
             'source-dir' => '/var/lib/redis',
             'target-dir' => '/var/lib/redis',
             'options'    => 'rw',
           },
-          'redis-log'                        => {
+          'redis-log'                     => {
             'source-dir' => '/var/log/redis',
             'target-dir' => '/var/log/redis',
             'options'    => 'rw',
           },
-          'redis-run'                        => {
+          'redis-run'                     => {
             'source-dir' => '/var/run/redis',
             'target-dir' => '/var/run/redis',
             'options'    => 'rw',
           },
-          'redis-pki-extracted'              => {
+          'redis-pki-extracted'           => {
             'source-dir' => '/etc/pki/ca-trust/extracted',
             'target-dir' => '/etc/pki/ca-trust/extracted',
             'options'    => 'ro',
           },
-          'redis-pki-ca-bundle-crt'          => {
+          'redis-pki-ca-bundle-crt'       => {
             'source-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
             'target-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
             'options'    => 'ro',
           },
-          'redis-pki-ca-bundle-trust-crt'    => {
+          'redis-pki-ca-bundle-trust-crt' => {
             'source-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
             'target-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
             'options'    => 'ro',
           },
-          'redis-pki-cert'                   => {
+          'redis-pki-cert'                => {
             'source-dir' => '/etc/pki/tls/cert.pem',
             'target-dir' => '/etc/pki/tls/cert.pem',
             'options'    => 'ro',
           },
-          'redis-dev-log'                    => {
+          'redis-dev-log'                 => {
             'source-dir' => '/dev/log',
             'target-dir' => '/dev/log',
             'options'    => 'rw',

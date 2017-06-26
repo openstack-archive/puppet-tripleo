@@ -98,8 +98,8 @@ class tripleo::profile::pacemaker::haproxy_bundle (
             'options'    => 'ro',
           },
           'haproxy-cfg-data'                => {
-            'source-dir' => '/var/lib/config-data/haproxy/etc',
-            'target-dir' => '/etc',
+            'source-dir' => '/var/lib/config-data/puppet-generated/haproxy/',
+            'target-dir' => '/var/lib/kolla/config_files/src',
             'options'    => 'ro',
           },
           'haproxy-hosts'                   => {

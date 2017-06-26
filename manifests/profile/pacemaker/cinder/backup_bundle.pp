@@ -85,13 +85,8 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
             'options'    => 'ro',
           },
           'cinder-backup-cfg-data'       => {
-            'source-dir' => '/var/lib/config-data/cinder/etc/cinder',
-            'target-dir' => '/etc/cinder',
-            'options'    => 'ro',
-          },
-          'cinder-backup-cfg-ceph'       => {
-            'source-dir' => '/var/lib/config-data/cinder/etc/ceph',
-            'target-dir' => '/etc/ceph',
+            'source-dir' => '/var/lib/config-data/puppet-generated/cinder/',
+            'target-dir' => '/var/lib/kolla/config_files/src',
             'options'    => 'ro',
           },
           'cinder-backup-hosts'          => {

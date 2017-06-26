@@ -215,7 +215,7 @@ MYSQL_HOST=localhost\n",
             'options'    => 'ro',
           },
           'mysql-cfg-data'                => {
-            'source-dir' => '/var/lib/config-data/mysql',
+            'source-dir' => '/var/lib/config-data/puppet-generated/mysql/',
             'target-dir' => '/var/lib/kolla/config_files/src',
             'options'    => 'ro',
           },
