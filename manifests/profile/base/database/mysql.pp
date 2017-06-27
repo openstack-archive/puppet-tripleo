@@ -220,6 +220,10 @@ class tripleo::profile::base::database::mysql (
     if hiera('ec2_api_enabled', false) {
       include ::ec2api::db::mysql
     }
+    if hiera('zaqar_enabled', false) and hiera('zaqar::db::mysql::user', '') == 'zaqar' {
+      # NOTE: by default zaqar uses mongodb
+      include ::zaqar::db::mysql
+    }
   }
 
 }
