@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Allow VF configuration files to be written for non-existent PCI devices to
+    allow updates while physical functions are currently in use by a guest.
