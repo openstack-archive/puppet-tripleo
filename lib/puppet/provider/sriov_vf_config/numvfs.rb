@@ -12,7 +12,7 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
     if File.file?(sriov_numvfs_path)
       _set_numvfs
     else
-      fail("#{sriov_numvfs_path} doesn't exist. Check if #{sriov_get_interface} is a valid network interface supporting SR-IOV")
+      warning("#{sriov_numvfs_path} doesn't exist. Check if #{sriov_get_interface} is a valid network interface supporting SR-IOV")
     end
   end
 

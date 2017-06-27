@@ -16,7 +16,7 @@ class tripleo::host::sriov (
 ) {
 
   if !empty($number_of_vfs) {
-    sriov_vf_config { $number_of_vfs: ensure => present }
+    sriov_vf_config { $number_of_vfs: }
 
     # the numvfs configuration needs to be persisted for every boot
     tripleo::host::sriov::numvfs_persistence {'persistent_numvfs':
