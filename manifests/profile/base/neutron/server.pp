@@ -113,10 +113,7 @@ class tripleo::profile::base::neutron::server (
     $l3_ha = false
   }
 
-  # We start neutron-server on the bootstrap node first, because
-  # it will try to populate tables and we need to make sure this happens
-  # before it starts on other nodes
-  if $step >= 4 and $sync_db or $step >= 5 and !$sync_db {
+  if $step >= 4 or ($step >= 3 and $sync_db) {
     if $enable_internal_tls {
       if !$neutron_network {
         fail('neutron_api_network is not set in the hieradata.')
@@ -130,9 +127,14 @@ class tripleo::profile::base::neutron::server (
         port       => $tls_proxy_port,
         tls_cert   => $tls_certfile,
         tls_key    => $tls_keyfile,
-        notify     => Class['::neutron::server'],
       }
+      Tripleo::Tls_proxy['neutron-api'] ~> Anchor<| title == 'neutron::service::begin' |>
     }
+  }
+  # We start neutron-server on the bootstrap node first, because
+  # it will try to populate tables and we need to make sure this happens
+  # before it starts on other nodes
+  if $step >= 4 and $sync_db or $step >= 5 and !$sync_db {
 
     include ::neutron::server::notifications
     # We need to override the hiera value neutron::server::sync_db which is set

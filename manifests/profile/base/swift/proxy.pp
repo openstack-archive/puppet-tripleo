@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('bootstrap_nodeid')
+#
 # [*ceilometer_enabled*]
 #   Whether the ceilometer pipeline is enabled.
 #   Defaults to true
@@ -96,6 +100,7 @@
 #   defaults to 8080
 #
 class tripleo::profile::base::swift::proxy (
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $ceilometer_enabled            = true,
   $ceilometer_messaging_driver   = hiera('messaging_notify_service_name', 'rabbit'),
   $ceilometer_messaging_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
@@ -113,7 +118,12 @@ class tripleo::profile::base::swift::proxy (
   $tls_proxy_fqdn                = undef,
   $tls_proxy_port                = 8080,
 ) {
-  if $step >= 4 {
+  if $::hostname == downcase($bootstrap_node) {
+    $is_bootstrap = true
+  } else {
+    $is_bootstrap = false
+  }
+  if $step >= 4 or ($step >= 3 and $is_bootstrap) {
     if $enable_internal_tls {
       if !$swift_proxy_network {
         fail('swift_proxy_network is not set in the hieradata.')
@@ -127,9 +137,11 @@ class tripleo::profile::base::swift::proxy (
         port       => $tls_proxy_port,
         tls_cert   => $tls_certfile,
         tls_key    => $tls_keyfile,
-        notify     => Class['::swift::proxy'],
       }
+      Tripleo::Tls_proxy['swift-proxy-api'] ~> Anchor<| title == 'swift::service::begin' |>
     }
+  }
+  if $step >= 4 {
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
     include ::swift::config
     include ::swift::proxy
