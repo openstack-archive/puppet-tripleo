@@ -89,22 +89,34 @@ class tripleo::profile::base::docker (
       require => Package['docker'],
     }
 
+    if $docker_options {
+      $options_changes = [ "set OPTIONS '\"${docker_options}\"'" ]
+    } else {
+      $options_changes = [ 'rm OPTIONS' ]
+    }
+
+    augeas { 'docker-sysconfig-options':
+      lens      => 'Shellvars.lns',
+      incl      => '/etc/sysconfig/docker',
+      changes   => $options_changes,
+      subscribe => Package['docker'],
+      notify    => Service['docker'],
+    }
+
     if $insecure_registry {
       if $docker_namespace == undef {
         fail('You must provide a $docker_namespace in order to configure insecure registry')
       }
       $namespace = strip($docker_namespace.split('/')[0])
-      $changes = [ "set INSECURE_REGISTRY '\"--insecure-registry ${namespace}\"'",
-                    "set OPTIONS '\"${docker_options}\"'" ]
+      $registry_changes = [ "set INSECURE_REGISTRY '\"--insecure-registry ${namespace}\"'" ]
     } else {
-      $changes = [ 'rm INSECURE_REGISTRY',
-                    "set OPTIONS '\"${docker_options}\"'" ]
+      $registry_changes = [ 'rm INSECURE_REGISTRY' ]
     }
 
-    augeas { 'docker-sysconfig':
+    augeas { 'docker-sysconfig-registry':
       lens      => 'Shellvars.lns',
       incl      => '/etc/sysconfig/docker',
-      changes   => $changes,
+      changes   => $registry_changes,
       subscribe => Package['docker'],
       notify    => Service['docker'],
     }

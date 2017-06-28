@@ -27,8 +27,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
       it {
-          is_expected.to contain_augeas('docker-sysconfig').with_changes([
-            'rm INSECURE_REGISTRY',
+          is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
             "set OPTIONS '\"--log-driver=journald --signature-verification=false\"'",
           ])
       }
@@ -45,9 +44,8 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
       it {
-        is_expected.to contain_augeas('docker-sysconfig').with_changes([
+        is_expected.to contain_augeas('docker-sysconfig-registry').with_changes([
           "set INSECURE_REGISTRY '\"--insecure-registry foo:8787\"'",
-          "set OPTIONS '\"--log-driver=journald --signature-verification=false\"'",
         ])
       }
     end
@@ -85,8 +83,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
       it {
-        is_expected.to contain_augeas('docker-sysconfig').with_changes([
-          "rm INSECURE_REGISTRY",
+        is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
           "set OPTIONS '\"--log-driver=syslog\"'",
         ])
       }
