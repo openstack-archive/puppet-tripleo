@@ -53,13 +53,6 @@ class tripleo::profile::base::database::mysql::client (
   $step                      = Integer(hiera('step')),
 ) {
   if $step >= 1 {
-    # If the folder /etc/my.cnf.d does not exist (e.g. if mariadb is not
-    # present in the base image but installed as a package afterwards),
-    # create it. We do not want to touch the permissions in case it already
-    # exists due to the mariadb server package being pre-installed
-    # Note: We use exec instead of file in the case that the mysql class is
-    # included on this node as well (we'd get duplicate declaration in such a
-    # situation when using file)
     if $mysql_client_bind_address {
       $client_bind_changes = [
         "set ${mysql_read_default_group}/bind-address '${mysql_client_bind_address}'"
@@ -85,15 +78,37 @@ class tripleo::profile::base::database::mysql::client (
     $conf_changes = union($client_bind_changes, $changes_ssl)
 
     # Create /etc/my.cnf.d/tripleo.cnf
-    exec { 'directory-create-etc-my.cnf.d':
-      command => 'mkdir -p /etc/my.cnf.d',
-      unless  => 'test -d /etc/my.cnf.d',
-      path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
-    } ->
+    # If the folder /etc/my.cnf.d does not exist (e.g. if mariadb is not
+    # present in the base image but installed as a package afterwards),
+    # create it. We do not want to touch the permissions in case it already
+    # exists due to the mariadb server package being pre-installed
+    if $::uuid == 'docker' {
+      # When generating configuration with docker-puppet, services do
+      # not include any profile that would ensure creation of /etc/my.cnf.d,
+      # so we enforce the check here.
+      file {'/etc/my.cnf.d':
+        ensure => 'directory'
+      }
+    } else {
+      # Otherwise, depending on the role, puppet may run this profile
+      # concurrently with the mysql profile, so we use an exec resource
+      # in order to avoid getting duplicate declaration errors
+      exec { 'directory-create-etc-my.cnf.d':
+        command => 'mkdir -p /etc/my.cnf.d',
+        unless  => 'test -d /etc/my.cnf.d',
+        path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
+        before  => Augeas['tripleo-mysql-client-conf']
+      }
+    }
+
     augeas { 'tripleo-mysql-client-conf':
       incl    => $mysql_read_default_file,
       lens    => 'Puppet.lns',
       changes => $conf_changes,
     }
+
+    # If a profile created a file resource for the parent directory,
+    # ensure it is being run before the config file generation
+    File<| title == '/etc/my.cnf.d' |> -> Augeas['tripleo-mysql-client-conf']
   }
 }
