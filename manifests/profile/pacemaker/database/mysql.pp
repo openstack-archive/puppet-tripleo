@@ -31,6 +31,13 @@
 #   connections from other nodes in the cluster.
 #   Defaults to hiera('mysql_bind_host')
 #
+# [*innodb_flush_log_at_trx_commit*]
+#   (Optional) Disk flush behavior for MySQL under Galera.  A value of
+#   '1' indicates flush to disk per transaction.   A value of '2' indicates
+#   flush to disk every second, flushing all unflushed transactions in
+#   one step.
+#   Defaults to hiera('innodb_flush_log_at_trx_commit', '1')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -41,11 +48,12 @@
 #   Defaults to hiera('pcs_tries', 20)
 #
 class tripleo::profile::pacemaker::database::mysql (
-  $bootstrap_node     = hiera('mysql_short_bootstrap_node_name'),
-  $bind_address       = $::hostname,
-  $gmcast_listen_addr = hiera('mysql_bind_host'),
-  $step               = hiera('step'),
-  $pcs_tries          = hiera('pcs_tries', 20),
+  $bootstrap_node                 = hiera('mysql_short_bootstrap_node_name'),
+  $bind_address                   = $::hostname,
+  $gmcast_listen_addr             = hiera('mysql_bind_host'),
+  $innodb_flush_log_at_trx_commit = hiera('innodb_flush_log_at_trx_commit', '1'),
+  $step                           = hiera('step'),
+  $pcs_tries                      = hiera('pcs_tries', 20),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -70,33 +78,34 @@ class tripleo::profile::pacemaker::database::mysql (
 
   $mysqld_options = {
     'mysqld' => {
-      'skip-name-resolve'             => '1',
-      'binlog_format'                 => 'ROW',
-      'default-storage-engine'        => 'innodb',
-      'innodb_autoinc_lock_mode'      => '2',
-      'innodb_locks_unsafe_for_binlog'=> '1',
-      'innodb_file_per_table'         => 'ON',
-      'query_cache_size'              => '0',
-      'query_cache_type'              => '0',
-      'bind-address'                  => $bind_address,
-      'max_connections'               => hiera('mysql_max_connections'),
-      'open_files_limit'              => '-1',
-      'wsrep_on'                      => 'ON',
-      'wsrep_provider'                => '/usr/lib64/galera/libgalera_smm.so',
-      'wsrep_cluster_name'            => 'galera_cluster',
-      'wsrep_cluster_address'         => "gcomm://${galera_nodes}",
-      'wsrep_slave_threads'           => '1',
-      'wsrep_certify_nonPK'           => '1',
-      'wsrep_max_ws_rows'             => '131072',
-      'wsrep_max_ws_size'             => '1073741824',
-      'wsrep_debug'                   => '0',
-      'wsrep_convert_LOCK_to_trx'     => '0',
-      'wsrep_retry_autocommit'        => '1',
-      'wsrep_auto_increment_control'  => '1',
-      'wsrep_drupal_282555_workaround'=> '0',
-      'wsrep_causal_reads'            => '0',
-      'wsrep_sst_method'              => 'rsync',
-      'wsrep_provider_options'        => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;",
+      'skip-name-resolve'              => '1',
+      'binlog_format'                  => 'ROW',
+      'default-storage-engine'         => 'innodb',
+      'innodb_autoinc_lock_mode'       => '2',
+      'innodb_locks_unsafe_for_binlog' => '1',
+      'innodb_file_per_table'          => 'ON',
+      'innodb_flush_log_at_trx_commit' => $innodb_flush_log_at_trx_commit,
+      'query_cache_size'               => '0',
+      'query_cache_type'               => '0',
+      'bind-address'                   => $bind_address,
+      'max_connections'                => hiera('mysql_max_connections'),
+      'open_files_limit'               => '-1',
+      'wsrep_on'                       => 'ON',
+      'wsrep_provider'                 => '/usr/lib64/galera/libgalera_smm.so',
+      'wsrep_cluster_name'             => 'galera_cluster',
+      'wsrep_cluster_address'          => "gcomm://${galera_nodes}",
+      'wsrep_slave_threads'            => '1',
+      'wsrep_certify_nonPK'            => '1',
+      'wsrep_max_ws_rows'              => '131072',
+      'wsrep_max_ws_size'              => '1073741824',
+      'wsrep_debug'                    => '0',
+      'wsrep_convert_LOCK_to_trx'      => '0',
+      'wsrep_retry_autocommit'         => '1',
+      'wsrep_auto_increment_control'   => '1',
+      'wsrep_drupal_282555_workaround' => '0',
+      'wsrep_causal_reads'             => '0',
+      'wsrep_sst_method'               => 'rsync',
+      'wsrep_provider_options'         => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;",
     }
   }
 
