@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added a new profile for the setup of the Swift dispersion tool. This will
+    be executed in step 5 or later to ensure Swift and Keystone are already up
+    and running.
