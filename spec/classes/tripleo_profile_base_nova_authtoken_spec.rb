@@ -32,6 +32,7 @@ describe 'tripleo::profile::base::nova::authtoken' do
     context 'with step 3' do
       let(:params) { {
         :step => 3,
+        :memcached_ips => '127.0.0.1',
       } }
 
       it {
@@ -44,7 +45,7 @@ describe 'tripleo::profile::base::nova::authtoken' do
     context 'with step 3 with ipv6' do
       let(:params) { {
         :step     => 3,
-        :use_ipv6 => true,
+        :memcached_ips => '::1',
       } }
 
       it {

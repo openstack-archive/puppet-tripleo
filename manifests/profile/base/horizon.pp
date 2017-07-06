@@ -31,10 +31,15 @@
 #   (Optional) A hash of parameters to enable features specific to Neutron
 #   Defaults to hiera('horizon::neutron_options', {})
 #
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_ips')
+#
 class tripleo::profile::base::horizon (
   $step            = Integer(hiera('step')),
   $bootstrap_node  = hiera('bootstrap_nodeid', undef),
   $neutron_options = hiera('horizon::neutron_options', {}),
+  $memcached_ips   = hiera('memcached_node_ips')
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -52,12 +57,14 @@ class tripleo::profile::base::horizon (
       $_profile_support = 'None'
     }
     $neutron_options_real = merge({'profile_support' => $_profile_support }, $neutron_options)
-    $memcached_ipv6 = hiera('memcached_ipv6', false)
-    if $memcached_ipv6 {
-      $horizon_memcached_servers = hiera('memcached_node_ips_v6', '[::1]')
+
+    if is_ipv6_address($memcached_ips[0]) {
+        $horizon_memcached_servers = prefix(any2array(normalize_ip_for_uri($memcached_ips)), 'inet6:')
+
     } else {
-      $horizon_memcached_servers = hiera('memcached_node_ips', '127.0.0.1')
+        $horizon_memcached_servers = any2array(normalize_ip_for_uri($memcached_ips))
     }
+
     class { '::horizon':
       cache_server_ip => $horizon_memcached_servers,
       neutron_options => $neutron_options_real,

@@ -21,33 +21,21 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*use_ipv6*]
-#   (Optional) Flag indicating if ipv6 should be used for caching
-#   Defaults to hiera('nova::use_ipv6', false)
-#
-# [*memcache_nodes_ipv6*]
-#   (Optional) Array of ipv6 addresses for memcache.  Used if use_ipv6 is true.
-#   Defaults to hiera('memcached_node_ipvs_v6', ['::1'])
-#
-# [*memcache_nodes_ipv4*]
-#   (Optional) Array of ipv4 addresses for memcache. Used by default unless
-#   use_ipv6 is set to true.
-#   Defaults to hiera('memcached_node_ips', ['127.0.0.1'])
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_ips')
 #
 class tripleo::profile::base::nova::authtoken (
   $step                = Integer(hiera('step')),
-  $use_ipv6            = hiera('nova::use_ipv6', false),
-  $memcache_nodes_ipv6 = hiera('memcached_node_ips_v6', ['::1']),
-  $memcache_nodes_ipv4 = hiera('memcached_node_ips', ['127.0.0.1']),
+  $memcached_ips       = hiera('memcached_node_ips'),
 ) {
 
   if $step >= 3 {
-    $memcached_ips = $use_ipv6 ? {
-      true    => $memcache_nodes_ipv6,
-      default => $memcache_nodes_ipv4
+    if is_ipv6_address($memcached_ips[0]) {
+      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211'), 'inet6:')
+    } else {
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
     }
-
-    $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
 
     class { '::nova::keystone::authtoken':
       memcached_servers => $memcache_servers

@@ -70,6 +70,9 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_ips')
 
 class tripleo::profile::base::nova (
   $bootstrap_node          = hiera('bootstrap_nodeid', undef),
@@ -85,6 +88,7 @@ class tripleo::profile::base::nova (
   $oslomsg_notify_username = hiera('nova::rabbit_userid', 'guest'),
   $oslomsg_use_ssl         = hiera('nova::rabbit_use_ssl', '0'),
   $step                    = Integer(hiera('step')),
+  $memcached_ips            = hiera('memcached_node_ips'),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -93,10 +97,10 @@ class tripleo::profile::base::nova (
     $sync_db = false
   }
 
-  if hiera('nova::use_ipv6', false) {
-    $memcache_servers = suffix(hiera('memcached_node_ips_v6'), ':11211')
+  if is_ipv6_address($memcached_ips[0]) {
+    $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211'), 'inet6:')
   } else {
-    $memcache_servers = suffix(hiera('memcached_node_ips'), ':11211')
+    $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
