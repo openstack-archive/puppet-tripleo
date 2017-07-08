@@ -28,12 +28,12 @@
 #
 # [*node_name*]
 #   (Optional) The short hostname of node
-#   Defaults to hiera('bootstack_nodeid')
+#   Defaults to hiera('bootstrap_nodeid')
 #
 class tripleo::profile::base::neutron::opendaylight (
   $step         = Integer(hiera('step')),
   $odl_api_ips  = hiera('opendaylight_api_node_ips'),
-  $node_name    = hiera('bootstack_nodeid')
+  $node_name    = hiera('bootstrap_nodeid')
 ) {
 
   if $step >= 1 {
