@@ -30,12 +30,6 @@
 #   (Optional) Whether or not the cephfs backend is enabled
 #   Defaults to hiera('manila_backend_cephfs_enabled', false)
 #
-# [*ceph_mds_enabled*]
-#   (Optional) Whether or not the ceph mds is enabled. This option is used
-#   to distinguish if an external ceph is used or if ceph is deployed by
-#   tripleo. By default ceph mds is not deployed by tripleo.
-#   Defaults to hiera('ceph_mds_enabled', false)
-#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('manila_share_short_bootstrap_node_name')
@@ -53,7 +47,6 @@ class tripleo::profile::pacemaker::manila (
   $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
-  $ceph_mds_enabled        = hiera('ceph_mds_enabled', false),
   $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
   $step                    = Integer(hiera('step')),
   $pcs_tries               = hiera('pcs_tries', 20),
@@ -119,12 +112,6 @@ class tripleo::profile::pacemaker::manila (
       $cephfs_auth_id = hiera('manila::backend::cephfsnative::cephfs_auth_id')
       $keyring_path = "/etc/ceph/ceph.client.${cephfs_auth_id}.keyring"
 
-      # $ceph_mds_enabled is used to distinguish if an external ceph is used or
-      # if ceph is deployed by TripleO
-      if $ceph_mds_enabled {
-        include ::ceph::profile::fs
-      }
-
       manila::backend::cephfsnative { $manila_cephfsnative_backend :
         driver_handles_share_servers => hiera('manila::backend::cephfsnative::driver_handles_share_servers', false),
         share_backend_name           => hiera('manila::backend::cephfsnative::share_backend_name'),
@@ -132,21 +119,6 @@ class tripleo::profile::pacemaker::manila (
         cephfs_auth_id               => $cephfs_auth_id,
         cephfs_cluster_name          => hiera('manila::backend::cephfsnative::cephfs_cluster_name'),
         cephfs_enable_snapshots      => hiera('manila::backend::cephfsnative::cephfs_enable_snapshots'),
-      }
-
-      if !defined(Resource['ceph::key', "client.${cephfs_auth_id}"]) {
-        ceph::key { "client.${cephfs_auth_id}" :
-          secret       => hiera('manila::backend::cephfsnative::ceph_client_key'),
-          keyring_path => $keyring_path,
-          # inject the new key into ceph cluster only if ceph is deployed by
-          # tripleo (if external ceph is used it should be added manually)
-          inject       => $ceph_mds_enabled,
-          user         => 'manila',
-          cap_mds      => 'allow *',
-          cap_mon      => 'allow r, allow command \"auth del\", allow command \"auth caps\", \
-allow command \"auth get\", allow command \"auth get-or-create\"',
-          cap_osd      => 'allow rw'
-        }
       }
 
       ceph_config {

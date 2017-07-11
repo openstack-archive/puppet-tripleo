@@ -32,4 +32,9 @@ class tripleo::profile::base::ceph::mds (
   if $step >= 3 {
     include ::ceph::profile::mds
   }
+
+  # when deploying mds, create also cephfs which is used by manila
+  if $step >= 4 {
+    include ::ceph::profile::fs
+  }
 }
