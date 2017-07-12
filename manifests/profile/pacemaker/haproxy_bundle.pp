@@ -30,6 +30,11 @@
 #   (Optional) Whether load balancing is enabled for this cluster
 #   Defaults to hiera('enable_load_balancer', true)
 #
+# [*deployed_ssl_cert_path*]
+#   (Optional) The filepath of the certificate as it will be stored in
+#   the controller.
+#   Defaults to '/etc/pki/tls/private/overcloud_endpoint.pem'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -40,11 +45,12 @@
 #   Defaults to hiera('pcs_tries', 20)
 #
 class tripleo::profile::pacemaker::haproxy_bundle (
-  $haproxy_docker_image = hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef),
-  $bootstrap_node       = hiera('haproxy_short_bootstrap_node_name'),
-  $enable_load_balancer = hiera('enable_load_balancer', true),
-  $step                 = Integer(hiera('step')),
-  $pcs_tries            = hiera('pcs_tries', 20),
+  $haproxy_docker_image   = hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef),
+  $bootstrap_node         = hiera('haproxy_short_bootstrap_node_name'),
+  $enable_load_balancer   = hiera('enable_load_balancer', true),
+  $deployed_ssl_cert_path = '/etc/pki/tls/private/overcloud_endpoint.pem',
+  $step                   = Integer(hiera('step')),
+  $pcs_tries              = hiera('pcs_tries', 20),
 ) {
   include ::tripleo::profile::base::haproxy
 
@@ -136,6 +142,11 @@ class tripleo::profile::pacemaker::haproxy_bundle (
             'source-dir' => '/dev/log',
             'target-dir' => '/dev/log',
             'options'    => 'rw',
+          },
+          'haproxy-cert'                    => {
+            'source-dir' => deployed_ssl_cert_path,
+            'target-dir' => deployed_ssl_cert_path,
+            'options'    => 'ro',
           },
         },
       }
