@@ -22,14 +22,6 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
 #
-# [*libvirt_enabled*]
-#   (Optional) Whether or not Libvirt is enabled.
-#   Defaults to false
-#
-# [*manage_migration*]
-#   (Optional) Whether or not manage Nova Live migration
-#   Defaults to false
-#
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
 #   Defaults to hiera('messaging_rpc_service_name', rabbit)
@@ -74,49 +66,27 @@
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('nova::rabbit_use_ssl', '0')
 #
-# [*nova_compute_enabled*]
-#   (Optional) Whether or not nova-compute is enabled.
-#   Defaults to false
-#
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
-# [*migration_ssh_key*]
-#   (Optional) SSH key pair for migration SSH tunnel.
-#   Expects a hash with keys 'private_key' and 'public_key'.
-#   Defaults to {}
-#
-# [*migration_ssh_localaddrs*]
-#   (Optional) Restrict ssh migration to clients connecting via this list of
-#   IPs.
-#   Defaults to [] (no restriction)
-#
-# [*libvirt_tls*]
-#   (Optional) Whether or not libvird TLS service is enabled.
-#   Defaults to false
 
 class tripleo::profile::base::nova (
-  $bootstrap_node           = hiera('bootstrap_nodeid', undef),
-  $libvirt_enabled          = false,
-  $manage_migration         = false,
-  $oslomsg_rpc_proto        = hiera('messaging_rpc_service_name', 'rabbit'),
-  $oslomsg_rpc_hosts        = any2array(hiera('rabbitmq_node_names', undef)),
-  $oslomsg_rpc_password     = hiera('nova::rabbit_password'),
-  $oslomsg_rpc_port         = hiera('nova::rabbit_port', '5672'),
-  $oslomsg_rpc_username     = hiera('nova::rabbit_userid', 'guest'),
-  $oslomsg_notify_proto     = hiera('messaging_notify_service_name', 'rabbit'),
-  $oslomsg_notify_hosts     = any2array(hiera('rabbitmq_node_names', undef)),
-  $oslomsg_notify_password  = hiera('nova::rabbit_password'),
-  $oslomsg_notify_port      = hiera('nova::rabbit_port', '5672'),
-  $oslomsg_notify_username  = hiera('nova::rabbit_userid', 'guest'),
-  $oslomsg_use_ssl          = hiera('nova::rabbit_use_ssl', '0'),
-  $nova_compute_enabled     = false,
-  $step                     = Integer(hiera('step')),
-  $migration_ssh_key        = {},
-  $migration_ssh_localaddrs = [],
-  $libvirt_tls              = false
+  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
+  $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
+  $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_rpc_password    = hiera('nova::rabbit_password'),
+  $oslomsg_rpc_port        = hiera('nova::rabbit_port', '5672'),
+  $oslomsg_rpc_username    = hiera('nova::rabbit_userid', 'guest'),
+  $oslomsg_notify_proto    = hiera('messaging_notify_service_name', 'rabbit'),
+  $oslomsg_notify_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_notify_password = hiera('nova::rabbit_password'),
+  $oslomsg_notify_port     = hiera('nova::rabbit_port', '5672'),
+  $oslomsg_notify_username = hiera('nova::rabbit_userid', 'guest'),
+  $oslomsg_use_ssl         = hiera('nova::rabbit_use_ssl', '0'),
+  $step                    = Integer(hiera('step')),
 ) {
+
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
@@ -128,10 +98,6 @@ class tripleo::profile::base::nova (
   } else {
     $memcache_servers = suffix(hiera('memcached_node_ips'), ':11211')
   }
-
-  validate_array($migration_ssh_localaddrs)
-  $migration_ssh_localaddrs.each |$x| { validate_ip_address($x) }
-  $migration_ssh_localaddrs_real = unique($migration_ssh_localaddrs)
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
@@ -160,103 +126,5 @@ class tripleo::profile::base::nova (
       }),
     }
     include ::nova::placement
-  }
-
-  if $step >= 4 {
-    if $manage_migration {
-      # Libvirt setup (live-migration)
-      if $libvirt_tls {
-        class { '::nova::migration::libvirt':
-          transport         => 'tls',
-          configure_libvirt => $libvirt_enabled,
-          configure_nova    => $nova_compute_enabled,
-        }
-      } else {
-        # Reuse the cold-migration SSH tunnel when TLS is not enabled
-        class { '::nova::migration::libvirt':
-          transport          => 'ssh',
-          configure_libvirt  => $libvirt_enabled,
-          configure_nova     => $nova_compute_enabled,
-          client_user        => 'nova_migration',
-          client_extraparams => {'keyfile' => '/etc/nova/migration/identity'}
-        }
-      }
-
-      $services_enabled = hiera('service_names', [])
-      if !empty($migration_ssh_key) and 'sshd' in $services_enabled {
-        # Nova SSH tunnel setup (cold-migration)
-
-        # Server side
-        if !empty($migration_ssh_localaddrs_real) {
-          $allow_type = sprintf('LocalAddress %s User', join($migration_ssh_localaddrs_real,','))
-          $deny_type = 'LocalAddress'
-          $deny_name = sprintf('!%s', join($migration_ssh_localaddrs_real,',!'))
-
-          ssh::server::match_block { 'nova_migration deny':
-            name    => $deny_name,
-            type    => $deny_type,
-            order   => 2,
-            options => {
-              'DenyUsers' => 'nova_migration'
-            },
-            notify  => Service['sshd']
-          }
-        }
-        else {
-          $allow_type = 'User'
-        }
-        $allow_name = 'nova_migration'
-
-        ssh::server::match_block { 'nova_migration allow':
-          name    => $allow_name,
-          type    => $allow_type,
-          order   => 1,
-          options => {
-            'ForceCommand'           => '/bin/nova-migration-wrapper',
-            'PasswordAuthentication' => 'no',
-            'AllowTcpForwarding'     => 'no',
-            'X11Forwarding'          => 'no',
-            'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
-          },
-          notify  => Service['sshd']
-        }
-
-        $migration_authorized_keys = $migration_ssh_key['public_key']
-        $migration_identity = $migration_ssh_key['private_key']
-        $migration_user_shell = '/bin/bash'
-      }
-      else {
-        # Remove the keys and prevent login when migration over SSH is not enabled
-        $migration_authorized_keys = '# Migration over SSH disabled by TripleO'
-        $migration_identity = '# Migration over SSH disabled by TripleO'
-        $migration_user_shell = '/sbin/nologin'
-      }
-
-      package { 'openstack-nova-migration':
-        ensure => present,
-        tag    => ['openstack', 'nova-package'],
-      }
-
-      file { '/etc/nova/migration/authorized_keys':
-        content => $migration_authorized_keys,
-        mode    => '0640',
-        owner   => 'root',
-        group   => 'nova_migration',
-        require => Package['openstack-nova-migration']
-      }
-
-      file { '/etc/nova/migration/identity':
-        content => $migration_identity,
-        mode    => '0600',
-        owner   => 'nova',
-        group   => 'nova',
-        require => Package['openstack-nova-migration']
-      }
-
-      user {'nova_migration':
-        shell   => $migration_user_shell,
-        require => Package['openstack-nova-migration']
-      }
-    }
   }
 }

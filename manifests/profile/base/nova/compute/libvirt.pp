@@ -28,6 +28,7 @@ class tripleo::profile::base::nova::compute::libvirt (
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::nova::compute
+    include ::tripleo::profile::base::nova::migration::client
 
     # Ceph + Libvirt
     $rbd_ephemeral_storage = hiera('nova::compute::rbd::ephemeral_storage', false)
