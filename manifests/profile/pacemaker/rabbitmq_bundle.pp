@@ -121,8 +121,8 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
             'options'    => 'ro',
           },
           'rabbitmq-cfg-data'                => {
-            'source-dir' => '/var/lib/config-data/rabbitmq/etc/rabbitmq',
-            'target-dir' => '/etc/rabbitmq',
+            'source-dir' => '/var/lib/config-data/puppet-generated/rabbitmq/',
+            'target-dir' => '/var/lib/kolla/config_files/src',
             'options'    => 'ro',
           },
           'rabbitmq-hosts'                   => {

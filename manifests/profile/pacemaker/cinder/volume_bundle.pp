@@ -85,8 +85,8 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
             'options'    => 'ro',
           },
           'cinder-volume-cfg-data'       => {
-            'source-dir' => '/var/lib/config-data/cinder/etc/cinder',
-            'target-dir' => '/etc/cinder',
+            'source-dir' => '/var/lib/config-data/puppet-generated/cinder/',
+            'target-dir' => '/var/lib/kolla/config_files/src',
             'options'    => 'ro',
           },
           'cinder-volume-hosts'          => {
