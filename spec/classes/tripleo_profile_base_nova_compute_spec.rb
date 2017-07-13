@@ -27,9 +27,6 @@ describe 'tripleo::profile::base::nova::compute' do
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::compute')
         is_expected.to_not contain_class('nova::network::neutron')
-        is_expected.to_not contain_package('iscsi-initiator-utils')
-        is_expected.to_not contain_exec('reset-iscsi-initiator-name')
-        is_expected.to_not contain_file('/etc/iscsi/.initiator_reset')
       }
     end
 
@@ -58,9 +55,6 @@ eos
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')
-          is_expected.to contain_package('iscsi-initiator-utils')
-          is_expected.to contain_exec('reset-iscsi-initiator-name')
-          is_expected.to contain_file('/etc/iscsi/.initiator_reset')
           is_expected.to_not contain_package('nfs-utils')
         }
       end
@@ -74,9 +68,6 @@ eos
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')
-          is_expected.to contain_package('iscsi-initiator-utils')
-          is_expected.to contain_exec('reset-iscsi-initiator-name')
-          is_expected.to contain_file('/etc/iscsi/.initiator_reset')
           is_expected.to contain_package('nfs-utils')
         }
       end
