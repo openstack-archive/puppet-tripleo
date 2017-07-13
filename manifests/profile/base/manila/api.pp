@@ -84,7 +84,7 @@ class tripleo::profile::base::manila::api (
       $cifs_protocol = undef
     }
     if $backend_cephfs_enabled {
-      $cephfs_protocol = 'CEPHFS'
+      $cephfs_protocol = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', 'CEPHFS')
     } else {
       $cephfs_protocol = undef
     }
