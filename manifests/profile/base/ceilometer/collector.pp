@@ -89,8 +89,16 @@ class tripleo::profile::base::ceilometer::collector (
   # are created safely.
   if $step >= 5 and $sync_db {
     exec {'ceilometer-db-upgrade':
-      command => 'ceilometer-upgrade --skip-metering-database',
-      path    => ['/usr/bin', '/usr/sbin'],
+      command   => 'ceilometer-upgrade --skip-metering-database',
+      path      => ['/usr/bin', '/usr/sbin'],
+      # LP#1703444 - When this runs, it talks to gnocchi on all controllers
+      # which then reaches out to keystone via haproxy. Since the deployment
+      # may restart httpd on these other nodes it can result in an intermittent
+      # 503 which fails this command. We should retry the upgrade in case of
+      # error since we cannot ensure that there might not be some other deploy
+      # process running on the other nodes.
+      try_sleep => 5,
+      tries     => 10
     }
   }
 }
