@@ -144,8 +144,8 @@ class tripleo::profile::pacemaker::haproxy_bundle (
             'options'    => 'rw',
           },
           'haproxy-cert'                    => {
-            'source-dir' => deployed_ssl_cert_path,
-            'target-dir' => deployed_ssl_cert_path,
+            'source-dir' => $deployed_ssl_cert_path,
+            'target-dir' => $deployed_ssl_cert_path,
             'options'    => 'ro',
           },
         },
