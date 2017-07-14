@@ -19,6 +19,10 @@
 #
 # == Parameters:
 #
+# [*host_ip*]
+#  (required) host IP address of Control
+#  String (IPv4) value.
+#
 # [*admin_password*]
 #  (optional) admin password
 #  String value.
@@ -42,7 +46,7 @@
 # [*api_server*]
 #  (optional) IP address of api server
 #  String value.
-#  Defaults to hiera('contrail_config_vip')
+#  Defaults to hiera('contrail_config_vip',hiera('internal_api_virtual_ip'))
 #
 # [*auth_host*]
 #  (optional) keystone server ip address

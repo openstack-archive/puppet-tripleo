@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    Traffic between Contrail nodes used the public network. This release will
+    move the traffic to the internal_api network per default and also allows
+    to optionally use the storage_mgmt network. This is in preparation for
+    for composable networks, where Contrail will have its own network.
+features:
+  - |
+    This release allows to enable Contrail DPDK on the compute nodes.

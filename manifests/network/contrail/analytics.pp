@@ -46,7 +46,7 @@
 # [*api_server*]
 #  (optional) IP address of api server
 #  String value.
-#  Defaults to hiera('contrail_config_vip')
+#  Defaults to hiera('contrail_config_vip',hiera('internal_api_virtual_ip'))
 #
 # [*api_port*]
 #  (optional) port of api server
@@ -67,11 +67,6 @@
 #  (optional) keystone port.
 #  Integer value.
 #  Defaults to hiera('contrail::auth_port')
-#
-# [*auth_port_ssl*]
-#  (optional) keystone ssl port.
-#  Integer value.
-#  Defaults to hiera('contrail::auth_port_ssl')
 #
 # [*auth_protocol*]
 #  (optional) authentication protocol.
@@ -106,7 +101,7 @@
 # [*disc_server_ip*]
 #  (optional) IPv4 address of discovery server.
 #  String (IPv4) value.
-#  Defaults to hiera('contrail_config_vip')
+#  Defaults to hiera('contrail::disc_server_ip')
 #
 # [*disc_server_port*]
 #  (optional) port Discovery server listens on.
@@ -133,10 +128,10 @@
 #  String (IPv4) value + port
 #  Defaults to hiera('contrail::memcached_server')
 #
-# [*public_vip*]
+# [*internal_vip*]
 #  (optional) Public virtual IP address
 #  String (IPv4) value
-#  Defaults to hiera('public_virtual_ip')
+#  Defaults to hiera('internal_api_virtual_ip')
 #
 # [*rabbit_server*]
 #  (optional) IPv4 addresses of rabbit server.
@@ -194,26 +189,25 @@ class tripleo::network::contrail::analytics(
   $admin_tenant_name          = hiera('contrail::admin_tenant_name'),
   $admin_token                = hiera('contrail::admin_token'),
   $admin_user                 = hiera('contrail::admin_user'),
-  $api_server                 = hiera('contrail_config_vip'),
+  $api_server                 = hiera('contrail_config_vip',hiera('internal_api_virtual_ip')),
   $api_port                   = hiera('contrail::api_port'),
   $auth_host                  = hiera('contrail::auth_host'),
   $auth_port                  = hiera('contrail::auth_port'),
   $auth_protocol              = hiera('contrail::auth_protocol'),
-  $auth_port_ssl              = hiera('contrail::auth_port_ssl'),
   $analytics_aaa_mode         = hiera('contrail::analytics_aaa_mode'),
   $cassandra_server_list      = hiera('contrail_analytics_database_node_ips'),
   $ca_file                    = hiera('contrail::service_certificate',false),
   $cert_file                  = hiera('contrail::service_certificate',false),
   $collector_http_server_port = hiera('contrail::analytics::collector_http_server_port'),
   $collector_sandesh_port     = hiera('contrail::analytics::collector_sandesh_port'),
-  $disc_server_ip             = hiera('contrail_config_vip'),
+  $disc_server_ip             = hiera('contrail_config_vip',hiera('internal_api_virtual_ip')),
   $disc_server_port           = hiera('contrail::disc_server_port'),
   $http_server_port           = hiera('contrail::analytics::http_server_port'),
   $host_ip                    = hiera('contrail::analytics::host_ip'),
   $insecure                   = hiera('contrail::insecure'),
   $kafka_broker_list          = hiera('contrail_analytics_database_node_ips'),
   $memcached_servers          = hiera('contrail::memcached_server'),
-  $public_vip                 = hiera('public_virtual_ip'),
+  $internal_vip               = hiera('internal_api_virtual_ip'),
   $rabbit_server              = hiera('rabbitmq_node_ips'),
   $rabbit_user                = hiera('contrail::rabbit_user'),
   $rabbit_password            = hiera('contrail::rabbit_password'),
@@ -227,7 +221,7 @@ class tripleo::network::contrail::analytics(
 {
   $cassandra_server_list_9042 = join([join($cassandra_server_list, ':9042 '),':9042'],'')
   $kafka_broker_list_9092 = join([join($kafka_broker_list, ':9092 '),':9092'],'')
-  $rabbit_server_list_5672 = join([join($rabbit_server, ":${rabbit_port},"),":${rabbit_port}"],'')
+  $rabbit_server_list_5672 = join([join($rabbit_server, ':5672,'),':5672'],'')
   $redis_config = "bind ${host_ip} 127.0.0.1"
   $zk_server_ip_2181 = join([join($zk_server_ip, ':2181 '),':2181'],'')
   $zk_server_ip_2181_comma = join([join($zk_server_ip, ':2181,'),':2181'],'')
@@ -238,7 +232,7 @@ class tripleo::network::contrail::analytics(
         'admin_tenant_name' => $admin_tenant_name,
         'admin_user'        => $admin_user,
         'auth_host'         => $auth_host,
-        'auth_port'         => $auth_port_ssl,
+        'auth_port'         => $auth_port,
         'auth_protocol'     => $auth_protocol,
         'insecure'          => $insecure,
         'certfile'          => $cert_file,
@@ -246,8 +240,8 @@ class tripleo::network::contrail::analytics(
     }
     $vnc_api_lib_config = {
       'auth' => {
-        'AUTHN_SERVER'   => $public_vip,
-        'AUTHN_PORT'     => $auth_port_ssl,
+        'AUTHN_SERVER'   => $auth_host,
+        'AUTHN_PORT'     => $auth_port,
         'AUTHN_PROTOCOL' => $auth_protocol,
         'certfile'       => $cert_file,
         'cafile'         => $ca_file,
@@ -265,7 +259,7 @@ class tripleo::network::contrail::analytics(
     }
     $vnc_api_lib_config = {
       'auth' => {
-        'AUTHN_SERVER' => $public_vip,
+        'AUTHN_SERVER' => $auth_host,
       },
     }
   }
@@ -354,6 +348,7 @@ class tripleo::network::contrail::analytics(
           'disc_server_ip'   => $disc_server_ip,
           'disc_server_port' => $disc_server_port,
         },
+        'KEYSTONE'  => $keystone_config,
       },
       redis_config             => $redis_config,
       topology_config          => {
@@ -380,7 +375,7 @@ class tripleo::network::contrail::analytics(
       keystone_admin_user        => $admin_user,
       keystone_admin_password    => $admin_password,
       keystone_admin_tenant_name => $admin_tenant_name,
-      openstack_vip              => $public_vip,
+      openstack_vip              => $auth_host,
     }
   }
 }
