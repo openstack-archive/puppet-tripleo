@@ -127,12 +127,12 @@ class tripleo::profile::base::glance::api (
       }
     }
     case $glance_backend {
-        'swift': { $backend_store = 'glance.store.swift.Store' }
-        'file': { $backend_store = 'glance.store.filesystem.Store' }
-        'rbd': { $backend_store = 'glance.store.rbd.Store' }
+        'swift': { $backend_store = 'swift' }
+        'file': { $backend_store = 'file' }
+        'rbd': { $backend_store = 'rbd' }
         default: { fail('Unrecognized glance_backend parameter.') }
     }
-    $http_store = ['glance.store.http.Store']
+    $http_store = ['http']
     $glance_store = concat($http_store, $backend_store)
 
     # TODO: notifications, scrubber, etc.
