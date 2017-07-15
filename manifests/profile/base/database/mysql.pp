@@ -224,6 +224,9 @@ class tripleo::profile::base::database::mysql (
       # NOTE: by default zaqar uses mongodb
       include ::zaqar::db::mysql
     }
+    if hiera('veritas_hyperscale_controller_enabled', false) {
+      include ::veritas_hyperscale::db::mysql
+    }
   }
 
 }

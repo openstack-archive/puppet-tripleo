@@ -166,4 +166,7 @@ class tripleo::profile::base::rabbitmq (
     }
   }
 
+  if $step >= 1 and hiera('veritas_hyperscale_controller_enabled', false) {
+    include ::veritas_hyperscale::hs_rabbitmq
+  }
 }
