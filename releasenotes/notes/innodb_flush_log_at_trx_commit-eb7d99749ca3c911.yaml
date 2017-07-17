@@ -1,0 +1,17 @@
+---
+features:
+  - |
+    Enable innodb_flush_log_at_trx_commit configuration for Galera only.
+upgrade:
+  - |
+    Setting the innodb_flush_log_at_trx_commit flag to the value of "2" instead
+    of its default value of "1" means that the underlying MySQL/MariaDB engine
+    will no longer flush transactions to disk on a per-transaction basis;
+    instead, flushes occur once per second.   This leads to far fewer
+    disk writes and can dramatically improve write performance, at the cost
+    of durability (e.g. will lose the last second's worth of transactions)
+    if the database engine is ungracefully shut down.   The
+    clustered nature of Galera mitigates this risk in that transactions
+    are replicated to other nodes before completion, and the setting of
+    "2" is considered to be generally safe for a Galera cluster, with the
+    exception case of simultaneous power loss for all nodes.
