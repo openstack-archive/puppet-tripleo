@@ -21,6 +21,11 @@ require 'spec_helper'
 describe 'tripleo::certmonger::ca::local' do
 
   shared_examples_for 'tripleo::certmonger::ca::local' do
+
+    let :pre_condition do
+      "include ::certmonger"
+    end
+
     let :params do
       {
         :ca_pem => '/etc/pki/ca-trust/source/anchors/cm-local-ca.pem',

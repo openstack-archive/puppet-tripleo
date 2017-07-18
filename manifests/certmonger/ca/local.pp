@@ -34,6 +34,6 @@ class tripleo::certmonger::ca::local(
     creates   => $ca_pem,
     tries     => 5,
     try_sleep => 1,
-    require   => Service['certmonger'],
   }
+  Service['certmonger'] ~> Exec<| title == 'extract-and-trust-ca' |>
 }
