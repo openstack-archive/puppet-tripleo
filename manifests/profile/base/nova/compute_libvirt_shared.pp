@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::nova::libvirt
+# == Class: tripleo::profile::base::nova::compute_libvirt_shared
 #
 # Libvirt profile for tripleo. It will deploy Libvirt service and configure it.
 #
@@ -23,30 +23,24 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::base::nova::libvirt (
+class tripleo::profile::base::nova::compute_libvirt_shared (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::nova
-    include ::tripleo::profile::base::nova::migration::client
-    include ::nova::compute::libvirt::services
-
-    file { ['/etc/libvirt/qemu/networks/autostart/default.xml',
-      '/etc/libvirt/qemu/networks/default.xml']:
-      ensure => absent,
-      before => Service['libvirt'],
+    # Ceph + Libvirt
+    $rbd_ephemeral_storage = hiera('nova::compute::rbd::ephemeral_storage', false)
+    $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
+    if $rbd_ephemeral_storage or $rbd_persistent_storage {
+      include ::nova::compute::rbd
     }
 
-    # in case libvirt has been already running before the Puppet run, make
-    # sure the default network is destroyed
-    exec { 'libvirt-default-net-destroy':
-      command => '/usr/bin/virsh net-destroy default',
-      onlyif  => '/usr/bin/virsh net-info default | /bin/grep -i "^active:\s*yes"',
-      before  => Service['libvirt'],
+    if $rbd_ephemeral_storage {
+      class { '::nova::compute::libvirt':
+        libvirt_disk_cachemodes => ['network=writeback'],
+        libvirt_hw_disk_discard => 'unmap',
+      }
+    } else {
+      include ::nova::compute::libvirt
     }
-
-    include ::nova::compute::libvirt::qemu
   }
-  include ::tripleo::profile::base::nova::compute_libvirt_shared
-
 }

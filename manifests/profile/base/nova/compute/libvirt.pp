@@ -29,25 +29,7 @@ class tripleo::profile::base::nova::compute::libvirt (
   if $step >= 4 {
     include ::tripleo::profile::base::nova::compute
     include ::tripleo::profile::base::nova::migration::client
-
-    # Ceph + Libvirt
-    $rbd_ephemeral_storage = hiera('nova::compute::rbd::ephemeral_storage', false)
-    $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
-    if $rbd_ephemeral_storage or $rbd_persistent_storage {
-      include ::nova::compute::rbd
-    }
-
-    if $rbd_ephemeral_storage {
-      class { '::nova::compute::libvirt':
-        libvirt_disk_cachemodes => ['network=writeback'],
-        libvirt_hw_disk_discard => 'unmap',
-      }
-    } else {
-      include ::nova::compute::libvirt
-    }
-
-    include ::nova::compute::libvirt::qemu
-
   }
+  include ::tripleo::profile::base::nova::compute_libvirt_shared
 
 }
