@@ -38,6 +38,7 @@ class tripleo::profile::base::cinder::volume::dellps (
       san_ip             => hiera('cinder::backend::eqlx::san_ip', undef),
       san_login          => hiera('cinder::backend::eqlx::san_login', undef),
       san_password       => hiera('cinder::backend::eqlx::san_password', undef),
+      san_private_key    => hiera('cinder::backend::eqlx::san_private_key', undef),
       san_thin_provision => hiera('cinder::backend::eqlx::san_thin_provision', undef),
       eqlx_group_name    => hiera('cinder::backend::eqlx::eqlx_group_name', undef),
       eqlx_pool          => hiera('cinder::backend::eqlx::eqlx_pool', undef),
