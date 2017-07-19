@@ -82,6 +82,9 @@ describe 'tripleo::profile::base::gnocchi::api' do
         is_expected.to contain_class('gnocchi::storage').with(
           :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
+        is_expected.to contain_class('gnocchi::storage::incoming::redis').with(
+          :redis_url => 'redis://:gnocchi@127.0.0.1:6379/'
+        )
         is_expected.to contain_class('gnocchi::storage::file')
       }
     end
@@ -99,6 +102,9 @@ describe 'tripleo::profile::base::gnocchi::api' do
         is_expected.to contain_class('gnocchi::wsgi::apache')
         is_expected.to contain_class('gnocchi::storage').with(
           :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
+        )
+        is_expected.to contain_class('gnocchi::storage::incoming::redis').with(
+          :redis_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
         is_expected.to contain_class('gnocchi::storage::ceph')
       }
