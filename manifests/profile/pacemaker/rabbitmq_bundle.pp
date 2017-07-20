@@ -24,7 +24,7 @@
 #
 # [*rabbitmq_docker_control_port*]
 #   (Optional) The bundle's pacemaker_remote control port on the host
-#   Defaults to hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3121')
+#   Defaults to hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122')
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
@@ -55,7 +55,7 @@
 #
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef),
-  $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3121'),
+  $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122'),
   $bootstrap_node               = hiera('rabbitmq_short_bootstrap_node_name'),
   $erlang_cookie                = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),

@@ -24,7 +24,7 @@
 #
 # [*redis_docker_control_port*]
 #   (Optional) The bundle's pacemaker_remote control port on the host
-#   Defaults to hiera('tripleo::profile::pacemaker::redis_bundle::control_port', '3121')
+#   Defaults to hiera('tripleo::profile::pacemaker::redis_bundle::control_port', '3124')
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
