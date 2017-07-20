@@ -93,7 +93,7 @@ class tripleo::profile::pacemaker::ovn_northd (
       tries        => $pcs_tries,
     }
 
-    Pacemaker::Resource::Ocf["${ovndb_servers_resource_name}"] ->
-      Pacemaker::Constraint::Colocation["${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}"]
+    Pacemaker::Resource::Ocf["${ovndb_servers_resource_name}"]
+      -> Pacemaker::Constraint::Colocation["${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}"]
   }
 }

@@ -62,20 +62,21 @@ class tripleo::profile::base::cinder::volume::nfs (
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    if str2bool($::selinux) {
-      selboolean { 'virt_use_nfs':
-        value      => on,
-        persistent => true,
-      } -> Package['nfs-utils']
-    }
-
-    package {'nfs-utils': } ->
-    cinder::backend::nfs { $backend_name :
+    package {'nfs-utils': }
+    -> cinder::backend::nfs { $backend_name :
       nfs_servers                 => $cinder_nfs_servers,
       nfs_mount_options           => $cinder_nfs_mount_options,
       nfs_shares_config           => '/etc/cinder/shares-nfs.conf',
       nas_secure_file_operations  => $cinder_nas_secure_file_operations,
       nas_secure_file_permissions => $cinder_nas_secure_file_permissions,
+    }
+
+    if str2bool($::selinux) {
+      selboolean { 'virt_use_nfs':
+        value      => on,
+        persistent => true,
+        require    => Package['nfs-utils'],
+      }
     }
   }
 

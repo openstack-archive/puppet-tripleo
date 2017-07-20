@@ -94,8 +94,8 @@ class tripleo::profile::base::swift::ringbuilder (
       path    => ['/usr/bin'],
       command => "curl --insecure --silent '${swift_ring_get_tempurl}' -o /tmp/swift-rings.tar.gz",
       returns => [0, 3]
-    } ~>
-    exec{'extract_swift_ring_tarball':
+    }
+    ~> exec{'extract_swift_ring_tarball':
       path    => ['/bin'],
       command => 'tar xzf /tmp/swift-rings.tar.gz -C /',
       returns => [0, 2]
@@ -122,15 +122,15 @@ class tripleo::profile::base::swift::ringbuilder (
         part_power     => $part_power,
         replicas       => min(count($device_array), $replicas),
         min_part_hours => $min_part_hours,
-      } ->
+      }
 
       # add all other devices
-      tripleo::profile::base::swift::add_devices {$device_array:
+      -> tripleo::profile::base::swift::add_devices {$device_array:
         swift_zones => $swift_zones,
-      } ->
+      }
 
       # rebalance
-      swift::ringbuilder::rebalance{ ['object', 'account', 'container']:
+      -> swift::ringbuilder::rebalance{ ['object', 'account', 'container']:
         seed => '999',
       }
 
