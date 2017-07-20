@@ -53,6 +53,11 @@
 #  Should haproxy run in daemon mode or not
 #  Defaults to true
 #
+# [*manage_firewall*]
+#  (optional) Enable or disable firewall settings for ports exposed by HAProxy
+#  (false means disabled, and true means enabled)
+#  Defaults to hiera('tripleo::firewall::manage_firewall', true)
+#
 # [*controller_hosts*]
 #  IPs of host or group of hosts to load-balance the services
 #  Can be a string or an array.
@@ -563,6 +568,7 @@ class tripleo::haproxy (
   $haproxy_daemon              = true,
   $haproxy_stats_user          = 'admin',
   $haproxy_stats_password      = undef,
+  $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
   $controller_hosts            = hiera('controller_node_ips'),
   $controller_hosts_names      = hiera('controller_node_names', undef),
   $contrail_config_hosts       = hiera('contrail_config_node_ips', undef),
@@ -881,6 +887,7 @@ class tripleo::haproxy (
     use_internal_certificates   => $use_internal_certificates,
     internal_certificates_specs => $internal_certificates_specs,
     listen_options              => $default_listen_options,
+    manage_firewall             => $manage_firewall,
   }
 
   if $haproxy_stats {
@@ -1361,7 +1368,7 @@ class tripleo::haproxy (
       server_names      => hiera('mysql_node_names', $controller_hosts_names_real),
       options           => $mysql_member_options_real,
     }
-    if hiera('tripleo::firewall::manage_firewall', true) {
+    if $manage_firewall {
       include ::tripleo::firewall
       $mysql_firewall_rules = {
         '100 mysql_haproxy' => {
@@ -1443,7 +1450,7 @@ class tripleo::haproxy (
       server_names      => hiera('redis_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
     }
-    if hiera('tripleo::firewall::manage_firewall', true) {
+    if $manage_firewall {
       include ::tripleo::firewall
       $redis_firewall_rules = {
         '100 redis_haproxy' => {

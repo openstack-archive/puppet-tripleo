@@ -26,6 +26,11 @@
 #   (Optional) Whether load balancing is enabled for this cluster
 #   Defaults to hiera('enable_load_balancer', true)
 #
+# [*manage_firewall*]
+#  (optional) Enable or disable firewall settings for ports exposed by HAProxy
+#  (false means disabled, and true means enabled)
+#  Defaults to hiera('tripleo::firewall::manage_firewall', true)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -38,10 +43,13 @@
 class tripleo::profile::pacemaker::haproxy (
   $bootstrap_node       = hiera('haproxy_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
+  $manage_firewall      = hiera('tripleo::firewall::manage_firewall', true),
   $step                 = Integer(hiera('step')),
   $pcs_tries            = hiera('pcs_tries', 20),
 ) {
-  include ::tripleo::profile::base::haproxy
+  class {'::tripleo::profile::base::haproxy':
+    manage_firewall => $manage_firewall,
+  }
 
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
