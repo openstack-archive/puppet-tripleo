@@ -46,11 +46,6 @@ class tripleo::profile::base::pacemaker_remote (
   }
   $enable_fencing_real = str2bool($enable_fencing) and $step >= 5
 
-  class { '::pacemaker::stonith':
-    disable => !$enable_fencing_real,
-    tries   => $pcs_tries,
-  }
-
   if $enable_fencing_real {
     include ::tripleo::fencing
 
@@ -58,7 +53,5 @@ class tripleo::profile::base::pacemaker_remote (
     Pcmk_resource<||> -> Class['tripleo::fencing']
     Pcmk_constraint<||> -> Class['tripleo::fencing']
     Exec <| tag == 'pacemaker_constraint' |> -> Class['tripleo::fencing']
-    # enable stonith after all fencing devices have been created
-    Class['tripleo::fencing'] -> Class['pacemaker::stonith']
   }
 }
