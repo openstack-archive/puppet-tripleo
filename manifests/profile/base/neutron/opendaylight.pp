@@ -33,7 +33,6 @@
 class tripleo::profile::base::neutron::opendaylight (
   $step         = Integer(hiera('step')),
   $odl_api_ips  = hiera('opendaylight_api_node_ips'),
-  $node_name    = hiera('bootstrap_nodeid')
 ) {
 
   if $step >= 1 {
@@ -43,12 +42,9 @@ class tripleo::profile::base::neutron::opendaylight (
     } elsif size($odl_api_ips) == 2 {
       fail('2 node OpenDaylight deployments are unsupported.  Use 1 or greater than 2')
     } elsif size($odl_api_ips) > 2 {
-      $node_string = split($node_name, '-')
-      $ha_node_index = $node_string[-1] + 1
       class { '::opendaylight':
-        enable_ha     => true,
-        ha_node_ips   => $odl_api_ips,
-        ha_node_index => $ha_node_index,
+        enable_ha   => true,
+        ha_node_ips => $odl_api_ips,
       }
     } else {
       include ::opendaylight

@@ -18,8 +18,7 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::neutron::opendaylight' do
   let :params do
-    { :step                    => 1,
-      :node_name   => 'overcloud-controller-0',
+    { :step                    => 1
     }
   end
   shared_examples_for 'tripleo::profile::base::neutron::opendaylight' do
@@ -69,8 +68,7 @@ describe 'tripleo::profile::base::neutron::opendaylight' do
       it 'should install and configure OpenDaylight in HA' do
         is_expected.to contain_class('opendaylight').with(
           :enable_ha     => true,
-          :ha_node_ips   => params[:odl_api_ips],
-          :ha_node_index => '1',
+          :ha_node_ips   => params[:odl_api_ips]
         )
       end
     end

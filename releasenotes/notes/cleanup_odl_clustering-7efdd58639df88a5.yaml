@@ -1,0 +1,8 @@
+---
+deprecations:
+  - Deprecates and removes workaround OpenDaylight
+    clustering function and class.  Clustering config
+    is now handled by puppet-opendaylight.
+  - Removes deprecated opendaylight parameter
+    'ha_node_index' which is no longer needed to
+    configure clustering.
