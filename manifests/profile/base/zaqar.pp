@@ -30,21 +30,56 @@
 #   (Optional) The messaging store for Zaqar.
 #   Defaults to 'mongodb'
 #
+# [*certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Example with hiera:
+#     apache_certificates_specs:
+#       httpd-internal_api:
+#         hostname: <overcloud controller fqdn>
+#         service_certificate: <service certificate path>
+#         service_key: <service key path>
+#         principal: "haproxy/<overcloud controller fqdn>"
+#   Defaults to hiera('apache_certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*zaqar_api_network*]
+#   (Optional) The network name where the zaqar API endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('zaqar_api_network', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::zaqar (
-  $bootstrap_node   = hiera('bootstrap_nodeid', undef),
-  $management_store = 'mongodb',
-  $messaging_store  = 'mongodb',
-  $step             = Integer(hiera('step')),
+  $bootstrap_node      = hiera('bootstrap_nodeid', undef),
+  $management_store    = 'mongodb',
+  $messaging_store     = 'mongodb',
+  $certificates_specs  = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls = hiera('enable_internal_tls', false),
+  $zaqar_api_network   = hiera('zaqar_api_network', undef),
+  $step                = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
     $is_bootstrap = false
+  }
+
+  if $enable_internal_tls {
+    if !$zaqar_api_network {
+      fail('zaqar_api_network is not set in the hieradata.')
+    }
+    $tls_certfile = $certificates_specs["httpd-${zaqar_api_network}"]['service_certificate']
+    $tls_keyfile = $certificates_specs["httpd-${zaqar_api_network}"]['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
@@ -92,7 +127,10 @@ class tripleo::profile::base::zaqar (
     class { '::zaqar::server':
       service_name => 'httpd', # TODO cleanup when passed by t-h-t.
     }
-    include ::zaqar::wsgi::apache
+    class { '::zaqar::wsgi::apache':
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
+    }
     zaqar::server_instance{ '1':
       transport => 'websocket'
     }

@@ -1483,6 +1483,7 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[zaqar_api_ssl_port],
       service_network   => $zaqar_api_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
