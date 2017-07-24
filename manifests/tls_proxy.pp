@@ -43,7 +43,7 @@ define tripleo::tls_proxy(
   include ::apache
   ::apache::vhost { "${title}-proxy":
     ensure          => 'present',
-    docroot         => undef,  # This is required by the manifest
+    docroot         => false,  # This is required by the manifest
     manage_docroot  => false,
     servername      => $servername,
     ip              => $ip,
