@@ -107,6 +107,7 @@ class tripleo::profile::base::gnocchi::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
+    include ::gnocchi::api
     include ::apache::mod::ssl
     class { '::gnocchi::wsgi::apache':
       ssl_cert => $tls_certfile,
@@ -132,7 +133,6 @@ class tripleo::profile::base::gnocchi::api (
       'rbd': { include ::gnocchi::storage::ceph }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
-    include ::gnocchi::api
   }
 
 }
