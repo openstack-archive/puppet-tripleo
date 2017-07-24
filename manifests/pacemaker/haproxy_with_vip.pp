@@ -104,9 +104,9 @@ define tripleo::pacemaker::haproxy_with_vip(
       default => Pacemaker::Resource::Service['haproxy']
     }
 
-    Pacemaker::Resource::Ip["${vip_name}_vip"] ->
-      $service_resource ->
-        Pacemaker::Constraint::Order["${vip_name}_vip-then-haproxy"] ->
-          Pacemaker::Constraint::Colocation["${vip_name}_vip-with-haproxy"]
+    Pacemaker::Resource::Ip["${vip_name}_vip"]
+      -> $service_resource
+        -> Pacemaker::Constraint::Order["${vip_name}_vip-then-haproxy"]
+          -> Pacemaker::Constraint::Colocation["${vip_name}_vip-with-haproxy"]
   }
 }

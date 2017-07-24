@@ -76,8 +76,8 @@ class tripleo::profile::base::logging::fluentd (
     include ::fluentd
 
     if $fluentd_groups {
-      Package<| tag == 'openstack' |> ->
-      user { $::fluentd::config_owner:
+      Package<| tag == 'openstack' |>
+      -> user { $::fluentd::config_owner:
         ensure     => present,
         groups     => $fluentd_groups,
         membership => 'minimum',

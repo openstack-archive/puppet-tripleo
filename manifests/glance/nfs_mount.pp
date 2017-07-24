@@ -62,8 +62,8 @@ class tripleo::glance::nfs_mount (
 
   file { $images_dir:
     ensure => directory,
-  } ->
-  exec { 'NFS mount for glance file backend':
+  }
+  -> exec { 'NFS mount for glance file backend':
     path    => ['/usr/sbin', '/usr/bin'],
     command => "mount -t nfs '${share}' '${images_dir}' ${options_part}",
     unless  => "mount | grep ' ${images_dir} '",

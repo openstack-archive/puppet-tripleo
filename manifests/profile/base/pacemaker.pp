@@ -104,8 +104,8 @@ class tripleo::profile::base::pacemaker (
     }
     class { '::pacemaker':
       hacluster_pwd => hiera('hacluster_pwd'),
-    } ->
-    class { '::pacemaker::corosync':
+    }
+    -> class { '::pacemaker::corosync':
       cluster_members      => $pacemaker_cluster_members,
       setup_cluster        => $pacemaker_master,
       cluster_setup_extras => $cluster_setup_extras,

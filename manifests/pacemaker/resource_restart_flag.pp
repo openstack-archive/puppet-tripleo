@@ -41,6 +41,6 @@ define tripleo::pacemaker::resource_restart_flag() {
     refreshonly => true,
   }
 
-  File['/var/lib/tripleo/pacemaker-restarts'] ->
-  Exec["${title} resource restart flag"]
+  File['/var/lib/tripleo/pacemaker-restarts']
+  -> Exec["${title} resource restart flag"]
 }

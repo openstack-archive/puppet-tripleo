@@ -76,8 +76,8 @@ class tripleo::profile::pacemaker::ceph::rbdmirror (
     ceph::mirror { $client_name:
       rbd_mirror_enable => false,
       rbd_mirror_ensure => 'stopped',
-    } ->
-    pacemaker::resource::service { "ceph-rbd-mirror_${client_name}":
+    }
+    -> pacemaker::resource::service { "ceph-rbd-mirror_${client_name}":
       # NOTE(gfidente): systemd uses the @ sign but it is an invalid
       # character in a pcmk resource name, so we need to use it only
       # for the name of the service

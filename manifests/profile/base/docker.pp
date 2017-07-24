@@ -185,8 +185,8 @@ class tripleo::profile::base::docker (
     group { 'docker_nova_group':
       name => 'docker_nova',
       gid  => $docker_nova_uid
-    } ->
-    user { 'docker_nova_user':
+    }
+    -> user { 'docker_nova_user':
       name    => 'docker_nova',
       uid     => $docker_nova_uid,
       gid     => $docker_nova_uid,
@@ -207,8 +207,8 @@ polkit.addRule(function(action, subject) {
 '
     package {'polkit':
       ensure => installed,
-    } ->
-    file {'/etc/polkit-1/rules.d/50-nova.rules':
+    }
+    -> file {'/etc/polkit-1/rules.d/50-nova.rules':
       content => $docker_nova_polkit_rule,
       mode    => '0644'
     }
