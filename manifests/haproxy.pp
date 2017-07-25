@@ -1374,7 +1374,7 @@ class tripleo::haproxy (
       server_names      => hiera('mysql_node_names', $controller_hosts_names_real),
       options           => $mysql_member_options_real,
     }
-    if hiera('manage_firewall', true) {
+    if hiera('tripleo::firewall::manage_firewall', true) {
       include ::tripleo::firewall
       $mysql_firewall_rules = {
         '100 mysql_haproxy' => {
@@ -1459,7 +1459,7 @@ class tripleo::haproxy (
       server_names      => hiera('redis_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
     }
-    if hiera('manage_firewall', true) {
+    if hiera('tripleo::firewall::manage_firewall', true) {
       include ::tripleo::firewall
       $redis_firewall_rules = {
         '100 redis_haproxy' => {
