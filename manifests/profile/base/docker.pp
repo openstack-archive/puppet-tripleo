@@ -43,18 +43,6 @@
 # [*step*]
 #   step defaults to hiera('step')
 #
-# [*configure_libvirt_polkit*]
-#   Configures libvirt polkit to grant the kolla nova user access to the libvirtd unix domain socket on the host.
-#   Defaults to true when nova_compute service is enabled, false when nova_compute is disabled
-#
-# [*docker_nova_uid*]
-#   When configure_libvirt_polkit = true, the uid/gid of the nova user within the docker container.
-#   Defaults to 42436
-#
-# [*services_enabled*]
-#   List of TripleO services enabled on the role.
-#   Defaults to hiera('services_names')
-#
 # DEPRECATED PARAMETERS
 #
 # [*docker_namespace*]
@@ -73,19 +61,10 @@ class tripleo::profile::base::docker (
   $configure_storage = true,
   $storage_options = '-s overlay2',
   $step = Integer(hiera('step')),
-  $configure_libvirt_polkit = undef,
-  $docker_nova_uid = 42436,
-  $services_enabled = hiera('service_names', []),
   # DEPRECATED PARAMETERS
   $docker_namespace = undef,
   $insecure_registry = false,
 ) {
-
-  if $configure_libvirt_polkit == undef {
-    $configure_libvirt_polkit_real = 'nova_compute' in $services_enabled
-  } else {
-    $configure_libvirt_polkit_real = $configure_libvirt_polkit
-  }
 
   if $step >= 1 {
     package {'docker':
@@ -175,42 +154,5 @@ class tripleo::profile::base::docker (
       require => Package['docker'],
     }
 
-  }
-  if ($step >= 4 and $configure_libvirt_polkit_real) {
-    # Workaround for polkit authorization for libvirtd socket on host
-    #
-    # This creates a local user with the kolla nova uid, and sets the polkit rule to
-    # allow both it and the nova user from the nova rpms, should it exist (uid 162).
-
-    group { 'docker_nova_group':
-      name => 'docker_nova',
-      gid  => $docker_nova_uid
-    }
-    -> user { 'docker_nova_user':
-      name    => 'docker_nova',
-      uid     => $docker_nova_uid,
-      gid     => $docker_nova_uid,
-      shell   => '/sbin/nologin',
-      comment => 'OpenStack Nova Daemons',
-      groups  => ['nobody']
-    }
-
-    # Similar to the polkit rule in the openstack-nova rpm spec
-    # but allow both the 'docker_nova' and 'nova' user
-    $docker_nova_polkit_rule = '// openstack-nova libvirt management permissions
-polkit.addRule(function(action, subject) {
-    if (action.id == "org.libvirt.unix.manage" &&
-        /^(docker_)?nova$/.test(subject.user)) {
-        return polkit.Result.YES;
-    }
-});
-'
-    package {'polkit':
-      ensure => installed,
-    }
-    -> file {'/etc/polkit-1/rules.d/50-nova.rules':
-      content => $docker_nova_polkit_rule,
-      mode    => '0644'
-    }
   }
 }

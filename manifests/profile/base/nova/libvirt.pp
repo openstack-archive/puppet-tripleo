@@ -23,8 +23,13 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*libvirtd_config*]
+#   (Optional) Overrides for libvirtd config options
+#   Default to {}
+#
 class tripleo::profile::base::nova::libvirt (
   $step = Integer(hiera('step')),
+  $libvirtd_config = {},
 ) {
   include ::tripleo::profile::base::nova::compute_libvirt_shared
 
@@ -32,6 +37,18 @@ class tripleo::profile::base::nova::libvirt (
     include ::tripleo::profile::base::nova
     include ::tripleo::profile::base::nova::migration::client
     include ::nova::compute::libvirt::services
+
+    $libvirtd_config_default = {
+      unix_sock_group    => {value => '"libvirt"'},
+      auth_unix_ro       => {value => '"none"'},
+      auth_unix_rw       => {value => '"none"'},
+      unix_sock_ro_perms => {value => '"0777"'},
+      unix_sock_rw_perms => {value => '"0770"'}
+    }
+
+    class { '::nova::compute::libvirt::config':
+      libvirtd_config => merge($libvirtd_config_default, $libvirtd_config)
+    }
 
     file { ['/etc/libvirt/qemu/networks/autostart/default.xml',
       '/etc/libvirt/qemu/networks/default.xml']:

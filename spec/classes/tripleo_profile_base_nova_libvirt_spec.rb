@@ -69,6 +69,51 @@ eos
         is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
         is_expected.to contain_exec('libvirt-default-net-destroy')
+        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config({
+          "unix_sock_group"    => {"value" => '"libvirt"'},
+          "auth_unix_ro"       => {"value" => '"none"'},
+          "auth_unix_rw"       => {"value" => '"none"'},
+          "unix_sock_ro_perms" => {"value" => '"0777"'},
+          "unix_sock_rw_perms" => {"value" => '"0770"'}
+        })
+      }
+    end
+
+    context 'with step 4 and libvirtd_config' do
+      let(:pre_condition) do
+        <<-eos
+        class { '::tripleo::profile::base::nova':
+          step => #{params[:step]},
+          oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        }
+        class { '::tripleo::profile::base::nova::migration':
+          step => #{params[:step]}
+        }
+        class { '::tripleo::profile::base::nova::migration::client':
+          step => #{params[:step]}
+        }
+        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+          step => #{params[:step]}
+        }
+eos
+      end
+
+      let(:params) { { :step => 4, :libvirtd_config => { "unix_sock_group" => {"value" => '"foobar"'}} } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::compute::libvirt::services')
+        is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
+        is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
+        is_expected.to contain_exec('libvirt-default-net-destroy')
+        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config({
+          "unix_sock_group"    => {"value" => '"foobar"'},
+          "auth_unix_ro"       => {"value" => '"none"'},
+          "auth_unix_rw"       => {"value" => '"none"'},
+          "unix_sock_ro_perms" => {"value" => '"0777"'},
+          "unix_sock_rw_perms" => {"value" => '"0770"'}
+        })
       }
     end
   end
