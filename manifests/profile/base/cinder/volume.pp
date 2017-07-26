@@ -26,6 +26,10 @@
 #   (Optional) Whether to enable the delsc backend
 #   Defaults to false
 #
+# [*cinder_enable_dellemc_unity_backend*]
+#   (Optional) Whether to enable the unity backend
+#   Defaults to false
+#
 # [*cinder_enable_hpelefthand_backend*]
 #   (Optional) Whether to enable the hpelefthand backend
 #   Defaults to false
@@ -68,18 +72,19 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::volume (
-  $cinder_enable_pure_backend        = false,
-  $cinder_enable_dellsc_backend      = false,
-  $cinder_enable_hpelefthand_backend = false,
-  $cinder_enable_dellps_backend      = false,
-  $cinder_enable_iscsi_backend       = true,
-  $cinder_enable_netapp_backend      = false,
-  $cinder_enable_nfs_backend         = false,
-  $cinder_enable_rbd_backend         = false,
-  $cinder_enable_scaleio_backend     = false,
-  $cinder_enable_vrts_hs_backend     = false,
-  $cinder_user_enabled_backends      = hiera('cinder_user_enabled_backends', undef),
-  $step                              = Integer(hiera('step')),
+  $cinder_enable_pure_backend          = false,
+  $cinder_enable_dellsc_backend        = false,
+  $cinder_enable_dellemc_unity_backend = false,
+  $cinder_enable_hpelefthand_backend   = false,
+  $cinder_enable_dellps_backend        = false,
+  $cinder_enable_iscsi_backend         = true,
+  $cinder_enable_netapp_backend        = false,
+  $cinder_enable_nfs_backend           = false,
+  $cinder_enable_rbd_backend           = false,
+  $cinder_enable_scaleio_backend       = false,
+  $cinder_enable_vrts_hs_backend       = false,
+  $cinder_user_enabled_backends        = hiera('cinder_user_enabled_backends', undef),
+  $step                                = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder
 
@@ -98,6 +103,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellsc_backend_name = hiera('cinder::backend::dellsc_iscsi::volume_backend_name', 'tripleo_dellsc')
     } else {
       $cinder_dellsc_backend_name = undef
+    }
+
+    if $cinder_enable_dellemc_unity_backend {
+      include ::tripleo::profile::base::cinder::volume::dellemc_unity
+      $cinder_dellemc_unity_backend_name = hiera('cinder::backend::dellemc_unity::volume_backend_name', 'tripleo_dellemc_unity')
+    } else {
+      $cinder_dellemc_unity_backend_name = undef
     }
 
     if $cinder_enable_hpelefthand_backend {
@@ -161,6 +173,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_pure_backend_name,
                                       $cinder_dellps_backend_name,
                                       $cinder_dellsc_backend_name,
+                                      $cinder_dellemc_unity_backend_name,
                                       $cinder_hpelefthand_backend_name,
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
