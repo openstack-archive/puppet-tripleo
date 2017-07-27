@@ -105,6 +105,11 @@ class tripleo::profile::base::gnocchi::api (
     class { '::gnocchi::storage':
       coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
     }
+
+    class { '::gnocchi::storage::incoming::redis':
+      redis_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
+    }
+
     case $gnocchi_backend {
       'swift': {
         include ::gnocchi::storage::swift
