@@ -26,6 +26,8 @@
 class tripleo::profile::base::nova::libvirt (
   $step = Integer(hiera('step')),
 ) {
+  include ::tripleo::profile::base::nova::compute_libvirt_shared
+
   if $step >= 4 {
     include ::tripleo::profile::base::nova
     include ::tripleo::profile::base::nova::migration::client
@@ -47,6 +49,4 @@ class tripleo::profile::base::nova::libvirt (
 
     include ::nova::compute::libvirt::qemu
   }
-  include ::tripleo::profile::base::nova::compute_libvirt_shared
-
 }

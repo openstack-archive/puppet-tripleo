@@ -58,7 +58,7 @@ describe 'tripleo::selinux' do
 
     context 'with selinux disabled' do
       before :each do
-        facts.merge!({ :selinux => 'false' })
+        facts.merge!({ :selinux => false })
       end
 
       let :params do

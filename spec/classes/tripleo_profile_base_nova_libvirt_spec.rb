@@ -21,9 +21,16 @@ describe 'tripleo::profile::base::nova::libvirt' do
 
     context 'with step less than 4' do
       let(:params) { { :step => 1, } }
-
+      let(:pre_condition) do
+        <<-eos
+        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+          step => #{params[:step]}
+        }
+eos
+      end
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
+        is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::compute::libvirt::services')
         is_expected.to_not contain_file('/etclibvirt/qemu/networks/autostart/default.xml')
@@ -45,6 +52,9 @@ describe 'tripleo::profile::base::nova::libvirt' do
         class { '::tripleo::profile::base::nova::migration::client':
           step => #{params[:step]}
         }
+        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+          step => #{params[:step]}
+        }
 eos
       end
 
@@ -52,8 +62,10 @@ eos
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
+        is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('nova::compute::libvirt::services')
+        is_expected.to contain_class('nova::compute::libvirt::qemu')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
         is_expected.to contain_exec('libvirt-default-net-destroy')

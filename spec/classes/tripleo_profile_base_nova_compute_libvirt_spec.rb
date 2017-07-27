@@ -22,12 +22,21 @@ describe 'tripleo::profile::base::nova::compute::libvirt' do
     context 'with step less than 4' do
       let(:params) { { :step => 1, } }
 
+      let(:pre_condition) do
+        <<-eos
+        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+          step => #{params[:step]},
+        }
+eos
+      end
+
+
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::compute::libvirt')
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('tripleo::profile::base::nova::compute')
-        is_expected.to_not contain_class('nova::compute::libvirt')
-        is_expected.to_not contain_class('nova::compute::libvirt::qemu')
+        is_expected.to_not contain_class('tripleo::profile::base::nova::migration::client')
+        is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
       }
     end
 
@@ -37,6 +46,9 @@ describe 'tripleo::profile::base::nova::compute::libvirt' do
         class { '::tripleo::profile::base::nova':
           step => #{params[:step]},
           oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        }
+        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+          step => #{params[:step]},
         }
         class { '::tripleo::profile::base::nova::compute':
           step => #{params[:step]},
@@ -54,10 +66,9 @@ eos
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::compute::libvirt')
-        is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('tripleo::profile::base::nova::compute')
-        is_expected.to contain_class('nova::compute::libvirt')
-        is_expected.to contain_class('nova::compute::libvirt::qemu')
+        is_expected.to contain_class('tripleo::profile::base::nova::migration::client')
+        is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
       }
     end
   end
