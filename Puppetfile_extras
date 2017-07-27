@@ -35,7 +35,7 @@ mod 'ntp',
 
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
-  :ref => 'master'
+  :ref => 'a0321364514f52a4c110a15afbdad5109d768fe6'
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
