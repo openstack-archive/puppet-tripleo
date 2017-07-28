@@ -18,12 +18,19 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::nova::compute' do
   shared_examples_for 'tripleo::profile::base::nova::compute' do
+    before :each do
+      facts.merge!({ :step => params[:step] })
+    end
 
     context 'with step less than 5' do
       let(:params) { { :step => 1, } }
 
       it {
-        is_expected.to contain_class('tripleo::profile::base::nova::compute')
+        is_expected.to contain_class('tripleo::profile::base::nova::compute').with(
+          # Verify legacy key manager is enabled when none is set in hiera.
+          :keymgr_api_class => 'nova.keymgr.conf_key_mgr.ConfKeyManager',
+        )
+
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::compute')
         is_expected.to_not contain_class('nova::network::neutron')
@@ -50,7 +57,10 @@ eos
         let(:params) { { :step => 4, } }
 
         it {
-          is_expected.to contain_class('tripleo::profile::base::nova::compute')
+          is_expected.to contain_class('tripleo::profile::base::nova::compute').with(
+            # Verify proper key manager is enabled when value is set in hiera.
+            :keymgr_api_class => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
+          )
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::compute')

@@ -18,6 +18,10 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::cinder::api' do
   shared_examples_for 'tripleo::profile::base::cinder::api' do
+    before :each do
+      facts.merge!({ :step => params[:step] })
+    end
+
     let(:pre_condition) do
       "class { '::tripleo::profile::base::cinder': step => #{params[:step]}, oslomsg_rpc_hosts => ['127.0.0.1'] }"
     end
@@ -40,7 +44,10 @@ describe 'tripleo::profile::base::cinder::api' do
       } }
 
       it 'should trigger complete configuration' do
-        is_expected.to contain_class('cinder::api')
+        is_expected.to contain_class('cinder::api').with(
+          # Verify legacy key manager is enabled when none is set in hiera.
+          :keymgr_api_class => 'cinder.keymgr.conf_key_mgr.ConfKeyManager',
+        )
         is_expected.to contain_class('cinder::ceilometer')
       end
     end
@@ -63,7 +70,10 @@ describe 'tripleo::profile::base::cinder::api' do
       } }
 
       it 'should trigger complete configuration' do
-        is_expected.to contain_class('cinder::api')
+        is_expected.to contain_class('cinder::api').with(
+          # Verify proper key manager is enabled when value is set in hiera.
+          :keymgr_api_class => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
+        )
         is_expected.to contain_class('cinder::ceilometer')
       end
     end
