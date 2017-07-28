@@ -30,6 +30,10 @@
 #   (Optional) Whether or not the vmax backend is enabled
 #   Defaults to hiera('manila_backend_vmax_enabled', false)
 #
+# [*backend_isilon_enabled*]
+#   (Optional) Whether or not the isilon backend is enabled
+#   Defaults to hiera('manila_backend_isilon_enabled', false)
+#
 # [*backend_cephfs_enabled*]
 #   (Optional) Whether or not the cephfs backend is enabled
 #   Defaults to hiera('manila_backend_cephfs_enabled', false)
@@ -51,6 +55,7 @@ class tripleo::profile::pacemaker::manila (
   $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
   $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
+  $backend_isilon_enabled  = hiera('manila_backend_isilon_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
   $step                    = Integer(hiera('step')),
@@ -174,12 +179,29 @@ class tripleo::profile::pacemaker::manila (
 
 
 
+    # manila isilon:
+    if $backend_isilon_enabled {
+      $manila_isilon_backend = hiera('manila::backend::dellemc_isilon::title')
+      manila::backend::dellemc_isilon { $manila_isilon_backend :
+        driver_handles_share_servers => hiera('manila::backend::dellemc_isilon::driver_handles_share_servers', false),
+        emc_nas_login                => hiera('manila::backend::dellemc_isilon::emc_nas_login'),
+        emc_nas_password             => hiera('manila::backend::dellemc_isilon::emc_nas_password'),
+        emc_nas_server               => hiera('manila::backend::dellemc_isilon::emc_nas_server'),
+        emc_share_backend            => hiera('manila::backend::dellemc_isilon::emc_share_backend','isilon'),
+        share_backend_name           => hiera('manila::backend::dellemc_isilon::share_backend_name'),
+        emc_nas_root_dir             => hiera('manila::backend::dellemc_isilon::emc_nas_root_dir'),
+        emc_nas_server_port          => hiera('manila::backend::dellemc_isilon::emc_server_port'),
+        emc_nas_server_secure        => hiera('manila::backend::dellemc_isilon::emc_nas_secure'),
+      }
+    }
+
     $manila_enabled_backends = delete_undef_values(
       [
         $manila_generic_backend,
         $manila_cephfsnative_backend,
         $manila_netapp_backend,
-        $manila_vmax_backend
+        $manila_vmax_backend,
+        $manila_isilon_backend
       ]
     )
     class { '::manila::backends' :
