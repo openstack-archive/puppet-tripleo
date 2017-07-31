@@ -63,6 +63,10 @@
 #   be set to 60s.
 #   Defaults to hiera('pacemaker_cluster_recheck_interval', undef)
 #
+# [*encryption*]
+#   (Optional) Whether or not to enable encryption of the pacemaker traffic
+#   Defaults to true
+#
 class tripleo::profile::base::pacemaker (
   $step                      = Integer(hiera('step')),
   $pcs_tries                 = hiera('pcs_tries', 20),
@@ -74,6 +78,7 @@ class tripleo::profile::base::pacemaker (
   $remote_tries              = hiera('pacemaker_remote_tries', 5),
   $remote_try_sleep          = hiera('pacemaker_remote_try_sleep', 60),
   $cluster_recheck_interval  = hiera('pacemaker_cluster_recheck_interval', undef),
+  $encryption                = true,
 ) {
 
   if count($remote_short_node_names) != count($remote_node_ips) {
@@ -98,9 +103,20 @@ class tripleo::profile::base::pacemaker (
     $pacemaker_cluster_members = downcase(regsubst($pacemaker_short_node_names, ',', ' ', 'G'))
     $corosync_ipv6 = str2bool(hiera('corosync_ipv6', false))
     if $corosync_ipv6 {
-      $cluster_setup_extras = { '--token' => hiera('corosync_token_timeout', 1000), '--ipv6' => '' }
+      $cluster_setup_extras_pre = {
+        '--token' => hiera('corosync_token_timeout', 1000),
+        '--ipv6' => ''
+      }
     } else {
-      $cluster_setup_extras = { '--token' => hiera('corosync_token_timeout', 1000) }
+      $cluster_setup_extras_pre = {
+        '--token' => hiera('corosync_token_timeout', 1000)
+      }
+    }
+
+    if $encryption {
+      $cluster_setup_extras = merge($cluster_setup_extras_pre, {'--encryption' => '1'})
+    } else {
+      $cluster_setup_extras = $cluster_setup_extras_pre
     }
     class { '::pacemaker':
       hacluster_pwd => hiera('hacluster_pwd'),

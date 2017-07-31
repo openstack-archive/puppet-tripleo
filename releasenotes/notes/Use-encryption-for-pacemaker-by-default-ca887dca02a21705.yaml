@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Encryption is used for pacemaker traffic by default. This is achieved by
+    using a pre shared key for all the pacemaker cluster nodes (same as the one
+    that was used for the pacemaker remote communication).
