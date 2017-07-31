@@ -26,14 +26,19 @@
 #   (Optional) The address that the local mysql instance should bind to.
 #   Defaults to hiera('mysql_bind_host')
 #
+# [*clustercheck_user*]
+#   (Optional) The name of the clustercheck user.
+#   Defaults to 'clustercheck'
+#
 # [*clustercheck_password*]
 #   (Optional) The password for the clustercheck user.
-#   Defaults to hiera('mysql::server::root_password')
+#   Defaults to hiera('mysql_clustercheck_password')
 #
 #
 class tripleo::profile::pacemaker::clustercheck (
   $step                  = Integer(hiera('step')),
-  $clustercheck_password = hiera('mysql::server::root_password'),
+  $clustercheck_user     = 'clustercheck',
+  $clustercheck_password = hiera('mysql_clustercheck_password'),
   $bind_address          = hiera('mysql_bind_host'),
 ) {
 
@@ -43,7 +48,7 @@ class tripleo::profile::pacemaker::clustercheck (
       mode    => '0600',
       owner   => 'mysql',
       group   => 'mysql',
-      content => "MYSQL_USERNAME=root\n
+      content => "MYSQL_USERNAME=${clustercheck_user}\n
 MYSQL_PASSWORD='${clustercheck_password}'\n
 MYSQL_HOST=localhost\n",
     }
