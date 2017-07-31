@@ -772,12 +772,6 @@ class tripleo::haproxy (
     $controller_hosts_names_real = downcase(any2array(split($controller_hosts_names, ',')))
   }
 
-  # TODO(bnemec): When we have support for SSL on private and admin endpoints,
-  # have the haproxy stats endpoint use that certificate by default.
-  if $haproxy_stats_certificate {
-    $haproxy_stats_bind_certificate = $haproxy_stats_certificate
-  }
-
   $horizon_vip = hiera('horizon_vip', $controller_virtual_ip)
   if $service_certificate {
     # NOTE(jaosorior): If the horizon_vip and the public_virtual_ip are the
@@ -812,16 +806,6 @@ class tripleo::haproxy (
     $horizon_options = {
       'cookie' => 'SERVERID insert indirect nocache',
       'option' => [ 'forwardfor', 'httpchk' ],
-    }
-  }
-
-  if $haproxy_stats_bind_certificate {
-    $haproxy_stats_bind_opts = {
-      "${controller_virtual_ip}:1993" => union($haproxy_listen_bind_param, ['ssl', 'crt', $haproxy_stats_bind_certificate]),
-    }
-  } else {
-    $haproxy_stats_bind_opts = {
-      "${controller_virtual_ip}:1993" => $haproxy_listen_bind_param,
     }
   }
 
@@ -891,19 +875,20 @@ class tripleo::haproxy (
   }
 
   if $haproxy_stats {
-    $stats_base = ['enable', 'uri /']
-    if $haproxy_stats_password {
-      $stats_config = union($stats_base, ["auth ${haproxy_stats_user}:${haproxy_stats_password}"])
+    if $haproxy_stats_certificate {
+      $haproxy_stats_certificate_real = $haproxy_stats_certificate
+    } elsif $use_internal_certificates {
+      # NOTE(jaosorior): Right now it's hardcoded to use the ctlplane network
+      $haproxy_stats_certificate_real = $internal_certificates_specs["haproxy-ctlplane"]['service_pem']
     } else {
-      $stats_config = $stats_base
+      $haproxy_stats_certificate_real = undef
     }
-    haproxy::listen { 'haproxy.stats':
-      bind             => $haproxy_stats_bind_opts,
-      mode             => 'http',
-      options          => {
-        'stats' => $stats_config,
-      },
-      collect_exported => false,
+    class { '::tripleo::haproxy::stats':
+      haproxy_listen_bind_param => $haproxy_listen_bind_param,
+      ip                        => $controller_virtual_ip,
+      password                  => $haproxy_stats_password,
+      certificate               => $haproxy_stats_certificate_real,
+      user                      => $haproxy_stats_user,
     }
   }
 

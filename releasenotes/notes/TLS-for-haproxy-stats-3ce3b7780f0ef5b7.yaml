@@ -1,0 +1,8 @@
+---
+features:
+  - When TLS everywhere is enabled, the HAProxy stats interface will also use
+    TLS. This requires the user to access the interface through the ctlplane
+    FQDN (which is configured by the CloudNameCtlplane parameter in
+    tripleo-heat-templates). Note that one can still use the
+    haproxy_stats_certificate parameter from the haproxy class, and that one
+    will take precedence if set.
