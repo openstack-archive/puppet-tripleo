@@ -36,6 +36,11 @@
 #   (Optional) Whether or not loadbalancer is enabled.
 #   Defaults to hiera('enable_load_balancer', true).
 #
+# [*manage_firewall*]
+#  (optional) Enable or disable firewall settings for ports exposed by HAProxy
+#  (false means disabled, and true means enabled)
+#  Defaults to hiera('tripleo::firewall::manage_firewall', true)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -44,12 +49,14 @@
 class tripleo::profile::base::haproxy (
   $certificates_specs            = {},
   $enable_load_balancer          = hiera('enable_load_balancer', true),
+  $manage_firewall               = hiera('tripleo::firewall::manage_firewall', true),
   $step                          = Integer(hiera('step')),
 ) {
   if $step >= 1 {
     if $enable_load_balancer {
       class {'::tripleo::haproxy':
         internal_certificates_specs => $certificates_specs,
+        manage_firewall             => $manage_firewall,
       }
 
       unless hiera('tripleo::haproxy::haproxy_service_manage', true) {

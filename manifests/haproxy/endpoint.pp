@@ -86,6 +86,11 @@
 #  fetching the certificate for that specific network.
 #  Defaults to undef
 #
+# [*manage_firewall*]
+#  (optional) Enable or disable firewall settings for ports exposed by HAProxy
+#  (false means disabled, and true means enabled)
+#  Defaults to hiera('tripleo::firewall::manage_firewall', true)
+#
 define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
@@ -103,6 +108,7 @@ define tripleo::haproxy::endpoint (
   $use_internal_certificates   = false,
   $internal_certificates_specs = {},
   $service_network             = undef,
+  $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
 ) {
   if $public_virtual_ip {
     # service exposed to the public network
@@ -158,7 +164,7 @@ define tripleo::haproxy::endpoint (
     server_names      => $server_names,
     options           => $member_options,
   }
-  if hiera('tripleo::firewall::manage_firewall', true) {
+  if $manage_firewall {
     include ::tripleo::firewall
     # This block will construct firewall rules only when we specify
     # a port for the regular service and also the ssl port for the service.
