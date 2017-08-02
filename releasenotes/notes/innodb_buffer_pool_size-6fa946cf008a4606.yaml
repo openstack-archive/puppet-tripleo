@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Enable innodb_buffer_pool_size configuration for all MySQL databases.
