@@ -32,7 +32,7 @@
 #   OPTIONS that are used to startup the docker service.  NOTE:
 #   --selinux-enabled is dropped due to recommendations here:
 #   https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/7.2_Release_Notes/technology-preview-file_systems.html
-#   Defaults to '--log-driver=journald --signature-verification=false'
+#   Defaults to '--log-driver=journald --signature-verification=false --iptables=false'
 #
 # [*configure_storage*]
 #   Boolean. Whether to configure a docker storage backend. Defaults to true.
@@ -69,7 +69,7 @@
 class tripleo::profile::base::docker (
   $insecure_registry_address = undef,
   $registry_mirror = false,
-  $docker_options = '--log-driver=journald --signature-verification=false',
+  $docker_options = '--log-driver=journald --signature-verification=false --iptables=false',
   $configure_storage = true,
   $storage_options = '-s overlay2',
   $step = Integer(hiera('step')),
