@@ -98,6 +98,7 @@ class tripleo::profile::base::certmonger_user (
     ensure_resources('tripleo::certmonger::libvirt', $libvirt_certificates_specs)
   }
   unless empty($haproxy_certificates_specs) {
+    include ::tripleo::certmonger::haproxy_dirs
     ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs)
     # The haproxy fronends (or listen resources) depend on the certificate
     # existing and need to be refreshed if it changed.
