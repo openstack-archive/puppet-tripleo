@@ -289,6 +289,10 @@
 #  (optional) Enable or not Ironic Inspector API binding
 #  Defaults to hiera('ironic_inspector_enabled', false)
 #
+# [*octavia*]
+#  (optional) Enable or not Octavia APII binding
+#  Defaults to hiera('octavia_api_enabled', false)
+#
 # [*mysql*]
 #  (optional) Enable or not MySQL Galera binding
 #  Defaults to hiera('mysql_enabled', false)
@@ -471,6 +475,10 @@
 #  (optional) Specify the network etcd is running on.
 #  Defaults to hiera('etcd_network', undef)
 #
+# [*octavia_network*]
+#  (optional) Specify the network octavia is running on.
+#  Defaults to hiera('octavia_api_network', undef)
+#
 # [*opendaylight_network*]
 #  (optional) Specify the network opendaylight is running on.
 #  Defaults to hiera('opendaylight_api_network', undef)
@@ -546,6 +554,8 @@
 #    'nova_metadata_port' (Defaults to 8775)
 #    'nova_novnc_port' (Defaults to 6080)
 #    'nova_novnc_ssl_port' (Defaults to 13080)
+#    'octavia_api_port' (Defaults to 9876)
+#    'octavia_api_ssl_port' (Defaults to 13876)
 #    'opendaylight_api_port' (Defaults to 8081)
 #    'panko_api_port' (Defaults to 8977)
 #    'panko_api_ssl_port' (Defaults to 13977)
@@ -629,6 +639,7 @@ class tripleo::haproxy (
   $horizon                     = hiera('horizon_enabled', false),
   $ironic                      = hiera('ironic_api_enabled', false),
   $ironic_inspector            = hiera('ironic_inspector_enabled', false),
+  $octavia                     = hiera('octavia_api_enabled', false),
   $mysql                       = hiera('mysql_enabled', false),
   $mysql_clustercheck          = false,
   $mysql_max_conn              = undef,
@@ -670,6 +681,7 @@ class tripleo::haproxy (
   $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', undef),
   $nova_osapi_network          = hiera('nova_api_network', undef),
   $nova_placement_network      = hiera('nova_placement_network', undef),
+  $octavia_network             = hiera('octavia_api_network', undef),
   $panko_network               = hiera('panko_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $ec2_api_network             = hiera('ec2_api_network', undef),
@@ -737,6 +749,8 @@ class tripleo::haproxy (
     nova_metadata_port => 8775,
     nova_novnc_port => 6080,
     nova_novnc_ssl_port => 13080,
+    octavia_api_port => 9876,
+    octavia_api_ssl_port => 13876,
     opendaylight_api_port => 8081,
     panko_api_port => 8977,
     panko_api_ssl_port => 13977,
@@ -1492,6 +1506,17 @@ class tripleo::haproxy (
     }
   }
 
+  if $octavia {
+    ::tripleo::haproxy::endpoint { 'octavia':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('octavia_api_vip', $controller_virtual_ip),
+      service_port      => $ports[octavia_api_port],
+      ip_addresses      => hiera('octavia_api_node_ips'),
+      server_names      => hiera('octavia_api_node_names'),
+      public_ssl_port   => $ports[octavia_api_ssl_port],
+      service_network   => $octavia_network,
+    }
+  }
 
   if $ovn_dbs and $ovn_dbs_manage_lb {
     # FIXME: is this config enough to ensure we only hit the first node in
