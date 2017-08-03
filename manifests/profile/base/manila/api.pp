@@ -33,6 +33,10 @@
 #   (Optional) Whether or not the isilon backend is enabled
 #   Defaults to hiera('manila_backend_isilon_enabled', false)
 #
+# [*backend_unity_enabled*]
+#   (Optional) Whether or not the unity backend is enabled
+#   Defaults to hiera('manila_backend_unity_enabled', false)
+#
 # [*backend_cephfs_enabled*]
 #   (Optional) Whether or not the cephfs backend is enabled
 #   Defaults to hiera('manila_backend_cephfs_enabled', false)
@@ -51,6 +55,7 @@ class tripleo::profile::base::manila::api (
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
   $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
   $backend_isilon_enabled  = hiera('manila_backend_isilon_enabled', false),
+  $backend_unity_enabled   = hiera('manila_backend_unity_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $bootstrap_node          = hiera('bootstrap_nodeid', undef),
   $step                    = Integer(hiera('step')),
@@ -64,7 +69,7 @@ class tripleo::profile::base::manila::api (
   include ::tripleo::profile::base::manila
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    if $backend_generic_enabled or $backend_netapp_enabled or $backend_vmax_enabled or $backend_isilon_enabled {
+    if $backend_generic_enabled or $backend_netapp_enabled or $backend_vmax_enabled or $backend_isilon_enabled or $backend_unity_enabled {
       $nfs_protocol = 'NFS'
       $cifs_protocol = 'CIFS'
     } else {

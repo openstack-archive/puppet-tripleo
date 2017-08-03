@@ -34,6 +34,10 @@
 #   (Optional) Whether or not the isilon backend is enabled
 #   Defaults to hiera('manila_backend_isilon_enabled', false)
 #
+# [*backend_unity_enabled*]
+#   (Optional) Whether or not the unity backend is enabled
+#   Defaults to hiera('manila_backend_unity_enabled', false)
+#
 # [*backend_cephfs_enabled*]
 #   (Optional) Whether or not the cephfs backend is enabled
 #   Defaults to hiera('manila_backend_cephfs_enabled', false)
@@ -56,6 +60,7 @@ class tripleo::profile::pacemaker::manila (
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
   $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
   $backend_isilon_enabled  = hiera('manila_backend_isilon_enabled', false),
+  $backend_unity_enabled   = hiera('manila_backend_unity_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
   $step                    = Integer(hiera('step')),
@@ -176,6 +181,21 @@ class tripleo::profile::pacemaker::manila (
         vmax_ethernet_ports          => hiera('manila::backend::dellemc_vmax::vmax_ethernet_ports'),
       }
     }
+    # manila unity:
+    if $backend_unity_enabled {
+      $manila_unity_backend = hiera('manila::backend::dellemc_unity::title')
+      manila::backend::dellemc_unity { $manila_unity_backend :
+        driver_handles_share_servers => hiera('manila::backend::dellemc_unity::driver_handles_share_servers', true),
+        emc_nas_login                => hiera('manila::backend::dellemc_unity::emc_nas_login'),
+        emc_nas_password             => hiera('manila::backend::dellemc_unity::emc_nas_password'),
+        emc_nas_server               => hiera('manila::backend::dellemc_unity::emc_nas_server'),
+        emc_share_backend            => hiera('manila::backend::dellemc_unity::emc_share_backend','unity'),
+        share_backend_name           => hiera('manila::backend::dellemc_unity::share_backend_name'),
+        unity_server_meta_pool       => hiera('manila::backend::dellemc_unity::unity_server_meta_pool'),
+        unity_share_data_pools       => hiera('manila::backend::dellemc_unity::unity_share_data_pools'),
+        unity_ethernet_ports         => hiera('manila::backend::dellemc_unity::unity_ethernet_ports'),
+      }
+    }
 
 
 
@@ -201,7 +221,8 @@ class tripleo::profile::pacemaker::manila (
         $manila_cephfsnative_backend,
         $manila_netapp_backend,
         $manila_vmax_backend,
-        $manila_isilon_backend
+        $manila_isilon_backend,
+        $manila_unity_backend
       ]
     )
     class { '::manila::backends' :
