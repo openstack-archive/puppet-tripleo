@@ -46,6 +46,10 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('manila_share_short_bootstrap_node_name')
 #
+# [*backend_vnx_enabled*]
+#   (Optional) Whether or not the vnx backend is enabled
+#   Defaults to hiera('manila_backend_vnx_enabled', false)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -61,6 +65,7 @@ class tripleo::profile::pacemaker::manila (
   $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
   $backend_isilon_enabled  = hiera('manila_backend_isilon_enabled', false),
   $backend_unity_enabled   = hiera('manila_backend_unity_enabled', false),
+  $backend_vnx_enabled     = hiera('manila_backend_vnx_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
   $step                    = Integer(hiera('step')),
@@ -196,6 +201,21 @@ class tripleo::profile::pacemaker::manila (
         unity_ethernet_ports         => hiera('manila::backend::dellemc_unity::unity_ethernet_ports'),
       }
     }
+    # manila vnx:
+    if $backend_vnx_enabled {
+      $manila_vnx_backend = hiera('manila::backend::dellemc_vnx::title')
+      manila::backend::dellemc_vnx { $manila_vnx_backend :
+        driver_handles_share_servers => hiera('manila::backend::dellemc_vnx::driver_handles_share_servers', false),
+        emc_nas_login                => hiera('manila::backend::dellemc_vnx::emc_nas_login'),
+        emc_nas_password             => hiera('manila::backend::dellemc_vnx::emc_nas_password'),
+        emc_nas_server               => hiera('manila::backend::dellemc_vnx::emc_nas_server'),
+        emc_share_backend            => hiera('manila::backend::dellemc_vnx::emc_share_backend','vnx'),
+        share_backend_name           => hiera('manila::backend::dellemc_vnx::share_backend_name'),
+        vnx_server_container         => hiera('manila::backend::dellemc_vnx::vnx_server_container'),
+        vnx_share_data_pools         => hiera('manila::backend::dellemc_vnx::vnx_share_data_pools'),
+        vnx_ethernet_ports           => hiera('manila::backend::dellemc_vnx::vnx_ethernet_ports'),
+      }
+    }
 
 
 
@@ -222,7 +242,8 @@ class tripleo::profile::pacemaker::manila (
         $manila_netapp_backend,
         $manila_vmax_backend,
         $manila_isilon_backend,
-        $manila_unity_backend
+        $manila_unity_backend,
+        $manila_vnx_backend
       ]
     )
     class { '::manila::backends' :
