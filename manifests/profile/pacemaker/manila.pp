@@ -26,6 +26,10 @@
 #   (Optional) Whether or not the netapp backend is enabled
 #   Defaults to hiera('manila_backend_netapp_enabled', false)
 #
+# [*backend_vmax_enabled*]
+#   (Optional) Whether or not the vmax backend is enabled
+#   Defaults to hiera('manila_backend_vmax_enabled', false)
+#
 # [*backend_cephfs_enabled*]
 #   (Optional) Whether or not the cephfs backend is enabled
 #   Defaults to hiera('manila_backend_cephfs_enabled', false)
@@ -52,6 +56,7 @@
 class tripleo::profile::pacemaker::manila (
   $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
+  $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
   $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
   $ceph_mds_enabled        = hiera('ceph_mds_enabled', false),
   $bootstrap_node          = hiera('manila_share_short_bootstrap_node_name'),
@@ -177,11 +182,30 @@ allow command \"auth get\", allow command \"auth get-or-create\"',
       }
     }
 
+    # manila vmax:
+    if $backend_vmax_enabled {
+      $manila_vmax_backend = hiera('manila::backend::dellemc_vmax::title')
+      manila::backend::dellemc_vmax { $manila_vmax_backend :
+        driver_handles_share_servers => hiera('manila::backend::dellemc_vmax::driver_handles_share_servers', true),
+        emc_nas_login                => hiera('manila::backend::dellemc_vmax::emc_nas_login'),
+        emc_nas_password             => hiera('manila::backend::dellemc_vmax::emc_nas_password'),
+        emc_nas_server               => hiera('manila::backend::dellemc_vmax::emc_nas_server'),
+        emc_share_backend            => hiera('manila::backend::dellemc_vmax::emc_share_backend','vmax'),
+        share_backend_name           => hiera('manila::backend::dellemc_vmax::share_backend_name'),
+        vmax_server_container        => hiera('manila::backend::dellemc_vmax::vmax_server_container'),
+        vmax_share_data_pools        => hiera('manila::backend::dellemc_vmax::vmax_share_data_pools'),
+        vmax_ethernet_ports          => hiera('manila::backend::dellemc_vmax::vmax_ethernet_ports'),
+      }
+    }
+
+
+
     $manila_enabled_backends = delete_undef_values(
       [
         $manila_generic_backend,
         $manila_cephfsnative_backend,
-        $manila_netapp_backend
+        $manila_netapp_backend,
+        $manila_vmax_backend
       ]
     )
     class { '::manila::backends' :
