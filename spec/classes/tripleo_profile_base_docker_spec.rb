@@ -28,7 +28,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_service('docker') }
       it {
           is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
-            "set OPTIONS '\"--log-driver=journald --signature-verification=false\"'",
+            "set OPTIONS '\"--log-driver=journald --signature-verification=false --iptables=false\"'",
           ])
       }
     end
