@@ -84,6 +84,7 @@ define tripleo::certmonger::haproxy (
       postsave_cmd => $postsave_cmd,
       principal    => $principal,
       wait         => true,
+      tag          => 'haproxy-cert',
       require      => Class['::certmonger'],
     }
     concat { $service_pem :
@@ -91,12 +92,14 @@ define tripleo::certmonger::haproxy (
       mode    => '0640',
       owner   => 'haproxy',
       group   => 'haproxy',
+      tag     => 'haproxy-cert',
       require => Package[$::haproxy::params::package_name],
     }
     concat::fragment { "${title}-cert-fragment":
       target  => $service_pem,
       source  => $service_certificate,
       order   => '01',
+      tag     => 'haproxy-cert',
       require => Certmonger_certificate["${title}-cert"],
     }
 
@@ -106,6 +109,7 @@ define tripleo::certmonger::haproxy (
         target  => $service_pem,
         source  => $ca_pem,
         order   => '10',
+        tag     => 'haproxy-cert',
         require => Class['tripleo::certmonger::ca::local'],
       }
     }
@@ -114,6 +118,7 @@ define tripleo::certmonger::haproxy (
       target  => $service_pem,
       source  => $service_key,
       order   => 20,
+      tag     => 'haproxy-cert',
       require => Certmonger_certificate["${title}-cert"],
     }
 }
