@@ -1,0 +1,6 @@
+---
+features:
+  - Precision Time Protocol (PTP) is a protocol used to synchronize clocks
+    throughout a network. When used in conjunction with hardware support,
+    PTP is capable of sub-microsecond accuracy which is far better than is
+    normally obtainable with NTP.
