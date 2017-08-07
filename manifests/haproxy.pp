@@ -402,6 +402,10 @@
 #  (optional) Specify the network heat_cloudwatch is running on.
 #  Defaults to hiera('heat_api_cloudwatch_network', undef)
 #
+# [*horizon_network*]
+#  (optional) Specify the network horizon is running on.
+#  Defaults to hiera('horizon_network', undef)
+#
 # [*ironic_inspector_network*]
 #  (optional) Specify the network ironic_inspector is running on.
 #  Defaults to hiera('ironic_inspector_network', undef)
@@ -644,6 +648,7 @@ class tripleo::haproxy (
   $heat_api_network            = hiera('heat_api_network', undef),
   $heat_cfn_network            = hiera('heat_api_cfn_network', undef),
   $heat_cloudwatch_network     = hiera('heat_api_cloudwatch_network', undef),
+  $horizon_network             = hiera('horizon_network', undef),
   $ironic_inspector_network    = hiera('ironic_inspector_network', undef),
   $ironic_network              = hiera('ironic_api_network', undef),
   $keystone_admin_network      = hiera('keystone_admin_api_network', undef),
@@ -770,43 +775,6 @@ class tripleo::haproxy (
     $controller_hosts_names_real = $controller_hosts_real
   } else {
     $controller_hosts_names_real = downcase(any2array(split($controller_hosts_names, ',')))
-  }
-
-  $horizon_vip = hiera('horizon_vip', $controller_virtual_ip)
-  if $service_certificate {
-    # NOTE(jaosorior): If the horizon_vip and the public_virtual_ip are the
-    # same, the first option takes precedence. Which is the case when network
-    # isolation is not enabled. This is not a problem as both options are
-    # identical. If network isolation is enabled, this works correctly and
-    # will add a TLS binding to both the horizon_vip and the
-    # public_virtual_ip.
-    # Even though for the public_virtual_ip the port 80 is listening, we
-    # redirect to https in the horizon_options below.
-    $horizon_bind_opts = {
-      "${horizon_vip}:80"        => $haproxy_listen_bind_param,
-      "${horizon_vip}:443"       => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
-      "${public_virtual_ip}:80"  => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $service_certificate]),
-    }
-    $horizon_options = {
-      'cookie'       => 'SERVERID insert indirect nocache',
-      'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
-      # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
-      'redirect'     => 'scheme https code 301 if !{ ssl_fc }',
-      'option'       => [ 'forwardfor', 'httpchk' ],
-      'http-request' => [
-          'set-header X-Forwarded-Proto https if { ssl_fc }',
-          'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-    }
-  } else {
-    $horizon_bind_opts = {
-      "${horizon_vip}:80" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:80" => $haproxy_listen_bind_param,
-    }
-    $horizon_options = {
-      'cookie' => 'SERVERID insert indirect nocache',
-      'option' => [ 'forwardfor', 'httpchk' ],
-    }
   }
 
   $mysql_vip = hiera('mysql_vip', $controller_virtual_ip)
@@ -1274,18 +1242,17 @@ class tripleo::haproxy (
   }
 
   if $horizon {
-    haproxy::listen { 'horizon':
-      bind             => $horizon_bind_opts,
-      options          => $horizon_options,
-      mode             => 'http',
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'horizon':
-      listening_service => 'horizon',
-      ports             => '80',
-      ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
-      server_names      => hiera('horizon_node_names', $controller_hosts_names_real),
-      options           => union($haproxy_member_options, ["cookie ${::hostname}"]),
+    class { '::tripleo::haproxy::horizon_endpoint':
+      public_virtual_ip           => $public_virtual_ip,
+      internal_ip                 => hiera('horizon_vip', $controller_virtual_ip),
+      haproxy_listen_bind_param   => $haproxy_listen_bind_param,
+      ip_addresses                => hiera('horizon_node_ips', $controller_hosts_real),
+      server_names                => hiera('horizon_node_names', $controller_hosts_names_real),
+      member_options              => union($haproxy_member_options, $internal_tls_member_options),
+      public_certificate          => $service_certificate,
+      use_internal_certificates   => $use_internal_certificates,
+      internal_certificates_specs => $internal_certificates_specs,
+      service_network             => $horizon_network,
     }
   }
 
