@@ -19,10 +19,11 @@
 #
 # === Parameters
 #
-# [*insecure_registry_address*]
-#   The host/port combiniation of the insecure registry. This is used to configure
-#   /etc/sysconfig/docker so that a local (insecure) registry can be accessed.
-#   Example: 127.0.0.1:8787 (defaults to unset)
+# [*insecure_registries*]
+#   An array of host/port combiniations of insecure registries. This is used to configure
+#   /etc/sysconfig/docker so that local (insecure) registries can be accessed.
+#   Example: ['127.0.0.1:8787']
+#   (defaults to unset)
 #
 # [*registry_mirror*]
 #   Configure a registry-mirror in the /etc/docker/daemon.json file.
@@ -45,6 +46,11 @@
 #
 # DEPRECATED PARAMETERS
 #
+# [*insecure_registry_address*]
+#   DEPRECATED: The host/port combiniation of the insecure registry. This is used to configure
+#   /etc/sysconfig/docker so that a local (insecure) registry can be accessed.
+#   Example: 127.0.0.1:8787 (defaults to unset)
+#
 # [*docker_namespace*]
 #   DEPRECATED: The namespace to be used when setting INSECURE_REGISTRY
 #   this will be split on "/" to derive the docker registry
@@ -55,13 +61,14 @@
 #   is enabled (defaults to false)
 #
 class tripleo::profile::base::docker (
-  $insecure_registry_address = undef,
+  $insecure_registries = undef,
   $registry_mirror = false,
   $docker_options = '--log-driver=journald --signature-verification=false --iptables=false',
   $configure_storage = true,
   $storage_options = '-s overlay2',
   $step = Integer(hiera('step')),
   # DEPRECATED PARAMETERS
+  $insecure_registry_address = undef,
   $docker_namespace = undef,
   $insecure_registry = false,
 ) {
@@ -92,14 +99,19 @@ class tripleo::profile::base::docker (
     }
 
     if $insecure_registry {
-      warning('The $insecure_registry and $docker_namespace are deprecated. Use $insecure_registry_address instead.')
+      warning('The $insecure_registry and $docker_namespace are deprecated. Use $insecure_registries instead.')
       if $docker_namespace == undef {
         fail('You must provide a $docker_namespace in order to configure insecure registry')
       }
       $namespace = strip($docker_namespace.split('/')[0])
       $registry_changes = [ "set INSECURE_REGISTRY '\"--insecure-registry ${namespace}\"'" ]
     } elsif $insecure_registry_address {
+      warning('The $insecure_registry_address parameter is deprecated. Use $insecure_registries instead.')
       $registry_changes = [ "set INSECURE_REGISTRY '\"--insecure-registry ${insecure_registry_address}\"'" ]
+    } elsif $insecure_registries {
+      $registry_changes = [ join(['set INSECURE_REGISTRY \'"--insecure-registry ',
+                                  join($insecure_registries, ' --insecure-registry '),
+                                  '"\''], '') ]
     } else {
       $registry_changes = [ 'rm INSECURE_REGISTRY' ]
     }
