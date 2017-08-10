@@ -134,17 +134,19 @@ class tripleo::profile::pacemaker::manila (
         cephfs_enable_snapshots      => hiera('manila::backend::cephfsnative::cephfs_enable_snapshots'),
       }
 
-      ceph::key { "client.${cephfs_auth_id}" :
-        secret       => hiera('manila::backend::cephfsnative::ceph_client_key'),
-        keyring_path => $keyring_path,
-        # inject the new key into ceph cluster only if ceph is deployed by
-        # tripleo (if external ceph is used it should be added manually)
-        inject       => $ceph_mds_enabled,
-        user         => 'manila',
-        cap_mds      => 'allow *',
-        cap_mon      => 'allow r, allow command \"auth del\", allow command \"auth caps\", \
+      if !defined(Resource['ceph::key', "client.${cephfs_auth_id}"]) {
+        ceph::key { "client.${cephfs_auth_id}" :
+          secret       => hiera('manila::backend::cephfsnative::ceph_client_key'),
+          keyring_path => $keyring_path,
+          # inject the new key into ceph cluster only if ceph is deployed by
+          # tripleo (if external ceph is used it should be added manually)
+          inject       => $ceph_mds_enabled,
+          user         => 'manila',
+          cap_mds      => 'allow *',
+          cap_mon      => 'allow r, allow command \"auth del\", allow command \"auth caps\", \
 allow command \"auth get\", allow command \"auth get-or-create\"',
-        cap_osd      => 'allow rw'
+          cap_osd      => 'allow rw'
+        }
       }
 
       ceph_config {
