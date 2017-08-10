@@ -44,6 +44,10 @@
 #   (Optional) The list of rabbitmq nodes names
 #   Defaults to hiera('rabbitmq_node_names')
 #
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -60,6 +64,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $erlang_cookie                = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
   $rabbit_nodes                 = hiera('rabbitmq_node_names'),
+  $enable_internal_tls          = hiera('enable_internal_tls', false),
   $pcs_tries                    = hiera('pcs_tries', 20),
   $step                         = Integer(hiera('step')),
 ) {
@@ -102,6 +107,76 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         }
       }
 
+      $storage_maps = {
+        'rabbitmq-cfg-files'               => {
+          'source-dir' => '/var/lib/kolla/config_files/rabbitmq.json',
+          'target-dir' => '/var/lib/kolla/config_files/config.json',
+          'options'    => 'ro',
+        },
+        'rabbitmq-cfg-data'                => {
+          'source-dir' => '/var/lib/config-data/puppet-generated/rabbitmq/',
+          'target-dir' => '/var/lib/kolla/config_files/src',
+          'options'    => 'ro',
+        },
+        'rabbitmq-hosts'                   => {
+          'source-dir' => '/etc/hosts',
+          'target-dir' => '/etc/hosts',
+          'options'    => 'ro',
+        },
+        'rabbitmq-localtime'               => {
+          'source-dir' => '/etc/localtime',
+          'target-dir' => '/etc/localtime',
+          'options'    => 'ro',
+        },
+        'rabbitmq-lib'                     => {
+          'source-dir' => '/var/lib/rabbitmq',
+          'target-dir' => '/var/lib/rabbitmq',
+          'options'    => 'rw',
+        },
+        'rabbitmq-pki-extracted'           => {
+          'source-dir' => '/etc/pki/ca-trust/extracted',
+          'target-dir' => '/etc/pki/ca-trust/extracted',
+          'options'    => 'ro',
+        },
+        'rabbitmq-pki-ca-bundle-crt'       => {
+          'source-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
+          'target-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
+          'options'    => 'ro',
+        },
+        'rabbitmq-pki-ca-bundle-trust-crt' => {
+          'source-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
+          'target-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
+          'options'    => 'ro',
+        },
+        'rabbitmq-pki-cert'                => {
+          'source-dir' => '/etc/pki/tls/cert.pem',
+          'target-dir' => '/etc/pki/tls/cert.pem',
+          'options'    => 'ro',
+        },
+        'rabbitmq-dev-log'                 => {
+          'source-dir' => '/dev/log',
+          'target-dir' => '/dev/log',
+          'options'    => 'rw',
+        },
+      }
+
+      if $enable_internal_tls {
+        $storage_maps_tls = {
+          'rabbitmq-pki-cert' => {
+            'source-dir' => '/etc/pki/tls/certs/rabbitmq.crt',
+            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/certs/rabbitmq.crt',
+            'options'    => 'ro',
+          },
+          'rabbitmq-pki-key'  => {
+            'source-dir' => '/etc/pki/tls/private/rabbitmq.key',
+            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/private/rabbitmq.key',
+            'options'    => 'ro',
+          },
+        }
+      } else {
+        $storage_maps_tls = {}
+      }
+
       pacemaker::resource::bundle { 'rabbitmq-bundle':
         image             => $rabbitmq_docker_image,
         replicas          => $rabbitmq_nodes_count,
@@ -114,58 +189,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${rabbitmq_docker_control_port}",
-        storage_maps      => {
-          'rabbitmq-cfg-files'               => {
-            'source-dir' => '/var/lib/kolla/config_files/rabbitmq.json',
-            'target-dir' => '/var/lib/kolla/config_files/config.json',
-            'options'    => 'ro',
-          },
-          'rabbitmq-cfg-data'                => {
-            'source-dir' => '/var/lib/config-data/puppet-generated/rabbitmq/',
-            'target-dir' => '/var/lib/kolla/config_files/src',
-            'options'    => 'ro',
-          },
-          'rabbitmq-hosts'                   => {
-            'source-dir' => '/etc/hosts',
-            'target-dir' => '/etc/hosts',
-            'options'    => 'ro',
-          },
-          'rabbitmq-localtime'               => {
-            'source-dir' => '/etc/localtime',
-            'target-dir' => '/etc/localtime',
-            'options'    => 'ro',
-          },
-          'rabbitmq-lib'                     => {
-            'source-dir' => '/var/lib/rabbitmq',
-            'target-dir' => '/var/lib/rabbitmq',
-            'options'    => 'rw',
-          },
-          'rabbitmq-pki-extracted'           => {
-            'source-dir' => '/etc/pki/ca-trust/extracted',
-            'target-dir' => '/etc/pki/ca-trust/extracted',
-            'options'    => 'ro',
-          },
-          'rabbitmq-pki-ca-bundle-crt'       => {
-            'source-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
-            'target-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
-            'options'    => 'ro',
-          },
-          'rabbitmq-pki-ca-bundle-trust-crt' => {
-            'source-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
-            'target-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
-            'options'    => 'ro',
-          },
-          'rabbitmq-pki-cert'                => {
-            'source-dir' => '/etc/pki/tls/cert.pem',
-            'target-dir' => '/etc/pki/tls/cert.pem',
-            'options'    => 'ro',
-          },
-          'rabbitmq-dev-log'                 => {
-            'source-dir' => '/dev/log',
-            'target-dir' => '/dev/log',
-            'options'    => 'rw',
-          },
-        },
+        storage_maps      => merge($storage_maps, $storage_maps_tls),
       }
 
       # The default nr of ha queues is ceiling(N/2)
