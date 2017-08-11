@@ -88,13 +88,14 @@ define tripleo::certmonger::haproxy (
       require      => Class['::certmonger'],
     }
     concat { $service_pem :
-      ensure  => present,
-      mode    => '0640',
-      owner   => 'haproxy',
-      group   => 'haproxy',
-      tag     => 'haproxy-cert',
-      require => Package[$::haproxy::params::package_name],
+      ensure => present,
+      mode   => '0640',
+      owner  => 'haproxy',
+      group  => 'haproxy',
+      tag    => 'haproxy-cert',
     }
+    Package<| name == $::haproxy::params::package_name |> -> Concat[$service_pem]
+
     concat::fragment { "${title}-cert-fragment":
       target  => $service_pem,
       source  => $service_certificate,

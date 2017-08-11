@@ -80,13 +80,16 @@ class tripleo::profile::base::certmonger_user (
   unless empty($haproxy_certificates_specs) {
     $reload_haproxy = ['systemctl reload haproxy']
     Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>
-    Class['::tripleo::certmonger::ca::crl'] ~> Class['::haproxy']
+    if defined(Class['::haproxy']) {
+      Class['::tripleo::certmonger::ca::crl'] ~> Class['::haproxy']
+    }
   } else {
     $reload_haproxy = []
   }
   class { '::tripleo::certmonger::ca::crl' :
     reload_cmds => $reload_haproxy,
   }
+  Certmonger_certificate<||> -> Class['::tripleo::certmonger::ca::crl']
   include ::tripleo::certmonger::ca::libvirt
 
   unless empty($apache_certificates_specs) {
