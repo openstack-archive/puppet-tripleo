@@ -34,6 +34,27 @@
 #   (Optional) The address that the local mysql instance should bind to.
 #   Defaults to $::hostname
 #
+# [*ca_file*]
+#   (Optional) The path to the CA file that will be used for the TLS
+#   configuration. It's only used if internal TLS is enabled.
+#   Defaults to undef
+#
+# [*certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate
+#   it will create. Note that the certificate nickname must be 'mysql' in
+#   the case of this service.
+#   Example with hiera:
+#     tripleo::profile::base::database::mysql::certificate_specs:
+#       hostname: <overcloud controller fqdn>
+#       service_certificate: <service certificate path>
+#       service_key: <service key path>
+#       principal: "mysql/<overcloud controller fqdn>"
+#   Defaults to hiera('tripleo::profile::base::database::mysql::certificate_specs', {}).
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*gmcast_listen_addr*]
 #   (Optional) This variable defines the address on which the node listens to
 #   connections from other nodes in the cluster.
@@ -50,13 +71,16 @@
 #
 #
 class tripleo::profile::pacemaker::database::mysql_bundle (
-  $mysql_docker_image = hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef),
-  $control_port       = hiera('tripleo::profile::pacemaker::database::mysql_bundle::control_port', '3123'),
-  $bootstrap_node     = hiera('mysql_short_bootstrap_node_name'),
-  $bind_address       = $::hostname,
-  $gmcast_listen_addr = hiera('mysql_bind_host'),
-  $pcs_tries          = hiera('pcs_tries', 20),
-  $step               = Integer(hiera('step')),
+  $mysql_docker_image  = hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef),
+  $control_port        = hiera('tripleo::profile::pacemaker::database::mysql_bundle::control_port', '3123'),
+  $bootstrap_node      = hiera('mysql_short_bootstrap_node_name'),
+  $bind_address        = $::hostname,
+  $ca_file             = undef,
+  $certificate_specs   = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
+  $enable_internal_tls = hiera('enable_internal_tls', false),
+  $gmcast_listen_addr  = hiera('mysql_bind_host'),
+  $pcs_tries           = hiera('pcs_tries', 20),
+  $step                = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -64,16 +88,11 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $pacemaker_master = false
   }
 
-  # use only mysql_node_names when we land a patch in t-h-t that
-  # switches to autogenerating these values from composable services
-  # The galera node names need to match the pacemaker node names... so if we
-  # want to use FQDNs for this, the cluster will not finish bootstrapping,
-  # since all the nodes will be marked as slaves. For now, we'll stick to the
-  # short name which is already registered in pacemaker until we get around
-  # this issue.
-  $galera_node_names_lookup = hiera('mysql_short_node_names', hiera('mysql_node_names', $::hostname))
+  $galera_node_names_lookup = hiera('mysql_short_node_names', $::hostname)
+  $galera_fqdns_names_lookup = hiera('mysql_node_names', $::hostname)
+
   if is_array($galera_node_names_lookup) {
-    $galera_nodes = downcase(join($galera_node_names_lookup, ','))
+    $galera_nodes = downcase(join($galera_fqdns_names_lookup, ','))
   } else {
     $galera_nodes = downcase($galera_node_names_lookup)
   }
@@ -86,6 +105,19 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     "galera-bundle-${i}:${host}"
   }
   $cluster_host_map_string = join($host_map_array, ';')
+
+  if $enable_internal_tls {
+    $tls_certfile = $certificate_specs['service_certificate']
+    $tls_keyfile = $certificate_specs['service_key']
+    if $ca_file {
+      $tls_ca_options = "socket.ssl_ca=${ca_file}"
+    } else {
+      $tls_ca_options = ''
+    }
+    $tls_options = "socket.ssl_key=${tls_keyfile};socket.ssl_cert=${tls_certfile};${tls_ca_options};"
+  } else {
+    $tls_options = ''
+  }
 
   $mysqld_options = {
     'mysqld' => {
@@ -116,7 +148,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
       'wsrep_drupal_282555_workaround'=> '0',
       'wsrep_causal_reads'            => '0',
       'wsrep_sst_method'              => 'rsync',
-      'wsrep_provider_options'        => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;",
+      'wsrep_provider_options'        => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}",
     },
     'mysqld_safe' => {
       'pid-file'                      => '/var/lib/mysql/mariadb.pid',
@@ -195,6 +227,74 @@ MYSQL_HOST=localhost\n",
         }
         # lint:endignore
       }
+
+      $storage_maps = {
+        'mysql-cfg-files'   => {
+          'source-dir' => '/var/lib/kolla/config_files/mysql.json',
+          'target-dir' => '/var/lib/kolla/config_files/config.json',
+          'options'    => 'ro',
+        },
+        'mysql-cfg-data'    => {
+          'source-dir' => '/var/lib/config-data/puppet-generated/mysql/',
+          'target-dir' => '/var/lib/kolla/config_files/src',
+          'options'    => 'ro',
+        },
+        'mysql-hosts'       => {
+          'source-dir' => '/etc/hosts',
+          'target-dir' => '/etc/hosts',
+          'options'    => 'ro',
+        },
+        'mysql-localtime'   => {
+          'source-dir' => '/etc/localtime',
+          'target-dir' => '/etc/localtime',
+          'options'    => 'ro',
+        },
+        'mysql-lib'         => {
+          'source-dir' => '/var/lib/mysql',
+          'target-dir' => '/var/lib/mysql',
+          'options'    => 'rw',
+        },
+        'mysql-log-mariadb' => {
+          'source-dir' => '/var/log/mariadb',
+          'target-dir' => '/var/log/mariadb',
+          'options'    => 'rw',
+        },
+        'mysql-dev-log'     => {
+          'source-dir' => '/dev/log',
+          'target-dir' => '/dev/log',
+          'options'    => 'rw',
+        },
+      }
+
+      if $enable_internal_tls {
+        $mysql_storage_maps_tls = {
+          'mysql-pki-gcomm-key'  => {
+            'source-dir' => '/etc/pki/tls/private/mysql.key',
+            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/private/mysql.key',
+            'options'    => 'ro',
+          },
+          'mysql-pki-gcomm-cert' => {
+            'source-dir' => '/etc/pki/tls/certs/mysql.crt',
+            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/certs/mysql.crt',
+            'options'    => 'ro',
+          },
+        }
+        if $ca_file {
+          $ca_storage_maps_tls = {
+            'mysql-pki-gcomm-ca' => {
+              'source-dir' => $ca_file,
+              'target-dir' => "/var/lib/kolla/config_files/src-tls${ca_file}",
+              'options'    => 'ro',
+            },
+          }
+        } else {
+          $ca_storage_maps_tls = {}
+        }
+        $storage_maps_tls = merge($mysql_storage_maps_tls, $ca_storage_maps_tls)
+      } else {
+        $storage_maps_tls = {}
+      }
+
       pacemaker::resource::bundle { 'galera-bundle':
         image             => $mysql_docker_image,
         replicas          => $galera_nodes_count,
@@ -208,63 +308,7 @@ MYSQL_HOST=localhost\n",
         options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${control_port}",
-        storage_maps      => {
-          'mysql-cfg-files'               => {
-            'source-dir' => '/var/lib/kolla/config_files/mysql.json',
-            'target-dir' => '/var/lib/kolla/config_files/config.json',
-            'options'    => 'ro',
-          },
-          'mysql-cfg-data'                => {
-            'source-dir' => '/var/lib/config-data/puppet-generated/mysql/',
-            'target-dir' => '/var/lib/kolla/config_files/src',
-            'options'    => 'ro',
-          },
-          'mysql-hosts'                   => {
-            'source-dir' => '/etc/hosts',
-            'target-dir' => '/etc/hosts',
-            'options'    => 'ro',
-          },
-          'mysql-localtime'               => {
-            'source-dir' => '/etc/localtime',
-            'target-dir' => '/etc/localtime',
-            'options'    => 'ro',
-          },
-          'mysql-lib'                     => {
-            'source-dir' => '/var/lib/mysql',
-            'target-dir' => '/var/lib/mysql',
-            'options'    => 'rw',
-          },
-          'mysql-log-mariadb'             => {
-            'source-dir' => '/var/log/mariadb',
-            'target-dir' => '/var/log/mariadb',
-            'options'    => 'rw',
-          },
-          'mysql-pki-extracted'           => {
-            'source-dir' => '/etc/pki/ca-trust/extracted',
-            'target-dir' => '/etc/pki/ca-trust/extracted',
-            'options'    => 'ro',
-          },
-          'mysql-pki-ca-bundle-crt'       => {
-            'source-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
-            'target-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
-            'options'    => 'ro',
-          },
-          'mysql-pki-ca-bundle-trust-crt' => {
-            'source-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
-            'target-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
-            'options'    => 'ro',
-          },
-          'mysql-pki-cert'                => {
-            'source-dir' => '/etc/pki/tls/cert.pem',
-            'target-dir' => '/etc/pki/tls/cert.pem',
-            'options'    => 'ro',
-          },
-          'mysql-dev-log'                 => {
-            'source-dir' => '/dev/log',
-            'target-dir' => '/dev/log',
-            'options'    => 'rw',
-          },
-        },
+        storage_maps      => merge($storage_maps, $storage_maps_tls),
       }
 
       pacemaker::resource::ocf { 'galera':
