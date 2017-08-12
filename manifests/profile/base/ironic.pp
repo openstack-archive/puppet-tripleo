@@ -70,8 +70,9 @@ class tripleo::profile::base::ironic (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
     class { '::ironic':
-      sync_db               => $sync_db,
-      default_transport_url => os_transport_url({
+      sync_db                   => $sync_db,
+      db_online_data_migrations => $sync_db,
+      default_transport_url     => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
         'port'      => sprintf('%s', $oslomsg_rpc_port),
