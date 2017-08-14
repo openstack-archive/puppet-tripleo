@@ -43,6 +43,12 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
+# [*keymgr_api_class*]
+#   (Optional) The encryption key manager API class. The default value
+#   ensures Cinder's legacy key manager is enabled when no hiera value is
+#   specified.
+#   Defaults to hiera('cinder::api::keymgr_api_class', 'cinder.keymgr.conf_key_mgr.ConfKeyManager')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -53,6 +59,7 @@ class tripleo::profile::base::cinder::api (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $cinder_api_network            = hiera('cinder_api_network', undef),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $keymgr_api_class              = hiera('cinder::api::keymgr_api_class', 'cinder.keymgr.conf_key_mgr.ConfKeyManager'),
   $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -75,7 +82,9 @@ class tripleo::profile::base::cinder::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::cinder::api
+    class { '::cinder::api':
+      keymgr_api_class => $keymgr_api_class,
+    }
     include ::apache::mod::ssl
     class { '::cinder::wsgi::apache':
       ssl_cert => $tls_certfile,
