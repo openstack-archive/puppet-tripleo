@@ -30,10 +30,34 @@
 #   (Optional) Whether load balancing is enabled for this cluster
 #   Defaults to hiera('enable_load_balancer', true)
 #
+# [*ca_bundle*]
+#   (Optional) The path to the CA file that will be used for the TLS
+#   configuration. It's only used if internal TLS is enabled.
+#   Defaults to hiera('tripleo::haproxy::ca_bundle', undef)
+#
+# [*crl_file*]
+#   (Optional) The path to the file that contains the certificate
+#   revocation list. It's only used if internal TLS is enabled.
+#   Defaults to hiera('tripleo::haproxy::crl_file', undef)
+#
 # [*deployed_ssl_cert_path*]
 #   (Optional) The filepath of the certificate as it will be stored in
 #   the controller.
-#   Defaults to '/etc/pki/tls/private/overcloud_endpoint.pem'
+#   Defaults to hiera('tripleo::haproxy::service_certificate', undef)
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*internal_certs_directory*]
+#   (Optional) Directory the holds the certificates to be used when
+#   when TLS is enabled in the internal network
+#   Defaults to undef
+#
+# [*internal_keys_directory*]
+#   (Optional) Directory the holds the certificates to be used when
+#   when TLS is enabled in the internal network
+#   Defaults to undef
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -45,12 +69,17 @@
 #   Defaults to hiera('pcs_tries', 20)
 #
 class tripleo::profile::pacemaker::haproxy_bundle (
-  $haproxy_docker_image   = hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef),
-  $bootstrap_node         = hiera('haproxy_short_bootstrap_node_name'),
-  $enable_load_balancer   = hiera('enable_load_balancer', true),
-  $deployed_ssl_cert_path = '/etc/pki/tls/private/overcloud_endpoint.pem',
-  $step                   = Integer(hiera('step')),
-  $pcs_tries              = hiera('pcs_tries', 20),
+  $haproxy_docker_image     = hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef),
+  $bootstrap_node           = hiera('haproxy_short_bootstrap_node_name'),
+  $enable_load_balancer     = hiera('enable_load_balancer', true),
+  $ca_bundle                = hiera('tripleo::haproxy::ca_bundle', undef),
+  $crl_file                 = hiera('tripleo::haproxy::crl_file', undef),
+  $enable_internal_tls      = hiera('enable_internal_tls', false),
+  $internal_certs_directory = undef,
+  $internal_keys_directory  = undef,
+  $deployed_ssl_cert_path   = hiera('tripleo::haproxy::service_certificate', undef),
+  $step                     = Integer(hiera('step')),
+  $pcs_tries                = hiera('pcs_tries', 20),
 ) {
   include ::tripleo::profile::base::haproxy
 
@@ -90,14 +119,8 @@ class tripleo::profile::pacemaker::haproxy_bundle (
       $haproxy_nodes = hiera('haproxy_short_node_names')
       $haproxy_nodes_count = count($haproxy_nodes)
 
-      pacemaker::resource::bundle { 'haproxy-bundle':
-        image             => $haproxy_docker_image,
-        replicas          => $haproxy_nodes_count,
-        location_rule     => $haproxy_location_rule,
-        container_options => 'network=host',
-        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
-        run_command       => '/bin/bash /usr/local/bin/kolla_start',
-        storage_maps      => {
+
+      $storage_maps = {
           'haproxy-cfg-files'               => {
             'source-dir' => '/var/lib/kolla/config_files/haproxy.json',
             'target-dir' => '/var/lib/kolla/config_files/config.json',
@@ -143,12 +166,68 @@ class tripleo::profile::pacemaker::haproxy_bundle (
             'target-dir' => '/dev/log',
             'options'    => 'rw',
           },
-          'haproxy-cert'                    => {
+      };
+
+      if $deployed_ssl_cert_path {
+        $cert_storage_maps = {
+          'haproxy-cert' => {
             'source-dir' => $deployed_ssl_cert_path,
-            'target-dir' => $deployed_ssl_cert_path,
+            'target-dir' => "/var/lib/kolla/config_files/src-tls${deployed_ssl_cert_path}",
             'options'    => 'ro',
           },
-        },
+        }
+      } else {
+        $cert_storage_maps = {}
+      }
+
+      if $enable_internal_tls {
+        $haproxy_storage_maps = {
+          'haproxy-pki-certs'  => {
+            'source-dir' => $internal_certs_directory,
+            'target-dir' => "/var/lib/kolla/config_files/src-tls${internal_certs_directory}",
+            'options'    => 'ro',
+          },
+          'haproxy-pki-keys' => {
+            'source-dir' => $internal_keys_directory,
+            'target-dir' => "/var/lib/kolla/config_files/src-tls${internal_keys_directory}",
+            'options'    => 'ro',
+          },
+        }
+        if $ca_bundle {
+          $ca_storage_maps = {
+            'haproxy-pki-ca-file' => {
+              'source-dir' => $ca_bundle,
+              'target-dir' => "/var/lib/kolla/config_files/src-tls${ca_bundle}",
+              'options'    => 'ro',
+            },
+          }
+        } else {
+          $ca_storage_maps = {}
+        }
+        if $crl_file {
+          $crl_storage_maps = {
+            'haproxy-pki-crl-file' => {
+              'source-dir' => $crl_file,
+              'target-dir' => $crl_file,
+              'options'    => 'ro',
+            },
+          }
+        } else {
+          $crl_storage_maps = {}
+        }
+        $storage_maps_internal_tls = merge($haproxy_storage_maps, $ca_storage_maps, $crl_storage_maps)
+      } else {
+        $storage_maps_internal_tls = {}
+      }
+
+      pacemaker::resource::bundle { 'haproxy-bundle':
+        image             => $haproxy_docker_image,
+        replicas          => $haproxy_nodes_count,
+        location_rule     => $haproxy_location_rule,
+        container_options => 'network=host',
+        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
+        run_command       => '/bin/bash /usr/local/bin/kolla_start',
+        storage_maps      => merge($storage_maps, $cert_storage_maps, $storage_maps_internal_tls),
       }
       $control_vip = hiera('controller_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_control_vip':
