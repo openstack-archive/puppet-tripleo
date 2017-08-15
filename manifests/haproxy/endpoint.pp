@@ -122,15 +122,28 @@ define tripleo::haproxy::endpoint (
     if !$service_network {
       fail("The service_network for this service is undefined. Can't configure TLS for the internal network.")
     }
-    # NOTE(jaosorior): The key of the internal_certificates_specs hash must
-    # must match the convention haproxy-<network name> or else this
-    # will fail. Futherly, it must contain the path that we'll use under
-    # 'service_pem'.
-    $internal_cert_path = $internal_certificates_specs["haproxy-${service_network}"]['service_pem']
+
+    if $service_network == 'external' and $public_certificate {
+      # NOTE(jaosorior): This service has been configured to use the external
+      # network. We should use the public certificate in this case.
+      $internal_cert_path = $public_certificate
+    } else {
+      # NOTE(jaosorior): This service is configured for the internal network.
+      # We use the certificate spec hash. The key of the
+      # internal_certificates_specs hash must must match the convention
+      # haproxy-<network name> or else this will fail. Futherly, it must
+      # contain the path that we'll use under 'service_pem'.
+      $internal_cert_path = $internal_certificates_specs["haproxy-${service_network}"]['service_pem']
+    }
     $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"),
                                         union($haproxy_listen_bind_param, ['ssl', 'crt', $internal_cert_path]))
   } else {
-    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
+    if $service_network == 'external' and $public_certificate {
+      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"),
+                                          union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+    } else {
+      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
+    }
   }
   $bind_opts = merge($internal_bind_opts, $public_bind_opts)
 
