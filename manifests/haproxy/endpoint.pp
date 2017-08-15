@@ -68,6 +68,11 @@
 #  Certificate path used to enable TLS for the internal proxy endpoint.
 #  Defaults to undef.
 #
+# [*service_network*]
+#  (optional) Indicates the network that the service is running on. Used for
+#  fetching the certificate for that specific network.
+#  Defaults to undef
+#
 define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
@@ -83,6 +88,7 @@ define tripleo::haproxy::endpoint (
   $public_ssl_port           = undef,
   $public_certificate        = undef,
   $internal_certificate      = undef,
+  $service_network           = undef,
 ) {
   if $public_virtual_ip {
     # service exposed to the public network
@@ -99,10 +105,22 @@ define tripleo::haproxy::endpoint (
   }
 
   if $internal_certificate {
+    if $service_network == 'external' and $public_certificate {
+      # NOTE(jaosorior): This service has been configured to use the external
+      # network. We should use the public certificate in this case.
+      $internal_cert_path = $public_certificate
+    } else {
+      $internal_cert_path = $internal_certificate
+    }
     $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"),
-                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $internal_cert_path]))
   } else {
-    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
+    if $service_network == 'external' and $public_certificate {
+      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"),
+                                          union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+    } else {
+      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
+    }
   }
   $bind_opts = merge($internal_bind_opts, $public_bind_opts)
 
