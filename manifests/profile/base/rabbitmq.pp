@@ -98,15 +98,6 @@ class tripleo::profile::base::rabbitmq (
     $tls_keyfile = undef
   }
 
-  # IPv6 environment, necessary for RabbitMQ.
-  if $ipv6 {
-    $rabbit_env = merge($environment, {
-      'RABBITMQ_SERVER_START_ARGS' => '"-proto_dist inet6_tcp"',
-      'RABBITMQ_CTL_ERL_ARGS' => '"-proto_dist inet6_tcp"'
-    })
-  } else {
-    $rabbit_env = $environment
-  }
   if $inet_dist_interface {
     $real_kernel_variables = merge(
       $kernel_variables,
@@ -125,10 +116,11 @@ class tripleo::profile::base::rabbitmq (
         cluster_nodes           => $nodes,
         config_kernel_variables => $real_kernel_variables,
         config_variables        => $config_variables,
-        environment_variables   => $rabbit_env,
+        environment_variables   => $environment,
         # TLS options
         ssl_cert                => $tls_certfile,
         ssl_key                 => $tls_keyfile,
+        ipv6                    => $ipv6,
       }
       # when running multi-nodes without Pacemaker
       if $manage_service {
@@ -144,10 +136,11 @@ class tripleo::profile::base::rabbitmq (
       class { '::rabbitmq':
         config_kernel_variables => $kernel_variables,
         config_variables        => $config_variables,
-        environment_variables   => $rabbit_env,
+        environment_variables   => $environment,
         # TLS options
         ssl_cert                => $tls_certfile,
         ssl_key                 => $tls_keyfile,
+        ipv6                    => $ipv6,
       }
     }
   }
