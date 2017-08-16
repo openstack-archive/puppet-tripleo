@@ -38,10 +38,20 @@
 #   it will create.
 #   Defaults to hiera('apache_certificate_specs', {}).
 #
+# [*apache_postsave_cmd*]
+#   (Optional) If set, it overrides the default way to restart apache when the
+#   certificate is renewed.
+#   Defaults to undef
+#
 # [*haproxy_certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
 #   Defaults to hiera('tripleo::profile::base::haproxy::certificate_specs', {}).
+#
+# [*haproxy_postsave_cmd*]
+#   (Optional) If set, it overrides the default way to restart haproxy when the
+#   certificate is renewed.
+#   Defaults to undef
 #
 # [*libvirt_certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -70,7 +80,9 @@
 #
 class tripleo::profile::base::certmonger_user (
   $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
+  $apache_postsave_cmd        = undef,
   $haproxy_certificates_specs = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
+  $haproxy_postsave_cmd       = undef,
   $libvirt_certificates_specs = hiera('libvirt_certificates_specs', {}),
   $mongodb_certificate_specs  = hiera('mongodb_certificate_specs',{}),
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
@@ -94,7 +106,8 @@ class tripleo::profile::base::certmonger_user (
 
   unless empty($apache_certificates_specs) {
     include ::tripleo::certmonger::apache_dirs
-    ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs)
+    ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs,
+                      {'postsave_cmd' => $apache_postsave_cmd})
   }
   unless empty($libvirt_certificates_specs) {
     include ::tripleo::certmonger::libvirt_dirs
@@ -102,7 +115,8 @@ class tripleo::profile::base::certmonger_user (
   }
   unless empty($haproxy_certificates_specs) {
     include ::tripleo::certmonger::haproxy_dirs
-    ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs)
+    ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs,
+                      {'postsave_cmd' => $haproxy_postsave_cmd})
     # The haproxy fronends (or listen resources) depend on the certificate
     # existing and need to be refreshed if it changed.
     Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
