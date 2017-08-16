@@ -31,19 +31,9 @@
 #  The port on which the UI is listening.
 #  Defaults to 3000
 #
-# [*enabled_languages*]
-#  Which languages to show in the UI.
-#  A hash.
-#  Defaults to
-#  {
-#    'de'    => 'German',
-#    'en'    => 'English',
-#    'es'    => 'Spanish',
-#    'id'    => 'Indonesian',
-#    'ja'    => 'Japanese',
-#    'ko-KR' => 'Korean',
-#    'zh-CN' => 'Simplified Chinese'
-#  }
+# [*excluded_languages*]
+#  A list of languages that shouldn't be enabled in the UI, e.g. ['en', 'de']
+#  Defaults to []
 #
 # [*endpoint_proxy_keystone*]
 #  The keystone proxy endpoint url
@@ -107,19 +97,11 @@
 #  Defaults to 'tripleo'
 #
 class tripleo::ui (
-  $servername               = $::fqdn,
-  $bind_host                = hiera('controller_host'),
-  $ui_port                  = 3000,
-  $zaqar_default_queue      = 'tripleo',
-  $enabled_languages        = {
-    'de'    => 'German',
-    'en'    => 'English',
-    'es'    => 'Spanish',
-    'id'    => 'Indonesian',
-    'ja'    => 'Japanese',
-    'ko-KR' => 'Korean',
-    'zh-CN' => 'Simplified Chinese'
-  },
+  $servername                       = $::fqdn,
+  $bind_host                        = hiera('controller_host'),
+  $ui_port                          = 3000,
+  $zaqar_default_queue              = 'tripleo',
+  $excluded_languages               = [],
   $endpoint_proxy_zaqar             = undef,
   $endpoint_proxy_keystone          = undef,
   $endpoint_proxy_heat              = undef,

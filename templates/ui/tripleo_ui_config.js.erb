@@ -16,10 +16,12 @@ window.tripleOUiConfig = {
   'zaqar_default_queue': '<%= @zaqar_default_queue %>',
 
   // Languages
-  // If you choose more than one language, a language switcher will appear in
-  // the navigation bar.
-  // Only 'en' (English) is enabled by default.
-  'languages': <%= @enabled_languages.to_json %>,
+  //
+  // By default, all available languages are enabled.  Use this setting to
+  // disable certain languages.
+  //
+  'excludedLanguages': <%= @excluded_languages.to_json %>,
+
 
   // Logging
   // 'loggers': ['console']
