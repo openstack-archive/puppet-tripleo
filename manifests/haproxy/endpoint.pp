@@ -133,6 +133,7 @@ define tripleo::haproxy::endpoint (
   } else {
     # internal service only
     $public_bind_opts = {}
+    $listen_options_real = $listen_options
   }
 
   if $use_internal_certificates {
