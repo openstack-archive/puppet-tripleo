@@ -520,7 +520,6 @@
 #    'ironic_inspector_port' (Defaults to 5050)
 #    'ironic_inspector_ssl_port' (Defaults to 13050)
 #    'keystone_admin_api_port' (Defaults to 35357)
-#    'keystone_admin_api_ssl_port' (Defaults to 13357)
 #    'keystone_public_api_port' (Defaults to 5000)
 #    'keystone_public_api_ssl_port' (Defaults to 13000)
 #    'manila_api_port' (Defaults to 8786)
@@ -708,7 +707,6 @@ class tripleo::haproxy (
     ironic_inspector_port => 5050,
     ironic_inspector_ssl_port => 13050,
     keystone_admin_api_port => 35357,
-    keystone_admin_api_ssl_port => 13357,
     keystone_public_api_port => 5000,
     keystone_public_api_ssl_port => 13000,
     manila_api_port => 8786,
@@ -894,16 +892,14 @@ class tripleo::haproxy (
 
   if $keystone_admin {
     ::tripleo::haproxy::endpoint { 'keystone_admin':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('keystone_admin_api_vip', $controller_virtual_ip),
-      service_port      => $ports[keystone_admin_api_port],
-      ip_addresses      => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('keystone_admin_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /v3' ] }),
-      public_ssl_port   => $ports[keystone_admin_api_ssl_port],
-      service_network   => $keystone_admin_network,
-      member_options    => union($haproxy_member_options, $internal_tls_member_options),
+      internal_ip     => hiera('keystone_admin_api_vip', $controller_virtual_ip),
+      service_port    => $ports[keystone_admin_api_port],
+      ip_addresses    => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
+      server_names    => hiera('keystone_admin_api_node_names', $controller_hosts_names_real),
+      mode            => 'http',
+      listen_options  => merge($default_listen_options, { 'option' => [ 'httpchk GET /v3' ] }),
+      service_network => $keystone_admin_network,
+      member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
