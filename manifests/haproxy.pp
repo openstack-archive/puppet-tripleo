@@ -1071,6 +1071,7 @@ class tripleo::haproxy (
         'option'  => [ 'httpchk', ],
       },
       service_network => $nova_metadata_network,
+      member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
