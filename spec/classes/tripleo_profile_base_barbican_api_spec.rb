@@ -45,7 +45,6 @@ describe 'tripleo::profile::base::barbican::api' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('tripleo::profile::base::barbican::api')
         is_expected.to contain_class('tripleo::profile::base::barbican')
-        is_expected.to contain_class('barbican::db::mysql')
         is_expected.to contain_class('barbican::db::sync')
         is_expected.to contain_class('barbican::api')
         is_expected.to contain_class('barbican::api::logging')
@@ -64,7 +63,6 @@ describe 'tripleo::profile::base::barbican::api' do
       it 'should not trigger any configuration' do
         is_expected.to contain_class('tripleo::profile::base::barbican::api')
         is_expected.to contain_class('tripleo::profile::base::barbican')
-        is_expected.to_not contain_class('barbican::db::mysql')
         is_expected.to_not contain_class('barbican::db::sync')
         is_expected.to_not contain_class('barbican::api')
         is_expected.to_not contain_class('barbican::api::logging')
@@ -81,7 +79,6 @@ describe 'tripleo::profile::base::barbican::api' do
       } }
 
       it 'should trigger complete configuration with out db items' do
-        is_expected.to_not contain_class('barbican::db::mysql')
         # TODO(aschultz): barbican::api includes this automatically
         #is_expected.to_not contain_class('barbican::db::sync')
         is_expected.to contain_class('barbican::api')

@@ -129,10 +129,6 @@ class tripleo::profile::base::barbican::api (
 
   include ::tripleo::profile::base::barbican
 
-  if $step >= 3 and $sync_db {
-    include ::barbican::db::mysql
-  }
-
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
     class { '::barbican::api':
