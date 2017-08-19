@@ -50,6 +50,19 @@ describe 'tripleo::profile::base::docker' do
       }
     end
 
+    context 'with step 1 and insecure_registries configured' do
+      let(:params) { {
+          :insecure_registries => ['foo:8787', 'bar'],
+          :step => 1,
+      } }
+
+      it {
+        is_expected.to contain_augeas('docker-sysconfig-registry').with_changes([
+          "set INSECURE_REGISTRY '\"--insecure-registry foo:8787 --insecure-registry bar\"'",
+        ])
+      }
+    end
+
     context 'with step 1 and insecure_registry configured but no docker_namespace' do
       let(:params) { {
           :insecure_registry => true,
