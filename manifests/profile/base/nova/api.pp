@@ -46,10 +46,30 @@
 #   Nova Team discourages it.
 #   Defaults to hiera('nova_wsgi_enabled', false)
 #
+# [*nova_metadata_network*]
+#   (Optional) The network name where the nova metadata endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('nova_metadata_network', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
+#
+# [*metadata_tls_proxy_bind_ip*]
+#   IP on which the TLS proxy will listen on. Required only if
+#   enable_internal_tls is set.
+#   Defaults to undef
+#
+# [*metadata_tls_proxy_fqdn*]
+#   fqdn on which the tls proxy will listen on. required only used if
+#   enable_internal_tls is set.
+#   defaults to undef
+#
+# [*metadata_tls_proxy_port*]
+#   port on which the tls proxy will listen on. Only used if
+#   enable_internal_tls is set.
+#   defaults to 8080
 #
 class tripleo::profile::base::nova::api (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
@@ -57,7 +77,11 @@ class tripleo::profile::base::nova::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $nova_api_network              = hiera('nova_api_network', undef),
   $nova_api_wsgi_enabled         = hiera('nova_wsgi_enabled', false),
+  $nova_metadata_network         = hiera('nova_metadata_network', undef),
   $step                          = Integer(hiera('step')),
+  $metadata_tls_proxy_bind_ip    = undef,
+  $metadata_tls_proxy_fqdn       = undef,
+  $metadata_tls_proxy_port       = 8775,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -73,6 +97,22 @@ class tripleo::profile::base::nova::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
+    if $enable_internal_tls {
+      if !$nova_metadata_network {
+        fail('nova_metadata_network is not set in the hieradata.')
+      }
+      $metadata_tls_certfile = $certificates_specs["httpd-${nova_metadata_network}"]['service_certificate']
+      $metadata_tls_keyfile = $certificates_specs["httpd-${nova_metadata_network}"]['service_key']
+
+      ::tripleo::tls_proxy { 'nova-metadata-api':
+        servername => $metadata_tls_proxy_fqdn,
+        ip         => $metadata_tls_proxy_bind_ip,
+        port       => $metadata_tls_proxy_port,
+        tls_cert   => $metadata_tls_certfile,
+        tls_key    => $metadata_tls_keyfile,
+      }
+      Tripleo::Tls_proxy['nova-metadata-api'] ~> Anchor<| title == 'nova::service::begin' |>
+    }
 
     class { '::nova::api':
       sync_db     => $sync_db,
