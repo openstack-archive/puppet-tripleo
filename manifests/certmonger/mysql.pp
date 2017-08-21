@@ -37,6 +37,11 @@
 #   This parameter can take both a string or an array of strings.
 #   Defaults to $hostname
 #
+# [*postsave_cmd*]
+#   (Optional) Specifies the command to execute after requesting a certificate.
+#   If nothing is given, it will default to: "systemctl restart ${service name}"
+#   Defaults to undef.
+#
 # [*principal*]
 #   (Optional) The haproxy service principal that is set for MySQL in kerberos.
 #   Defaults to undef
@@ -47,12 +52,13 @@ class tripleo::certmonger::mysql (
   $service_key,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $dnsnames      = $hostname,
+  $postsave_cmd  = undef,
   $principal     = undef,
 ) {
   include ::certmonger
   include ::mysql::params
 
-  $postsave_cmd        = "systemctl reload ${::mysql::params::server_service_name}"
+  $postsave_cmd_real = pick($postsave_cmd, "systemctl reload ${::mysql::params::server_service_name}")
   certmonger_certificate { 'mysql' :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -60,7 +66,7 @@ class tripleo::certmonger::mysql (
     hostname     => $hostname,
     dnsname      => $dnsnames,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd,
+    postsave_cmd => $postsave_cmd_real,
     ca           => $certmonger_ca,
     wait         => true,
     require      => Class['::certmonger'],

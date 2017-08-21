@@ -34,6 +34,11 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
+# [*postsave_cmd*]
+#   (Optional) Specifies the command to execute after requesting a certificate.
+#   If nothing is given, it will default to: "systemctl restart ${service name}"
+#   Defaults to undef.
+#
 # [*principal*]
 #   (Optional) The service principal that is set for the service in kerberos.
 #   Defaults to undef
@@ -44,12 +49,13 @@ class tripleo::certmonger::mongodb (
   $service_key,
   $service_pem,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
+  $postsave_cmd  = undef,
   $principal     = undef,
 ) {
   include ::certmonger
   include ::mongodb::params
 
-  $postsave_cmd  = "systemctl restart ${::mongodb::params::service_name}"
+  $postsave_cmd_real = pick($postsave_cmd, "systemctl restart ${::mongodb::params::service_name}")
   certmonger_certificate { 'mongodb' :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -57,7 +63,7 @@ class tripleo::certmonger::mongodb (
     hostname     => $hostname,
     dnsname      => $hostname,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd,
+    postsave_cmd => $postsave_cmd_real,
     ca           => $certmonger_ca,
     wait         => true,
     require      => Class['::certmonger'],

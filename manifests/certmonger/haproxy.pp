@@ -32,10 +32,6 @@
 #   The hostname that certmonger will use as the common name for the
 #   certificate.
 #
-# [*postsave_cmd*]
-#   The post-save-command that certmonger will use once it renews the
-#   certificate.
-#
 # [*certmonger_ca*]
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
@@ -48,15 +44,19 @@
 # [*principal*]
 #   The haproxy service principal that is set for HAProxy in kerberos.
 #
+# [*postsave_cmd*]
+#   The post-save-command that certmonger will use once it renews the
+#   certificate.
+#
 define tripleo::certmonger::haproxy (
   $service_pem,
   $service_certificate,
   $service_key,
   $hostname,
-  $postsave_cmd,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $dnsnames      = undef,
   $principal     = undef,
+  $postsave_cmd  = undef,
 ){
     include ::certmonger
     include ::haproxy::params
@@ -74,6 +74,7 @@ define tripleo::certmonger::haproxy (
       $dnsnames_real = $hostname
     }
 
+    $postsave_cmd_real = pick($postsave_cmd, 'systemctl reload haproxy')
     certmonger_certificate { "${title}-cert":
       ensure       => 'present',
       ca           => $certmonger_ca,
@@ -81,7 +82,7 @@ define tripleo::certmonger::haproxy (
       dnsname      => $dnsnames_real,
       certfile     => $service_certificate,
       keyfile      => $service_key,
-      postsave_cmd => $postsave_cmd,
+      postsave_cmd => $postsave_cmd_real,
       principal    => $principal,
       wait         => true,
       tag          => 'haproxy-cert',

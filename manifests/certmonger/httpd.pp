@@ -36,6 +36,11 @@
 #   in the certificate. If left unset, the value will be set to the $hostname.
 #   Defaults to undef
 #
+# [*postsave_cmd*]
+#   (Optional) Specifies the command to execute after requesting a certificate.
+#   If nothing is given, it will default to: "systemctl restart ${service name}"
+#   Defaults to undef.
+#
 # [*principal*]
 #   The haproxy service principal that is set for HAProxy in kerberos.
 #
@@ -45,6 +50,7 @@ define tripleo::certmonger::httpd (
   $service_key,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $dnsnames      = undef,
+  $postsave_cmd  = undef,
   $principal     = undef,
 ) {
   include ::certmonger
@@ -56,7 +62,7 @@ define tripleo::certmonger::httpd (
     $dnsnames_real = $hostname
   }
 
-  $postsave_cmd = "systemctl reload ${::apache::params::service_name}"
+  $postsave_cmd_real = pick($postsave_cmd, "systemctl reload ${::apache::params::service_name}")
   certmonger_certificate { $name :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -64,7 +70,7 @@ define tripleo::certmonger::httpd (
     hostname     => $hostname,
     dnsname      => $dnsnames_real,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd,
+    postsave_cmd => $postsave_cmd_real,
     ca           => $certmonger_ca,
     wait         => true,
     tag          => 'apache-cert',
