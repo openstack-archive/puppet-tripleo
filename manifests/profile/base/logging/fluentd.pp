@@ -36,9 +36,10 @@
 # [*fluentd_groups*]
 #   (Optional) List of strings. Add the 'fluentd' user to these groups.
 #
-# [*fluentd_pos_file_path*]
-#   (Optional) String.  Path to a directory that will be created
-#   if it does not exist and made writable by the fluentd user.
+# [*fluentd_manage_groups*]
+#   (Optional) Boolean. If true, modify the group membership of the
+#   fluentd_config_user using information provided by fluentd_groups
+#   and the per-service configurations.
 #
 # [*fluentd_use_ssl*]
 #   (Optional) Boolean. If true, use the secure_forward plugin.
@@ -63,40 +64,77 @@
 #   (Optional) List. Specifies [find, replace] arguments that will be
 #   used to transform the 'path' value for logging sources using puppet's
 #   regsubst function.
+#
+# [*fluentd_pos_file_path*]
+#   (Optional) String.  Path to a directory that will be created
+#   if it does not exist and made writable by the fluentd user.
+#
+# [*fluentd_default_format*]
+#   (Optional) String. Default log format if not otherwise specified
+#   in a log source definition.
+#
+# [*service_names*]
+#   (Optional) List of services enabled on the current role. This is used
+#   to obtain per-service configuration information.
 class tripleo::profile::base::logging::fluentd (
   $step = Integer(hiera('step')),
   $fluentd_sources = undef,
   $fluentd_filters = undef,
   $fluentd_servers = undef,
   $fluentd_groups = undef,
-  $fluentd_pos_file_path = undef,
+  $fluentd_manage_groups = true,
   $fluentd_use_ssl = undef,
   $fluentd_ssl_certificate = undef,
   $fluentd_shared_key = undef,
   $fluentd_listen_syslog = true,
   $fluentd_syslog_port = 42185,
-  $fluentd_path_transform = undef
+  $fluentd_path_transform = undef,
+  $fluentd_pos_file_path = undef,
+  $fluentd_default_format = undef,
+  $service_names = hiera('service_names', [])
 ) {
 
   if $step >= 4 {
     include ::fluentd
 
-    if $fluentd_groups {
-      Package<| tag == 'openstack' |>
-      -> user { $::fluentd::config_owner:
-        ensure     => present,
-        groups     => $fluentd_groups,
-        membership => 'minimum',
+    # Load per-service plugin configuration
+    ::tripleo::profile::base::logging::fluentd::fluentd_service {
+      $service_names:
+        pos_file_path  => $fluentd_pos_file_path,
+        default_format => $fluentd_default_format
+    }
+
+    if $fluentd_manage_groups {
+      # compute a list of all the groups of which the fluentd user
+      # should be a member.
+      $_tmpgroups1 = $service_names.map |$srv| {
+          hiera("tripleo_fluentd_groups_${srv}", undef)
+      }.filter |$new_srv| { ! empty($new_srv) }.flatten()
+
+      $_tmpgroups2 = any2array($fluentd_groups)
+      $groups = concat($_tmpgroups2,
+        $_tmpgroups1)
+
+      if !empty($groups) {
+        Package<| tag == 'openstack' |>
+        -> user { $::fluentd::config_owner:
+          ensure     => present,
+          groups     => $groups,
+          membership => 'minimum',
+        }
+        ~> Service[$::fluentd::service_name]
       }
     }
 
     if $fluentd_pos_file_path {
       file { $fluentd_pos_file_path:
-        ensure => 'directory',
-        owner  => $::fluentd::config_owner,
-        group  => $::fluentd::config_group,
-        mode   => '0750',
+        ensure  => 'directory',
+        owner   => $::fluentd::config_owner,
+        group   => $::fluentd::config_group,
+        mode    => '0750',
+        recurse =>  true,
       }
+      ~> Service[$::fluentd::service_name]
     }
 
     ::fluentd::plugin { 'rubygem-fluent-plugin-add':
@@ -149,7 +187,8 @@ class tripleo::profile::base::logging::fluentd (
         group   => 'root',
         mode    => '0644',
       } ~> exec { 'reload rsyslog':
-        command => '/bin/systemctl restart rsyslog',
+        command     => '/bin/systemctl restart rsyslog',
+        refreshonly => true,
       }
     }
 

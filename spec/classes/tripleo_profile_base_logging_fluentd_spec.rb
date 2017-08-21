@@ -19,6 +19,10 @@ require 'spec_helper'
 describe 'tripleo::profile::base::logging::fluentd' do
   shared_examples_for 'tripleo::profile::base::logging::fluentd' do
 
+    before :each do
+      facts.merge!({ :step => params[:step] })
+    end
+
     context 'with step less than 4' do
       let(:params) { { :step => 3 } }
 
@@ -92,6 +96,39 @@ describe 'tripleo::profile::base::logging::fluentd' do
         }
       ) }
     end
+
+    context 'Config by service -- ceilometer_agent_central' do
+      let(:params) { {
+        :step => 4,
+        :fluentd_default_format => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/',
+        :fluentd_manage_groups => false,
+        :fluentd_pos_file_path => '/var/cache/fluentd/',
+        :service_names => [ 'ceilometer_agent_central' ]
+      } }
+      it { is_expected.to contain_class('fluentd') }
+      it { is_expected.to contain_file('/var/cache/fluentd/') }
+      it { is_expected.to contain_tripleo__profile__base__logging__fluentd__fluentd_service('ceilometer_agent_central').with(
+       :pos_file_path => '/var/cache/fluentd/',
+       :default_format => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/'
+      ) }
+      it { is_expected.to contain_fluentd__config('100-openstack-ceilometer_agent_central.conf') }
+      it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-ceilometer_agent_central.conf') }
+    end
+
+    context 'Groups by service -- ceilometer_agent_central added ceilometer' do
+      let(:params) { {
+        :step => 4,
+        :fluentd_manage_groups => true,
+        :fluentd_groups => [ 'fluentd' ]
+      } }
+      it { is_expected.to contain_class('fluentd') }
+      it { is_expected.to contain_user('fluentd').with(
+        :ensure =>'present',
+        :groups => [ 'fluentd', 'ceilometer' ],
+        :membership => 'minimum'
+      ) }
+    end
+
   end
 
   on_supported_os.each do |os, facts|
