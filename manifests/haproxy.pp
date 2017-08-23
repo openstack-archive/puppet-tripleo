@@ -1274,6 +1274,7 @@ class tripleo::haproxy (
       server_names      => hiera('ironic_inspector_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
+      listen_options    => { 'http-check' => ['expect rstring .*200.*'], },
     }
   }
 
