@@ -125,7 +125,7 @@ class tripleo::profile::base::pacemaker (
       Pcmk_constraint<||> -> Class['tripleo::fencing']
       Exec <| tag == 'pacemaker_constraint' |> -> Class['tripleo::fencing']
       # enable stonith after all fencing devices have been created
-      Class['tripleo::fencing'] -> Class['pacemaker::stonith']
+      Class['tripleo::fencing'] -> Pcmk_property<|title == 'Enable STONITH'|>
     }
     # We have pacemaker remote nodes configured so let's add them as resources
     # We do this during step 1 right after wait-for-settle, because during step 2
