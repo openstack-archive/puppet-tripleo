@@ -26,6 +26,10 @@
 #   (Optional) Use compute namespace for polling agent.
 #   Defaults to false.
 #
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*ipmi_namespace*]
 #   (Optional) Use ipmi namespace for polling agent.
 #   Defaults to false.
@@ -44,6 +48,7 @@
 class tripleo::profile::base::ceilometer::agent::polling (
   $central_namespace         = hiera('central_namespace', false),
   $compute_namespace         = hiera('compute_namespace', false),
+  $enable_internal_tls       = hiera('enable_internal_tls', false),
   $ipmi_namespace            = hiera('ipmi_namespace', false),
   $ceilometer_redis_password = hiera('ceilometer_redis_password', undef),
   $redis_vip                 = hiera('redis_vip', undef),
@@ -55,13 +60,19 @@ class tripleo::profile::base::ceilometer::agent::polling (
     include ::tripleo::profile::base::ceilometer::upgrade
   }
 
+  if $enable_internal_tls {
+    $tls_query_param = '?ssl=true'
+  } else {
+    $tls_query_param = ''
+  }
+
   if $step >= 4 {
     include ::ceilometer::agent::auth
     class { '::ceilometer::agent::polling':
       central_namespace => $central_namespace,
       compute_namespace => $compute_namespace,
       ipmi_namespace    => $ipmi_namespace,
-      coordination_url  => join(['redis://:', $ceilometer_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
+      coordination_url  => join(['redis://:', $ceilometer_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
     }
   }
 }
