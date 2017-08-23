@@ -181,7 +181,8 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::encryption
     include ::swift::proxy::kms_keymaster
     include ::swift::keymaster
-
+    include ::swift::proxy::s3api
+    include ::swift::proxy::s3token
 
     class { '::swift::objectexpirer':
       pipeline         => ['catch_errors', 'cache', 'proxy-server'],
