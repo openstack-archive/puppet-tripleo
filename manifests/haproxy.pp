@@ -864,7 +864,7 @@ class tripleo::haproxy (
 
 
   $default_listen_options = {
-    'option'       => [ 'httpchk', ],
+    'option'       => [ 'httpchk', 'httplog', ],
     'http-request' => [
       'set-header X-Forwarded-Proto https if { ssl_fc }',
       'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
@@ -1073,9 +1073,6 @@ class tripleo::haproxy (
       service_port    => $ports[nova_metadata_port],
       ip_addresses    => hiera('nova_metadata_node_ips', $controller_hosts_real),
       server_names    => hiera('nova_metadata_node_names', $controller_hosts_names_real),
-      listen_options  => {
-        'option'  => [ 'httpchk', ],
-      },
       service_network => $nova_metadata_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -1089,7 +1086,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
       server_names      => hiera('nova_api_node_names', $controller_hosts_names_real),
       listen_options    => merge($default_listen_options, {
-        'option'  => [ 'tcpka' ],
+        'option'  => [ 'tcpka', 'tcplog' ],
         'balance' => 'source',
         'timeout' => [ 'tunnel 1h' ],
       }),
@@ -1313,7 +1310,7 @@ class tripleo::haproxy (
 
   if $mysql_clustercheck {
     $mysql_listen_options = {
-      'option'         => [ 'tcpka', 'httpchk' ],
+      'option'         => [ 'tcpka', 'httpchk', 'tcplog' ],
       'timeout client' => '90m',
       'timeout server' => '90m',
       'stick-table'    => 'type ip size 1000',
@@ -1366,7 +1363,7 @@ class tripleo::haproxy (
     haproxy::listen { 'rabbitmq':
       bind             => $rabbitmq_bind_opts,
       options          => {
-        'option'  => [ 'tcpka' ],
+        'option'  => [ 'tcpka', 'tcplog' ],
         'timeout' => [ 'client 0', 'server 0' ],
       },
       collect_exported => false,
@@ -1416,7 +1413,7 @@ class tripleo::haproxy (
       bind             => $redis_bind_opts,
       options          => {
         'balance'   => 'first',
-        'option'    => ['tcp-check',],
+        'option'    => [ 'tcp-check', 'tcplog', ],
         'tcp-check' => union($redis_tcp_check_options, ['send PING\r\n',
                                                         'expect string +PONG',
                                                         'send info\ replication\r\n',
@@ -1540,7 +1537,7 @@ class tripleo::haproxy (
     # disabled.
     # If HA is enabled, pacemaker configures the OVN DB servers accordingly.
     $ovn_db_listen_options = {
-      'option'         => [ 'tcpka' ],
+      'option'         => [ 'tcpka', 'tcplog' ],
       'timeout client' => '90m',
       'timeout server' => '90m',
       'stick-table'    => 'type ip size 1000',
