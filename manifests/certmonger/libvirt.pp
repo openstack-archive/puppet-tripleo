@@ -35,6 +35,11 @@
 #   (Optional) The user which the certificate and key files belong to.
 #   Defaults to 'root'
 #
+# [*postsave_cmd*]
+#   (Optional) Specifies the command to execute after requesting a certificate.
+#   If nothing is given, it will default to: "systemctl reload ${service name}"
+#   Defaults to undef.
+#
 # [*principal*]
 #   (Optional) The service principal that is set for the service in kerberos.
 #   Defaults to undef
@@ -44,12 +49,13 @@ define tripleo::certmonger::libvirt (
   $service_certificate,
   $service_key,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
+  $postsave_cmd  = undef,
   $principal     = undef,
 ) {
   include ::certmonger
   include ::nova::params
 
-  $postsave_cmd  = "systemctl restart ${::nova::params::libvirt_service_name}"
+  $postsave_cmd_real = pick($postsave_cmd, "systemctl reload ${::nova::params::libvirt_service_name}")
   certmonger_certificate { $name :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -57,7 +63,7 @@ define tripleo::certmonger::libvirt (
     hostname     => $hostname,
     dnsname      => $hostname,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd,
+    postsave_cmd => $postsave_cmd_real,
     ca           => $certmonger_ca,
     wait         => true,
     tag          => 'libvirt-cert',

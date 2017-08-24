@@ -58,6 +58,11 @@
 #   it will create.
 #   Defaults to hiera('libvirt_certificates_specs', {}).
 #
+# [*libvirt_postsave_cmd*]
+#   (Optional) If set, it overrides the default way to restart libvirt when the
+#   certificate is renewed.
+#   Defaults to undef
+#
 # [*mongodb_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -84,6 +89,7 @@ class tripleo::profile::base::certmonger_user (
   $haproxy_certificates_specs = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
   $haproxy_postsave_cmd       = undef,
   $libvirt_certificates_specs = hiera('libvirt_certificates_specs', {}),
+  $libvirt_postsave_cmd       = undef,
   $mongodb_certificate_specs  = hiera('mongodb_certificate_specs',{}),
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
@@ -111,7 +117,8 @@ class tripleo::profile::base::certmonger_user (
   }
   unless empty($libvirt_certificates_specs) {
     include ::tripleo::certmonger::libvirt_dirs
-    ensure_resources('tripleo::certmonger::libvirt', $libvirt_certificates_specs)
+    ensure_resources('tripleo::certmonger::libvirt', $libvirt_certificates_specs,
+                      {'postsave_cmd' => $libvirt_postsave_cmd})
   }
   unless empty($haproxy_certificates_specs) {
     include ::tripleo::certmonger::haproxy_dirs
