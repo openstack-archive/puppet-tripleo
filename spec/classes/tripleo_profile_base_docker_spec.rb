@@ -82,9 +82,31 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
       it {
-        is_expected.to contain_augeas('docker-daemon.json').with_changes(['set dict/entry[. = "registry-mirrors"] "registry-mirrors', "set dict/entry[. = \"registry-mirrors\"]/array/string \"http://foo/bar\""])
+        is_expected.to contain_augeas('docker-daemon.json').with_changes(
+            ['set dict/entry[. = "registry-mirrors"] "registry-mirrors',
+             "set dict/entry[. = \"registry-mirrors\"]/array/string \"http://foo/bar\"",
+             'set dict/entry[. = "debug"] "debug"',
+             "set dict/entry[. = \"debug\"]/const \"false\""])
       }
     end
+
+    context 'with step 1 and docker debug' do
+      let(:params) { {
+          :step  => 1,
+          :debug => true,
+      } }
+
+      it { is_expected.to contain_class('tripleo::profile::base::docker') }
+      it { is_expected.to contain_package('docker') }
+      it { is_expected.to contain_service('docker') }
+      it {
+        is_expected.to contain_augeas('docker-daemon.json').with_changes(
+            ['rm dict/entry[. = "registry-mirrors"]',
+             'set dict/entry[. = "debug"] "debug"',
+             "set dict/entry[. = \"debug\"]/const \"true\""])
+      }
+    end
+
 
     context 'with step 1 and docker_options configured' do
       let(:params) { {
