@@ -138,7 +138,7 @@ class tripleo::certmonger::ca::crl (
   cron { 'tripleo-refresh-crl-file':
     ensure      => $ensure,
     command     => $cron_cmd,
-    environment => 'PATH=/usr/bin SHELL=/bin/sh',
+    environment => 'PATH=/usr/bin:/bin SHELL=/bin/sh',
     user        => 'root',
     minute      => $minute,
     hour        => $hour,
