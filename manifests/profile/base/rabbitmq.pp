@@ -93,9 +93,19 @@ class tripleo::profile::base::rabbitmq (
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
+    $cert_option = "-ssl_dist_opt server_certfile ${tls_certfile}"
+    $key_option = "-ssl_dist_opt server_keyfile ${tls_keyfile}"
+    $secure_renegotiate = '-ssl_dist_opt server_secure_renegotiate true -ssl_dist_opt client_secure_renegotiate true'
+
+    $rabbitmq_additional_erl_args = "\"${cert_option} ${key_option} ${secure_renegotiate}\""
+    $environment_real = merge($environment, {
+      'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS' => $rabbitmq_additional_erl_args,
+      'RABBITMQ_CTL_ERL_ARGS' => $rabbitmq_additional_erl_args
+    })
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
+    $environment_real = $environment
   }
 
   if $inet_dist_interface {
@@ -116,7 +126,7 @@ class tripleo::profile::base::rabbitmq (
         cluster_nodes           => $nodes,
         config_kernel_variables => $real_kernel_variables,
         config_variables        => $config_variables,
-        environment_variables   => $environment,
+        environment_variables   => $environment_real,
         # TLS options
         ssl_cert                => $tls_certfile,
         ssl_key                 => $tls_keyfile,
