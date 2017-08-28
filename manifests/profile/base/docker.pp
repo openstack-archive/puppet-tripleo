@@ -44,6 +44,10 @@
 # [*step*]
 #   step defaults to hiera('step')
 #
+# [*debug*]
+#   Boolean. Value to configure docker daemon's debug configuration.
+#   Defaults to false
+#
 # DEPRECATED PARAMETERS
 #
 # [*insecure_registry_address*]
@@ -62,11 +66,12 @@
 #
 class tripleo::profile::base::docker (
   $insecure_registries = undef,
-  $registry_mirror = false,
-  $docker_options = '--log-driver=journald --signature-verification=false --iptables=false',
-  $configure_storage = true,
-  $storage_options = '-s overlay2',
-  $step = Integer(hiera('step')),
+  $registry_mirror     = false,
+  $docker_options      = '--log-driver=journald --signature-verification=false --iptables=false',
+  $configure_storage   = true,
+  $storage_options     = '-s overlay2',
+  $step                = Integer(hiera('step')),
+  $debug               = false,
   # DEPRECATED PARAMETERS
   $insecure_registry_address = undef,
   $docker_namespace = undef,
@@ -133,6 +138,9 @@ class tripleo::profile::base::docker (
       $mirror_changes = [ 'rm dict/entry[. = "registry-mirrors"]', ]
     }
 
+    $debug_changes = ['set dict/entry[. = "debug"] "debug"',
+                      "set dict/entry[. = \"debug\"]/const \"${debug}\"",]
+
     file { '/etc/docker/daemon.json':
       ensure  => 'present',
       content => '{}',
@@ -144,7 +152,7 @@ class tripleo::profile::base::docker (
     augeas { 'docker-daemon.json':
       lens      => 'Json.lns',
       incl      => '/etc/docker/daemon.json',
-      changes   => $mirror_changes,
+      changes   => concat($mirror_changes, $debug_changes),
       subscribe => Package['docker'],
       notify    => Service['docker'],
       require   => File['/etc/docker/daemon.json'],
