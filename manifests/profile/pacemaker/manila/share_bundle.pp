@@ -129,6 +129,11 @@ class tripleo::profile::pacemaker::manila::share_bundle (
             'target-dir' => '/var/log/manila',
             'options'    => 'rw',
           },
+          'ceph-cfg-dir'                => {
+            'source-dir' => '/etc/ceph',
+            'target-dir' => '/etc/ceph',
+            'options'    => 'ro',
+          },
         },
       }
     }
