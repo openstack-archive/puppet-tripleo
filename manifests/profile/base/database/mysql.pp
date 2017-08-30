@@ -31,6 +31,10 @@
 #   limit for the mysql service.
 #   Defaults to false
 #
+# [*innodb_buffer_pool_size*]
+#   (Optional) Configure the size of the MySQL buffer pool.
+#   Defaults to hiera('innodb_buffer_pool_size', undef)
+#
 # [*manage_resources*]
 #   (Optional) Whether or not manage root user, root my.cnf, and service.
 #   Defaults to true
@@ -57,6 +61,7 @@ class tripleo::profile::base::database::mysql (
   $bind_address               = $::hostname,
   $bootstrap_node             = hiera('bootstrap_nodeid', undef),
   $generate_dropin_file_limit = false,
+  $innodb_buffer_pool_size    = hiera('innodb_buffer_pool_size', undef),
   $manage_resources           = true,
   $mysql_server_options       = {},
   $mysql_max_connections      = hiera('mysql_max_connections', undef),
@@ -90,12 +95,19 @@ class tripleo::profile::base::database::mysql (
     # set bind-address to a hostname instead of an ip address; to move Mysql
     # from internal_api on another network we'll have to customize both
     # MysqlNetwork and ControllerHostnameResolveNetwork in ServiceNetMap
+
+    if $innodb_buffer_pool_size {
+      $buffer_options = { 'innodb_buffer_pool_size' => $innodb_buffer_pool_size }
+    } else {
+      $buffer_options = {}
+    }
+
     $mysql_server_default = {
-      'mysqld' => {
-        'bind-address'     => $bind_address,
-        'max_connections'  => $mysql_max_connections,
-        'open_files_limit' => '-1',
-      }
+      'mysqld' => merge({
+        'bind-address'            => $bind_address,
+        'max_connections'         => $mysql_max_connections,
+        'open_files_limit'        => '-1',
+      }, $buffer_options)
     }
     $mysql_server_options_real = deep_merge($mysql_server_default, $mysql_server_options)
     class { '::mysql::server':
