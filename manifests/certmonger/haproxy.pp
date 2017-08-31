@@ -74,7 +74,7 @@ define tripleo::certmonger::haproxy (
       $dnsnames_real = $hostname
     }
 
-    $postsave_cmd_real = pick($postsave_cmd, 'systemctl reload haproxy')
+    $postsave_cmd_real = pick($postsave_cmd, 'if systemctl -q is-active haproxy; then systemctl reload haproxy; else true; fi')
     certmonger_certificate { "${title}-cert":
       ensure       => 'present',
       ca           => $certmonger_ca,
