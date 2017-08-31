@@ -1,0 +1,4 @@
+---
+features:
+  - Allow using Redis as Zaqar messaging backend.
+    

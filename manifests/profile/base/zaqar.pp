@@ -104,6 +104,8 @@ class tripleo::profile::base::zaqar (
       class {'::zaqar::messaging::mongodb':
         uri => $mongo_database_connection,
       }
+    } elsif $messaging_store == 'redis' {
+      include ::zaqar::messaging::redis
     } else {
       fail("unsupported Zaqar messaging_store set: ${messaging_store}")
     }
