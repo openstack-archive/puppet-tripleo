@@ -337,7 +337,7 @@ class tripleo::profile::base::keystone (
     if hiera('trove_api_enabled', false) {
       include ::trove::keystone::auth
     }
-    if hiera('zaqar_enabled', false) {
+    if hiera('zaqar_api_enabled', false) {
       include ::zaqar::keystone::auth
       include ::zaqar::keystone::auth_websocket
     }
