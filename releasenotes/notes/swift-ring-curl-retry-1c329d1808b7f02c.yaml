@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Retry Swift ring up-/downloads on failures to improve overall
+    stability during deployments when there are temporary errors.
+    Retries are executed in case of HTTP errors (for example due to a
+    temporary issue between the proxy and backend servers) as well as
+    connection issue to the proxy itself.

@@ -92,8 +92,10 @@ class tripleo::profile::base::swift::ringbuilder (
   if $step >= 2 and $swift_ring_get_tempurl != '' {
     exec{'fetch_swift_ring_tarball':
       path    => ['/usr/bin'],
-      command => "curl --insecure --silent '${swift_ring_get_tempurl}' -o /tmp/swift-rings.tar.gz",
-      returns => [0, 3]
+      command => "curl --insecure --silent --retry 3 '${swift_ring_get_tempurl}' -o /tmp/swift-rings.tar.gz",
+      returns => [0, 3],
+      timeout => 30,
+      tries   => 3,
     }
     ~> exec{'extract_swift_ring_tarball':
       path    => ['/bin'],
@@ -155,9 +157,11 @@ class tripleo::profile::base::swift::ringbuilder (
     }
     exec{'upload_swift_ring_tarball':
       path        => ['/usr/bin'],
-      command     => "curl --insecure --silent -X PUT '${$swift_ring_put_tempurl}' --data-binary @/tmp/swift-rings.tar.gz",
+      command     => "curl --insecure --silent --retry 3 -X PUT '${$swift_ring_put_tempurl}' --data-binary @/tmp/swift-rings.tar.gz",
       require     => Exec['create_swift_ring_tarball'],
       refreshonly => true,
+      timeout     => 30,
+      tries       => 3,
     }
 
     Exec['rebalance_account'] ~> Exec['create_swift_ring_tarball']
