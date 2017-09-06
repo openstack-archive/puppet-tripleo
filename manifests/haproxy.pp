@@ -1373,11 +1373,19 @@ class tripleo::haproxy (
   }
 
   if $redis {
-    if $redis_password {
-      $redis_tcp_check_options = ["send AUTH\\ ${redis_password}\\r\\n"]
+    if $enable_internal_tls {
+      $redis_tcp_check_ssl_options = ['connect ssl']
+      $redis_ssl_member_options = ['check-ssl', "ca-file ${ca_bundle}"]
     } else {
-      $redis_tcp_check_options = []
+      $redis_tcp_check_ssl_options = []
+      $redis_ssl_member_options = []
     }
+    if $redis_password {
+      $redis_tcp_check_password_options = ["send AUTH\\ ${redis_password}\\r\\n"]
+    } else {
+      $redis_tcp_check_password_options = []
+    }
+    $redis_tcp_check_options = union($redis_tcp_check_ssl_options, $redis_tcp_check_password_options)
     haproxy::listen { 'redis':
       bind             => $redis_bind_opts,
       options          => {
@@ -1397,7 +1405,8 @@ class tripleo::haproxy (
       ports             => '6379',
       ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
       server_names      => hiera('redis_node_names', $controller_hosts_names_real),
-      options           => $haproxy_member_options,
+      options           => union($haproxy_member_options, $redis_ssl_member_options),
+      verifyhost        => false,
     }
     if $manage_firewall {
       include ::tripleo::firewall
