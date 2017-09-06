@@ -26,7 +26,9 @@ describe 'tripleo::profile::base::sshd' do
       it do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
-          'options' => {}
+          'options' => {
+            'Port' => [22]
+          }
         })
         is_expected.to_not contain_file('/etc/issue')
         is_expected.to_not contain_file('/etc/issue.net')
@@ -39,11 +41,49 @@ describe 'tripleo::profile::base::sshd' do
       it do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
-          'options' => {}
+          'options' => {
+            'Port' => [22]
+          }
         })
         is_expected.to_not contain_file('/etc/issue')
         is_expected.to_not contain_file('/etc/issue.net')
         is_expected.to_not contain_file('/etc/motd')
+      end
+    end
+
+    context 'with port configured' do
+      let(:params) {{ :port => 123 }}
+      it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'Port' => [123]
+          }
+        })
+      end
+    end
+
+    context 'with port configured and port option' do
+      let(:params) {{ :port => 123, :options => {'Port' => 456}  }}
+      it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'Port' => [456, 123]
+          }
+        })
+      end
+    end
+
+    context 'with port configured and same port option' do
+      let(:params) {{ :port => 123, :options => {'Port' => 123}  }}
+      it do
+        is_expected.to contain_class('ssh::server').with({
+          'storeconfigs_enabled' => false,
+          'options' => {
+            'Port' => [123]
+          }
+        })
       end
     end
 
@@ -53,7 +93,8 @@ describe 'tripleo::profile::base::sshd' do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
           'options' => {
-            'Banner' => '/etc/issue.net'
+            'Banner' => '/etc/issue.net',
+            'Port' => [22]
           }
         })
         is_expected.to contain_file('/etc/issue').with({
@@ -78,6 +119,7 @@ describe 'tripleo::profile::base::sshd' do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
           'options' => {
+            'Port' => [22],
             'PrintMotd' => 'yes'
           }
         })
@@ -98,6 +140,7 @@ describe 'tripleo::profile::base::sshd' do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
           'options' => {
+            'Port' => [22],
             'X11Forwarding' => 'no'
           }
         })
@@ -117,6 +160,7 @@ describe 'tripleo::profile::base::sshd' do
           'storeconfigs_enabled' => false,
           'options' => {
             'Banner' => '/etc/issue.net',
+            'Port' => [22],
             'PrintMotd' => 'yes'
           }
         })
@@ -146,6 +190,7 @@ describe 'tripleo::profile::base::sshd' do
         :bannertext => 'foo',
         :motd => 'foo',
         :options => {
+          'Port' => [22],
           'PrintMotd' => 'no', # this should be overridden
           'X11Forwarding' => 'no'
         }
@@ -155,6 +200,7 @@ describe 'tripleo::profile::base::sshd' do
           'storeconfigs_enabled' => false,
           'options' => {
             'Banner' => '/etc/issue.net',
+            'Port' => [22],
             'PrintMotd' => 'yes',
             'X11Forwarding' => 'no'
           }
