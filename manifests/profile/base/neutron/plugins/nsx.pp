@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::profile::base::neutron::plugins::nsx_v3
+# == Class: tripleo::profile::base::neutron::plugins::nsx
 #
 # VMware NSXv3 Neutron profile for tripleo
 #
@@ -27,7 +27,7 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::base::neutron::plugins::nsx_v3 (
+class tripleo::profile::base::neutron::plugins::nsx (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = Integer(hiera('step')),
 ) {
@@ -40,6 +40,6 @@ class tripleo::profile::base::neutron::plugins::nsx_v3 (
   include ::tripleo::profile::base::neutron
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
-    include ::neutron::plugins::nsx_v3
+    include ::neutron::plugins::nsx
   }
 }
