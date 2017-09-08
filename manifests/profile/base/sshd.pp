@@ -31,11 +31,16 @@
 #   Hash of SSHD options to set. See the puppet-ssh module documentation for
 #   details.
 #   Defaults to {}
+#
+# [*port*]
+#   SSH port or list of ports to bind to
+#   Defaults to [22]
 
 class tripleo::profile::base::sshd (
   $bannertext = hiera('BannerText', undef),
   $motd = hiera('MOTD', undef),
-  $options = {}
+  $options = {},
+  $port = [22],
 ) {
 
   if $bannertext and $bannertext != '' {
@@ -67,10 +72,18 @@ class tripleo::profile::base::sshd (
     $sshd_options_motd = {}
   }
 
+  if $options['Port'] {
+    $sshd_options_port = {'Port' => unique(concat(any2array($options['Port']), $port))}
+  }
+  else {
+    $sshd_options_port = {'Port' => unique(any2array($port))}
+  }
+
   $sshd_options = merge(
     $options,
     $sshd_options_banner,
-    $sshd_options_motd
+    $sshd_options_motd,
+    $sshd_options_port
   )
 
   # NB (owalsh) in puppet-ssh hiera takes precedence over the class param

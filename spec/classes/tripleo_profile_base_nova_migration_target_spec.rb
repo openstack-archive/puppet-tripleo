@@ -269,6 +269,51 @@ eos
       it { is_expected.to_not compile }
     end
 
+    context 'with step 4 with wrapper_command' do
+        let(:pre_condition) {
+        <<-eos
+        class { '::tripleo::profile::base::nova::migration':
+          step => #{params[:step]}
+        }
+        class { '::ssh::server':
+          storeconfigs_enabled => false,
+          options              => {}
+        }
+eos
+      }
+      let(:params) { {
+        :step                => 4,
+        :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
+        :services_enabled    => ['docker', 'nova_migration_target'],
+        :wrapper_command     => '/bin/true'
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::migration')
+        is_expected.to contain_ssh__server__match_block('nova_migration allow').with(
+          :type  => 'User',
+          :name  => 'nova_migration',
+          :options => {
+            'ForceCommand'           => '/bin/true',
+            'PasswordAuthentication' => 'no',
+            'AllowTcpForwarding'     => 'no',
+            'X11Forwarding'          => 'no',
+            'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
+          }
+        )
+        is_expected.to_not contain_ssh__server__match_block('nova_migration deny')
+        is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
+          :content => 'ssh-rsa bar\nssh-rsa baz',
+          :mode => '0640',
+          :owner => 'root',
+          :group => 'nova_migration',
+        )
+        is_expected.to contain_user('nova_migration').with(
+          :shell => '/bin/bash'
+        )
+      }
+    end
+
   end
 
 
