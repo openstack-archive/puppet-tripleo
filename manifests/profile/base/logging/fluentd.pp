@@ -73,6 +73,11 @@
 #   (Optional) String. Default log format if not otherwise specified
 #   in a log source definition.
 #
+# [*fluentd_service_user*]
+#   (Optional) String. Username that will run the fluentd service.
+#   This will be used to create a systemd drop-in for the fluentd
+#   service that sets User explicitly.
+#
 # [*service_names*]
 #   (Optional) List of services enabled on the current role. This is used
 #   to obtain per-service configuration information.
@@ -91,11 +96,28 @@ class tripleo::profile::base::logging::fluentd (
   $fluentd_path_transform = undef,
   $fluentd_pos_file_path = undef,
   $fluentd_default_format = undef,
+  $fluentd_service_user = undef,
   $service_names = hiera('service_names', [])
 ) {
-
   if $step >= 4 {
     include ::fluentd
+    include ::systemd::systemctl::daemon_reload
+
+    $_fluentd_service_user = pick($fluentd_service_user,
+                                  $::fluentd::config_owner,
+                                  'fluentd')
+
+    # don't manage groups for 'root'
+    $_fluentd_manage_groups = $_fluentd_service_user ? {
+      'root'  => false,
+      default => $fluentd_manage_groups,
+    }
+
+    ::systemd::dropin_file { 'fluentd_user.conf':
+      unit    => "${::fluentd::service_name}.service",
+      content => template('tripleo/fluentd/fluentd_user.conf.erb'),
+    }
+    ~> Service['fluentd']
 
     # Load per-service plugin configuration
     ::tripleo::profile::base::logging::fluentd::fluentd_service {
@@ -104,7 +126,7 @@ class tripleo::profile::base::logging::fluentd (
         default_format => $fluentd_default_format
     }
 
-    if $fluentd_manage_groups {
+    if $_fluentd_manage_groups {
       # compute a list of all the groups of which the fluentd user
       # should be a member.
       $_tmpgroups1 = $service_names.map |$srv| {
@@ -117,7 +139,7 @@ class tripleo::profile::base::logging::fluentd (
 
       if !empty($groups) {
         Package<| tag == 'openstack' |>
-        -> user { $::fluentd::config_owner:
+        -> user { $_fluentd_service_user:
           ensure     => present,
           groups     => $groups,
           membership => 'minimum',
@@ -129,7 +151,7 @@ class tripleo::profile::base::logging::fluentd (
     if $fluentd_pos_file_path {
       file { $fluentd_pos_file_path:
         ensure  => 'directory',
-        owner   => $::fluentd::config_owner,
+        owner   => $_fluentd_service_user,
         group   => $::fluentd::config_group,
         mode    => '0750',
         recurse =>  true,
@@ -208,7 +230,7 @@ class tripleo::profile::base::logging::fluentd (
 
         file {'/etc/fluentd/ca_cert.pem':
           content => $fluentd_ssl_certificate,
-          owner   => $::fluentd::config_owner,
+          owner   => $_fluentd_service_user,
           group   => $::fluentd::config_group,
           mode    => '0444',
         }
