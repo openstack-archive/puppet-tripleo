@@ -96,6 +96,10 @@
 #  A string.
 #  Defaults to 'tripleo'
 #
+# [*enabled_loggers*]
+#  List of enabled loggers
+#  Defaults to ['console', 'zaqar']
+#
 class tripleo::ui (
   $servername                       = $::fqdn,
   $bind_host                        = hiera('controller_host'),
@@ -116,6 +120,7 @@ class tripleo::ui (
   $endpoint_config_ironic_inspector = undef,
   $endpoint_config_mistral          = undef,
   $endpoint_config_swift            = undef,
+  $enabled_loggers                  = ['console', 'zaqar'],
 
 ) {
   package {'openstack-tripleo-ui': }
