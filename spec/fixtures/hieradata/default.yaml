@@ -48,6 +48,10 @@ memcached_node_ips:
 # octavia related items
 octavia::rabbit_password: 'password'
 horizon::secret_key: 'secrete'
+horizon_node_ips:
+ - '127.0.0.1'
+horizon_node_names:
+ - 'controller-1'
 #Neutron related
 neutron::rabbit_password: 'password'
 # Pacemaker related

@@ -80,6 +80,21 @@ describe 'tripleo::haproxy' do
       end
     end
 
+    describe "horizon" do
+      before :each do
+        params.merge!({
+          :horizon      => true,
+        })
+      end
+
+      it 'should configure haproxy horizon endpoint' do
+        is_expected.to contain_class('tripleo::haproxy::horizon_endpoint')
+        is_expected.to contain_haproxy__balancermember('horizon_127.0.0.1_controller-1').with(
+          :options => ['check', 'inter 2000', 'rise 2', 'fall 5', 'cookie controller-1'],
+        )
+      end
+    end
+
     describe "override maxconn without clustercheck" do
       before :each do
         params.merge!({
