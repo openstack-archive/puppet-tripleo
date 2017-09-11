@@ -39,10 +39,6 @@ class tripleo::profile::base::octavia::api (
 
   include ::tripleo::profile::base::octavia
 
-  if $step >= 3 and $sync_db {
-    include ::octavia::db::mysql
-  }
-
   # We start the Octavia API server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes
