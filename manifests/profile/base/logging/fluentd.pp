@@ -58,6 +58,11 @@
 # [*fluentd_syslog_port*]
 #   (Optional, default 42185) Port on which fluentd should listen if
 #   $fluentd_listen_syslog is true.
+#
+# [*fluentd_path_transform*]
+#   (Optional) List. Specifies [find, replace] arguments that will be
+#   used to transform the 'path' value for logging sources using puppet's
+#   regsubst function.
 class tripleo::profile::base::logging::fluentd (
   $step = Integer(hiera('step')),
   $fluentd_sources = undef,
@@ -69,7 +74,8 @@ class tripleo::profile::base::logging::fluentd (
   $fluentd_ssl_certificate = undef,
   $fluentd_shared_key = undef,
   $fluentd_listen_syslog = true,
-  $fluentd_syslog_port = 42185
+  $fluentd_syslog_port = 42185,
+  $fluentd_path_transform = undef
 ) {
 
   if $step >= 4 {
@@ -98,9 +104,28 @@ class tripleo::profile::base::logging::fluentd (
     }
 
     if $fluentd_sources {
+
+      if $fluentd_path_transform {
+        $_fluentd_sources = map($fluentd_sources) |$source| {
+          if $source['path'] {
+            $newpath = {
+              'path' => regsubst($source['path'],
+                        $fluentd_path_transform[0],
+                        $fluentd_path_transform[1])
+            }
+
+            $source + $newpath
+          } else {
+            $source
+          }
+        }
+      } else {
+        $_fluentd_sources = $fluentd_sources
+      }
+
       ::fluentd::config { '100-openstack-sources.conf':
         config => {
-          'source' => $fluentd_sources,
+          'source' => $_fluentd_sources,
         }
       }
     }
