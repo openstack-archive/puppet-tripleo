@@ -144,11 +144,13 @@ class tripleo::haproxy::horizon_endpoint (
     mode             => 'http',
     collect_exported => false,
   }
-  haproxy::balancermember { 'horizon':
-    listening_service => 'horizon',
-    ports             => $backend_port,
-    ipaddresses       => $ip_addresses,
-    server_names      => $server_names,
-    options           => union($member_options, ["cookie ${::hostname}"]),
+  hash(zip($ip_addresses, $server_names)).each | $ip, $server | {
+    haproxy::balancermember { "horizon_${ip}_${server}":
+      listening_service => 'horizon',
+      ports             => $backend_port,
+      ipaddresses       => $ip,
+      server_names      => $server,
+      options           => union($member_options, ["cookie ${server}"]),
+    }
   }
 }
