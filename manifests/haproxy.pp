@@ -53,6 +53,11 @@
 #  Should haproxy run in daemon mode or not
 #  Defaults to true
 #
+# [*haproxy_socket_access_level*]
+#  Access level for HAProxy socket.
+#  Can be "user" or "admin"
+#  Defaults to "user"
+#
 # [*manage_firewall*]
 #  (optional) Enable or disable firewall settings for ports exposed by HAProxy
 #  (false means disabled, and true means enabled)
@@ -569,6 +574,7 @@ class tripleo::haproxy (
   $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address         = '/dev/log',
   $haproxy_daemon              = true,
+  $haproxy_socket_access_level = 'user',
   $haproxy_stats_user          = 'admin',
   $haproxy_stats_password      = undef,
   $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
@@ -799,7 +805,7 @@ class tripleo::haproxy (
     'ssl-default-bind-ciphers' => $ssl_cipher_suite,
     'ssl-default-bind-options' => $ssl_options,
     'stats'                    => [
-      'socket /var/lib/haproxy/stats mode 600 level user',
+      "socket /var/lib/haproxy/stats mode 600 level ${haproxy_socket_access_level}",
       'timeout 2m'
     ],
   }
