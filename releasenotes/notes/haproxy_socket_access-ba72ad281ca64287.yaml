@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Provides a way to set HAProxy socket access level.
+    This will allow people to manage HAProxy directly through
+    command-line, for example in order to temporarly disable
+    backends.
