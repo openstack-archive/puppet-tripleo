@@ -33,6 +33,10 @@ mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
   :ref => 'master'
 
+mod 'fluentd',
+  :git => 'https://github.com/soylent/konstantin-fluentd',
+  :ref => 'master'
+
 mod 'certmonger',
   :git => 'https://github.com/saltedsignal/puppet-certmonger',
   :ref => 'v1.1.1'
