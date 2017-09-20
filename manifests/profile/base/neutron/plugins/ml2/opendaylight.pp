@@ -34,6 +34,10 @@
 #   (Optional) Virtual IP address for ODL Api Service
 #   Defaults to hiera('opendaylight_api_vip')
 #
+# [*odl_api_ips*]
+#   (Optional) List of OpenStack Controller IPs for ODL API
+#   Defaults to hiera('opendaylight_api_node_ips')
+#
 # [*conn_proto*]
 #   (Optional) Protocol to use to for ODL REST access
 #   Defaults to hiera('opendaylight::nb_connection_protocol')
@@ -48,6 +52,7 @@ class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
   $odl_username = hiera('opendaylight::username'),
   $odl_password = hiera('opendaylight::password'),
   $odl_url_ip   = hiera('opendaylight_api_vip'),
+  $odl_api_ips  = hiera('opendaylight_api_node_ips'),
   $conn_proto   = hiera('opendaylight::nb_connection_protocol'),
   $step         = Integer(hiera('step')),
 ) {
@@ -55,10 +60,24 @@ class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
   if $step >= 4 {
     if ! $odl_url_ip { fail('OpenDaylight API VIP is Empty') }
 
+    $ml2_odl_params = {
+      'odl_username' => $odl_username,
+      'odl_password' => $odl_password,
+      'odl_url'      => "${conn_proto}://${odl_url_ip}:${odl_port}/controller/nb/v2/neutron",
+    }
+
+    validate_array($odl_api_ips)
+    if size($odl_api_ips) > 2 {
+      $odl_features = 'False'
+    } else {
+      $odl_features = $::os_service_default
+    }
+
     class { '::neutron::plugins::ml2::opendaylight':
       odl_username => $odl_username,
       odl_password => $odl_password,
-      odl_url      => "${conn_proto}://${odl_url_ip}:${odl_port}/controller/nb/v2/neutron";
+      odl_url      => "${conn_proto}://${odl_url_ip}:${odl_port}/controller/nb/v2/neutron",
+      odl_features => $odl_features;
     }
   }
 }
