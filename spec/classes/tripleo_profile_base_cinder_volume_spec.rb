@@ -187,6 +187,18 @@ describe 'tripleo::profile::base::cinder::volume' do
             :enabled_backends => ['tripleo_ceph']
           )
         end
+        context 'additional rbd pools' do
+          # The list of additional rbd pools is not an input, but instead comes
+          # from hiera. Step 4's hiera data doesn't define additional RBD pools,
+          # so test the feature by defining extra pools in step 5 (see
+          # ../fixtures/hieradata/step5.yaml).
+          let(:params) { { :step => 5 } }
+          it 'should configure additional rbd backends' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_ceph', 'tripleo_ceph_foo', 'tripleo_ceph_bar']
+            )
+          end
+        end
       end
 
       context 'with only user backend' do

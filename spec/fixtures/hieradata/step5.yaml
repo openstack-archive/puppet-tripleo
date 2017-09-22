@@ -1,2 +1,5 @@
 ---
 step: 5
+tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools:
+  - 'foo'
+  - 'bar'

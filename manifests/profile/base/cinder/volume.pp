@@ -163,8 +163,17 @@ class tripleo::profile::base::cinder::volume (
     if $cinder_enable_rbd_backend {
       include ::tripleo::profile::base::cinder::volume::rbd
       $cinder_rbd_backend_name = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph')
+
+      $cinder_rbd_extra_pools = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef)
+      if $cinder_rbd_extra_pools {
+          $base_name = $cinder_rbd_backend_name
+          $cinder_rbd_extra_backend_names = $cinder_rbd_extra_pools.map |$pool_name| { "${base_name}_${pool_name}" }
+      } else {
+          $cinder_rbd_extra_backend_names = undef
+      }
     } else {
       $cinder_rbd_backend_name = undef
+      $cinder_rbd_extra_backend_names = undef
     }
 
     if $cinder_enable_scaleio_backend {
@@ -181,8 +190,9 @@ class tripleo::profile::base::cinder::volume (
       $cinder_veritas_hyperscale_backend_name = undef
     }
 
-    $backends = delete_undef_values([$cinder_iscsi_backend_name,
+    $backends = delete_undef_values(concat([], $cinder_iscsi_backend_name,
                                       $cinder_rbd_backend_name,
+                                      $cinder_rbd_extra_backend_names,
                                       $cinder_pure_backend_name,
                                       $cinder_dellps_backend_name,
                                       $cinder_dellsc_backend_name,
@@ -193,7 +203,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_nfs_backend_name,
                                       $cinder_scaleio_backend_name,
                                       $cinder_veritas_hyperscale_backend_name,
-                                      $cinder_user_enabled_backends])
+                                      $cinder_user_enabled_backends))
     # NOTE(aschultz): during testing it was found that puppet 3 may incorrectly
     # include a "" in the previous array which is not removed by the
     # delete_undef_values function. So we need to make sure we don't have any

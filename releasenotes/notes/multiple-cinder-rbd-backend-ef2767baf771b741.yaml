@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Add support for specifying a list of Ceph pools to be used for additional
+    Cinder RBD backends. This is in addition to the Ceph pool associated with
+    the first Cinder RBD backend. The list of extra pools is optional, and
+    defaults to an empty list.
