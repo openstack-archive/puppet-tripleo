@@ -50,3 +50,16 @@ octavia::rabbit_password: 'password'
 horizon::secret_key: 'secrete'
 #Neutron related
 neutron::rabbit_password: 'password'
+# Pacemaker related
+pacemaker_short_bootstrap_node_name: 'node.example.com'
+pacemaker_short_node_names:
+ - 'node.example.com'
+hacluster_pwd: 'password'
+pacemaker::resource_defaults::defaults:
+ test-default:
+   name: 'requires'
+   value: 'noop'
+# pcmk instance ha
+keystone::endpoint::public_url: 'localhost:5000'
+keystone::admin_password: 'password'
+

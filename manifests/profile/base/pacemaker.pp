@@ -67,6 +67,10 @@
 #   (Optional) Whether or not to enable encryption of the pacemaker traffic
 #   Defaults to true
 #
+# [*enable_instanceha*]
+#  (Optional) Boolean driving the Instance HA controlplane configuration
+#  Defaults to false
+#
 class tripleo::profile::base::pacemaker (
   $step                      = Integer(hiera('step')),
   $pcs_tries                 = hiera('pcs_tries', 20),
@@ -79,6 +83,7 @@ class tripleo::profile::base::pacemaker (
   $remote_try_sleep          = hiera('pacemaker_remote_try_sleep', 60),
   $cluster_recheck_interval  = hiera('pacemaker_cluster_recheck_interval', undef),
   $encryption                = true,
+  $enable_instanceha         = hiera('tripleo::instanceha', false),
 ) {
 
   if count($remote_short_node_names) != count($remote_node_ips) {
@@ -176,26 +181,29 @@ class tripleo::profile::base::pacemaker (
     }
   }
 
-  if $step >= 2 {
-    if $pacemaker_master {
+  if $enable_instanceha and $pacemaker_master {
+    include ::tripleo::profile::base::pacemaker::instance_ha
+  }
+
+  if ($step >= 2 and $pacemaker_master) {
+    if ! $enable_instanceha {
       include ::pacemaker::resource_defaults
-      # When we have a non-zero number of pacemaker remote nodes we
-      # want to set the cluster-recheck-interval property to something
-      # lower (unless the operator has explicitely set a value)
-      if count($remote_short_node_names) > 0 and $cluster_recheck_interval == undef {
-        pacemaker::property{ 'cluster-recheck-interval-property':
-          property => 'cluster-recheck-interval',
-          value    => '60s',
-          tries    => $pcs_tries,
-        }
-      } elsif $cluster_recheck_interval != undef {
-        pacemaker::property{ 'cluster-recheck-interval-property':
-          property => 'cluster-recheck-interval',
-          value    => $cluster_recheck_interval,
-          tries    => $pcs_tries,
-        }
+    }
+    # When we have a non-zero number of pacemaker remote nodes we
+    # want to set the cluster-recheck-interval property to something
+    # lower (unless the operator has explicitely set a value)
+    if count($remote_short_node_names) > 0 and $cluster_recheck_interval == undef {
+      pacemaker::property{ 'cluster-recheck-interval-property':
+        property => 'cluster-recheck-interval',
+        value    => '60s',
+        tries    => $pcs_tries,
+      }
+    } elsif $cluster_recheck_interval != undef {
+      pacemaker::property{ 'cluster-recheck-interval-property':
+        property => 'cluster-recheck-interval',
+        value    => $cluster_recheck_interval,
+        tries    => $pcs_tries,
       }
     }
   }
-
 }
