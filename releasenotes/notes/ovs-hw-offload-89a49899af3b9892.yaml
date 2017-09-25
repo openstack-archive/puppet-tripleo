@@ -1,0 +1,4 @@
+---
+features:
+  - Allows to configure SR-IOV NIC to switchdev mode.
+    This feature requires kernel 4.10 and above.
