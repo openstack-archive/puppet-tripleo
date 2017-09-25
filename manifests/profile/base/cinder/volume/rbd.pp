@@ -30,6 +30,11 @@
 #   (Optional) The name of the RBD pool to use
 #   Defaults to 'volumes'
 #
+# [*cinder_rbd_extra_pools*]
+#   (Optional) List of additional pools to use for Cinder. A separate RBD
+#   backend is created for each additional pool.
+#   Defaults to undef
+#
 # [*cinder_rbd_secret_uuid*]
 #   (Optional) UUID of the of the libvirt secret storing the Cephx key
 #   Defaults to 'ceph::profile::params::fsid'
@@ -47,6 +52,7 @@ class tripleo::profile::base::cinder::volume::rbd (
   $backend_name            = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph'),
   $cinder_rbd_backend_host = hiera('cinder::host', 'hostgroup'),
   $cinder_rbd_pool_name    = 'volumes',
+  $cinder_rbd_extra_pools  = undef,
   $cinder_rbd_secret_uuid  = hiera('ceph::profile::params::fsid', undef),
   $cinder_rbd_user_name    = 'openstack',
   $step                    = Integer(hiera('step')),
@@ -59,6 +65,17 @@ class tripleo::profile::base::cinder::volume::rbd (
       rbd_pool        => $cinder_rbd_pool_name,
       rbd_user        => $cinder_rbd_user_name,
       rbd_secret_uuid => $cinder_rbd_secret_uuid,
+    }
+
+    if $cinder_rbd_extra_pools {
+      $cinder_rbd_extra_pools.each |$pool_name| {
+        cinder::backend::rbd { "${backend_name}_${pool_name}" :
+          backend_host    => $cinder_rbd_backend_host,
+          rbd_pool        => $pool_name,
+          rbd_user        => $cinder_rbd_user_name,
+          rbd_secret_uuid => $cinder_rbd_secret_uuid,
+        }
+      }
     }
   }
 
