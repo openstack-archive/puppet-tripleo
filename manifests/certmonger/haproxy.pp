@@ -97,6 +97,7 @@ define tripleo::certmonger::haproxy (
       keyfile      => $service_key,
       postsave_cmd => $postsave_cmd_real,
       principal    => $principal,
+      eku          => ['id-kp-clientAuth', 'id-kp-serverAuth'],
       wait         => true,
       tag          => 'haproxy-cert',
       require      => Class['::certmonger'],
