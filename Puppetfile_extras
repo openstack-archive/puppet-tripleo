@@ -34,7 +34,7 @@ mod 'fdio',
   :ref => 'master'
 
 mod 'certmonger',
-  :git => 'https://github.com/earsdown/puppet-certmonger',
+  :git => 'https://github.com/saltedsignal/puppet-certmonger',
   :ref => 'v1.1.1'
 
 mod 'ntp',
