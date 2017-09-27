@@ -59,6 +59,20 @@
 #   one step.
 #   Defaults to hiera('innodb_flush_log_at_trx_commit', '1')
 #
+# [*sst_tls_cipher*]
+#   (Optional) When enable_internal_tls is true, defines the list of
+#   ciphers that the socat may use to tunnel SST connections.
+#   Defaults to '!SSLv2:kEEH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES'
+#
+# [*sst_tls_options*]
+#   (Optional) When enable_internal_tls is true, defines additional
+#   parameters to be passed to socat for tunneling SST connections.
+#   Defaults to undef
+#
+# [*ipv6*]
+#   (Optional) Whether to deploy MySQL on IPv6 network.
+#   Defaults to str2bool(hiera('mysql_ipv6', false))
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -76,6 +90,9 @@ class tripleo::profile::pacemaker::database::mysql (
   $enable_internal_tls            = hiera('enable_internal_tls', false),
   $gmcast_listen_addr             = hiera('mysql_bind_host'),
   $innodb_flush_log_at_trx_commit = hiera('innodb_flush_log_at_trx_commit', '1'),
+  $sst_tls_cipher                 = '!SSLv2:kEEH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
+  $sst_tls_options                = undef,
+  $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
   $step                           = Integer(hiera('step')),
   $pcs_tries                      = hiera('pcs_tries', 20),
 ) {
@@ -105,17 +122,36 @@ class tripleo::profile::pacemaker::database::mysql (
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
+    $sst_tls = {
+      'tcert' => $tls_certfile,
+      'tkey' => $tls_keyfile,
+    }
     if $ca_file {
       $tls_ca_options = "socket.ssl_ca=${ca_file}"
+      $sst_tca = { 'tca' => $ca_file }
     } else {
       $tls_ca_options = ''
+      $sst_tca = {}
     }
     $tls_options = "socket.ssl_key=${tls_keyfile};socket.ssl_cert=${tls_certfile};${tls_ca_options};"
+    $wsrep_sst_method = 'rsync_tunnel'
+    if $ipv6 {
+      $sst_ipv6 = 'pf=ip6'
+    } else {
+      $sst_ipv6 = undef
+    }
+    $all_sst_options = ["cipher=${sst_tls_cipher}", $sst_tls_options, $sst_ipv6]
+    $sst_sockopt = {
+      'sockopt' => join(delete_undef_values($all_sst_options), ',')
+    }
+    $mysqld_options_sst = { 'sst' => merge($sst_tls, $sst_tca, $sst_sockopt) }
   } else {
     $tls_options = ''
+    $wsrep_sst_method = 'rsync'
+    $mysqld_options_sst = {}
   }
 
-  $mysqld_options = {
+  $mysqld_options_mysqld = {
     'mysqld' => {
       'skip-name-resolve'              => '1',
       'binlog_format'                  => 'ROW',
@@ -143,10 +179,12 @@ class tripleo::profile::pacemaker::database::mysql (
       'wsrep_auto_increment_control'   => '1',
       'wsrep_drupal_282555_workaround' => '0',
       'wsrep_causal_reads'             => '0',
-      'wsrep_sst_method'               => 'rsync',
+      'wsrep_sst_method'               => $wsrep_sst_method,
       'wsrep_provider_options'         => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}",
     }
   }
+
+  $mysqld_options = merge($mysqld_options_mysqld, $mysqld_options_sst)
 
   # since we are configuring rsync for wsrep_sst_method, we ought to make sure
   # it's installed. We only includ this at step 2 since puppet-rsync may be
