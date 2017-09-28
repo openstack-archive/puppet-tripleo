@@ -51,19 +51,29 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('zaqar_api_network', undef)
 #
+# [*zaqar_redis_password*]
+#  (Optional) Password for the gnocchi redis user for the coordination url
+#  Defaults to hiera('zaqar_redis_password')
+#
+# [*redis_vip*]
+#  (Optional) Redis ip address for the coordination url
+#  Defaults to hiera('redis_vip')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::zaqar (
-  $bootstrap_node      = hiera('bootstrap_nodeid', undef),
-  $management_store    = 'mongodb',
-  $messaging_store     = 'mongodb',
-  $certificates_specs  = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $zaqar_api_network   = hiera('zaqar_api_network', undef),
-  $step                = Integer(hiera('step')),
+  $bootstrap_node       = hiera('bootstrap_nodeid', undef),
+  $management_store     = 'mongodb',
+  $messaging_store      = 'mongodb',
+  $certificates_specs   = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls  = hiera('enable_internal_tls', false),
+  $zaqar_api_network    = hiera('zaqar_api_network', undef),
+  $zaqar_redis_password = hiera('zaqar_redis_password', undef),
+  $redis_vip            = hiera('redis_vip', undef),
+  $step                 = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -77,9 +87,11 @@ class tripleo::profile::base::zaqar (
     }
     $tls_certfile = $certificates_specs["httpd-${zaqar_api_network}"]['service_certificate']
     $tls_keyfile = $certificates_specs["httpd-${zaqar_api_network}"]['service_key']
+    $tls_query_param = '?ssl=true'
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
+    $tls_query_param = ''
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
@@ -105,7 +117,9 @@ class tripleo::profile::base::zaqar (
         uri => $mongo_database_connection,
       }
     } elsif $messaging_store == 'redis' {
-      include ::zaqar::messaging::redis
+      class {'::zaqar::messaging::redis':
+        uri => join(['redis://:', $zaqar_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
+      }
     } else {
       fail("unsupported Zaqar messaging_store set: ${messaging_store}")
     }
