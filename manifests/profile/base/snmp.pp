@@ -18,6 +18,20 @@
 #
 # === Parameters
 #
+# [*snmpd_config*]
+#   An array of snmp config.
+#   Example:
+#     snmpd_config:
+#       - 'createUser ro_snmp_user MD5 "secrete"',
+#       - 'rouser ro_snmp_user'
+#       - 'proc neutron-server'
+#       - 'proc nova-api'
+#   Note: since we give total freedom to configure snmpd_config and don't
+#   verify the content, the user will have to ensure that the parameters
+#   related to user / password in the array, are the same given to
+#   THT via SnmpdReadonlyUserName and SnmpdReadonlyUserPassword.
+#   Defaults to undef.
+#
 # [*snmpd_password*]
 #   The SNMP password
 #   Defaults to hiera('snmpd_readonly_user_password')
@@ -32,6 +46,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::snmp (
+  $snmpd_config   = undef,
   $snmpd_password = hiera('snmpd_readonly_user_password'),
   $snmpd_user     = hiera('snmpd_readonly_user_name'),
   $step           = Integer(hiera('step')),
@@ -41,17 +56,24 @@ class tripleo::profile::base::snmp (
       authtype => 'MD5',
       authpass => $snmpd_password,
     }
-    class { '::snmp':
-      snmpd_config => [ join(['createUser ', $snmpd_user, ' MD5 "', $snmpd_password, '"']),
-                        join(['rouser ', $snmpd_user]),
-                        'proc  cron',
-                        'includeAllDisks  10%',
-                        'master agentx',
-                        'trapsink localhost public',
-                        'iquerySecName internalUser',
-                        'rouser internalUser',
-                        'defaultMonitors yes',
-                        'linkUpDownNotifications yes' ],
+    if $snmpd_config {
+      validate_array($snmpd_config)
+      class { '::snmp':
+        snmpd_config => $snmpd_config,
+      }
+    } else {
+      class { '::snmp':
+        snmpd_config => [ join(['createUser ', $snmpd_user, ' MD5 "', $snmpd_password, '"']),
+                          join(['rouser ', $snmpd_user]),
+                          'proc  cron',
+                          'includeAllDisks  10%',
+                          'master agentx',
+                          'trapsink localhost public',
+                          'iquerySecName internalUser',
+                          'rouser internalUser',
+                          'defaultMonitors yes',
+                          'linkUpDownNotifications yes' ],
+      }
     }
   }
 }
