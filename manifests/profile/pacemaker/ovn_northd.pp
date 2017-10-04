@@ -61,6 +61,12 @@ class tripleo::profile::pacemaker::ovn_northd (
       tries    => $pcs_tries,
       node     => $::hostname,
     }
+
+    # Allow non local bind, because all the ovsdb-server's running in the
+    # cluster try to open a TCP socket on the VIP.
+    ensure_resource('sysctl::value',  'net.ipv4.ip_nonlocal_bind', {
+      'value'=> 1,
+    })
   }
 
   if $step >= 3 and downcase($::hostname) == $pacemaker_master {
