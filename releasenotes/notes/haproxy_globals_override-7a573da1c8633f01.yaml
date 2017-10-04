@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    This new parameter allows to set/override HAProxy global
+    options in a convenient way.

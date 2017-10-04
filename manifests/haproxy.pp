@@ -49,6 +49,10 @@
 #  The IPv4, IPv6 or filesystem socket path of the syslog server.
 #  Defaults to '/dev/log'
 #
+# [*haproxy_globals_override*]
+#  HAProxy global option we can append to the default base set in this class.
+#  If you enter an already existing key, it will override the default.
+#
 # [*haproxy_daemon*]
 #  Should haproxy run in daemon mode or not
 #  Defaults to true
@@ -573,6 +577,7 @@ class tripleo::haproxy (
   $haproxy_listen_bind_param   = [ 'transparent' ],
   $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address         = '/dev/log',
+  $haproxy_globals_override    = {},
   $haproxy_daemon              = true,
   $haproxy_socket_access_level = 'user',
   $haproxy_stats_user          = 'admin',
@@ -819,7 +824,7 @@ class tripleo::haproxy (
 
   class { '::haproxy':
     service_manage   => $haproxy_service_manage,
-    global_options   => merge($haproxy_global_options, $haproxy_daemonize),
+    global_options   => merge($haproxy_global_options, $haproxy_daemonize, $haproxy_globals_override),
     defaults_options => {
       'mode'    => 'tcp',
       'log'     => 'global',
