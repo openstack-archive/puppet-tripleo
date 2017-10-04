@@ -71,6 +71,13 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   }
 
   if $step >= 3 {
+
+    # Allow non local bind, because all the ovsdb-server's running in the
+    # cluster try to open a TCP socket on the VIP.
+    ensure_resource('sysctl::value',  'net.ipv4.ip_nonlocal_bind', {
+      'value'=> 1,
+    })
+
     if $pacemaker_master {
       $ovndb_servers_resource_name = 'ovndb_servers'
       $ovndb_servers_ocf_name      = 'ovn:ovndb-servers'
