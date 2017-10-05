@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Adds workaround to disable port status feature for OpenDaylight which
+    is currently broken in OpenDaylight.  This fixes the inability to
+    launch nova instances.
