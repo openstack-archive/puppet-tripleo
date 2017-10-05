@@ -22,7 +22,6 @@ window.tripleOUiConfig = {
   //
   'excludedLanguages': <%= @excluded_languages.to_json %>,
 
-
   // Logging
-  // 'loggers': ['console']
+  'loggers': <%= @enabled_loggers.to_json %>
 };
