@@ -100,10 +100,9 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $galera_nodes_count = count($galera_nodes_array)
 
   # construct a galera-pacemaker name mapping for the resource agent
-  # [galera-0:galera-0.internalapi.local, ...]
-  $host_map_array_tmp = zip($galera_node_names_lookup, $galera_fqdns_names_lookup)
-  $host_map_array = $host_map_array_tmp.map |$i| {
-    "${i[0]}:${i[1]}"
+  # [galera-bundle-0:galera_node[0], galera-bundle-1:galera_node[1], ... ,galera-bundle-n:galera_node[n]]
+  $host_map_array = $galera_nodes_array.map |$i, $host| {
+    "galera-bundle-${i}:${host}"
   }
   $cluster_host_map_string = join($host_map_array, ';')
 
@@ -315,7 +314,7 @@ MYSQL_HOST=localhost\n",
       pacemaker::resource::ocf { 'galera':
         ocf_agent_name  => 'heartbeat:galera',
         master_params   => '',
-        meta_params     => "master-max=${galera_nodes_count} ordered=true container-attribute-target=host",
+        meta_params     => "master-max=${galera_nodes_count} ordered=true",
         op_params       => 'promote timeout=300s on-fail=block',
         resource_params => "additional_parameters='--open-files-limit=16384' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map_string}'",
         tries           => $pcs_tries,

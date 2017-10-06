@@ -206,7 +206,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       pacemaker::resource::ocf { 'rabbitmq':
         ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
         resource_params => $params,
-        meta_params     => 'notify=true container-attribute-target=host',
+        meta_params     => 'notify=true',
         op_params       => 'start timeout=200s stop timeout=200s',
         tries           => $pcs_tries,
         location_rule   => {
