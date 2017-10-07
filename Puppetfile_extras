@@ -52,3 +52,8 @@ mod 'opendaylight',
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
   :ref => 'v3.0.1'
+
+mod 'snmp',
+  :git => 'https://github.com/razorsedge/puppet-snmp',
+  :ref => 'master'
+

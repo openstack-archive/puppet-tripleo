@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Expose a new Puppet parameter to snmp profile, ``snmpd_config`` which
+    is an array definded to undef by default.
+    It can be used to override all snmpd configuration for advanced
+    deployments.
+    If used, all parameters have to be configured included users and
+    passwords, which should be the same as given to snmpd_password
+    and snmpd_user. There is no logic that will verify the content
+    of ``snmpd_config``.
