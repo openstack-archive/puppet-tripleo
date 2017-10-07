@@ -139,7 +139,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         resource_params => "master_ip=${ovn_dbs_vip} nb_master_port=${nb_db_port} sb_master_port=${sb_db_port} manage_northd=yes",
         tries           => $pcs_tries,
         location_rule   => $ovn_dbs_location_rule,
-        meta_params     => 'notify=true container-attribute-target=host',
+        meta_params     => 'notify=true',
         bundle          => 'ovn-dbs-bundle',
       }
 
