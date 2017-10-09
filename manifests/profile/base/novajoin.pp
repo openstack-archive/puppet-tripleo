@@ -25,33 +25,29 @@
 #   Enable FreeIPA client installation for the node this runs on.
 #   Defaults to false
 #
-# [*rabbit_hosts*]
-#   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('rabbitmq_node_names', undef)
-#
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
-#   Defaults to hiera('messaging_rpc_service_name', rabbit)
+#   Defaults to hiera('oslo_messaging_rpc_scheme', rabbit)
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
-#
-# [*oslomsg_rpc_password*]
-#   Password for oslo messaging rpc service
-#   Defaults to undef
+#   Defaults to hiera('oslo_messaging_rpc_node_names')
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
-#   Defaults to '5672'
+#   Defaults to hiera('oslo_messaging_rpc_port', 5672)
 #
 # [*oslomsg_rpc_username*]
 #   Username for oslo messaging rpc service
-#   Defaults to 'guest'
+#   Defaults to hiera('oslo_messaging_rpc_user_name', 'guest')
 #
-# [*oslomsg_use_ssl*]
+# [*oslomsg_rpc_password*]
+#   Password for oslo messaging rpc service
+#   Defaults to hiera('oslo_messaging_rpc_password')
+#
+# [*oslomsg_rpc_use_ssl*]
 #   Enable ssl oslo messaging services
-#   Defaults to '0'
+#   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
 #
 # [*step*]
 #   (Optional) The current step of the deployment
@@ -61,28 +57,26 @@
 class tripleo::profile::base::novajoin (
   $service_password,
   $enable_ipa_client_install = false,
-  $rabbit_hosts              = hiera('rabbitmq_node_names', undef),
-  $oslomsg_rpc_proto         = hiera('messaging_rpc_service_name', 'rabbit'),
-  $oslomsg_rpc_hosts         = hiera('oslo_messaging_rpc_node_names', undef),
-  $oslomsg_rpc_password      = undef,
-  $oslomsg_rpc_port          = '5672',
-  $oslomsg_rpc_username      = 'guest',
-  $oslomsg_use_ssl           = '0',
+  $oslomsg_rpc_proto         = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
+  $oslomsg_rpc_hosts         = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
+  $oslomsg_rpc_password      = hiera('oslo_messaging_rpc_password'),
+  $oslomsg_rpc_port          = hiera('oslo_messaging_rpc_port', '5672'),
+  $oslomsg_rpc_username      = hiera('oslo_messaging_rpc_user_name', 'guest'),
+  $oslomsg_rpc_use_ssl       = hiera('oslo_messaging_rpc_use_ssl', '0'),
   $step                      = Integer(hiera('step')),
 ) {
   if $step >= 3 {
-    $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
-    $oslomsg_rpc_hosts_real = any2array(pick($rabbit_hosts, $oslomsg_rpc_hosts))
+    $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     class { '::nova::metadata::novajoin::api' :
       service_password          => $service_password,
       enable_ipa_client_install => $enable_ipa_client_install,
       transport_url             => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
-        'hosts'     => $oslomsg_rpc_hosts_real,
+        'hosts'     => $oslomsg_rpc_hosts,
         'port'      => sprintf('%s', $oslomsg_rpc_port),
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,
-        'ssl'       => $oslomsg_use_ssl_real,
+        'ssl'       => $oslomsg_rpc_use_ssl_real,
         }),
     }
   }

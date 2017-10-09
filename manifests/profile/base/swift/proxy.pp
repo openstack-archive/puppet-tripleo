@@ -26,29 +26,29 @@
 #   Whether the ceilometer pipeline is enabled.
 #   Defaults to true
 #
-# [*ceilometer_messaging_driver*]
-#   Driver for messaging service.
-#   Defaults to hiera('messaging_notify_service_name', 'rabbit')
+# [*oslomsg_rpc_proto*]
+#   Protocol driver for the oslo messaging rpc service
+#   Defaults to hiera('oslo_messaging_rpc_scheme', rabbit)
 #
-# [*ceilometer_messaging_hosts*]
-#   list of the messaging host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
+# [*oslomsg_rpc_hosts*]
+#   list of the oslo messaging rpc host fqdns
+#   Defaults to hiera('oslo_messaging_rpc_node_names')
 #
-# [*ceilometer_messaging_password*]
-#   Password for messaging nova queue
-#   Defaults to hiera('swift::proxy::ceilometer::rabbit_password', undef)
+# [*oslomsg_rpc_port*]
+#   IP port for oslo messaging rpc service
+#   Defaults to hiera('oslo_messaging_rpc_port', 5672)
 #
-# [*ceilometer_messaging_port*]
-#   IP port for messaging service
-#   Defaults to hiera('tripleo::profile::base::swift::proxy::rabbit_port', 5672)
+# [*oslomsg_rpc_username*]
+#   Username for oslo messaging rpc service
+#   Defaults to hiera('oslo_messaging_rpc_user_name', 'guest')
 #
-# [*ceilometer_messaging_use_ssl*]
-#   Flag indicating ssl usage.
-#   Defaults to '0'
+# [*oslomsg_rpc_password*]
+#   Password for oslo messaging rpc service
+#   Defaults to hiera('oslo_messaging_rpc_password')
 #
-# [*ceilometer_messaging_username*]
-#   Username for messaging nova queue
-#   Defaults to hiera('swift::proxy::ceilometer::rabbit_user', 'guest')
+# [*oslomsg_rpc_use_ssl*]
+#   Enable ssl oslo messaging services
+#   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -73,10 +73,6 @@
 # [*memcache_servers*]
 #   (Optional) List of memcache servers
 #   Defaults to hiera('memcached_node_ips')
-#
-# [*oslomsg_rpc_hosts*]
-#   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -104,24 +100,23 @@
 #   defaults to 8080
 #
 class tripleo::profile::base::swift::proxy (
-  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
-  $ceilometer_enabled            = true,
-  $ceilometer_messaging_driver   = hiera('messaging_notify_service_name', 'rabbit'),
-  $ceilometer_messaging_hosts    = hiera('rabbitmq_node_names', undef),
-  $ceilometer_messaging_password = hiera('swift::proxy::ceilometer::rabbit_password', undef),
-  $ceilometer_messaging_port     = hiera('tripleo::profile::base::swift::proxy::rabbit_port', '5672'),
-  $ceilometer_messaging_use_ssl  = '0',
-  $ceilometer_messaging_username = hiera('swift::proxy::ceilometer::rabbit_user', 'guest'),
-  $certificates_specs            = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $memcache_port                 = 11211,
-  $memcache_servers              = hiera('memcached_node_ips'),
-  $oslomsg_rpc_hosts             = hiera('oslo_messaging_rpc_node_names', undef),
-  $step                          = Integer(hiera('step')),
-  $swift_proxy_network           = hiera('swift_proxy_network', undef),
-  $tls_proxy_bind_ip             = undef,
-  $tls_proxy_fqdn                = undef,
-  $tls_proxy_port                = 8080,
+  $bootstrap_node       = hiera('bootstrap_nodeid', undef),
+  $ceilometer_enabled   = true,
+  $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
+  $oslomsg_rpc_hosts    = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
+  $oslomsg_rpc_password = hiera('oslo_messaging_rpc_password'),
+  $oslomsg_rpc_port     = hiera('oslo_messaging_rpc_port', '5672'),
+  $oslomsg_rpc_username = hiera('oslo_messaging_rpc_user_name', 'guest'),
+  $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
+  $certificates_specs   = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls  = hiera('enable_internal_tls', false),
+  $memcache_port        = 11211,
+  $memcache_servers     = hiera('memcached_node_ips'),
+  $step                 = Integer(hiera('step')),
+  $swift_proxy_network  = hiera('swift_proxy_network', undef),
+  $tls_proxy_bind_ip    = undef,
+  $tls_proxy_fqdn       = undef,
+  $tls_proxy_port       = 8080,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -164,17 +159,16 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::tempurl
     include ::swift::proxy::formpost
     include ::swift::proxy::bulk
-    $ceilometer_messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($ceilometer_messaging_use_ssl)))
-    $ceilometer_messaging_hosts_real = any2array(pick($ceilometer_messaging_hosts,$oslomsg_rpc_hosts, []))
     if $ceilometer_enabled {
+      $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
       class { '::swift::proxy::ceilometer':
-        default_transport_url => os_transport_url({
-          'transport' => $ceilometer_messaging_driver,
-          'hosts'     => $ceilometer_messaging_hosts_real,
-          'port'      => sprintf('%s', $ceilometer_messaging_port),
-          'username'  => $ceilometer_messaging_username,
-          'password'  => $ceilometer_messaging_password,
-          'ssl'       => $ceilometer_messaging_use_ssl_real,
+        default_transport_url      => os_transport_url({
+          'transport' => $oslomsg_rpc_proto,
+          'hosts'     => $oslomsg_rpc_hosts,
+          'port'      => $oslomsg_rpc_port,
+          'username'  => $oslomsg_rpc_username,
+          'password'  => $oslomsg_rpc_password,
+          'ssl'       => $oslomsg_rpc_use_ssl_real,
         }),
       }
     }
