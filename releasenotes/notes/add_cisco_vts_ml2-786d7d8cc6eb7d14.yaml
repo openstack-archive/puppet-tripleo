@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Add tripleo puppet manifest to support the configuration of the cisco VTS controller ml2 plugin.
