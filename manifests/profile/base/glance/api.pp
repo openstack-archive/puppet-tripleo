@@ -130,6 +130,7 @@ class tripleo::profile::base::glance::api (
         'swift': { $backend_store = 'swift' }
         'file': { $backend_store = 'file' }
         'rbd': { $backend_store = 'rbd' }
+        'cinder': { $backend_store = 'cinder' }
         default: { fail('Unrecognized glance_backend parameter.') }
     }
     $http_store = ['http']
