@@ -75,6 +75,8 @@ class tripleo::profile::base::swift::proxy (
     }
     include ::swift::proxy::versioned_writes
 
-    include ::swift::objectexpirer
+    class { '::swift::objectexpirer':
+      memcache_servers => $swift_memcache_servers
+    }
   }
 }
