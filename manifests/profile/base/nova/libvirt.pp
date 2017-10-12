@@ -32,8 +32,9 @@ class tripleo::profile::base::nova::libvirt (
 
     file { ['/etc/libvirt/qemu/networks/autostart/default.xml',
       '/etc/libvirt/qemu/networks/default.xml']:
-      ensure => absent,
-      before => Service['libvirt'],
+      ensure  => absent,
+      require => Package['libvirt'],
+      before  => Service['libvirt'],
     }
 
     # in case libvirt has been already running before the Puppet run, make
@@ -41,6 +42,7 @@ class tripleo::profile::base::nova::libvirt (
     exec { 'libvirt-default-net-destroy':
       command => '/usr/bin/virsh net-destroy default',
       onlyif  => '/usr/bin/virsh net-info default | /bin/grep -i "^active:\s*yes"',
+      require => Package['libvirt'],
       before  => Service['libvirt'],
     }
   }
