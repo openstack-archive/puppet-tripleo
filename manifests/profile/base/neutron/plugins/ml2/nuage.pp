@@ -21,11 +21,20 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*mechanism_drivers*]
+#   (Optional) The mechanism drivers to use with the Ml2 plugin
+#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
+#
 class tripleo::profile::base::neutron::plugins::ml2::nuage (
   $step              = hiera('step'),
+  $mechanism_drivers = hiera('neutron::plugins::ml2::mechanism_drivers'),
 ) {
 
   if $step >= 4 {
     include ::neutron::plugins::ml2::nuage
+
+    if 'sriovnicswitch' in $mechanism_drivers {
+      include ::nova::patch::config
+    }
   }
 }
