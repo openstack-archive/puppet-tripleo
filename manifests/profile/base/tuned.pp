@@ -12,9 +12,11 @@
 class tripleo::profile::base::tuned (
   $profile = 'throughput-performance'
 ) {
+  ensure_resource('package', 'tuned', { ensure => 'present' })
   exec { 'tuned-adm':
     path    => ['/bin', '/usr/bin', '/sbin', '/usr/sbin'],
     command => "tuned-adm profile ${profile}",
-    unless  => "tuned-adm active | grep -q '${profile}'"
+    unless  => "tuned-adm active | grep -q '${profile}'",
+    require => Package['tuned'],
   }
 }
