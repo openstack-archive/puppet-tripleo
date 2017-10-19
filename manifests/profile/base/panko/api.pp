@@ -92,7 +92,7 @@ class tripleo::profile::base::panko::api (
     class { '::panko::api':
       sync_db => $sync_db,
     }
-    include ::apache::mod::ssl
+    include ::tripleo::profile::base::apache
     class { '::panko::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

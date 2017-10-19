@@ -40,7 +40,8 @@ class tripleo::profile::base::horizon (
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     # Horizon
     include ::apache::mod::remoteip
-    include ::apache::mod::status
+    include ::tripleo::profile::base::apache
+
     if 'cisco_n1kv' in hiera('neutron::plugins::ml2::mechanism_drivers', undef) {
       $_profile_support = 'cisco'
     } else {

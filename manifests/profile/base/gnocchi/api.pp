@@ -118,7 +118,7 @@ class tripleo::profile::base::gnocchi::api (
     }
 
     include ::gnocchi::api
-    include ::apache::mod::ssl
+    include ::tripleo::profile::base::apache
     class { '::gnocchi::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
