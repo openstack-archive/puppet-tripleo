@@ -39,6 +39,10 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('mistral_api_network', undef)
 #
+# [*mistral_api_wsgi_enabled*]
+#   (Optional) Whether or not deploy Mistral API in WSGI with Apache.
+#   Defaults to hiera('mistral_wsgi_enabled', true)
+#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('bootstrap_nodeid')
@@ -53,6 +57,7 @@ class tripleo::profile::base::mistral::api (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $mistral_api_network           = hiera('mistral_api_network', undef),
+  $mistral_api_wsgi_enabled      = hiera('mistral_wsgi_enabled', true),
   $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -76,10 +81,14 @@ class tripleo::profile::base::mistral::api (
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::mistral::api
-    include ::apache::mod::ssl
-    class { '::mistral::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    # Temporarily disable Mistral API deployed in WSGI
+    # https://bugs.launchpad.net/tripleo/+bug/1724607
+    if $mistral_api_wsgi_enabled {
+      include ::apache::mod::ssl
+      class { '::mistral::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 }
