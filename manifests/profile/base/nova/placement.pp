@@ -74,7 +74,7 @@ class tripleo::profile::base::nova::placement (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::apache::mod::ssl
+    include ::tripleo::profile::base::apache
     class { '::nova::wsgi::apache_placement':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

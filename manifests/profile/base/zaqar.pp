@@ -119,7 +119,7 @@ class tripleo::profile::base::zaqar (
     }
 
     include ::zaqar::transport::websocket
-    include ::apache::mod::ssl
+    include ::tripleo::profile::base::apache
     include ::zaqar::transport::wsgi
 
     # TODO (bcrochet): At some point, the transports should be split out to
