@@ -85,7 +85,7 @@ class tripleo::profile::base::cinder::api (
     class { '::cinder::api':
       keymgr_api_class => $keymgr_api_class,
     }
-    include ::apache::mod::ssl
+    include ::tripleo::profile::base::apache
     class { '::cinder::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

@@ -84,7 +84,7 @@ class tripleo::profile::base::mistral::api (
     # Temporarily disable Mistral API deployed in WSGI
     # https://bugs.launchpad.net/tripleo/+bug/1724607
     if $mistral_api_wsgi_enabled {
-      include ::apache::mod::ssl
+      include ::tripleo::profile::base::apache
       class { '::mistral::wsgi::apache':
         ssl_cert => $tls_certfile,
         ssl_key  => $tls_keyfile,
