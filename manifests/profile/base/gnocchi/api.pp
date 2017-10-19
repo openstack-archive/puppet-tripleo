@@ -50,8 +50,8 @@ class tripleo::profile::base::gnocchi::api (
 
   if $step >= 4 {
     include ::gnocchi::api
-    include ::apache::mod::ssl
     include ::gnocchi::wsgi::apache
+    include ::tripleo::profile::base::apache
 
     class { '::gnocchi::storage':
       coordination_url => join(['redis://:', hiera('gnocchi_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/']),

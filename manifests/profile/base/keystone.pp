@@ -87,8 +87,8 @@ class tripleo::profile::base::keystone (
     }
 
     include ::keystone::config
-    include ::apache::mod::ssl
     include ::keystone::wsgi::apache
+    include ::tripleo::profile::base::apache
     include ::keystone::cors
 
     if $manage_roles {
