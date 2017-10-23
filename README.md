@@ -11,7 +11,7 @@ Lightweight composition layer for Puppet TripleO.
 
 ## Contributing
 
-* Free software: Apache licence
+* Free software: Apache License (2.0)
 * Source: http://git.openstack.org/cgit/openstack/puppet-tripleo
 * Bugs: http://bugs.launchpad.net/tripleo (tag: puppet)
 * Documentation:
