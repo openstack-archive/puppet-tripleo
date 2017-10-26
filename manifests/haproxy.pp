@@ -237,10 +237,6 @@
 #  (optional) Enable or not EC2 API metadata binding
 #  Defaults to hiera('ec2_api_enabled', false)
 #
-# [*ceilometer*]
-#  (optional) Enable or not Ceilometer API binding
-#  Defaults to hiera('ceilometer_api_enabled', false)
-#
 # [*aodh*]
 #  (optional) Enable or not Aodh API binding
 #  Defaults to hiera('aodh_api_enabled', false)
@@ -370,10 +366,6 @@
 # [*barbican_network*]
 #  (optional) Specify the network barbican is running on.
 #  Defaults to hiera('barbican_api_network', undef)
-#
-# [*ceilometer_network*]
-#  (optional) Specify the network ceilometer is running on.
-#  Defaults to hiera('ceilometer_api_network', undef)
 #
 # [*ceph_rgw_network*]
 #  (optional) Specify the network ceph_rgw is running on.
@@ -510,8 +502,6 @@
 #    'aodh_api_ssl_port' (Defaults to 13042)
 #    'barbican_api_port' (Defaults to 9311)
 #    'barbican_api_ssl_port' (Defaults to 13311)
-#    'ceilometer_api_port' (Defaults to 8777)
-#    'ceilometer_api_ssl_port' (Defaults to 13777)
 #    'cinder_api_port' (Defaults to 8776)
 #    'cinder_api_ssl_port' (Defaults to 13776)
 #    'docker_registry_port' (Defaults to 8787)
@@ -616,7 +606,6 @@ class tripleo::haproxy (
   $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
   $ec2_api                     = hiera('ec2_api_enabled', false),
   $ec2_api_metadata            = hiera('ec2_api_enabled', false),
-  $ceilometer                  = hiera('ceilometer_api_enabled', false),
   $aodh                        = hiera('aodh_api_enabled', false),
   $panko                       = hiera('panko_api_enabled', false),
   $barbican                    = hiera('barbican_api_enabled', false),
@@ -648,7 +637,6 @@ class tripleo::haproxy (
   $ui                          = hiera('enable_ui', false),
   $aodh_network                = hiera('aodh_api_network', undef),
   $barbican_network            = hiera('barbican_api_network', false),
-  $ceilometer_network          = hiera('ceilometer_api_network', undef),
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
   $cinder_network              = hiera('cinder_api_network', undef),
   $congress_network            = hiera('congress_api_network', undef),
@@ -687,8 +675,6 @@ class tripleo::haproxy (
     aodh_api_ssl_port => 13042,
     barbican_api_port => 9311,
     barbican_api_ssl_port => 13311,
-    ceilometer_api_port => 8777,
-    ceilometer_api_ssl_port => 13777,
     cinder_api_port => 8776,
     cinder_api_ssl_port => 13776,
     congress_api_port => 1789,
@@ -1089,20 +1075,6 @@ class tripleo::haproxy (
       server_names    => hiera('ec2_api_node_names', $controller_hosts_names_real),
       service_network => $ec2_api_metadata_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
-    }
-  }
-
-  if $ceilometer {
-    ::tripleo::haproxy::endpoint { 'ceilometer':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ceilometer_api_vip', $controller_virtual_ip),
-      service_port      => $ports[ceilometer_api_port],
-      ip_addresses      => hiera('ceilometer_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('ceilometer_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      public_ssl_port   => $ports[ceilometer_api_ssl_port],
-      service_network   => $ceilometer_network,
-      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
