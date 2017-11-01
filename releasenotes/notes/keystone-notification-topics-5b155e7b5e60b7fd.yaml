@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    keystone notification topics are now configured via the
+    keystone_notification_topics hiera key. Which aggregates
+    all the keys that match this. It's useful for dynamically
+    configuring the topics and not always sending them.
