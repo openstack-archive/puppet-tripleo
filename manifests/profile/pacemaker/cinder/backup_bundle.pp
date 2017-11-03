@@ -120,9 +120,9 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
             'options'    => 'ro',
           },
           'cinder-backup-iscsi'          => {
-            'source-dir' => '/etc/iscsi',
-            'target-dir' => '/etc/iscsi',
-            'options'    => 'rw',
+            'source-dir' => '/var/lib/config-data/puppet-generated/iscsid/',
+            'target-dir' => '/var/lib/kolla/config_files/src-iscsid',
+            'options'    => 'ro',
           },
           'cinder-backup-var-lib-cinder' => {
             'source-dir' => '/var/lib/cinder',
@@ -136,7 +136,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
           },
           'ceph-cfg-dir'                 => {
             'source-dir' => '/etc/ceph',
-            'target-dir' => '/etc/ceph',
+            'target-dir' => '/var/lib/kolla/config_files/src-ceph',
             'options'    => 'ro',
           },
         },
