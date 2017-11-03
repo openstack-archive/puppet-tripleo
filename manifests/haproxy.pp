@@ -1076,6 +1076,9 @@ class tripleo::haproxy (
       server_names      => hiera('ec2_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[ec2_api_ssl_port],
+      listen_options    => merge($default_listen_options, {
+        'option' => [ 'tcpka' ]
+      }),
       service_network   => $ec2_api_network,
     }
   }
