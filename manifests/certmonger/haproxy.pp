@@ -72,6 +72,19 @@ define tripleo::certmonger::haproxy (
       $principal_real = $principal
     }
 
+    # If we have HAProxy in the resource catalog, we can use the haproxy user
+    # and group.
+    if defined(Class['::haproxy']) {
+      $cert_user = 'haproxy'
+      $cert_group = 'haproxy'
+    # If it's not in the resource catalog, it means that we're running in
+    # containers. So we have to rely on the container to set the appropriate
+    # permissions.
+    } else {
+      $cert_user = 'root'
+      $cert_group = 'root'
+    }
+
     if $dnsnames {
       $dnsnames_real = $dnsnames
     } else {
@@ -109,8 +122,8 @@ define tripleo::certmonger::haproxy (
     concat { $service_pem :
       ensure => present,
       mode   => '0640',
-      owner  => 'haproxy',
-      group  => 'haproxy',
+      owner  => $cert_user,
+      group  => $cert_group,
       tag    => 'haproxy-cert',
     }
     Package<| name == $::haproxy::params::package_name |> -> Concat[$service_pem]
