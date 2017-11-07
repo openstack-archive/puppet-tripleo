@@ -67,6 +67,9 @@ define tripleo::certmonger::haproxy (
       if defined(Class['::haproxy']) {
         Class['::tripleo::certmonger::ca::local'] ~> Class['::haproxy']
       }
+      $principal_real = undef
+    } else {
+      $principal_real = $principal
     }
 
     if $dnsnames {
@@ -97,7 +100,7 @@ define tripleo::certmonger::haproxy (
       certfile     => $service_certificate,
       keyfile      => $service_key,
       postsave_cmd => $postsave_cmd_real,
-      principal    => $principal,
+      principal    => $principal_real,
       eku          => ['id-kp-clientAuth', 'id-kp-serverAuth'],
       wait         => true,
       tag          => 'haproxy-cert',
