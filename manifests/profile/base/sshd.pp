@@ -79,8 +79,18 @@ class tripleo::profile::base::sshd (
     $sshd_options_port = {'Port' => unique(any2array($port))}
   }
 
+  # Prevent error messages on sshd startup
+  $basic_options = {
+    'HostKey' => [
+    '/etc/ssh/ssh_host_rsa_key',
+    '/etc/ssh/ssh_host_ecdsa_key',
+    '/etc/ssh/ssh_host_ed25519_key',
+    ]
+  }
+
   $sshd_options = merge(
     $options,
+    $basic_options,
     $sshd_options_banner,
     $sshd_options_motd,
     $sshd_options_port

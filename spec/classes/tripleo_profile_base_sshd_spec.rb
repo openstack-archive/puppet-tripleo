@@ -26,8 +26,13 @@ describe 'tripleo::profile::base::sshd' do
       it do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
-          'options' => {
-            'Port' => [22]
+          'options'   => {
+            'Port'    => [22],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
         is_expected.to_not contain_file('/etc/issue')
@@ -42,7 +47,12 @@ describe 'tripleo::profile::base::sshd' do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
           'options' => {
-            'Port' => [22]
+            'Port' => [22],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
         is_expected.to_not contain_file('/etc/issue')
@@ -57,7 +67,12 @@ describe 'tripleo::profile::base::sshd' do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
           'options' => {
-            'Port' => [123]
+            'Port' => [123],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
       end
@@ -69,7 +84,12 @@ describe 'tripleo::profile::base::sshd' do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
           'options' => {
-            'Port' => [456, 123]
+            'Port' => [456, 123],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
       end
@@ -81,7 +101,12 @@ describe 'tripleo::profile::base::sshd' do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
           'options' => {
-            'Port' => [123]
+            'Port' => [123],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
       end
@@ -94,7 +119,12 @@ describe 'tripleo::profile::base::sshd' do
           'storeconfigs_enabled' => false,
           'options' => {
             'Banner' => '/etc/issue.net',
-            'Port' => [22]
+            'Port' => [22],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
         is_expected.to contain_file('/etc/issue').with({
@@ -120,7 +150,12 @@ describe 'tripleo::profile::base::sshd' do
           'storeconfigs_enabled' => false,
           'options' => {
             'Port' => [22],
-            'PrintMotd' => 'yes'
+            'PrintMotd' => 'yes',
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
         is_expected.to contain_file('/etc/motd').with({
@@ -141,7 +176,12 @@ describe 'tripleo::profile::base::sshd' do
           'storeconfigs_enabled' => false,
           'options' => {
             'Port' => [22],
-            'X11Forwarding' => 'no'
+            'X11Forwarding' => 'no',
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
         is_expected.to_not contain_file('/etc/motd')
@@ -161,7 +201,12 @@ describe 'tripleo::profile::base::sshd' do
           'options' => {
             'Banner' => '/etc/issue.net',
             'Port' => [22],
-            'PrintMotd' => 'yes'
+            'PrintMotd' => 'yes',
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
         is_expected.to contain_file('/etc/motd').with({
@@ -192,7 +237,7 @@ describe 'tripleo::profile::base::sshd' do
         :options => {
           'Port' => [22],
           'PrintMotd' => 'no', # this should be overridden
-          'X11Forwarding' => 'no'
+          'X11Forwarding' => 'no',
         }
       }}
       it do
@@ -202,7 +247,12 @@ describe 'tripleo::profile::base::sshd' do
             'Banner' => '/etc/issue.net',
             'Port' => [22],
             'PrintMotd' => 'yes',
-            'X11Forwarding' => 'no'
+            'X11Forwarding' => 'no',
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
           }
         })
         is_expected.to contain_file('/etc/motd').with({
