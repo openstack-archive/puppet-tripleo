@@ -121,36 +121,46 @@
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('keystone::rabbit_use_ssl', '0')
 #
+# [*ceilometer_notification_topics*]
+#   Notification topics that keystone should use for ceilometer to consume.
+#   Defaults to []
+#
+# [*extra_notification_topics*]
+#   Extra notification topics that keystone should produce.
+#   Defaults to []
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::keystone (
-  $admin_endpoint_network        = hiera('keystone_admin_api_network', undef),
-  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
-  $certificates_specs            = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $heat_admin_domain             = undef,
-  $heat_admin_email              = undef,
-  $heat_admin_password           = undef,
-  $heat_admin_user               = undef,
-  $ldap_backends_config          = undef,
-  $ldap_backend_enable           = false,
-  $manage_db_purge               = hiera('keystone_enable_db_purge', true),
-  $public_endpoint_network       = hiera('keystone_public_api_network', undef),
-  $oslomsg_rpc_proto             = hiera('messaging_rpc_service_name', 'rabbit'),
-  $oslomsg_rpc_hosts             = any2array(hiera('rabbitmq_node_names', undef)),
-  $oslomsg_rpc_password          = hiera('keystone::rabbit_password'),
-  $oslomsg_rpc_port              = hiera('keystone::rabbit_port', '5672'),
-  $oslomsg_rpc_username          = hiera('keystone::rabbit_userid', 'guest'),
-  $oslomsg_notify_proto          = hiera('messaging_notify_service_name', 'rabbit'),
-  $oslomsg_notify_hosts          = any2array(hiera('rabbitmq_node_names', undef)),
-  $oslomsg_notify_password       = hiera('keystone::rabbit_password'),
-  $oslomsg_notify_port           = hiera('keystone::rabbit_port', '5672'),
-  $oslomsg_notify_username       = hiera('keystone::rabbit_userid', 'guest'),
-  $oslomsg_use_ssl               = hiera('keystone::rabbit_use_ssl', '0'),
-  $step                          = Integer(hiera('step')),
+  $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
+  $bootstrap_node                 = hiera('bootstrap_nodeid', undef),
+  $certificates_specs             = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls            = hiera('enable_internal_tls', false),
+  $heat_admin_domain              = undef,
+  $heat_admin_email               = undef,
+  $heat_admin_password            = undef,
+  $heat_admin_user                = undef,
+  $ldap_backends_config           = undef,
+  $ldap_backend_enable            = false,
+  $manage_db_purge                = hiera('keystone_enable_db_purge', true),
+  $public_endpoint_network        = hiera('keystone_public_api_network', undef),
+  $oslomsg_rpc_proto              = hiera('messaging_rpc_service_name', 'rabbit'),
+  $oslomsg_rpc_hosts              = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_rpc_password           = hiera('keystone::rabbit_password'),
+  $oslomsg_rpc_port               = hiera('keystone::rabbit_port', '5672'),
+  $oslomsg_rpc_username           = hiera('keystone::rabbit_userid', 'guest'),
+  $oslomsg_notify_proto           = hiera('messaging_notify_service_name', 'rabbit'),
+  $oslomsg_notify_hosts           = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_notify_password        = hiera('keystone::rabbit_password'),
+  $oslomsg_notify_port            = hiera('keystone::rabbit_port', '5672'),
+  $oslomsg_notify_username        = hiera('keystone::rabbit_userid', 'guest'),
+  $oslomsg_use_ssl                = hiera('keystone::rabbit_use_ssl', '0'),
+  $ceilometer_notification_topics = [],
+  $extra_notification_topics      = [],
+  $step                           = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -204,6 +214,7 @@ class tripleo::profile::base::keystone (
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_use_ssl_real,
       }),
+      notification_topics        => union($ceilometer_notification_topics, $extra_notification_topics)
     }
 
     if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{
