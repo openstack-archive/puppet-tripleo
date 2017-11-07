@@ -83,6 +83,22 @@ class tripleo::profile::base::docker (
       ensure => installed,
     }
 
+    $docker_unit_override="[Service]\nMountFlags=\n"
+
+    file {'/etc/systemd/system/docker.service.d':
+      ensure  => directory,
+      require => Package['docker'],
+    }
+    -> file {'/etc/systemd/system/docker.service.d/99-unset-mountflags.conf':
+      content => $docker_unit_override,
+    }
+    ~> exec { 'systemd daemon-reload':
+      command     => 'systemctl daemon-reload',
+      path        => ['/usr/bin', '/usr/sbin'],
+      refreshonly => true,
+      notify      => Service['docker']
+    }
+
     service { 'docker':
       ensure  => 'running',
       enable  => true,
