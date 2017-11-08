@@ -26,6 +26,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_class('tripleo::profile::base::docker') }
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
           is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
             "set OPTIONS '\"--log-driver=journald --signature-verification=false --iptables=false\"'",
@@ -43,6 +44,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_class('tripleo::profile::base::docker') }
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-sysconfig-registry').with_changes([
           "set INSECURE_REGISTRY '\"--insecure-registry foo:8787\"'",
@@ -81,6 +83,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_class('tripleo::profile::base::docker') }
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-daemon.json').with_changes(
             ['set dict/entry[. = "registry-mirrors"] "registry-mirrors',
@@ -99,6 +102,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_class('tripleo::profile::base::docker') }
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-daemon.json').with_changes(
             ['rm dict/entry[. = "registry-mirrors"]',
@@ -117,6 +121,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_class('tripleo::profile::base::docker') }
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
           "set OPTIONS '\"--log-driver=syslog\"'",
@@ -133,6 +138,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_class('tripleo::profile::base::docker') }
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-sysconfig-storage').with_changes([
           "set DOCKER_STORAGE_OPTIONS '\" #{params[:storage_options]}\"'",
@@ -149,6 +155,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_class('tripleo::profile::base::docker') }
       it { is_expected.to contain_package('docker') }
       it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-sysconfig-storage').with_changes([
           "rm DOCKER_STORAGE_OPTIONS",
