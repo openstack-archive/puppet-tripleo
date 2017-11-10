@@ -240,6 +240,10 @@
 #  (optional) Enable or not Barbican API binding
 #  Defaults to hiera('barbican_api_enabled', false)
 #
+# [*designate*]
+#  (optional) Enable or not Designate API binding
+#  Defaults to hiera('designate_api_enabled', false)
+#
 # [*gnocchi*]
 #  (optional) Enable or not Gnocchi API binding
 #  Defaults to hiera('gnocchi_api_enabled', false)
@@ -377,6 +381,10 @@
 # [*congress_network*]
 #  (optional) Specify the network congress is running on.
 #  Defaults to hiera('congress_api_network', undef)
+#
+# [*designate_network*]
+#  (optional) Specify the network designate is running on.
+#  Defaults to hiera('designate_api_network', undef)
 #
 # [*docker_registry_network*]
 #  (optional) Specify the network docker-registry is running on.
@@ -629,6 +637,7 @@ class tripleo::haproxy (
   $ironic                      = hiera('ironic_api_enabled', false),
   $ironic_inspector            = hiera('ironic_inspector_enabled', false),
   $octavia                     = hiera('octavia_api_enabled', false),
+  $designate                   = hiera('designate_api_enabled', false),
   $mysql                       = hiera('mysql_enabled', false),
   $kubernetes_master           = hiera('kubernetes_master_enabled', false),
   $mysql_clustercheck          = false,
@@ -652,6 +661,7 @@ class tripleo::haproxy (
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
   $cinder_network              = hiera('cinder_api_network', undef),
   $congress_network            = hiera('congress_api_network', undef),
+  $designate_network           = hiera('designate_api_network', undef),
   $docker_registry_network     = hiera('docker_registry_network', undef),
   $glance_api_network          = hiera('glance_api_network', undef),
   $gnocchi_network             = hiera('gnocchi_api_network', undef),
@@ -693,6 +703,8 @@ class tripleo::haproxy (
     cinder_api_ssl_port => 13776,
     congress_api_port => 1789,
     congress_api_ssl_port => 13789,
+    designate_api_port => 9001,
+    designate_api_ssl_port => 13001,
     docker_registry_port => 8787,
     docker_registry_ssl_port => 13787,
     etcd_port => 2379,
@@ -1281,6 +1293,18 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
       listen_options    => { 'http-check' => ['expect rstring .*200.*'], },
+    }
+  }
+
+  if $designate {
+    ::tripleo::haproxy::endpoint { 'designate':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('designate_api_vip', $controller_virtual_ip),
+      service_port      => $ports[designate_api_port],
+      ip_addresses      => hiera('designate_node_ips', $controller_hosts_real),
+      server_names      => hiera('designate_node_names', $controller_hosts_names_real),
+      public_ssl_port   => $ports[designate_api_ssl_port],
+      service_network   => $designate_network,
     }
   }
 
