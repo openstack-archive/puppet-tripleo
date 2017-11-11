@@ -124,7 +124,15 @@ class tripleo::profile::base::gnocchi::api (
         }
       }
       'file': { include ::gnocchi::storage::file }
-      'rbd': { include ::gnocchi::storage::ceph }
+      'rbd': {
+        include ::gnocchi::storage::ceph
+        exec{ 'exec-setfacl-openstack-gnocchi':
+          path    => ['/bin', '/usr/bin'],
+          command => 'setfacl -m u:gnocchi:r-- /etc/ceph/ceph.client.openstack.keyring',
+          unless  => 'getfacl /etc/ceph/ceph.client.openstack.keyring | grep -q "user:gnocchi:r--"',
+        }
+        Ceph::Key<||> -> Exec['exec-satfacl-openstack-gnocchi']
+      }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
   }

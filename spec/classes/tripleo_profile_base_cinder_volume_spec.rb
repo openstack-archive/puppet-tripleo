@@ -186,6 +186,9 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('cinder::backends').with(
             :enabled_backends => ['tripleo_ceph']
           )
+          is_expected.to contain_exec('exec-setfacl-openstack-cinder').with(
+             'command' => "setfacl -m u:cinder:r-- /etc/ceph/ceph.client.openstack.keyring"
+          )
         end
         context 'additional rbd pools' do
           # The list of additional rbd pools is not an input, but instead comes
