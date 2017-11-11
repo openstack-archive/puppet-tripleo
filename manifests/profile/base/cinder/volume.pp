@@ -164,13 +164,6 @@ class tripleo::profile::base::cinder::volume (
       include ::tripleo::profile::base::cinder::volume::rbd
       $cinder_rbd_backend_name = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph')
 
-      exec{ 'exec-setfacl-openstack-cinder':
-        path    => ['/bin', '/usr/bin'],
-        command => 'setfacl -m u:cinder:r-- /etc/ceph/ceph.client.openstack.keyring',
-        unless  => 'getfacl /etc/ceph/ceph.client.openstack.keyring | grep -q "user:cinder:r--"',
-      }
-      Ceph::Key<||> -> Exec['exec-setfacl-openstack-cinder']
-
       $cinder_rbd_extra_pools = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef)
       if $cinder_rbd_extra_pools {
           $base_name = $cinder_rbd_backend_name

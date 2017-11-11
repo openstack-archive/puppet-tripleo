@@ -129,16 +129,7 @@ class tripleo::profile::base::glance::api (
     case $glance_backend {
         'swift': { $backend_store = 'swift' }
         'file': { $backend_store = 'file' }
-        'rbd': {
-          $backend_store = 'rbd'
-          exec{ 'exec-setfacl-openstack-glance':
-            path    => ['/bin', '/usr/bin'],
-            command => 'setfacl -m u:glance:r-- /etc/ceph/ceph.client.openstack.keyring',
-            unless  => 'getfacl /etc/ceph/ceph.client.openstack.keyring | grep -q "user:glance:r--"',
-          }
-          Class['glance']->Exec['exec-setfacl-openstack-glance']
-          Ceph::Key<||> -> Exec['exec-setfacl-openstack-glance']
-        }
+        'rbd': { $backend_store = 'rbd' }
         'cinder': { $backend_store = 'cinder' }
         default: { fail('Unrecognized glance_backend parameter.') }
     }
