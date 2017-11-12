@@ -100,14 +100,7 @@ class tripleo::profile::base::manila::share (
       $cephfs_auth_id = hiera('manila::backend::cephfsnative::cephfs_auth_id')
       $keyring_path = "/etc/ceph/ceph.client.${cephfs_auth_id}.keyring"
 
-      exec{ "exec-setfacl-${cephfs_auth_id}}":
-        path    => ['/bin', '/usr/bin' ],
-        command => "setfacl -m u:manila:r-- ${keyring_path}",
-        unless  => "getfacl ${keyring_path} | grep -q \"user:manila:r--\"",
-      }
-      Ceph::Key<||> -> Exec["exec-satfacl-openstack-${cephfs_auth_id}"]
-
-      manila::backend::cephfs { $manila_cephfsnative_backend :
+      manila::backend::cephfsnative { $manila_cephfsnative_backend :
         driver_handles_share_servers => hiera('manila::backend::cephfsnative::driver_handles_share_servers', false),
         share_backend_name           => hiera('manila::backend::cephfsnative::share_backend_name'),
         cephfs_conf_path             => hiera('manila::backend::cephfsnative::cephfs_conf_path'),

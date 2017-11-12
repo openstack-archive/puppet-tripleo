@@ -107,9 +107,6 @@ describe 'tripleo::profile::base::gnocchi::api' do
           :redis_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
         is_expected.to contain_class('gnocchi::storage::ceph')
-        is_expected.to contain_exec('exec-setfacl-openstack-gnocchi').with(
-          'command' => 'setfacl -m u:gnocchi:r-- /etc/ceph/ceph.client.openstack.keyring'
-        )
       }
     end
 

@@ -32,12 +32,6 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
     $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
     if $rbd_ephemeral_storage or $rbd_persistent_storage {
       include ::nova::compute::rbd
-      exec{ 'exec-setfacl-openstack-nova':
-        path    => ['/bin', '/usr/bin'],
-        command => 'setfacl -m u:nova:r-- /etc/ceph/ceph.client.openstack.keyring',
-        unless  => 'getfacl /etc/ceph/ceph.client.openstack.keyring | grep -q "user:nova:r--"',
-      }
-      Ceph::Key<||> -> Exec['exec-satfacl-openstack-nova']
     }
 
     if $rbd_ephemeral_storage {
