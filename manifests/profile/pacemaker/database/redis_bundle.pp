@@ -249,7 +249,7 @@ slave-announce-port ${local_tuple[0][2]}
           'options'    => 'rw',
         },
         'redis-log'                     => {
-          'source-dir' => '/var/log/redis',
+          'source-dir' => '/var/log/containers/redis',
           'target-dir' => '/var/log/redis',
           'options'    => 'rw',
         },
