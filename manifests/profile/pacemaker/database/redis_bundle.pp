@@ -150,7 +150,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
         ocf_agent_name  => 'heartbeat:redis',
         resource_params => 'wait_last_known_master=true',
         master_params   => '',
-        meta_params     => 'notify=true ordered=true interleave=true',
+        meta_params     => 'notify=true ordered=true interleave=true container-attribute-target=host',
         op_params       => 'start timeout=200s stop timeout=200s',
         tries           => $pcs_tries,
         location_rule   => {
