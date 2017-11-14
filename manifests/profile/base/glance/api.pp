@@ -87,6 +87,9 @@
 #   enable_internal_tls is set.
 #   defaults to 9292
 #
+# [*glance_rbd_client_name*]
+#   RBD client naem
+#   (optional) Defaults to hiera('glance::backend::rbd::rbd_store_user')
 class tripleo::profile::base::glance::api (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -101,6 +104,7 @@ class tripleo::profile::base::glance::api (
   $tls_proxy_bind_ip             = undef,
   $tls_proxy_fqdn                = undef,
   $tls_proxy_port                = 9292,
+  $glance_rbd_client_name        = hiera('glance::backend::rbd::rbd_store_user','openstack'),
 ) {
   if $enable_internal_tls and $generate_service_certificates {
     ensure_resources('tripleo::certmonger::httpd', $certificates_specs)
@@ -142,7 +146,15 @@ class tripleo::profile::base::glance::api (
     case $glance_backend {
         'swift': { $backend_store = 'glance.store.swift.Store' }
         'file': { $backend_store = 'glance.store.filesystem.Store' }
-        'rbd': { $backend_store = 'glance.store.rbd.Store' }
+        'rbd': {
+          $backend_store = 'glance.store.rbd.Store'
+          exec{ "exec-setfacl-${glance_rbd_client_name}-glance":
+            path    => ['/bin', '/usr/bin'],
+            command => "setfacl -m u:glance:r-- /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring",
+            unless  => "getfacl /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring | grep -q user:glance:r--",
+          }
+          Ceph::Key<| title == "client.${glance_rbd_client_name}" |> -> Exec["exec-setfacl-${glance_rbd_client_name}-glance"]
+        }
         default: { fail('Unrecognized glance_backend parameter.') }
     }
     $http_store = ['glance.store.http.Store']
