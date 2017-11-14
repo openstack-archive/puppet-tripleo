@@ -38,6 +38,10 @@
 # [*rabbit_port*]
 #   IP port for rabbitmq service
 #   Defaults to hiera('glance::notify::rabbitmq::rabbit_port', 5672)
+#
+# [*glance_rbd_client_name*]
+# Name used by the glance ceph key
+# defaults to 'openstack'
 
 class tripleo::profile::base::glance::api (
   $glance_backend = downcase(hiera('glance_backend', 'swift')),
@@ -45,6 +49,7 @@ class tripleo::profile::base::glance::api (
   $step           = hiera('step'),
   $rabbit_hosts   = hiera('rabbitmq_node_ips', undef),
   $rabbit_port    = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
+  $glance_rbd_client_name = hiera('glance::backend::rbd::rbd_store_user','openstack'),
 ) {
 
   if $step >= 1 and $glance_nfs_enabled {
@@ -55,7 +60,15 @@ class tripleo::profile::base::glance::api (
     case $glance_backend {
         'swift': { $backend_store = 'glance.store.swift.Store' }
         'file': { $backend_store = 'glance.store.filesystem.Store' }
-        'rbd': { $backend_store = 'glance.store.rbd.Store' }
+        'rbd': {
+          $backend_store = 'glance.store.rbd.Store'
+          exec{ "exec-setfacl-${glance_rbd_client_name}-glance":
+            path    => ['/bin', '/usr/bin'],
+            command => "setfacl -m u:glance:r-- /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring",
+            unless  => "getfacl /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring | grep -q user:glance:r--",
+          }
+          Ceph::Key<| title == "client.${glance_rbd_client_name}" |> -> Exec["exec-setfacl-${glance_rbd_client_name}-glance"]
+        }
         default: { fail('Unrecognized glance_backend parameter.') }
     }
     $http_store = ['glance.store.http.Store']

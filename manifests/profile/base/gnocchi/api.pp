@@ -26,6 +26,10 @@
 #   (Optional) Gnocchi backend string file, swift or rbd
 #   Defaults to swift
 #
+# [*gnocchi_rbd_client_name*]
+#   Name used by the gnocchi cephx key
+#   Defaults to 'openstack'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -34,6 +38,7 @@
 class tripleo::profile::base::gnocchi::api (
   $bootstrap_node  = hiera('bootstrap_nodeid', undef),
   $gnocchi_backend = downcase(hiera('gnocchi_backend', 'swift')),
+  $gnocchi_rbd_client_name       = hiera('gnocchi::storage::ceph::ceph_username','openstack'),
   $step            = hiera('step'),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -59,7 +64,15 @@ class tripleo::profile::base::gnocchi::api (
     case $gnocchi_backend {
       'swift': { include ::gnocchi::storage::swift }
       'file': { include ::gnocchi::storage::file }
-      'rbd': { include ::gnocchi::storage::ceph }
+      'rbd': {
+        include ::gnocchi::storage::ceph
+        exec{ "exec-setfacl-${gnocchi_rbd_client_name}-gnocchi":
+          path    => ['/bin', '/usr/bin'],
+          command => "setfacl -m u:gnocchi:r-- /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring",
+          unless  => "getfacl /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q user:gnocchi:r--",
+        }
+        Ceph::Key<| title == "client.${gnocchi_rbd_client_name}" |> -> Exec["exec-setfacl-${gnocchi_rbd_client_name}-gnocchi"]
+      }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
   }
