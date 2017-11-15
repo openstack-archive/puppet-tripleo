@@ -1,0 +1,7 @@
+module(load="imuxsock" syssock.Use="off")
+
+input(type="imuxsock" socket="<%= @socket_path %>")
+
+template(name="messageonly" type="string" string="%msg%\n")
+
+action(type="omfile" file="/dev/stdout" template="messageonly")
