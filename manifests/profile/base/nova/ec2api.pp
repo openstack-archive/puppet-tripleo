@@ -43,6 +43,11 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('ec2_api_network', undef)
 #
+# [*ec2_api_metadata_network*]
+#   (Optional) The network name where the ec2api metadata endpoint is listening on.
+#   This is set by t-h-t.
+#   Defaults to hiera('ec2_api_network', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -63,15 +68,34 @@
 #   enable_internal_tls is set.
 #   Defaults to 8788
 #
+# [*metadata_tls_proxy_bind_ip*]
+#   IP on which the TLS proxy will listen on. Required only used if
+#   enable_internal_tls is set.
+#   Defaults to undef
+#
+#  [*metadata_tls_proxy_fqdn*]
+#    fqdn on which the tls proxy will listen on. Required only used if
+#    enable_internal_tls is set.
+#    Defaults to undef
+#
+#  [*metadata_tls_proxy_port*]
+#    port on which the tls proxy will listen on. Only used if
+#    enable_internal_tls is set.
+#    Defaults to 8789
+#
 class tripleo::profile::base::nova::ec2api (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $ec2_api_network               = hiera('ec2_api_network', undef),
+  $ec2_api_metadata_network      = hiera('ec2_api_network', undef),
   $step                          = Integer(hiera('step')),
   $ec2_api_tls_proxy_bind_ip     = undef,
   $ec2_api_tls_proxy_fqdn        = undef,
   $ec2_api_tls_proxy_port        = 8788,
+  $metadata_tls_proxy_bind_ip    = undef,
+  $metadata_tls_proxy_fqdn       = undef,
+  $metadata_tls_proxy_port       = 8789,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -95,6 +119,21 @@ class tripleo::profile::base::nova::ec2api (
         tls_key    => $ec2_api_tls_keyfile,
       }
       Tripleo::Tls_proxy['ec2-api'] ~> Anchor<| title == 'ec2api::service::begin' |>
+
+      if !$ec2_api_metadata_network {
+        fail('ec2_api_metadata_network is not set in the hieradata.')
+      }
+      $metadata_tls_certfile = $certificates_specs["httpd-${ec2_api_metadata_network}"]['service_certificate']
+      $metadata_tls_keyfile = $certificates_specs["httpd-${ec2_api_metadata_network}"]['service_key']
+
+      ::tripleo::tls_proxy { 'ec2-api-metadata':
+        servername => $metadata_tls_proxy_fqdn,
+        ip         => $metadata_tls_proxy_bind_ip,
+        port       => $metadata_tls_proxy_port,
+        tls_cert   => $metadata_tls_certfile,
+        tls_key    => $metadata_tls_keyfile,
+      }
+      Tripleo::Tls_proxy['ec2-api-metadata'] ~> Anchor<| title == 'ec2api::service::begin' |>
     }
     include ::ec2api
     include ::ec2api::api

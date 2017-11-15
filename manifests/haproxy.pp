@@ -1088,6 +1088,7 @@ class tripleo::haproxy (
       ip_addresses    => hiera('ec2_api_node_ips', $controller_hosts_real),
       server_names    => hiera('ec2_api_node_names', $controller_hosts_names_real),
       service_network => $ec2_api_metadata_network,
+      member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
