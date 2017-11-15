@@ -217,7 +217,25 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         bundle          => 'rabbitmq-bundle',
         require         => [Class['::rabbitmq'],
                             Pacemaker::Resource::Bundle['rabbitmq-bundle']],
+        notify          => Exec['rabbitmq-ready'],
       }
+
+      # This grep makes sure the rabbit app in erlang is up and running
+      # which is enough to guarantee that the user will eventually get
+      # replicated around the cluster
+      exec { 'rabbitmq-ready':
+        path        => '/usr/sbin:/usr/bin:/sbin:/bin',
+        command     => 'rabbitmqctl status | grep -F "{rabbit,"',
+        timeout     => 30,
+        tries       => 180,
+        try_sleep   => 10,
+        refreshonly => true,
+        tag         => 'rabbitmq_ready',
+      }
+      # Make sure that if we create rabbitmq users at the same step it happens
+      # after the cluster is up
+      Exec['rabbitmq-ready'] -> Rabbitmq_user<||>
+      Exec['rabbitmq-ready'] -> Rabbitmq_policy<||>
     }
   }
 }
