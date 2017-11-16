@@ -61,6 +61,7 @@ class tripleo::profile::base::nova::migration::client (
         transport         => 'tls',
         configure_libvirt => $libvirt_enabled,
         configure_nova    => $nova_compute_enabled,
+        auth              => 'sasl'
       }
     } else {
       # Reuse the cold-migration SSH tunnel when TLS is not enabled

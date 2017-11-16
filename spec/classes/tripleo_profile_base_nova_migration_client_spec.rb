@@ -101,6 +101,7 @@ eos
           :transport         => 'tls',
           :configure_libvirt => params[:libvirt_enabled],
           :configure_nova    => params[:nova_compute_enabled],
+          :auth              => 'sasl'
         )
         is_expected.to contain_file('/etc/nova/migration/identity').with(
           :content => '# Migration over SSH disabled by TripleO',
@@ -163,7 +164,8 @@ eos
         is_expected.to contain_class('nova::migration::libvirt').with(
           :transport         => 'tls',
           :configure_libvirt => params[:libvirt_enabled],
-          :configure_nova    => params[:nova_compute_enabled]
+          :configure_nova    => params[:nova_compute_enabled],
+          :auth              => 'sasl'
         )
         is_expected.to contain_file('/etc/nova/migration/identity').with(
           :content => 'foo',
