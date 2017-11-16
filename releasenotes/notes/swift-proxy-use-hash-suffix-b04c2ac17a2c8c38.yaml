@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Include the Swift base class in the proxy class, to ensure Swift hash
+    values are properly set in swift.conf when not applying the storage
+    manifest on the same node.
