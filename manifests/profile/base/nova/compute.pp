@@ -27,25 +27,42 @@
 #   (Optional) Whether or not Cinder is backed by NFS.
 #   Defaults to hiera('cinder_enable_nfs_backend', false)
 #
-# [*keymgr_api_class*]
-#   (Optional) The encryption key manager API class. The default value
+# [*keymgr_backend*]
+#   (Optional) The encryption key manager backend. The default value
 #   ensures Nova's legacy key manager is enabled when no hiera value is
 #   specified.
-#   Defaults to hiera('nova::compute::keymgr_api_class', 'nova.keymgr.conf_key_mgr.ConfKeyManager')
+#   Defaults to hiera('nova::compute::keymgr_backend', 'nova.keymgr.conf_key_mgr.ConfKeyManager')
+#
+# DEPRECATED PARAMETERS
+#
+# [*keymgr_api_class*]
+#   (Optional) Deprecated. The encryption key manager API class. The default value
+#   ensures Nova's legacy key manager is enabled when no hiera value is
+#   specified.
+#   Defaults to undef.
 #
 class tripleo::profile::base::nova::compute (
   $step               = Integer(hiera('step')),
   $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
-  $keymgr_api_class   = hiera('nova::compute::keymgr_api_class', 'nova.keymgr.conf_key_mgr.ConfKeyManager'),
+  $keymgr_backend     = hiera('nova::compute::keymgr_backend', 'nova.keymgr.conf_key_mgr.ConfKeyManager'),
+  # DEPRECATED PARAMETERS
+  $keymgr_api_class   = undef,
 ) {
 
   if $step >= 4 {
     # deploy basic bits for nova
     include ::tripleo::profile::base::nova
 
+    if $keymgr_api_class {
+      warning('The keymgr_api_class parameter is deprecated, use keymgr_backend')
+      $keymgr_backend_real = $keymgr_api_class
+    } else {
+      $keymgr_backend_real = $keymgr_backend
+    }
+
     # deploy basic bits for nova-compute
     class { '::nova::compute':
-      keymgr_api_class => $keymgr_api_class,
+      keymgr_backend => $keymgr_backend_real,
     }
     # If Service['nova-conductor'] is in catalog, make sure we start it
     # before nova-compute.
