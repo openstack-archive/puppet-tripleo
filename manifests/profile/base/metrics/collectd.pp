@@ -137,6 +137,11 @@
 #   (Optional) List of strings.  A list of active services in this tripleo
 #   deployment. This is used to look up service-specific plugins that
 #   need to be installed.
+#
+# [*collectd_manage_repo*]
+#   (Optional) Boolean. Whether let collectd enable manage repositories.
+#   If it is set to true the epel repository will be used
+#
 class tripleo::profile::base::metrics::collectd (
   $step = Integer(hiera('step')),
 
@@ -166,10 +171,13 @@ class tripleo::profile::base::metrics::collectd (
   $gnocchi_keystone_endpoint = undef,
   $gnocchi_resource_type = 'collectd',
   $gnocchi_batch_size = 10,
-  $service_names = hiera('service_names', [])
+  $service_names = hiera('service_names', []),
+  $collectd_manage_repo = false
 ) {
   if $step >= 3 {
-    include ::collectd
+    class {'::collectd':
+      manage_repo => $collectd_manage_repo
+    }
     if $enable_file_logging {
       include ::collectd::plugin::logfile
     }
