@@ -25,11 +25,16 @@
 #
 # [*libvirtd_config*]
 #   (Optional) Overrides for libvirtd config options
-#   Default to {}
+#   Defaults to {}
+#
+# [*tls_password*]
+#   (Optional) SASL Password for libvirtd TLS connections
+#   Defaults to '' (disabled)
 #
 class tripleo::profile::base::nova::libvirt (
   $step = Integer(hiera('step')),
   $libvirtd_config = {},
+  $tls_password    = '',
 ) {
   include ::tripleo::profile::base::nova::compute_libvirt_shared
 
@@ -67,5 +72,57 @@ class tripleo::profile::base::nova::libvirt (
     }
 
     include ::nova::compute::libvirt::qemu
+
+    $libvirt_sasl_conf = "
+mech_list: scram-sha-1
+sasldb_path: /etc/libvirt/passwd.db
+"
+
+    package { 'cyrus-sasl-scram':
+      ensure => present
+    }
+    ->file { '/etc/sasl2/libvirt.conf':
+      content => $libvirt_sasl_conf,
+      mode    => '0644',
+      owner   => 'root',
+      group   => 'root',
+      require => Package['libvirt'],
+      notify  => Service['libvirt'],
+    }
+
+    if !empty($tls_password) {
+      $libvirt_sasl_command = "echo \"\${TLS_PASSWORD}\" | saslpasswd2 -p -a libvirt -u overcloud migration"
+      $libvirt_auth_ensure = present
+      $libvirt_auth_conf = "
+[credentials-overcloud]
+authname=migration@overcloud
+password=${tls_password}
+
+[auth-libvirt-default]
+credentials=overcloud
+"
+    }
+    else {
+      $libvirt_sasl_command = 'saslpasswd2 -d -a libvirt -u overcloud migration'
+      $libvirt_auth_ensure = absent
+      $libvirt_auth_conf = ''
+    }
+
+    exec{ 'set libvirt sasl credentials':
+      environment => ["TLS_PASSWORD=${tls_password}"],
+      command     => $libvirt_sasl_command,
+      path        => ['/sbin', '/usr/sbin', '/bin', '/usr/bin'],
+      require     => File['/etc/sasl2/libvirt.conf'],
+      tag         => ['libvirt_tls_password']
+    }
+
+    file { '/etc/libvirt/auth.conf':
+      ensure  => $libvirt_auth_ensure,
+      content => $libvirt_auth_conf,
+      mode    => '0600',
+      owner   => 'root',
+      group   => 'root',
+      notify  => Service['libvirt']
+    }
   }
 }
