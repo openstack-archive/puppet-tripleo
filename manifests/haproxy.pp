@@ -289,6 +289,10 @@
 #  (optional) Enable or not Ironic Inspector API binding
 #  Defaults to hiera('ironic_inspector_enabled', false)
 #
+# [*kubernetes_master*]
+#  (optional) Enable or not Kubernetes API binding
+#  Defaults to hiera('kubernetes_master_enabled', false)
+#
 # [*mysql*]
 #  (optional) Enable or not MySQL Galera binding
 #  Defaults to hiera('mysql_enabled', false)
@@ -419,6 +423,10 @@
 #  (optional) Specify the network ironic_inspector is running on.
 #  Defaults to hiera('ironic_inspector_network', undef)
 #
+# [*kubernetes_master_network*]
+#  (optional) Specify the network kubernetes_master is running on.
+#  Defaults to hiera('kubernetes_master_network', undef)
+#
 # [*ironic_network*]
 #  (optional) Specify the network ironic is running on.
 #  Defaults to hiera('ironic_api_network', undef)
@@ -532,6 +540,8 @@
 #    'ironic_api_ssl_port' (Defaults to 13385)
 #    'ironic_inspector_port' (Defaults to 5050)
 #    'ironic_inspector_ssl_port' (Defaults to 13050)
+#    'kubernetes_master_port' (Defaults to 6443)
+#    'kubernetes_master_ssl_port' (Defaults to 13443)
 #    'keystone_admin_api_port' (Defaults to 35357)
 #    'keystone_public_api_port' (Defaults to 5000)
 #    'keystone_public_api_ssl_port' (Defaults to 13000)
@@ -630,6 +640,7 @@ class tripleo::haproxy (
   $ironic                      = hiera('ironic_api_enabled', false),
   $ironic_inspector            = hiera('ironic_inspector_enabled', false),
   $mysql                       = hiera('mysql_enabled', false),
+  $kubernetes_master           = hiera('kubernetes_master_enabled', false),
   $mysql_clustercheck          = false,
   $mysql_max_conn              = undef,
   $mysql_member_options        = undef,
@@ -661,6 +672,7 @@ class tripleo::haproxy (
   $horizon_network             = hiera('horizon_network', undef),
   $ironic_inspector_network    = hiera('ironic_inspector_network', undef),
   $ironic_network              = hiera('ironic_api_network', undef),
+  $kubernetes_master_network    = hiera('kubernetes_master_network', undef),
   $keystone_admin_network      = hiera('keystone_admin_api_network', undef),
   $keystone_public_network     = hiera('keystone_public_api_network', undef),
   $manila_network              = hiera('manila_api_network', undef),
@@ -722,6 +734,8 @@ class tripleo::haproxy (
     ironic_api_ssl_port => 13385,
     ironic_inspector_port => 5050,
     ironic_inspector_ssl_port => 13050,
+    kubernetes_master_port => 6443,
+    kubernetes_master_ssl_port => 13443,
     keystone_admin_api_port => 35357,
     keystone_public_api_port => 5000,
     keystone_public_api_ssl_port => 13000,
@@ -1626,4 +1640,20 @@ class tripleo::haproxy (
       }
     }
   }
+
+  if $kubernetes_master {
+    ::tripleo::haproxy::endpoint { 'kubernetes-master':
+      # Note we don't expose the kubernetes endpoint via public_virtual_ip
+      internal_ip     => hiera('kubernetes_master_vip', $controller_virtual_ip),
+      service_port    => $ports[kubernetes_master_port],
+      ip_addresses    => hiera('kubernetes_master_node_ips', $controller_hosts_real),
+      server_names    => hiera('kubernetes_master_node_names', $controller_hosts_names_real),
+      public_ssl_port => $ports[kubernetes_master_ssl_port],
+      service_network => $kubernetes_master_network,
+      listen_options  => {
+        'balance' => 'roundrobin',
+      }
+    }
+  }
+
 }
