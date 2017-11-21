@@ -2,7 +2,6 @@
     name: openstack/puppet-tripleo
     templates:
       - puppet-openstack-check-jobs
-      - puppet-openstack-module-unit-jobs
       - tripleo-undercloud-jobs
       - tripleo-multinode-baremetal-minimal
       - tripleo-multinode-container-minimal
@@ -10,6 +9,7 @@
       - tripleo-ovb-experimental
     check:
       jobs:
+        - puppet-openstack-unit-4.8-centos-7
         - tripleo-ci-centos-7-scenario001-multinode-oooq:
             files:
               - ^manifests/haproxy.*$
@@ -100,6 +100,7 @@
     gate:
       queue: tripleo
       jobs:
+        - puppet-openstack-unit-4.8-centos-7
         - tripleo-ci-centos-7-scenario002-multinode-oooq:
             files:
               - ^manifests/haproxy.*$
