@@ -3,7 +3,7 @@
 
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
-  :ref => 'master'
+  :ref => '6ee818019078e7ac9a6316409c369bf907ec2afd'
 
 mod 'midonet',
   :git => 'https://git.openstack.org/openstack/puppet-midonet',
