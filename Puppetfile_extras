@@ -61,3 +61,7 @@ mod 'snmp',
   :git => 'https://github.com/razorsedge/puppet-snmp',
   :ref => 'master'
 
+mod 'sensu',
+  :git => 'https://github.com/sensu/sensu-puppet',
+  :ref => 'master'
+
