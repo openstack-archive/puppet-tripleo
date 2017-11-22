@@ -35,6 +35,12 @@
 #   https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/7.2_Release_Notes/technology-preview-file_systems.html
 #   Defaults to '--log-driver=journald --signature-verification=false --iptables=false'
 #
+# [*disable_oci_register_machine*]
+#   Boolean option to control the 'disabled' setting in /etc/oci-register-machine.conf.
+#   Setting to false is known to cause issues with docker restarts or machine
+#   reboots when there are restarting containers.
+#   Defaults to True
+#
 # [*configure_network*]
 #   Boolean. Whether to configure the docker network. Defaults to false.
 #
@@ -71,19 +77,20 @@
 #   is enabled (defaults to false)
 #
 class tripleo::profile::base::docker (
-  $insecure_registries = undef,
-  $registry_mirror     = false,
-  $docker_options      = '--log-driver=journald --signature-verification=false --iptables=false',
-  $configure_network   = false,
-  $network_options     = '',
-  $configure_storage   = true,
-  $storage_options     = '-s overlay2',
-  $step                = Integer(hiera('step')),
-  $debug               = false,
+  $insecure_registries          = undef,
+  $registry_mirror              = false,
+  $docker_options               = '--log-driver=journald --signature-verification=false --iptables=false',
+  $disable_oci_register_machine = true,
+  $configure_network            = false,
+  $network_options              = '',
+  $configure_storage            = true,
+  $storage_options              = '-s overlay2',
+  $step                         = Integer(hiera('step')),
+  $debug                        = false,
   # DEPRECATED PARAMETERS
-  $insecure_registry_address = undef,
-  $docker_namespace = undef,
-  $insecure_registry = false,
+  $insecure_registry_address    = undef,
+  $docker_namespace             = undef,
+  $insecure_registry            = false,
 ) {
 
   if $step >= 1 {
@@ -213,6 +220,12 @@ class tripleo::profile::base::docker (
       changes => $network_changes,
       notify  => Service['docker'],
       require => Package['docker'],
+    }
+
+    file_line { 'configure-oci-register-machine':
+      path  => '/etc/oci-register-machine.conf',
+      line  => "disabled : ${disable_oci_register_machine}",
+      match => '^disabled.*',
     }
 
   }
