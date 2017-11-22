@@ -55,9 +55,9 @@
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
 #
-# [*nodes*]
+# [*rabbit_nodes*]
 #   (Optional) Array of host(s) for RabbitMQ nodes.
-#   Defaults to hiera('rabbitmq_node_names', []).
+#   Defaults to hiera('rabbitmq_node_names', undef).
 #
 # [*rabbitmq_pass*]
 #   (Optional) RabbitMQ Default Password.
@@ -66,6 +66,10 @@
 # [*rabbitmq_user*]
 #   (Optional) RabbitMQ Default User.
 #   Defaults to hiera('rabbitmq::default_user')
+#
+# [*oslomsg_rpc_nodes*]
+#   (Optional) Array of host(s) for Oslo Messaging rpc nodes.
+#   Defaults to hiera('oslo_messaging_rpc_node_names', undef).
 #
 # [*stack_action*]
 #   (Optional) Action of the stack deployment.
@@ -76,9 +80,13 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*bootstrap_node*]
+# [*rabbit_bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('rabbitmq_short_bootstrap_node_name')
+#
+# [*oslomsg_rpc_bootstrap_node*]
+#   (Optional) The hostname of the rpc node responsible for bootstrapping tasks
+#   Defaults to hiera('oslo_messaging_rpc_short_bootstrap_node_name')
 #
 class tripleo::profile::base::rabbitmq (
   $certificate_specs             = {},
@@ -88,13 +96,16 @@ class tripleo::profile::base::rabbitmq (
   $inet_dist_interface           = hiera('rabbitmq::interface', undef),
   $ipv6                          = str2bool(hiera('rabbit_ipv6', false)),
   $kernel_variables              = hiera('rabbitmq_kernel_variables'),
-  $nodes                         = hiera('rabbitmq_node_names', []),
+  $rabbit_nodes                  = hiera('rabbitmq_node_names', undef),
   $rabbitmq_pass                 = hiera('rabbitmq::default_pass'),
+  $oslomsg_rpc_nodes             = hiera('oslo_messaging_rpc_node_names', undef),
   $rabbitmq_user                 = hiera('rabbitmq::default_user'),
   $stack_action                  = hiera('stack_action'),
   $step                          = Integer(hiera('step')),
-  $bootstrap_node                = hiera('rabbitmq_short_bootstrap_node_name'),
+  $rabbit_bootstrap_node         = hiera('rabbitmq_short_bootstrap_node_name', undef),
+  $oslomsg_rpc_bootstrap_node    = hiera('oslo_messaging_rpc_short_bootstrap_node_name', undef),
 ) {
+  $bootstrap_node = pick($rabbit_bootstrap_node, $oslomsg_rpc_bootstrap_node, [])
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
@@ -122,6 +133,7 @@ class tripleo::profile::base::rabbitmq (
     $real_kernel_variables = $kernel_variables
   }
 
+  $nodes = pick($rabbit_nodes, $oslomsg_rpc_nodes, [])
   $manage_service = hiera('rabbitmq::service_manage', true)
   if $step >= 1 {
     # Specific configuration for multi-nodes or when running with Pacemaker.

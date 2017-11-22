@@ -34,7 +34,7 @@ describe 'tripleo::profile::base::qdr' do
           :hostname => 'node.example.com',
         })
         params.merge!({
-          :qdr_node_names => ['node.example.com'],
+          :oslomsg_rpc_hosts => ['node.example.com'],
         })
       end
 
@@ -53,14 +53,14 @@ describe 'tripleo::profile::base::qdr' do
           :hostname => 'node1.example.com',
         })
         params.merge!({
-          :qdr_node_names => ['node1.example.com','node2.example.com','node3.example.com'],
+          :oslomsg_rpc_hosts => ['node1.example.com','node2.example.com','node3.example.com'],
         })
       end
 
       it 'should set interior listener and no connectors' do
         is_expected.to contain_class('qdr').with(
           :router_mode     => 'interior',
-          :extra_listeners => [{'host' => '0.0.0.0','port' => '25672','role' => 'inter-router'}],
+          :extra_listeners => [{'host' => '0.0.0.0','port' => '31460','role' => 'inter-router'}],
           :connectors => [],
         )
       end
@@ -72,15 +72,15 @@ describe 'tripleo::profile::base::qdr' do
           :hostname => 'node2.example.com',
         })
         params.merge!({
-          :qdr_node_names => ['node1.example.com','node2.example.com','node3.example.com'],
+          :oslomsg_rpc_hosts => ['node1.example.com','node2.example.com','node3.example.com'],
         })
       end
 
       it 'should set up interior listener and one connector' do
         is_expected.to contain_class('qdr').with(
           :router_mode     => 'interior',
-          :extra_listeners => [{'host' => '0.0.0.0','port' => '25672','role' => 'inter-router'}],
-          :connectors => [{"host"=>"node1.example.com", "role"=>"inter-router", "port"=>"25672"}],
+          :extra_listeners => [{'host' => '0.0.0.0','port' => '31460','role' => 'inter-router'}],
+          :connectors => [{"host"=>"node1.example.com", "role"=>"inter-router", "port"=>"31460"}],
         )
       end
     end
@@ -91,17 +91,17 @@ describe 'tripleo::profile::base::qdr' do
           :hostname => 'node3.example.com',
         })
         params.merge!({
-          :qdr_node_names => ['node1.example.com','node2.example.com','node3.example.com'],
+          :oslomsg_rpc_hosts => ['node1.example.com','node2.example.com','node3.example.com'],
         })
       end
 
       it 'should set up interior listener and two connectors' do
         is_expected.to contain_class('qdr').with(
           :router_mode     => 'interior',
-          :extra_listeners => [{'host' => '0.0.0.0','port' => '25672','role' => 'inter-router'}],
+          :extra_listeners => [{'host' => '0.0.0.0','port' => '31460','role' => 'inter-router'}],
           :connectors => [
-            {"host"=>"node1.example.com", "role"=>"inter-router", "port"=>"25672"},
-            {"host"=>"node2.example.com", "role"=>"inter-router", "port"=>"25672"}],
+            {"host"=>"node1.example.com", "role"=>"inter-router", "port"=>"31460"},
+            {"host"=>"node2.example.com", "role"=>"inter-router", "port"=>"31460"}],
         )
       end
     end

@@ -26,9 +26,13 @@
 #   (Optional) The bundle's pacemaker_remote control port on the host
 #   Defaults to hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122')
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
+# [*rabbit_bootstrap_node*]
+#   (Optional) The hostname of the rabbit node responsible for bootstrapping tasks
 #   Defaults to hiera('rabbitmq_short_bootstrap_node_name')
+#
+# [*oslomsg_rpc_bootstrap_node*]
+#   (Optional) The hostname of the rpc node responsible for bootstrapping tasks
+#   Defaults to hiera('oslo_messaging_rpc_short_bootstrap_node_name')
 #
 # [*erlang_cookie*]
 #   (Optional) Content of erlang cookie.
@@ -42,7 +46,19 @@
 #
 # [*rabbit_nodes*]
 #   (Optional) The list of rabbitmq nodes names
-#   Defaults to hiera('rabbitmq_node_names')
+#   Defaults to hiera('rabbitmq_node_names', undef)
+#
+# [*oslomsg_rpc_nodes*]
+#   (Optional) The list of oslo messaging rpc nodes names
+#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
+#
+# [*rabbit_short_node_names*]
+#   (Optional) The list of rabbitmq short nodes names
+#   Defaults to hiera('rabbitmq_short_node_names', undef)
+#
+# [*oslomsg_rpc_short_node_names*]
+#   (Optional) The list of oslo messaging rpc shortnodes names
+#   Defaults to hiera('oslo_messaging_rpc_short_node_names', undef)
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
@@ -60,14 +76,20 @@
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef),
   $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122'),
-  $bootstrap_node               = hiera('rabbitmq_short_bootstrap_node_name'),
+  $rabbit_bootstrap_node        = hiera('rabbitmq_short_bootstrap_node_name', undef),
+  $oslomsg_rpc_bootstrap_node   = hiera('oslo_messaging_rpc_short_bootstrap_node_name', undef),
   $erlang_cookie                = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
-  $rabbit_nodes                 = hiera('rabbitmq_node_names'),
+  $rabbit_nodes                 = hiera('rabbitmq_node_names', undef),
+  $oslomsg_rpc_nodes            = hiera('oslo_messaging_rpc_node_names', undef),
+  $rabbit_short_node_names      = hiera('rabbitmq_short_node_names', undef),
+  $oslomsg_rpc_short_node_names = hiera('oslo_messaging_rpc_short_node_names', undef),
   $enable_internal_tls          = hiera('enable_internal_tls', false),
   $pcs_tries                    = hiera('pcs_tries', 20),
   $step                         = Integer(hiera('step')),
 ) {
+  $messaging_nodes = pick($rabbit_nodes, $oslomsg_rpc_nodes)
+  $bootstrap_node = pick($rabbit_bootstrap_node, $oslomsg_rpc_bootstrap_node, [])
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
@@ -95,9 +117,9 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
 
   if $step >= 2 {
     if $pacemaker_master {
-      $rabbitmq_short_node_names = hiera('rabbitmq_short_node_names')
-      $rabbitmq_nodes_count = count($rabbitmq_short_node_names)
-      $rabbitmq_short_node_names.each |String $node_name| {
+      $messaging_short_node_names = pick($rabbit_short_node_names, $oslomsg_rpc_short_node_names, [])
+      $rabbitmq_nodes_count = count($messaging_short_node_names)
+      $messaging_short_node_names.each |String $node_name| {
         pacemaker::property { "rabbitmq-role-${node_name}":
           property => 'rabbitmq-role',
           value    => true,
@@ -194,7 +216,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
 
       # The default nr of ha queues is ceiling(N/2)
       if $user_ha_queues == 0 {
-        $nr_rabbit_nodes = size($rabbit_nodes)
+        $nr_rabbit_nodes = size($messaging_nodes)
         $nr_ha_queues = $nr_rabbit_nodes / 2 + ($nr_rabbit_nodes % 2)
         $params = "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'"
       } elsif $user_ha_queues == -1 {
@@ -220,7 +242,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         before          => Exec['rabbitmq-ready'],
       }
 
-      if size($rabbit_nodes) == 1 {
+      if size($messaging_nodes) == 1 {
         $check_command = 'rabbitmqctl status | grep -F "{rabbit,"'
       } else {
         # This grep makes sure the rabbit app in erlang is up and running

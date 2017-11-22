@@ -22,13 +22,17 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
+# [*rabbit_hosts*]
+#   list of the oslo messaging rpc host fqdns
+#   Defaults to hiera('rabbitmq_node_names', undef)
+#
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
 #   Defaults to hiera('messaging_rpc_service_name', rabbit)
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
+#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
@@ -48,8 +52,9 @@
 
 class tripleo::profile::base::octavia (
   $step                 = Integer(hiera('step')),
+  $rabbit_hosts         = hiera('rabbitmq_node_names', undef),
   $oslomsg_rpc_proto    = hiera('messaging_rpc_service_name', 'rabbit'),
-  $oslomsg_rpc_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_rpc_hosts    = hiera('oslo_messaging_rpc_node_names', undef),
   $oslomsg_rpc_password = hiera('octavia::rabbit_password'),
   $oslomsg_rpc_port     = hiera('octavia::rabbit_port', '5672'),
   $oslomsg_rpc_username = hiera('octavia::rabbit_userid', 'guest'),
@@ -57,10 +62,11 @@ class tripleo::profile::base::octavia (
 ) {
   if $step >= 3 {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
+    $oslomsg_rpc_hosts_real = any2array(pick($rabbit_hosts, $oslomsg_rpc_hosts, []))
     class { '::octavia' :
       default_transport_url => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
-        'hosts'     => $oslomsg_rpc_hosts,
+        'hosts'     => $oslomsg_rpc_hosts_real,
         'port'      => sprintf('%s', $oslomsg_rpc_port),
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,
