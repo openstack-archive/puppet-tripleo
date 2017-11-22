@@ -126,18 +126,6 @@
               - ^manifests/profile/base/panko.*$
               - ^manifests/profile/base/swift.*$
               - ^manifests/profile/base/zaqar.*$
-        - tripleo-ci-centos-7-scenario003-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/mistral.*$
-              - ^manifests/profile/base/sahara.*$
-        - tripleo-ci-centos-7-scenario003-multinode-oooq-container:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/mistral.*$
-              - ^manifests/profile/base/sahara.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq:
             files:
               - ^manifests/haproxy.*$
