@@ -49,6 +49,11 @@
 #  The IPv4, IPv6 or filesystem socket path of the syslog server.
 #  Defaults to '/dev/log'
 #
+# [*activate_httplog*]
+#  Globally activate "httplog" option (in defaults section)
+#  In case the listener is NOT set to "http" mode, HAProxy will fallback to "tcplog".
+#  Defaults to false
+#
 # [*haproxy_globals_override*]
 #  HAProxy global option we can append to the default base set in this class.
 #  If you enter an already existing key, it will override the default.
@@ -587,6 +592,7 @@ class tripleo::haproxy (
   $haproxy_listen_bind_param   = [ 'transparent' ],
   $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address         = '/dev/log',
+  $activate_httplog            = false,
   $haproxy_globals_override    = {},
   $haproxy_daemon              = true,
   $haproxy_socket_access_level = 'user',
@@ -836,16 +842,23 @@ class tripleo::haproxy (
     $haproxy_daemonize = {}
   }
 
+  $haproxy_defaults_options = {
+    'mode'    => 'tcp',
+    'log'     => 'global',
+    'retries' => '3',
+    'timeout' => $haproxy_default_timeout,
+    'maxconn' => $haproxy_default_maxconn,
+  }
+  if $activate_httplog {
+    $httplog = {'option' => 'httplog'}
+  } else {
+    $httplog = {}
+  }
+
   class { '::haproxy':
     service_manage   => $haproxy_service_manage,
     global_options   => merge($haproxy_global_options, $haproxy_daemonize, $haproxy_globals_override),
-    defaults_options => {
-      'mode'    => 'tcp',
-      'log'     => 'global',
-      'retries' => '3',
-      'timeout' => $haproxy_default_timeout,
-      'maxconn' => $haproxy_default_maxconn,
-    },
+    defaults_options => merge($haproxy_defaults_options, $httplog),
   }
 
 
