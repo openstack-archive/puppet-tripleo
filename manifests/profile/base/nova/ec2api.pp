@@ -112,11 +112,12 @@ class tripleo::profile::base::nova::ec2api (
       $ec2_api_tls_keyfile = $certificates_specs["httpd-${ec2_api_network}"]['service_key']
 
       ::tripleo::tls_proxy { 'ec2-api':
-        servername => $ec2_api_tls_proxy_fqdn,
-        ip         => $ec2_api_tls_proxy_bind_ip,
-        port       => $ec2_api_tls_proxy_port,
-        tls_cert   => $ec2_api_tls_certfile,
-        tls_key    => $ec2_api_tls_keyfile,
+        servername    => $ec2_api_tls_proxy_fqdn,
+        ip            => $ec2_api_tls_proxy_bind_ip,
+        port          => $ec2_api_tls_proxy_port,
+        tls_cert      => $ec2_api_tls_certfile,
+        tls_key       => $ec2_api_tls_keyfile,
+        preserve_host => true,
       }
       Tripleo::Tls_proxy['ec2-api'] ~> Anchor<| title == 'ec2api::service::begin' |>
 
