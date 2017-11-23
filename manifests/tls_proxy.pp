@@ -33,26 +33,33 @@
 # [*tls_key*]
 #   The path to the key used for the specified certificate.
 #
+# [*preserve_host*]
+#   (Optional) Whether the Host header is perserved in proxied requests.
+#   See the Apache ProxyPreserveHost directive docs.
+#   Defaults to false
+
 define tripleo::tls_proxy(
   $ip,
   $port,
   $servername,
   $tls_cert,
   $tls_key,
+  $preserve_host = false
 ) {
   include ::apache
   ::apache::vhost { "${title}-proxy":
-    ensure          => 'present',
-    docroot         => false,  # This is required by the manifest
-    manage_docroot  => false,
-    servername      => $servername,
-    ip              => $ip,
-    port            => $port,
-    ssl             => true,
-    ssl_cert        => $tls_cert,
-    ssl_key         => $tls_key,
-    request_headers => ['set X-Forwarded-Proto "https"'],
-    proxy_pass      => {
+    ensure              => 'present',
+    docroot             => false,  # This is required by the manifest
+    manage_docroot      => false,
+    servername          => $servername,
+    ip                  => $ip,
+    port                => $port,
+    ssl                 => true,
+    ssl_cert            => $tls_cert,
+    ssl_key             => $tls_key,
+    request_headers     => ['set X-Forwarded-Proto "https"'],
+    proxy_preserve_host => $preserve_host,
+    proxy_pass          => {
       path   => '/',
       url    => "http://localhost:${port}/",
       params => {retry => '10'},
