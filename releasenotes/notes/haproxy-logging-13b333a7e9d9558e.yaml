@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Added new parameter to tripleo::haproxy: activate_httplog
+    This allows to activate the HTTP full logs in HAProxy.
+
+fixes:
+  - Fixes `bug 1733801
+    <https://bugs.launchpad.net/tripleo/+bug/1733801>`__ so we can activate
+    haproxy logs.
