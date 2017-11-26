@@ -106,7 +106,7 @@ class tripleo::profile::pacemaker::ceph_nfs (
       tries  => $pcs_tries,
     }
 
-    pacemaker::constraint::order { 'gansha_vip-then-ganesha':
+    pacemaker::constraint::order { 'ganesha_vip-then-ganesha':
       first_resource    => "ip-${ganesha_vip}",
       second_resource   => 'ceph-nfs',
       first_action      => 'start',
@@ -118,7 +118,7 @@ class tripleo::profile::pacemaker::ceph_nfs (
 
     Pacemaker::Resource::Ip['ganesha_vip']
       -> Pacemaker::Resource::Service['ceph-nfs']
-        -> Pacemaker::Constraint::Order['gansha_vip-then-ganesha']
+        -> Pacemaker::Constraint::Order['ganesha_vip-then-ganesha']
           -> Pacemaker::Constraint::Colocation['ganesha_vip-with-ganesha']
   }
 }
