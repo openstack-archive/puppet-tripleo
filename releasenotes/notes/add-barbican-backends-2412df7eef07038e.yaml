@@ -1,0 +1,5 @@
+---
+features:
+  - Added code to select plugin configuration based on tripleo heat
+    template dynamic variables for each backend, depending on if the
+    backend is enabled.  Multiple backends can now be configured.

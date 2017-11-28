@@ -134,8 +134,8 @@ class tripleo::profile::base::barbican::api (
 
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
     class { '::barbican::api':
-      sync_db                     => $sync_db,
-      default_transport_url       => os_transport_url({
+      sync_db                        => $sync_db,
+      default_transport_url          => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
         'port'      => $oslomsg_rpc_port,
@@ -143,7 +143,7 @@ class tripleo::profile::base::barbican::api (
         'password'  => $oslomsg_rpc_password,
         'ssl'       => $oslomsg_use_ssl_real,
       }),
-      notification_transport_url  => os_transport_url({
+      notification_transport_url     => os_transport_url({
         'transport' => $oslomsg_notify_proto,
         'hosts'     => $oslomsg_notify_hosts,
         'port'      => $oslomsg_notify_port,
@@ -151,8 +151,8 @@ class tripleo::profile::base::barbican::api (
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_use_ssl_real,
       }),
-      enabled_crypto_plugins      => $::tripleo::profile::base::barbican::backends::enabled_crypto_plugins,
-      enabled_secretstore_plugins => $::tripleo::profile::base::barbican::backends::enabled_secretstore_plugins
+      multiple_secret_stores_enabled => true,
+      enabled_secret_stores          => $::tripleo::profile::base::barbican::backends::enabled_secret_stores,
     }
     include ::barbican::keystone::authtoken
     include ::barbican::api::logging

@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::profile::base::barbican::backends
 #
-# Barbican's simple crypto plugin profile for tripleo
+# Barbican's secret store plugin profile for tripleo
 #
 # === Parameters
 #
@@ -32,17 +32,55 @@
 #   dynamically set via t-h-t.
 #   Defaults to hiera('barbican_backend_simple_crypto_enabled', false)
 #
+# [*dogtag_backend_enabled*]
+#   (Optional) Whether the Dogtag backend is enabled or not. This is
+#   dynamically set via t-h-t.
+#   Defaults to hiera('barbican_backend_dogtag_enabled', false)
+#
+# [*p11_crypto_backend_enabled*]
+#   (Optional) Whether the pkcs11 crypto backend is enabled or not. This is
+#   dynamically set via t-h-t.
+#   Defaults to hiera('barbican_backend_pkcs11_crypto_enabled', false)
+#
+# [*kmip_backend_enabled*]
+#   (Optional) Whether the KMIP backend is enabled or not. This is
+#   dynamically set via t-h-t.
+#   Defaults to hiera('barbican_backend_kmip_enabled', false)
+#
 class tripleo::profile::base::barbican::backends (
-  $simple_crypto_backend_enabled = hiera('barbican_backend_simple_crypto_enabled', false)
+  $simple_crypto_backend_enabled = hiera('barbican_backend_simple_crypto_enabled', false),
+  $dogtag_backend_enabled        = hiera('barbican_backend_dogtag_enabled', false),
+  $p11_crypto_backend_enabled    = hiera('barbican_backend_pkcs11_crypto_enabled', false),
+  $kmip_backend_enabled          = hiera('barbican_backend_kmip_enabled', false),
 ) {
   if $simple_crypto_backend_enabled {
     include ::barbican::plugins::simple_crypto
-    # Note that once we start adding more backends, this will be refactored to
-    # create a proper lits from all the enabled plugins.
-    $enabled_secretstore_plugins = 'store_crypto'
-    $enabled_crypto_plugins = 'simple_crypto'
+    $backend1 = 'simple_crypto'
   } else {
-    $enabled_secretstore_plugins = ''
-    $enabled_crypto_plugins = ''
+    $backend1 = undef
   }
+
+  if $dogtag_backend_enabled {
+    include ::barbican::plugins::dogtag
+    $backend2 = 'dogtag'
+  } else {
+    $backend2 = undef
+  }
+
+  if $p11_crypto_backend_enabled {
+    include ::barbican::plugins::p11_crypto
+    $backend3 = 'pkcs11'
+  } else {
+    $backend3 = undef
+  }
+
+  if $kmip_backend_enabled {
+    include ::barbican::plugins::kmip
+    $backend4 = 'kmip'
+  } else {
+    $backend4 = undef
+  }
+
+  $enabled_backends_list = [$backend1, $backend2, $backend3, $backend4].filter |$items| { $items != undef }
+  $enabled_secret_stores = join($enabled_backends_list, ',')
 }
