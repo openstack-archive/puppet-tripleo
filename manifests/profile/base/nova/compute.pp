@@ -47,6 +47,7 @@ class tripleo::profile::base::nova::compute (
     class { '::nova::compute':
       keymgr_api_class => $keymgr_api_class,
     }
+    include ::nova::compute::pci
     # If Service['nova-conductor'] is in catalog, make sure we start it
     # before nova-compute.
     Service<| title == 'nova-conductor' |> -> Service['nova-compute']
