@@ -89,5 +89,9 @@ class tripleo::profile::base::neutron::plugins::ml2 (
     if 'nuage' in $mechanism_drivers {
       include ::tripleo::profile::base::neutron::plugins::ml2::nuage
     }
+
+    if 'cisco_vts' in $mechanism_drivers {
+      include ::tripleo::profile::base::neutron::plugins::ml2::vts
+    }
   }
 }
