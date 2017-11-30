@@ -18,31 +18,20 @@
 #
 # === Parameters
 #
-# [*enable_internal_tls*]
-#   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::ceilometer::agent::central (
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $step                = Integer(hiera('step')),
+  $step = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::ceilometer
-
-  if $enable_internal_tls {
-    $tls_query_param = '?ssl=true'
-  } else {
-    $tls_query_param = ''
-  }
 
   if $step >= 4 {
     include ::ceilometer::agent::auth
     class { '::ceilometer::agent::central':
-      coordination_url => join(['redis://:', hiera('ceilometer_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/', $tls_query_param]),
+      coordination_url => join(['redis://:', hiera('ceilometer_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/']),
     }
   }
 

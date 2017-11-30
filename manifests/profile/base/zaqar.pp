@@ -87,11 +87,9 @@ class tripleo::profile::base::zaqar (
     }
     $tls_certfile = $certificates_specs["httpd-${zaqar_api_network}"]['service_certificate']
     $tls_keyfile = $certificates_specs["httpd-${zaqar_api_network}"]['service_key']
-    $tls_query_param = '?ssl=true'
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
-    $tls_query_param = ''
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
@@ -118,7 +116,7 @@ class tripleo::profile::base::zaqar (
       }
     } elsif $messaging_store == 'redis' {
       class {'::zaqar::messaging::redis':
-        uri => join(['redis://:', $zaqar_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
+        uri => join(['redis://:', $zaqar_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
       }
     } else {
       fail("unsupported Zaqar messaging_store set: ${messaging_store}")
