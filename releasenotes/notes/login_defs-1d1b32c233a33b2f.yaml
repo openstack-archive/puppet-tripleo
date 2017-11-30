@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Enables management of the login.defs file and its values around
+    password functionality (such as max days, min days, warning age,
+    fail retry times)
+security:
+  - |
+    Operators using this puppet module, can change values that
+    influence password security.
