@@ -42,7 +42,7 @@ class tripleo::profile::base::ceilometer::upgrade (
   # are created safely.
   if $step >= 5 and $sync_db {
     exec {'ceilometer-db-upgrade':
-      command   => 'ceilometer-upgrade --skip-metering-database',
+      command   => 'ceilometer-upgrade',
       path      => ['/usr/bin', '/usr/sbin'],
       # LP#1703444 - When this runs, it talks to gnocchi on all controllers
       # which then reaches out to keystone via haproxy. Since the deployment
