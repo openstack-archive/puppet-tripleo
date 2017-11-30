@@ -1,7 +1,7 @@
 ---
 step: 4
-cinder::api::keymgr_api_class: 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager'
-nova::compute::keymgr_api_class: 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager'
+cinder::api::keymgr_backend: 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager'
+nova::compute::keymgr_backend: 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager'
 # items needed for tripleo::profile::base::cinder::volume
 tripleo::profile::base::cinder::volume::iscsi::cinder_iscsi_address: '127.0.0.1'
 tripleo::profile::base::cinder::volume::nfs::cinder_nfs_servers:

@@ -46,7 +46,7 @@ describe 'tripleo::profile::base::cinder::api' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder::api').with(
           # Verify legacy key manager is enabled when none is set in hiera.
-          :keymgr_api_class => 'cinder.keymgr.conf_key_mgr.ConfKeyManager',
+          :keymgr_backend => 'cinder.keymgr.conf_key_mgr.ConfKeyManager',
         )
         is_expected.to contain_class('cinder::ceilometer')
       end
@@ -72,13 +72,25 @@ describe 'tripleo::profile::base::cinder::api' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder::api').with(
           # Verify proper key manager is enabled when value is set in hiera.
-          :keymgr_api_class => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
+          :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
         )
         is_expected.to contain_class('cinder::ceilometer')
       end
     end
-  end
 
+    context 'with deprecated keymgr parameters' do
+      let(:params) { {
+        :step             => 4,
+        :keymgr_api_class => 'some.other.key_manager',
+      } }
+
+      it 'should use deprecated keymgr parameters' do
+        is_expected.to contain_class('cinder::api').with(
+          :keymgr_backend => 'some.other.key_manager',
+        )
+      end
+    end
+  end
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do

@@ -1,0 +1,6 @@
+---
+deprecations:
+  - |
+    The keymgr_api_class parameter is deprecated in favor of an equivalent
+    keymgr_backend option. The deprecated keymgr_api_class is still supported
+    for backward compatibility.
