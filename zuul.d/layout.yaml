@@ -106,6 +106,36 @@
     gate:
       queue: tripleo
       jobs:
+        - tripleo-ci-centos-7-scenario001-multinode-oooq:
+            files:
+              - ^manifests/haproxy.*$
+              - ^manifests/profile/base/aodh.*$
+              - ^manifests/profile/base/ceilometer.*$
+              - ^manifests/profile/base/ceph.*$
+              - ^manifests/profile/base/cinder.*$
+              - ^manifests/profile/base/congress.*$
+              - ^manifests/profile/base/glance.*$
+              - ^manifests/profile/base/gnocchi.*$
+              - ^manifests/profile/base/logging.*$
+              - ^manifests/profile/base/metrics.*$
+              - ^manifests/profile/base/monitoring.*$
+              - ^manifests/profile/base/panko.*$
+              - ^manifests/profile/base/tacker.*$
+        - tripleo-ci-centos-7-scenario001-multinode-oooq-container:
+            files:
+              - ^manifests/haproxy.*$
+              - ^manifests/profile/base/aodh.*$
+              - ^manifests/profile/base/ceilometer.*$
+              - ^manifests/profile/base/ceph.*$
+              - ^manifests/profile/base/cinder.*$
+              - ^manifests/profile/base/congress.*$
+              - ^manifests/profile/base/glance.*$
+              - ^manifests/profile/base/gnocchi.*$
+              - ^manifests/profile/base/logging.*$
+              - ^manifests/profile/base/metrics.*$
+              - ^manifests/profile/base/monitoring.*$
+              - ^manifests/profile/base/panko.*$
+              - ^manifests/profile/base/tacker.*$
         - tripleo-ci-centos-7-scenario002-multinode-oooq:
             files:
               - ^manifests/haproxy.*$
@@ -132,6 +162,18 @@
               - ^manifests/profile/base/panko.*$
               - ^manifests/profile/base/swift.*$
               - ^manifests/profile/base/zaqar.*$
+        - tripleo-ci-centos-7-scenario003-multinode-oooq:
+            files:
+              - ^manifests/haproxy.*$
+              - ^manifests/profile/base/glance.*$
+              - ^manifests/profile/base/mistral.*$
+              - ^manifests/profile/base/sahara.*$
+        - tripleo-ci-centos-7-scenario003-multinode-oooq-container:
+            files:
+              - ^manifests/haproxy.*$
+              - ^manifests/profile/base/glance.*$
+              - ^manifests/profile/base/mistral.*$
+              - ^manifests/profile/base/sahara.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq:
             files:
               - ^manifests/haproxy.*$
