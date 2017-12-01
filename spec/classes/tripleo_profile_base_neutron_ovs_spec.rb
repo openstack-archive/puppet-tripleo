@@ -59,6 +59,26 @@ describe 'tripleo::profile::base::neutron::ovs' do
         :mode   => '0775',
       ) }
     end
+
+    context 'with vhostuser_socketdir and its permissions configured' do
+      let :params do
+        {
+          :step => 5,
+          :vhostuser_socket_dir   => '/var/lib/vhostuser_sockets',
+          :vhostuser_socket_group => 'hugetlbfs',
+          :vhostuser_socket_user  => 'openvswitch'
+        }
+      end
+
+      it { is_expected.to contain_class('tripleo::profile::base::neutron') }
+      it { is_expected.to contain_class('neutron::agents::ml2::ovs') }
+      it { is_expected.to contain_file('/var/lib/vhostuser_sockets').with(
+        :ensure => 'directory',
+        :owner  => 'openvswitch',
+        :group  => 'hugetlbfs',
+        :mode   => '0775',
+      ) }
+    end
   end
 
 

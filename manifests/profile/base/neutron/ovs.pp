@@ -27,10 +27,20 @@
 #   (Optional) vhostuser socket dir, The directory where $vhostuser_socket_dir
 #   will be created with correct permissions, inorder to support vhostuser
 #   client mode.
+#
+# [*vhostuser_socket_group*]
+#   (Optional) Group name for vhostuser socket dir.
+#   Defaults to qemu
+#
+# [*vhostuser_socket_user*]
+#   (Optional) User name for vhostuser socket dir.
+#   Defaults to qemu
 
 class tripleo::profile::base::neutron::ovs(
   $step                 = hiera('step'),
-  $vhostuser_socket_dir = hiera('neutron::agents::ml2::ovs::vhostuser_socket_dir', undef)
+  $vhostuser_socket_dir   = hiera('neutron::agents::ml2::ovs::vhostuser_socket_dir', undef),
+  $vhostuser_socket_group = hiera('vhostuser_socket_group', 'qemu'),
+  $vhostuser_socket_user  = hiera('vhostuser_socket_user', 'qemu'),
 ) {
   include ::tripleo::profile::base::neutron
 
@@ -45,8 +55,8 @@ class tripleo::profile::base::neutron::ovs(
     if $vhostuser_socket_dir {
       file { $vhostuser_socket_dir:
         ensure => directory,
-        owner  => 'qemu',
-        group  => 'qemu',
+        owner  => $vhostuser_socket_user,
+        group  => $vhostuser_socket_group,
         mode   => '0775',
       }
     }
