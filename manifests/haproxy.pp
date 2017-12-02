@@ -758,6 +758,7 @@ class tripleo::haproxy (
     octavia_api_port => 9876,
     octavia_api_ssl_port => 13876,
     opendaylight_api_port => 8081,
+    opendaylight_ws_port => 8185,
     panko_api_port => 8977,
     panko_api_ssl_port => 13977,
     ovn_nbdb_port => 6641,
@@ -1497,6 +1498,24 @@ class tripleo::haproxy (
       server_names   => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
       mode           => 'http',
       listen_options => {
+        'balance' => 'source',
+      },
+    }
+
+    ::tripleo::haproxy::endpoint { 'opendaylight_ws':
+      internal_ip    => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
+      service_port   => $ports[opendaylight_ws_port],
+      ip_addresses   => hiera('opendaylight_api_node_ips', $controller_hosts_real),
+      server_names   => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
+      mode           => 'http',
+      listen_options => {
+        # NOTE(jaosorior): Websockets have more overhead in establishing
+        # connections than regular HTTP connections. Also, since it begins
+        # as an HTTP connection and then "upgrades" to a TCP connection, some
+        # timeouts get overridden by others at certain times of the connection.
+        # The following values were taken from the following site:
+        # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
+        'timeout' => ['connect 5s', 'client 25s', 'server 25s', 'tunnel 3600s'],
         'balance' => 'source',
       },
     }

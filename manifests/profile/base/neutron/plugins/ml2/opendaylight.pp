@@ -55,12 +55,10 @@ class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
   if $step >= 4 {
     if ! $odl_url_ip { fail('OpenDaylight API VIP is Empty') }
 
-    # TODO(trozet) remove odl_features once ODL BZ: 9256, 9147 are fixed
     class { '::neutron::plugins::ml2::opendaylight':
       odl_username => $odl_username,
       odl_password => $odl_password,
       odl_url      => "${conn_proto}://${odl_url_ip}:${odl_port}/controller/nb/v2/neutron",
-      odl_features => 'False';
     }
   }
 }
