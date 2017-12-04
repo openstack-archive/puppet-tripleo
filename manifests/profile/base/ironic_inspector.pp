@@ -41,6 +41,8 @@ class tripleo::profile::base::ironic_inspector (
     class { '::ironic::inspector':
       sync_db => $sync_db,
     }
-  }
 
+    include ::ironic::inspector::pxe_filter
+    include ::ironic::inspector::pxe_filter::dnsmasq
+  }
 }
