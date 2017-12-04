@@ -46,6 +46,7 @@ class tripleo::profile::base::ironic::conductor (
       }
 
       # Configure a few popular drivers
+      include ::ironic::drivers::ansible
       include ::ironic::drivers::drac
       include ::ironic::drivers::ilo
       include ::ironic::drivers::ipmi
