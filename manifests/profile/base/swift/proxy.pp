@@ -178,6 +178,10 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::copy
     include ::swift::proxy::container_quotas
     include ::swift::proxy::account_quotas
+    include ::swift::proxy::encryption
+    include ::swift::proxy::kms_keymaster
+    include ::swift::keymaster
+
 
     class { '::swift::objectexpirer':
       pipeline         => ['catch_errors', 'cache', 'proxy-server'],
