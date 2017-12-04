@@ -26,9 +26,14 @@
 #   (Optional) Whether to manage the PXE/iPXE environment for the conductor.
 #   Defaults to true
 #
+# [*enable_staging*]
+#   (Optional) Whether to enable ironic-staging-drivers support.
+#   Defaults to false
+#
 class tripleo::profile::base::ironic::conductor (
   $step = Integer(hiera('step')),
   $manage_pxe = true,
+  $enable_staging = false,
 ) {
   include ::tripleo::profile::base::ironic
 
@@ -45,9 +50,8 @@ class tripleo::profile::base::ironic::conductor (
       include ::ironic::drivers::ilo
       include ::ironic::drivers::ipmi
       include ::ironic::drivers::redfish
-      # TODO: deprecated code cleanup, remove in Queens
-      ironic_config {
-        'ssh/libvirt_uri': ensure => absent;
+      if $enable_staging {
+          include ::ironic::drivers::staging
       }
 
       # Configure access to other services
