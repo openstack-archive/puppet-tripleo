@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Adds Basic Authentication support for HAProxy endpoints.
+fixes:
+  - Fixes `bug 1736132
+    <https://launchpad.net/bugs/1736132>`__ by implementing
+    Basic Authentication in HAProxy endpoint.

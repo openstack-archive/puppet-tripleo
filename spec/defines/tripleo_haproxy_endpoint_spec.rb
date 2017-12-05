@@ -28,7 +28,8 @@ describe 'tripleo::haproxy::endpoint' do
           :bind             => [
             ['10.0.0.1:9696', ['transparent']],
             ['192.168.0.1:9696', ['transparent']]
-          ]
+          ],
+          :options          => {'option' => []},
         )
       end
     end
@@ -50,6 +51,29 @@ describe 'tripleo::haproxy::endpoint' do
         )
       end
    end
+
+    context 'with userlist' do
+      before :each do
+        params.merge!({
+          :authorized_userlist => 'starwars',
+        })
+      end
+      let :pre_condition do
+        'include ::haproxy
+        ::tripleo::haproxy::userlist {"starwars": users => ["leia password sister"]}
+        '
+      end
+      it 'should configure an ACL' do
+        is_expected.to compile.with_all_deps
+        is_expected.to contain_haproxy__listen('neutron').with(
+          :options => {
+            'option'       => [],
+            'acl'          => 'acl Authneutron http_auth(starwars)',
+            'http-request' => 'auth realm neutron if !Authneutron',
+          }
+        )
+      end
+    end
   end
 
   context 'on Debian platforms' do
