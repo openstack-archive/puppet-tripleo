@@ -17,6 +17,9 @@
 # Docker Registry profile for tripleo
 #
 # === Parameters:
+# [*enable_container_images_build*]
+#  (Optional) Whether to install tools to build docker container images
+#  Defaults to hiera('enable_container_images_build', true)
 #
 # [*registry_host*]
 #  (String) IP address or hostname the Docker registry binds to
@@ -27,19 +30,18 @@
 #  Defaults to 8787
 #
 # [*registry_admin_host*]
-#  (String) IP address or hostname the Docker registry binds to in the admin
+#  DEPRECATED: (String) IP address or hostname the Docker registry binds to in the admin
 #  network
 #  Defaults to hiera('controller_admin_host')
 #
-# [*enable_container_images_build*]
-#  (Optional) Whether to install tools to build docker container images
-#  Defaults to hiera('enable_container_images_build', true)
 #
 class tripleo::profile::base::docker_registry (
+  $enable_container_images_build = hiera('enable_container_images_build', true),
+  # these are used within the config.yaml below
   $registry_host                 = hiera('controller_host'),
   $registry_port                 = 8787,
-  $registry_admin_host           = hiera('controller_admin_host'),
-  $enable_container_images_build = hiera('enable_container_images_build', true),
+  # DEPRECATED PARAMETERS
+  $registry_admin_host           = false,
 ) {
 
   include ::tripleo::profile::base::docker
@@ -62,19 +64,11 @@ class tripleo::profile::base::docker_registry (
     require => Package['docker-distribution'],
     notify  => Service['docker-distribution'],
   }
-  file_line { 'docker insecure registry':
-    path    => '/etc/sysconfig/docker',
-    line    => join ([
-      'INSECURE_REGISTRY="',
-      '--insecure-registry ', $registry_host, ':', $registry_port, ' ',
-      '--insecure-registry ', $registry_admin_host, ':', $registry_port, '"']),
-    match   => 'INSECURE_REGISTRY=',
-    require => Package['docker'],
-    notify  => Service['docker'],
-  }
+
   service { 'docker-distribution':
     ensure  => running,
     enable  => true,
     require => Package['docker-distribution'],
   }
+
 }
