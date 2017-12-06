@@ -30,5 +30,6 @@ class tripleo::profile::base::octavia::worker (
 
   if $step >= 5 {
     include ::octavia::worker
+    include ::octavia::certificates
   }
 }

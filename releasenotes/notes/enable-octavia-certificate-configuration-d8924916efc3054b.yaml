@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Enable configuration of octavia certificate related properties to support
+    secure communication with amphorae.
