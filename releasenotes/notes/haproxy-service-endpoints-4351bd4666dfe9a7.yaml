@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Adds support for puppet standard separator notation in order to be
+    able to have unit tests. The "." separator notation doesn't work in
+    puppet-rspec, probably because "hiera" isn't called per se. This new
+    feature allows to get two hashes, they are merged in the definition.
+fixes:
+  - Partly fixes `bug 1737086
+    <https://bugs.launchpad.net/tripleo/+bug/1737086>`__ for unit tests on
+    haproxy service_endpoints

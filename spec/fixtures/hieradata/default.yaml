@@ -66,3 +66,14 @@ keystone::admin_password: 'password'
 tripleo::dynamic_rules::firewall_rules:
   '11-neutron':
     port: 1138
+# HAProxy endpoints
+tripleo::dynamic_stuff::haproxy_endpoints:
+  neutron:
+    public_virtual_ip: '192.168.0.1'
+    internal_ip: '10.0.0.1'
+    service_port: 9696
+    ip_addresses: ['10.0.0.2', '10.0.0.3', '10.0.0.4']
+    server_names: ['controller1', 'controller2', 'controller3']
+    public_ssl_port: 19696
+    member_options: [ 'check', 'inter 2000', 'rise 2', 'fall 5' ]
+    haproxy_listen_bind_param: ['transparent']
