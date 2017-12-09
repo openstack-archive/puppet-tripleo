@@ -49,7 +49,7 @@ describe 'tripleo::haproxy' do
           :options => {
             'timeout client' => "90m",
             'timeout server' => "90m",
-            'option'         => ["tcpka", "httpchk"],
+            'option'         => ["tcpka", "httpchk", "tcplog"],
             'timeout client' => "90m",
             'timeout server' => "90m",
             'stick-table'    => "type ip size 1000",
@@ -71,7 +71,7 @@ describe 'tripleo::haproxy' do
       it 'should configure haproxy' do
         is_expected.to contain_haproxy__listen('mysql').with(
           :options => {
-            'option'         => ["tcpka", "httpchk"],
+            'option'         => ["tcpka", "httpchk", "tcplog"],
             'timeout client' => "90m",
             'timeout server' => "90m",
             'stick-table'    => "type ip size 1000",
