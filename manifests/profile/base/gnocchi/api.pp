@@ -94,9 +94,11 @@ class tripleo::profile::base::gnocchi::api (
     }
     $tls_certfile = $certificates_specs["httpd-${gnocchi_network}"]['service_certificate']
     $tls_keyfile = $certificates_specs["httpd-${gnocchi_network}"]['service_key']
+    $tls_query_param = '?ssl=true'
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
+    $tls_query_param = ''
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
@@ -122,12 +124,12 @@ class tripleo::profile::base::gnocchi::api (
     }
 
     class { '::gnocchi::storage':
-      coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
+      coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
     }
 
     if $incoming_storage_driver == 'redis' {
       class { '::gnocchi::storage::incoming::redis':
-        redis_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
+        redis_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
       }
     }
 

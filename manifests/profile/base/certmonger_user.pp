@@ -78,6 +78,11 @@
 #   it will create.
 #   Defaults to hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}).
 #
+# [*redis_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('redis_certificate_specs', {}).
+#
 # [*etcd_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -108,6 +113,7 @@ class tripleo::profile::base::certmonger_user (
   $mongodb_certificate_specs  = hiera('mongodb_certificate_specs',{}),
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
+  $redis_certificate_specs    = hiera('redis_certificate_specs', {}),
   $etcd_certificate_specs     = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
   $odl_certificate_specs      = hiera('tripleo::profile::base::neutron::opendaylight::certificate_specs', {}),
   $ovs_certificate_specs      = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
@@ -154,6 +160,9 @@ class tripleo::profile::base::certmonger_user (
   }
   unless empty($rabbitmq_certificate_specs) {
     ensure_resource('class', 'tripleo::certmonger::rabbitmq', $rabbitmq_certificate_specs)
+  }
+  unless empty($redis_certificate_specs) {
+    ensure_resource('class', 'tripleo::certmonger::redis', $redis_certificate_specs)
   }
   unless empty($etcd_certificate_specs) {
     ensure_resource('class', 'tripleo::certmonger::etcd', $etcd_certificate_specs)
