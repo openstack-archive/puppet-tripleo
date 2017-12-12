@@ -52,6 +52,10 @@
 #   The keystone project domain for nova
 #   Defaults to hiera('nova::keystone::authtoken::project_domain_name', 'Default')
 #
+# [*no_shared_storage*]
+#   Variable that defines the no_shared_storage for the nova evacuate resource
+#   Defaults to hiera('tripleo::instanceha::no_shared_storage', true)
+#
 class tripleo::profile::base::pacemaker::instance_ha (
   $step                  = Integer(hiera('step')),
   $pcs_tries             = hiera('pcs_tries', 20),
@@ -61,6 +65,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
   $keystone_domain       = hiera('tripleo::clouddomain', 'localdomain'),
   $user_domain           = hiera('nova::keystone::authtoken::user_domain_name', 'Default'),
   $project_domain        = hiera('nova::keystone::authtoken::project_domain_name', 'Default'),
+  $no_shared_storage     = hiera('tripleo::instanceha::no_shared_storage', true),
 ) {
   if $step >= 2 {
     class { '::pacemaker::resource_defaults':
@@ -100,7 +105,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
         expression         => ['compute-instanceha-role ne true'],
       }
     }
-    if hiera('tripleo::instanceha::no_shared_storage', true) {
+    if $no_shared_storage {
       $iha_no_shared_storage = 'no_shared_storage=true'
     } else {
       $iha_no_shared_storage = 'no_shared_storage=false'
