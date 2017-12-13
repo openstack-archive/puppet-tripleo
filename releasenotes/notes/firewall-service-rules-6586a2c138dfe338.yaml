@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Adds support for standard puppet separator. The "." separator does
+    not work in puppet-rpsec, so we can't get proper unit tests on the
+    firewall service_rules definition.
+fixes:
+  - Partly fixes `bug 1737086
+    <https://bugs.launchpad.net/tripleo/+bug/1737086>`__ in oder to get unit
+    tests on firewall service_rules definition

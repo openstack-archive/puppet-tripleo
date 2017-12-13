@@ -29,10 +29,14 @@ define tripleo::firewall::service_rules ($service_name = $title) {
   # This allows each composable service to load its own custom rules by
   # creating its own flat hiera key named:
   #   tripleo.<service name with underscores>.firewall_rules
-  $service_firewall_rules = hiera("tripleo.${underscore_name}.firewall_rules", {})
+  $dots_rules = hiera("tripleo.${underscore_name}.firewall_rules", {})
 
-  if !empty($service_firewall_rules) {
-    create_resources('tripleo::firewall::rule', $service_firewall_rules)
-  }
+  # Supports standard "::" notation:
+  #   tripleo::<service name with underscores>::firewall_rules
+  $colons_rules = hiera("tripleo::${underscore_name}::firewall_rules", {})
 
+  # merge rules
+  $firewall_rules = merge($colons_rules, $dots_rules)
+
+  create_resources('tripleo::firewall::rule', $firewall_rules)
 }
