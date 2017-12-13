@@ -120,7 +120,7 @@ class tripleo::profile::base::gnocchi::api (
           include ::swift::deps
           # Ensure we have swift proxy available before running gnocchi-upgrade
           # as storage is initialized at this point.
-          Anchor<| title == 'swift::service::end' |> ~> Class['Gnocchi::db::sync']
+          Anchor<| title == 'swift::service::end' |> ~> Anchor['gnocchi::dbsync::begin']
         }
       }
       'file': { include ::gnocchi::storage::file }
