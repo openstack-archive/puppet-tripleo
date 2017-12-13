@@ -62,7 +62,20 @@ define tripleo::host::sriov::numvfs_persistence(
     $vfspec = split($vf_defs[0], ':')
     $interface = $vfspec[0]
     $count = $vfspec[1]
-    $vfdef_str = "${content_string}[ \"${interface}\" == \"\$1\" ] && echo ${count} > /sys/class/net/${interface}/device/sriov_numvfs\n"
+    if (length($vfspec) == 3) {
+      $mode = $vfspec[2]
+    } else {
+      $mode = 'legacy'
+    }
+    if ($mode == 'switchdev') {
+      $vfdef_str = epp('tripleo/switchdev/switchdev.epp', {
+        'content_string' => "${content_string}",
+        'interface' => "${interface}",
+        'count' => "${count}"
+        })
+    } else {
+      $vfdef_str = "${content_string}[ \"${interface}\" == \"\$1\" ] && echo ${count} > /sys/class/net/${interface}/device/sriov_numvfs\n"
+    }
     $udev_str = "${udev_rules}KERNEL==\"${interface}\", RUN+=\"/etc/sysconfig/allocate_vfs %k\"\n"
     tripleo::host::sriov::numvfs_persistence{"mapped ${interface}":
       vf_defs        => delete_at($vf_defs, 0),

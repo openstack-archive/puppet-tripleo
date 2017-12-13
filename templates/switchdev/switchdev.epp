@@ -1,0 +1,22 @@
+<%- | String $content_string = '', String $interface = '', String $count = '' | -%>
+<%=$content_string%>if [ "<%=$interface%>" == "$1" ]
+then
+  echo <%=$count%> > /sys/class/net/<%=$interface%>/device/sriov_numvfs
+  if [ `cat /sys/class/net/<%=$interface%>/device/vendor` == "0x15b3" ]
+  then
+    for pci in `cat /sys/class/net/<%=$interface%>/device/virtfn*/uevent | grep PCI_SLOT_NAME | cut -d'=' -f2`
+    do
+      echo $pci > /sys/bus/pci/drivers/mlx5_core/unbind
+    done
+  fi
+  interface_pci=`ethtool -i <%=$interface%> | grep bus-info | awk {'print$2'}`
+  devlink dev eswitch set pci/$interface_pci mode switchdev
+  ethtool -K <%=$interface%> hw-tc-offload on
+  if [ `cat /sys/class/net/<%=$interface%>/device/vendor` == "0x15b3" ]
+  then
+    for pci in `cat /sys/class/net/<%=$interface%>/device/virtfn*/uevent | grep PCI_SLOT_NAME | cut -d'=' -f2`
+    do
+      echo $pci > /sys/bus/pci/drivers/mlx5_core/bind;
+    done
+  fi
+fi
