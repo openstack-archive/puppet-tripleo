@@ -38,8 +38,6 @@ class tripleo::profile::base::ceilometer::upgrade (
     $sync_db = false
   }
 
-  # Run ceilometer-upgrade in step 5 so gnocchi resource types
-  # are created safely.
   if $step >= 5 and $sync_db {
     exec {'ceilometer-db-upgrade':
       command   => 'ceilometer-upgrade',
@@ -53,5 +51,12 @@ class tripleo::profile::base::ceilometer::upgrade (
       try_sleep => 5,
       tries     => 10
     }
+
+    # NOTE(sileht): Ensure we run before ceilometer-agent-notification is
+    # started and after gnocchi-api is running
+    include ::gnocchi::deps
+    Anchor['gnocchi::service::end']
+    ~> Exec['ceilometer-db-upgrade']
+    ~> Anchor['ceilometer::service::begin']
   }
 }
