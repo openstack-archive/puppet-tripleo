@@ -100,5 +100,16 @@ class tripleo::profile::base::ceilometer::collector (
       try_sleep => 5,
       tries     => 10
     }
+
+    # NOTE(sileht): Ensure we run before ceilometer-agent-notification and
+    # ceilometer-collector rare started and after gnocchi-api is running
+    include ::gnocchi::deps
+    Anchor['gnocchi::service::end']
+    ~> Exec['ceilometer-db-upgrade']
+    ~> Service<| title == 'ceilometer-collector' |>
+    ~> Service<| title == 'ceilometer-agent-notification' |>
+    # NOTE(sileht): We can't depends on Anchor['ceilometer::service::begin']
+    # directly because that will depends on ceilometer-api and creates a dep
+    # loops across httpd, so we directly depends on the Services
   }
 }
