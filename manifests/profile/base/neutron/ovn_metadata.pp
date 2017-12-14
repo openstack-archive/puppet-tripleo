@@ -37,6 +37,7 @@ class tripleo::profile::base::neutron::ovn_metadata (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
+    include ::tripleo::profile::base::neutron
     class { '::neutron::agents::ovn_metadata':
       ovn_sb_connection => "tcp:${ovn_db_host}:${ovn_sb_port}",
     }
