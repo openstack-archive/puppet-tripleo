@@ -76,6 +76,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('rabbitmq_short_bootstrap_node_name')
+#
 class tripleo::profile::base::rabbitmq (
   $certificate_specs             = {},
   $config_variables              = hiera('rabbitmq_config_variables'),
@@ -89,6 +93,7 @@ class tripleo::profile::base::rabbitmq (
   $rabbitmq_user                 = hiera('rabbitmq::default_user'),
   $stack_action                  = hiera('stack_action'),
   $step                          = Integer(hiera('step')),
+  $bootstrap_node                = hiera('rabbitmq_short_bootstrap_node_name'),
 ) {
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
@@ -168,7 +173,12 @@ class tripleo::profile::base::rabbitmq (
     }
   }
 
-  if $step >= 1 and hiera('veritas_hyperscale_controller_enabled', false) {
+  if $::hostname == downcase($bootstrap_node) {
+    $rabbitmq_bootstrapnode = true
+  } else {
+    $rabbitmq_bootstrapnode = false
+  }
+  if $rabbitmq_bootstrapnode and $step >= 2 and hiera('veritas_hyperscale_controller_enabled', false) {
     include ::veritas_hyperscale::hs_rabbitmq
   }
 }
