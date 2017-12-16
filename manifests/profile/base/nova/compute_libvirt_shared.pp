@@ -18,13 +18,18 @@
 #
 # === Parameters
 #
+# [*nova_rbd_client_name*]
+#   (optional) name of RBD client
+#   defaults to hiera('nova::compute::rbd::libvirt_rbd_user')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::nova::compute_libvirt_shared (
-  $step = Integer(hiera('step')),
+  $nova_rbd_client_name = hiera('nova::compute::rbd::libvirt_rbd_user','openstack'),
+  $step                 = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     # Ceph + Libvirt
@@ -32,6 +37,12 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
     $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
     if $rbd_ephemeral_storage or $rbd_persistent_storage {
       include ::nova::compute::rbd
+      exec{ "exec-setfacl-${nova_rbd_client_name}-nova":
+        path    => ['/bin', '/usr/bin'],
+        command => "setfacl -m u:nova:r-- /etc/ceph/ceph.client.${nova_rbd_client_name}.keyring",
+        unless  => "getfacl /etc/ceph/ceph.client.${nova_rbd_client_name}.keyring | grep -q user:nova:r--",
+      }
+      Ceph::Key<| title == "client.${nova_rbd_client_name}" |> -> Exec["exec-setfacl-${nova_rbd_client_name}-nova"]
     }
 
     if $rbd_ephemeral_storage {
