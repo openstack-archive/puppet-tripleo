@@ -25,21 +25,13 @@ describe 'tripleo::haproxy::service_endpoints' do
     end
   end
 
-  context 'on Debian platforms' do
-    let :facts do
-      { :osfamily => 'Debian',
-        :hostname => 'myhost' }
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({})
+      end
+
+      it_behaves_like 'tripleo haproxy service_endpoints'
     end
-
-    it_configures 'tripleo haproxy service_endpoints'
-  end
-
-  context 'on RedHat platforms' do
-    let :facts do
-      { :osfamily => 'RedHat',
-        :hostname => 'myhost' }
-    end
-
-    it_configures 'tripleo haproxy service_endpoints'
   end
 end
