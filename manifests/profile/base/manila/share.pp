@@ -142,12 +142,12 @@ class tripleo::profile::base::manila::share (
         "client.${cephfs_auth_id}/client mount gid": value => 0;
       }
 
-      exec{ "exec-setfacl-${cephfs_auth_id}}":
+      exec{ "exec-setfacl-${cephfs_auth_id}":
         path    => ['/bin', '/usr/bin' ],
         command => "setfacl -m u:manila:r-- ${keyring_path}",
         unless  => "getfacl ${keyring_path} | grep -q user:manila:r--",
       }
-      Ceph::Key<| title == "client.${cephfs_auth_id}" |> -> Exec["exec-setfacl-${cephfs_auth_id}-manila"]
+      Ceph::Key<| title == "client.${cephfs_auth_id}" |> -> Exec["exec-setfacl-${cephfs_auth_id}"]
     }
 
     # manila netapp:
