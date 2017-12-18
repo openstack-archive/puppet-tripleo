@@ -171,8 +171,6 @@ class tripleo::profile::pacemaker::database::mysql (
       'wsrep_cluster_address'          => "gcomm://${galera_nodes}",
       'wsrep_slave_threads'            => '1',
       'wsrep_certify_nonPK'            => '1',
-      'wsrep_max_ws_rows'              => '131072',
-      'wsrep_max_ws_size'              => '1073741824',
       'wsrep_debug'                    => '0',
       'wsrep_convert_LOCK_to_trx'      => '0',
       'wsrep_retry_autocommit'         => '1',
