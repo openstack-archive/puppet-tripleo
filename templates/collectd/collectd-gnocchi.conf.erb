@@ -1,0 +1,62 @@
+<Plugin "python">
+  Import "collectd_gnocchi"
+  <Module "collectd_gnocchi">
+<%- if @auth_mode == 'simple' %>
+    ### Basic authentication
+    Endpoint "<%= @protocol %>://<%= @server %>:<%= @port %>"
+    <%- if @user %>
+    User "<%= @user %>"
+    <%- end -%>
+<%- elsif @auth_mode == 'keystone' %>
+    ### Keystone authentication
+    Auth_Mode "keystone"
+    Auth_Url "<%= @keystone_auth_url %>"
+    <%- if @keystone_user_name %>
+    Username "<%= @keystone_user_name %>"
+    <%- end -%>
+    <%- if @keystone_user_id %>
+    User_Id "<%= @keystone_user_id %>"
+    <%- end -%>
+    <%- if @keystone_project_id %>
+    Project_Id "<%= @keystone_project_id %>"
+    <%- end -%>
+    <%- if @keystone_project_name %>
+    Project_Name "<%= @keystone_project_name %>"
+    <%- end -%>
+    <%- if @keystone_password %>
+    Password "<%= @keystone_password %>"
+    <%- end -%>
+    <%- if @keystone_user_domain_id %>
+    User_Domain_Id "<%= @keystone_user_domain_id %>"
+    <%- end -%>
+    <%- if @keystone_user_domain_name %>
+    User_Domain_Name "<%= @keystone_user_domain_name %>"
+    <%- end -%>
+    <%- if @keystone_project_domain_id %>
+    Project_Domain_Id "<%= @keystone_project_domain_id %>"
+    <%- end -%>
+    <%- if @keystone_project_domain_name %>
+    Project_Domain_Name "<%= @keystone_project_domain_name %>"
+    <%- end -%>
+    <%- if @keystone_region_name %>
+    Region_Name "<%= @keystone_region_name %>"
+    <%- end -%>
+    <%- if @keystone_interface %>
+    Interface "<%= @keystone_interface %>"
+    <%- end -%>
+    <%- if @keystone_endpoint %>
+    Endpoint "<%= @keystone_endpoint %>"
+    <%- end -%>
+<%- end -%>
+
+<%- if @resource_type %>
+    ## Default resource type created by the plugin in Gnocchi
+    ## to store hosts
+    ResourceType "<%= @resource_type %>"
+<%- end -%>
+<%- if @batch_size %>
+    ## Minimum number of values to batch
+    BatchSize <%= @batch_size %>
+<%- end -%>
+  </Module>
+</Plugin>
