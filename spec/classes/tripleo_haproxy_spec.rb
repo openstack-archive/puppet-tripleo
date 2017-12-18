@@ -47,8 +47,6 @@ describe 'tripleo::haproxy' do
       it 'should configure haproxy with clustercheck' do
         is_expected.to contain_haproxy__listen('mysql').with(
           :options => {
-            'timeout client' => "90m",
-            'timeout server' => "90m",
             'option'         => ["tcpka", "httpchk", "tcplog"],
             'timeout client' => "90m",
             'timeout server' => "90m",
