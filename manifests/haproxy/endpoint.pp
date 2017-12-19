@@ -91,6 +91,11 @@
 #  (false means disabled, and true means enabled)
 #  Defaults to hiera('tripleo::firewall::manage_firewall', true)
 #
+# [*authorized_userlist*]
+#  (optional) Userlist that may access the endpoint. Activate Basic Authentication.
+#  You'll need to create a tripleo::haproxy::userlist in order to use that option.
+#  Defaults to undef
+#
 define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
@@ -109,6 +114,7 @@ define tripleo::haproxy::endpoint (
   $internal_certificates_specs = {},
   $service_network             = undef,
   $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
+  $authorized_userlist         = undef,
 ) {
   if $public_virtual_ip {
     # service exposed to the public network
@@ -163,13 +169,27 @@ define tripleo::haproxy::endpoint (
       $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
     }
   }
+  if $authorized_userlist {
+    $access_rules = {
+        'acl'          => "acl Auth${name} http_auth(${authorized_userlist})",
+        'http-request' => "auth realm ${name} if !Auth${name}",
+    }
+    Haproxy::Listen[$name] {
+      require => Tripleo::Haproxy::Userlist[$authorized_userlist],
+    }
+  } else {
+    $access_rules = {}
+  }
+
+  $_real_options = merge($listen_options_real, $access_rules)
+
   $bind_opts = merge($internal_bind_opts, $public_bind_opts)
 
   haproxy::listen { "${name}":
     bind             => $bind_opts,
     collect_exported => false,
     mode             => $mode,
-    options          => $listen_options_real,
+    options          => $_real_options,
   }
   haproxy::balancermember { "${name}":
     listening_service => $name,

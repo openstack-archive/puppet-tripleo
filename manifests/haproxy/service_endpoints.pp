@@ -24,19 +24,25 @@
 #
 define tripleo::haproxy::service_endpoints ($service_name = $title) {
 
-  $underscore_name = regsubst($service_name, '-', '_')
+  $underscore_name = regsubst($service_name, '-', '_', 'G')
 
   # This allows each composable service to load its own custom rules by
   # creating its own flat hiera key named:
   #   tripleo.<service name with underscores>.haproxy_endpoints
+  #   tripleo.<service name with underscores>.haproxy_userlists
   $dots_endpoints = hiera("tripleo.${underscore_name}.haproxy_endpoints", {})
+  $dots_userlists = hiera("tripleo.${underscore_name}.haproxy_userlists", {})
 
   # Supports standard "::" notation
   #   tripleo::<service name with underscores>::haproxy_endpoints
+  #   tripleo::<service name with underscores>::haproxy_userlists
   $colons_endpoints = hiera("tripleo::${underscore_name}::haproxy_endpoints", {})
+  $colons_userlists = hiera("tripleo::${underscore_name}::haproxy_userlists", {})
 
   # Merge hashes
   $service_endpoints = merge($colons_endpoints, $dots_endpoints)
+  $service_userlists = merge($colons_userlists, $dots_userlists)
 
+  create_resources('tripleo::haproxy::userlist', $service_userlists)
   create_resources('tripleo::haproxy::endpoint', $service_endpoints)
 }

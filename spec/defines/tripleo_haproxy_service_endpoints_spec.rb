@@ -23,6 +23,18 @@ describe 'tripleo::haproxy::service_endpoints' do
         is_expected.to compile.with_all_deps
       end
     end
+    context 'with userlist' do
+      let(:title) {'haproxy-basic-auth'}
+      it 'should compile' do
+        is_expected.to compile.with_all_deps
+      end
+      it 'should create haproxy endpoint' do
+        is_expected.to contain_tripleo__haproxy__endpoint('starwars')
+      end
+      it 'should create userlist' do
+        is_expected.to contain_tripleo__haproxy__userlist('starwars')
+      end
+    end
   end
 
   on_supported_os.each do |os, facts|
