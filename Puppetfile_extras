@@ -68,3 +68,8 @@ mod 'sensu',
 mod 'pacemaker',
   :git => 'https://github.com/openstack/puppet-pacemaker',
   :ref => 'master'
+
+mod 'collectd',
+  :git => 'https://github.com/voxpupuli/puppet-collectd',
+  :ref => 'master'
+
