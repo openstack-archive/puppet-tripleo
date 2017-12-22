@@ -163,7 +163,6 @@ class tripleo::profile::base::rabbitmq (
       # called explicity, if the rabbitmq service is already running.
       rabbitmq_user { $rabbitmq_user :
         password => $rabbitmq_pass,
-        provider => 'rabbitmqctl',
         admin    => true,
       }
     }
