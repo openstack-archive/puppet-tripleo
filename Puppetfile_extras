@@ -45,6 +45,10 @@ mod 'ntp',
   :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
   :ref => '4.2.x'
 
+mod 'ptp',
+  :git => 'https://github.com/redhat-nfvpe/ptp',
+  :ref => 'master'
+
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
   :ref => 'master'
