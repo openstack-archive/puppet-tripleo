@@ -78,7 +78,7 @@ describe 'tripleo::profile::base::ceph::rgw' do
           :inject  => true
         )
         is_expected.to contain_ceph__rgw__keystone('radosgw.gateway').with(
-          :rgw_keystone_accepted_roles => ['admin', '_member_', 'Member'],
+          :rgw_keystone_accepted_roles => ['admin', 'Member'],
           :use_pki                     => false,
           :rgw_keystone_admin_token    => 'token',
           :rgw_keystone_url            => 'url'
@@ -90,7 +90,7 @@ describe 'tripleo::profile::base::ceph::rgw' do
       let(:params) { default_params.merge({ :step => 4, :rgw_keystone_version => 'v3' }) }
       it 'should include rgw configuration' do
         is_expected.to contain_ceph__rgw__keystone('radosgw.gateway').with(
-          :rgw_keystone_accepted_roles => ["admin", "_member_", "Member"],
+          :rgw_keystone_accepted_roles => ["admin", "Member"],
           :use_pki                     => false,
           :rgw_keystone_url            => 'url'
         )
