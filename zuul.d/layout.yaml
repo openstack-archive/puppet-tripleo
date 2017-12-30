@@ -10,21 +10,6 @@
       - tripleo-ovb-experimental
     check:
       jobs:
-        - tripleo-ci-centos-7-scenario001-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/aodh.*$
-              - ^manifests/profile/base/ceilometer.*$
-              - ^manifests/profile/base/ceph.*$
-              - ^manifests/profile/base/cinder.*$
-              - ^manifests/profile/base/congress.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/gnocchi.*$
-              - ^manifests/profile/base/logging.*$
-              - ^manifests/profile/base/metrics.*$
-              - ^manifests/profile/base/monitoring.*$
-              - ^manifests/profile/base/panko.*$
-              - ^manifests/profile/base/tacker.*$
         - tripleo-ci-centos-7-scenario001-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
@@ -38,19 +23,6 @@
               - ^manifests/profile/base/metrics.*$
               - ^manifests/profile/base/monitoring.*$
               - ^manifests/profile/base/panko.*$
-        - tripleo-ci-centos-7-scenario002-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/aodh.*$
-              - ^manifests/profile/base/barbican.*$
-              - ^manifests/profile/base/ceilometer.*$
-              - ^manifests/profile/base/cinder.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/gnocchi.*$
-              - ^manifests/profile/base/nova/ec2.*$
-              - ^manifests/profile/base/panko.*$
-              - ^manifests/profile/base/swift.*$
-              - ^manifests/profile/base/zaqar.*$
         - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
@@ -64,25 +36,12 @@
               - ^manifests/profile/base/panko.*$
               - ^manifests/profile/base/swift.*$
               - ^manifests/profile/base/zaqar.*$
-        - tripleo-ci-centos-7-scenario003-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/mistral.*$
-              - ^manifests/profile/base/sahara.*$
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/base/glance.*$
               - ^manifests/profile/base/mistral.*$
               - ^manifests/profile/base/sahara.*$
-        - tripleo-ci-centos-7-scenario004-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/ceph.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/manila.*$
-              - ^manifests/profile/pacemaker/manila.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
@@ -90,11 +49,6 @@
               - ^manifests/profile/base/glance.*$
               - ^manifests/profile/base/manila.*$
               - ^manifests/profile/pacemaker/manila.*$
-        - tripleo-ci-centos-7-scenario007-multinode-oooq:
-            files:
-              - ^manifests/profile/base/neutron/plugins/ml2/ovn.*$
-              - ^manifests/profile/base/neutron/agents/ovn.*$
-              - ^manifests/profile/base/neutron/ovn.*$
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
             files:
               - ^manifests/profile/pacemaker/ovn.*$
@@ -106,21 +60,6 @@
     gate:
       queue: tripleo
       jobs:
-        - tripleo-ci-centos-7-scenario001-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/aodh.*$
-              - ^manifests/profile/base/ceilometer.*$
-              - ^manifests/profile/base/ceph.*$
-              - ^manifests/profile/base/cinder.*$
-              - ^manifests/profile/base/congress.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/gnocchi.*$
-              - ^manifests/profile/base/logging.*$
-              - ^manifests/profile/base/metrics.*$
-              - ^manifests/profile/base/monitoring.*$
-              - ^manifests/profile/base/panko.*$
-              - ^manifests/profile/base/tacker.*$
         - tripleo-ci-centos-7-scenario001-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
@@ -134,19 +73,6 @@
               - ^manifests/profile/base/metrics.*$
               - ^manifests/profile/base/monitoring.*$
               - ^manifests/profile/base/panko.*$
-        - tripleo-ci-centos-7-scenario002-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/aodh.*$
-              - ^manifests/profile/base/barbican.*$
-              - ^manifests/profile/base/ceilometer.*$
-              - ^manifests/profile/base/cinder.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/gnocchi.*$
-              - ^manifests/profile/base/nova/ec2.*$
-              - ^manifests/profile/base/panko.*$
-              - ^manifests/profile/base/swift.*$
-              - ^manifests/profile/base/zaqar.*$
         - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
@@ -160,25 +86,12 @@
               - ^manifests/profile/base/panko.*$
               - ^manifests/profile/base/swift.*$
               - ^manifests/profile/base/zaqar.*$
-        - tripleo-ci-centos-7-scenario003-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/mistral.*$
-              - ^manifests/profile/base/sahara.*$
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/base/glance.*$
               - ^manifests/profile/base/mistral.*$
               - ^manifests/profile/base/sahara.*$
-        - tripleo-ci-centos-7-scenario004-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/profile/base/ceph.*$
-              - ^manifests/profile/base/glance.*$
-              - ^manifests/profile/base/manila.*$
-              - ^manifests/profile/pacemaker/manila.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
@@ -186,11 +99,6 @@
               - ^manifests/profile/base/glance.*$
               - ^manifests/profile/base/manila.*$
               - ^manifests/profile/pacemaker/manila.*$
-        - tripleo-ci-centos-7-scenario007-multinode-oooq:
-            files:
-              - ^manifests/profile/base/neutron/plugins/ml2/ovn.*$
-              - ^manifests/profile/base/neutron/agents/ovn.*$
-              - ^manifests/profile/base/neutron/ovn.*$
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
             files:
               - ^manifests/profile/pacemaker/ovn.*$
