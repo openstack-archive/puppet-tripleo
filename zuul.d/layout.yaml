@@ -32,14 +32,12 @@
               - ^manifests/profile/base/ceilometer.*$
               - ^manifests/profile/base/ceph.*$
               - ^manifests/profile/base/cinder.*$
-              - ^manifests/profile/base/congress.*$
               - ^manifests/profile/base/glance.*$
               - ^manifests/profile/base/gnocchi.*$
               - ^manifests/profile/base/logging.*$
               - ^manifests/profile/base/metrics.*$
               - ^manifests/profile/base/monitoring.*$
               - ^manifests/profile/base/panko.*$
-              - ^manifests/profile/base/tacker.*$
         - tripleo-ci-centos-7-scenario002-multinode-oooq:
             files:
               - ^manifests/haproxy.*$
@@ -103,6 +101,8 @@
               - ^manifests/profile/base/neutron/plugins/ml2/ovn.*$
               - ^manifests/profile/base/neutron/agents/ovn.*$
               - ^manifests/profile/base/neutron/ovn.*$
+              - ^manifests/profile/base/congress.*$
+              - ^manifests/profile/base/tacker.*$
     gate:
       queue: tripleo
       jobs:
@@ -128,14 +128,12 @@
               - ^manifests/profile/base/ceilometer.*$
               - ^manifests/profile/base/ceph.*$
               - ^manifests/profile/base/cinder.*$
-              - ^manifests/profile/base/congress.*$
               - ^manifests/profile/base/glance.*$
               - ^manifests/profile/base/gnocchi.*$
               - ^manifests/profile/base/logging.*$
               - ^manifests/profile/base/metrics.*$
               - ^manifests/profile/base/monitoring.*$
               - ^manifests/profile/base/panko.*$
-              - ^manifests/profile/base/tacker.*$
         - tripleo-ci-centos-7-scenario002-multinode-oooq:
             files:
               - ^manifests/haproxy.*$
@@ -199,6 +197,8 @@
               - ^manifests/profile/base/neutron/plugins/ml2/ovn.*$
               - ^manifests/profile/base/neutron/agents/ovn.*$
               - ^manifests/profile/base/neutron/ovn.*$
+              - ^manifests/profile/base/congress.*$
+              - ^manifests/profile/base/tacker.*$
     experimental:
       jobs:
         - tripleo-ci-centos-7-scenario005-multinode-oooq:
