@@ -145,7 +145,10 @@ class tripleo::haproxy::horizon_endpoint (
     collect_exported => false,
   }
   hash(zip($ip_addresses, $server_names)).each | $ip, $server | {
-    haproxy::balancermember { "horizon_${ip}_${server}":
+    # We need to be sure the IP (IPv6) don't have colons
+    # which is a reserved character to reference manifests
+    $non_colon_ip = regsubst($ip, ':', '-', 'G')
+    haproxy::balancermember { "horizon_${non_colon_ip}_${server}":
       listening_service => 'horizon',
       ports             => $backend_port,
       ipaddresses       => $ip,
