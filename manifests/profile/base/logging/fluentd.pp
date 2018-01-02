@@ -100,8 +100,9 @@ class tripleo::profile::base::logging::fluentd (
     # Load per-service plugin configuration
     ::tripleo::profile::base::logging::fluentd::fluentd_service {
       $service_names:
-        pos_file_path  => $fluentd_pos_file_path,
-        default_format => $fluentd_default_format
+        pos_file_path     => $fluentd_pos_file_path,
+        default_format    => $fluentd_default_format,
+        fluentd_transform => $fluentd_path_transform
     }
 
     if $fluentd_manage_groups {
