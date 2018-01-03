@@ -565,7 +565,9 @@
 #    'panko_api_port' (Defaults to 8977)
 #    'panko_api_ssl_port' (Defaults to 13977)
 #    'ovn_nbdb_port' (Defaults to 6641)
+#    'ovn_nbdb_ssl_port' (Defaults to 13641)
 #    'ovn_sbdb_port' (Defaults to 6642)
+#    'ovn_sbdb_ssl_port' (Defaults to 13642)
 #    'sahara_api_port' (Defaults to 8386)
 #    'sahara_api_ssl_port' (Defaults to 13386)
 #    'swift_proxy_port' (Defaults to 8080)
@@ -762,7 +764,9 @@ class tripleo::haproxy (
     panko_api_port => 8977,
     panko_api_ssl_port => 13977,
     ovn_nbdb_port => 6641,
+    ovn_nbdb_ssl_port => 13641,
     ovn_sbdb_port => 6642,
+    ovn_sbdb_ssl_port => 13642,
     ec2_api_port => 8788,
     ec2_api_ssl_port => 13788,
     ec2_api_metadata_port => 8789,
@@ -1550,6 +1554,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ovn_dbs_node_ips', $controller_hosts_real),
       server_names      => hiera('ovn_dbs_node_names', $controller_hosts_names_real),
       service_network   => $ovn_dbs_network,
+      public_ssl_port   => $ports[ovn_nbdb_ssl_port],
       listen_options    => $ovn_db_listen_options,
       mode              => 'tcp'
     }
@@ -1560,6 +1565,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ovn_dbs_node_ips', $controller_hosts_real),
       server_names      => hiera('ovn_dbs_node_names', $controller_hosts_names_real),
       service_network   => $ovn_dbs_network,
+      public_ssl_port   => $ports[ovn_sbdb_ssl_port],
       listen_options    => $ovn_db_listen_options,
       mode              => 'tcp'
     }
