@@ -36,7 +36,27 @@
 #
 # [*conn_proto*]
 #   (Optional) Protocol to use to for ODL REST access
-#   Defaults to hiera('opendaylight::nb_connection_protocol')
+#   Defaults to 'http'
+#
+# [*certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate
+#   it will create. Note that the certificate nickname must be 'etcd' in
+#   the case of this service.
+#   Example with hiera:
+#     tripleo::profile::base::etcd::certificate_specs:
+#       hostname: <overcloud controller fqdn>
+#       service_certificate: <service certificate path>
+#       service_key: <service key path>
+#       principal: "etcd/<overcloud controller fqdn>"
+#   Defaults to {}.
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*tunnel_ip*]
+#   (Optional) IP to use for Tenant VXLAN/GRE tunneling source address
+#   Defaults to hiera('neutron::agents::ml2::ovs::local_ip')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -44,28 +64,43 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
-  $odl_port      = hiera('opendaylight::odl_rest_port'),
-  $odl_check_url = hiera('opendaylight_check_url'),
-  $odl_api_ips   = hiera('opendaylight_api_node_ips'),
-  $odl_url_ip    = hiera('opendaylight_api_vip'),
-  $conn_proto    = hiera('opendaylight::nb_connection_protocol'),
-  $step          = Integer(hiera('step')),
+  $odl_port            = hiera('opendaylight::odl_rest_port'),
+  $odl_check_url       = hiera('opendaylight_check_url'),
+  $odl_api_ips         = hiera('opendaylight_api_node_ips'),
+  $odl_url_ip          = hiera('opendaylight_api_vip'),
+  $conn_proto          = 'http',
+  $certificate_specs   = {},
+  $enable_internal_tls = hiera('enable_internal_tls', false),
+  $tunnel_ip           = hiera('neutron::agents::ml2::ovs::local_ip'),
+  $step                = Integer(hiera('step')),
 ) {
 
   if $step >= 4 {
-    if empty($odl_api_ips) { fail('No IPs assigned to OpenDaylight Api Service') }
 
-    if ! $odl_url_ip { fail('OpenDaylight API VIP is Empty') }
+    if empty($odl_api_ips) { fail('No IPs assigned to OpenDaylight API Service') }
+
+    if empty($odl_url_ip) { fail('OpenDaylight API VIP is Empty') }
 
     # Build URL to check if ODL is up before connecting OVS
     $opendaylight_url = "${conn_proto}://${odl_url_ip}:${odl_port}/${odl_check_url}"
 
-    $odl_ovsdb_str = join(regsubst($odl_api_ips, '.+', 'tcp:\0:6640'), ' ')
+    if $enable_internal_tls {
+      $tls_certfile = $certificate_specs['service_certificate']
+      $tls_keyfile = $certificate_specs['service_key']
+      $odl_ovsdb_str = join(regsubst($odl_api_ips, '.+', 'ssl:\0:6640'), ' ')
+    } else {
+      $tls_certfile = undef
+      $tls_keyfile = undef
+      $odl_ovsdb_str = join(regsubst($odl_api_ips, '.+', 'tcp:\0:6640'), ' ')
+    }
 
     class { '::neutron::plugins::ovs::opendaylight':
-      tunnel_ip       => hiera('neutron::agents::ml2::ovs::local_ip'),
+      tunnel_ip       => $tunnel_ip,
       odl_check_url   => $opendaylight_url,
       odl_ovsdb_iface => $odl_ovsdb_str,
+      enable_tls      => $enable_internal_tls,
+      tls_key_file    => $tls_keyfile,
+      tls_cert_file   => $tls_certfile
     }
   }
 }

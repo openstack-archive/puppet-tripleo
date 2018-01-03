@@ -36,7 +36,15 @@
 #
 # [*conn_proto*]
 #   (Optional) Protocol to use to for ODL REST access
-#   Defaults to hiera('opendaylight::nb_connection_protocol')
+#   Defaults to 'http'
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*internal_api_fqdn*]
+#   (Optional) FQDN.
+#   Defaults to hiera('cloud_name_internal_api')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -44,21 +52,28 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
-  $odl_port     = hiera('opendaylight::odl_rest_port'),
-  $odl_username = hiera('opendaylight::username'),
-  $odl_password = hiera('opendaylight::password'),
-  $odl_url_ip   = hiera('opendaylight_api_vip'),
-  $conn_proto   = hiera('opendaylight::nb_connection_protocol'),
-  $step         = Integer(hiera('step')),
+  $odl_port            = hiera('opendaylight::odl_rest_port'),
+  $odl_username        = hiera('opendaylight::username'),
+  $odl_password        = hiera('opendaylight::password'),
+  $odl_url_ip          = hiera('opendaylight_api_vip'),
+  $conn_proto          = 'http',
+  $enable_internal_tls = hiera('enable_internal_tls', false),
+  $internal_api_fqdn   = hiera('cloud_name_internal_api'),
+  $step                = Integer(hiera('step')),
 ) {
 
   if $step >= 4 {
-    if ! $odl_url_ip { fail('OpenDaylight API VIP is Empty') }
-
+    if $enable_internal_tls {
+      if empty($internal_api_fqdn) { fail('Internal API FQDN is Empty') }
+      $odl_url_addr = $internal_api_fqdn
+    } else {
+      if empty($odl_url_ip) { fail('OpenDaylight API VIP is Empty') }
+      $odl_url_addr = $odl_url_ip
+    }
     class { '::neutron::plugins::ml2::opendaylight':
       odl_username => $odl_username,
       odl_password => $odl_password,
-      odl_url      => "${conn_proto}://${odl_url_ip}:${odl_port}/controller/nb/v2/neutron",
+      odl_url      => "${conn_proto}://${odl_url_addr}:${odl_port}/controller/nb/v2/neutron",
     }
   }
 }

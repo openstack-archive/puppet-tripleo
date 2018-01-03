@@ -68,6 +68,46 @@ describe 'tripleo::profile::base::neutron::opendaylight' do
       it 'should install and configure OpenDaylight in HA' do
         is_expected.to contain_class('opendaylight').with(
           :enable_ha     => true,
+          :ha_node_ips   => params[:odl_api_ips],
+          :enable_tls    => false
+        )
+      end
+    end
+
+    context 'with TLS enabled' do
+      before do
+        params.merge!({
+          :enable_internal_tls => true,
+          :certificate_specs => {
+             "service_certificate" => "/etc/pki/tls/certs/odl.crt",
+             "service_key" => "/etc/pki/tls/private/odl.key"}
+        })
+      end
+      it 'should and configure OpenDaylight with TLS' do
+        is_expected.to contain_class('opendaylight').with(
+          :enable_tls => true,
+          :tls_key_file => params[:certificate_specs]['service_key'],
+          :tls_cert_file => params[:certificate_specs]['service_certificate']
+        )
+      end
+    end
+
+    context 'with TLS and HA enabled' do
+      before do
+        params.merge!({
+          :enable_internal_tls => true,
+          :certificate_specs => {
+             "service_certificate" => "/etc/pki/tls/certs/odl.crt",
+             "service_key" => "/etc/pki/tls/private/odl.key"},
+          :odl_api_ips => ['192.0.2.5', '192.0.2.6', '192.0.2.7']
+        })
+      end
+      it 'should and configure OpenDaylight with TLS and HA' do
+        is_expected.to contain_class('opendaylight').with(
+          :enable_tls    => true,
+          :tls_key_file  => params[:certificate_specs]['service_key'],
+          :tls_cert_file => params[:certificate_specs]['service_certificate'],
+          :enable_ha     => true,
           :ha_node_ips   => params[:odl_api_ips]
         )
       end
