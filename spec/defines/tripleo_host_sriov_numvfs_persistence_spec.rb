@@ -80,6 +80,11 @@ then
   fi
   interface_pci=`ethtool -i eth0 | grep bus-info | awk {'print\$2'}`
   devlink dev eswitch set pci/\$interface_pci mode switchdev
+  interface_device=`cat /sys/class/net/eth0/device/device`
+  if [ $interface_device == \"0x1013\" ] || [ $interface_device == \"0x1015\" ]
+  then
+    devlink dev eswitch set pci/$interface_pci inline-mode transport
+  fi
   ethtool -K eth0 hw-tc-offload on
   if [ `cat /sys/class/net/eth0/device/vendor` == \"0x15b3\" ]
   then
