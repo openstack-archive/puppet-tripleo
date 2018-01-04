@@ -230,6 +230,7 @@ class tripleo::profile::base::keystone (
       ssl_key_admin  => $tls_keyfile_admin,
     }
     include ::keystone::cors
+    include ::keystone::security_compliance
 
     if $ldap_backend_enable {
       validate_hash($ldap_backends_config)

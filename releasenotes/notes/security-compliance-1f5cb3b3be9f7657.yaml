@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The security compliance manifest was included in the keystone profile. This
+    enables us to configure the security compliance options through t-h-t.
