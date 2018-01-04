@@ -102,23 +102,32 @@ class tripleo::profile::base::gnocchi::api (
     $tls_keyfile = undef
   }
 
-  if $step >= 4 and $sync_db {
-    include ::gnocchi::db::sync
-  }
-
   if $step >= 4 or ($step >= 3 and $sync_db) {
+    if $sync_db {
+      # NOTE(sileht): We upgrade only the database on step 3.
+      # the storage will be updated on step4 when swift is ready
+      if ($step == 3 and $gnocchi_backend == 'swift') {
+        $db_sync_extra_opts = '--skip-storage'
+      } else {
+        $db_sync_extra_opts = undef
+      }
+
+      class { '::gnocchi::db::sync':
+        extra_opts => $db_sync_extra_opts,
+      }
+    }
+
     include ::gnocchi::api
     include ::apache::mod::ssl
     class { '::gnocchi::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }
-  }
 
-  if $step >= 4 {
     class { '::gnocchi::storage':
       coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
     }
+
     case $gnocchi_backend {
       'swift': {
         include ::gnocchi::storage::swift
