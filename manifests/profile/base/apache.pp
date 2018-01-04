@@ -35,6 +35,12 @@ class tripleo::profile::base::apache(
   include ::apache::mod::status
   include ::apache::mod::ssl
 
+  # Automatic restart
+  ::systemd::dropin_file { 'httpd.conf':
+    unit    => 'httpd.service',
+    content => "[Service]\nRestart=always\n",
+  }
+
   if $enable_status_listener {
     if !defined(Apache::Listen[$status_listener]) {
       ::apache::listen {$status_listener: }

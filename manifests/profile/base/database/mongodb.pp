@@ -67,5 +67,11 @@ class tripleo::profile::base::database::mongodb (
         'MemoryLimit' => $memory_limit
       }
     }
+
+    # Automatic restart
+    ::systemd::dropin_file { 'mongod.conf':
+      unit    => 'mongod.service',
+      content => "[Service]\nRestart=always\n",
+    }
   }
 }
