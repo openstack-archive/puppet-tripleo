@@ -220,13 +220,19 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         before          => Exec['rabbitmq-ready'],
       }
 
-      # This grep makes sure the rabbit app in erlang is up and running
-      # which is enough to guarantee that the user will eventually get
-      # replicated around the cluster
+      if size($rabbit_nodes) == 1 {
+        $check_command = 'rabbitmqctl status | grep -F "{rabbit,"'
+      } else {
+        # This grep makes sure the rabbit app in erlang is up and running
+        # which is enough to guarantee that the user will eventually get
+        # replicated around the cluster
+        $check_command = 'rabbitmqctl eval "rabbit_mnesia:is_clustered()." | grep -q true'
+      }
+
       exec { 'rabbitmq-ready':
         path      => '/usr/sbin:/usr/bin:/sbin:/bin',
-        command   => 'rabbitmqctl eval "rabbit_mnesia:is_clustered()." | grep -q true',
-        unless    => 'rabbitmqctl eval "rabbit_mnesia:is_clustered()." | grep -q true',
+        command   => $check_command,
+        unless    => $check_command,
         timeout   => 30,
         tries     => 180,
         try_sleep => 10,
