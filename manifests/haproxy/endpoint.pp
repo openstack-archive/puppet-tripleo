@@ -24,15 +24,17 @@
 # [*service_port*]
 #  The default port on which the endpoint will be listening.
 #
-# [*ip_addresses*]
-#  The ordered list of IPs to be used to contact the balancer member.
-#
-# [*server_names*]
-#  The names of the balancer members, which usually should be the hostname.
-#
 # [*member_options*]
 #  Options for the balancer member, specified after the server declaration.
 #  These should go in the member's configuration block.
+#
+# [*ip_addresses*]
+#  The ordered list of IPs to be used to contact the balancer member.
+#  Defaults to hiera("${name}_node_ips", undef)
+#
+# [*server_names*]
+#  The names of the balancer members, which usually should be the hostname.
+#  Defaults to hiera("${name}_node_names", undef)
 #
 # [*public_virtual_ip*]
 #  Address in which the proxy endpoint will be listening in the public network.
@@ -99,9 +101,9 @@
 define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
-  $ip_addresses,
-  $server_names,
   $member_options,
+  $ip_addresses                = hiera("${name}_node_ips", undef),
+  $server_names                = hiera("${name}_node_names", undef),
   $public_virtual_ip           = undef,
   $mode                        = undef,
   $haproxy_listen_bind_param   = undef,
