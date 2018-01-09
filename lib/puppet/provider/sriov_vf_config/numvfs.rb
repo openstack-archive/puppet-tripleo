@@ -57,6 +57,9 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
       # Changing the mode of sriov interface to switchdev mode
       %x{devlink dev eswitch set pci/#{get_interface_pci} mode switchdev}
       %x{ethtool -K #{sriov_get_interface} hw-tc-offload on}
+      if get_interface_device == "0x1013" || get_interface_device == "0x1015"
+        %x{devlink dev eswitch set pci/#{get_interface_pci} inline-mode transport}
+      end
       if cur_value == "0x15b3"
         # Binding virtual functions
         vfs_pcis.each do|vfs_pci|
@@ -98,4 +101,7 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
     %x{ethtool -i #{sriov_get_interface} | grep bus-info | awk {'print$2'}}.strip
   end
 
+  def get_interface_device
+    %x{cat /sys/class/net/#{sriov_get_interface}/device/device}.strip
+  end
 end
