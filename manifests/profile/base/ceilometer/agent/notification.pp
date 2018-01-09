@@ -32,6 +32,9 @@ class tripleo::profile::base::ceilometer::agent::notification (
   if $step >= 4 {
     include ::ceilometer::agent::auth
     include ::ceilometer::agent::notification
+
+    # NOTE(sileht): this also configures gnocchi when it's used as publisher
+    include ::ceilometer::dispatcher::gnocchi
   }
 
 }
