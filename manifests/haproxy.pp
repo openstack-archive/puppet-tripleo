@@ -57,6 +57,12 @@
 # [*haproxy_globals_override*]
 #  HAProxy global option we can append to the default base set in this class.
 #  If you enter an already existing key, it will override the default.
+#  Defaults to {}
+#
+# [*haproxy_defaults_override*]
+#  HAProxy defaults option we can append to the default base set in this class.
+#  If you enter an already existing key, it will override the default.
+#  Defaults to {}
 #
 # [*haproxy_daemon*]
 #  Should haproxy run in daemon mode or not
@@ -594,6 +600,7 @@ class tripleo::haproxy (
   $haproxy_log_address         = '/dev/log',
   $activate_httplog            = false,
   $haproxy_globals_override    = {},
+  $haproxy_defaults_override   = {},
   $haproxy_daemon              = true,
   $haproxy_socket_access_level = 'user',
   $haproxy_stats_user          = 'admin',
@@ -858,7 +865,7 @@ class tripleo::haproxy (
   class { '::haproxy':
     service_manage   => $haproxy_service_manage,
     global_options   => merge($haproxy_global_options, $haproxy_daemonize, $haproxy_globals_override),
-    defaults_options => merge($haproxy_defaults_options, $httplog),
+    defaults_options => merge($haproxy_defaults_options, $httplog, $haproxy_defaults_override),
   }
 
 
