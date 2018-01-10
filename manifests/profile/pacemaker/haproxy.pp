@@ -117,34 +117,18 @@ class tripleo::profile::pacemaker::haproxy (
         require       => Pacemaker::Property['haproxy-role-node-property'],
       }
 
-      $internal_api_vip = hiera('internal_api_virtual_ip')
-      tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_internal_api_vip':
-        ensure        => $internal_api_vip and $internal_api_vip != $control_vip,
-        vip_name      => 'internal_api',
-        ip_address    => $internal_api_vip,
-        location_rule => $haproxy_location_rule,
-        pcs_tries     => $pcs_tries,
-        require       => Pacemaker::Property['haproxy-role-node-property'],
-      }
-
-      $storage_vip = hiera('storage_virtual_ip')
-      tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_vip':
-        ensure        => $storage_vip and $storage_vip != $control_vip,
-        vip_name      => 'storage',
-        ip_address    => $storage_vip,
-        location_rule => $haproxy_location_rule,
-        pcs_tries     => $pcs_tries,
-        require       => Pacemaker::Property['haproxy-role-node-property'],
-      }
-
-      $storage_mgmt_vip = hiera('storage_mgmt_virtual_ip')
-      tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_storage_mgmt_vip':
-        ensure        => $storage_mgmt_vip and $storage_mgmt_vip != $control_vip,
-        vip_name      => 'storage_mgmt',
-        ip_address    => $storage_mgmt_vip,
-        location_rule => $haproxy_location_rule,
-        pcs_tries     => $pcs_tries,
-        require       => Pacemaker::Property['haproxy-role-node-property'],
+      # Set up all vips for isolated networks
+      $network_vips = hiera('network_virtual_ips', {})
+      $network_vips.each |String $net_name, $vip_info| {
+        $virtual_ip = $vip_info[ip_address]
+        tripleo::pacemaker::haproxy_with_vip {"haproxy_and_${net_name}_vip":
+          ensure        => $virtual_ip and $virtual_ip != $control_vip,
+          vip_name      => $net_name,
+          ip_address    => $virtual_ip,
+          location_rule => $haproxy_location_rule,
+          pcs_tries     => $pcs_tries,
+          require       => Pacemaker::Property['haproxy-role-node-property'],
+        }
       }
     }
   }
