@@ -81,7 +81,8 @@ class tripleo::profile::pacemaker::ovn_northd (
       ocf_agent_name  => "${ovndb_servers_ocf_name}",
       master_params   => '',
       op_params       => 'start timeout=200s stop timeout=200s',
-      resource_params => "master_ip=${ovn_dbs_vip} nb_master_port=${nb_db_port} sb_master_port=${sb_db_port} manage_northd=yes",
+      resource_params => "master_ip=${ovn_dbs_vip} nb_master_port=${nb_db_port} \
+sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000",
       tries           => $pcs_tries,
       location_rule   => {
         resource_discovery => 'exclusive',
