@@ -134,7 +134,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
             'target-dir' => '/var/log/cinder',
             'options'    => 'rw',
           },
-          'ceph-cfg-dir'                 => {
+          'cinder-backup-ceph-cfg-dir'   => {
             'source-dir' => '/etc/ceph',
             'target-dir' => '/var/lib/kolla/config_files/src-ceph',
             'options'    => 'ro',
