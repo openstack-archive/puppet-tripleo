@@ -120,7 +120,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
             'options'    => 'ro',
           },
           'cinder-volume-iscsi'          => {
-            'source-dir' => '/var/lib/config-data/puppet-generated/iscsid/',
+            'source-dir' => '/etc/iscsi',
             'target-dir' => '/var/lib/kolla/config_files/src-iscsid',
             'options'    => 'ro',
           },
