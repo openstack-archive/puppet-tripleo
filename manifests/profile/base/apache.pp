@@ -35,6 +35,26 @@ class tripleo::profile::base::apache(
   include ::apache::mod::status
   include ::apache::mod::ssl
 
+  # Automatic restart
+  file { '/etc/systemd/system/httpd.service.d':
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+  }
+  -> file { '/etc/systemd/system/httpd.service.d/httpd.conf':
+    ensure  => file,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => "[Service]\nRestart=always\n",
+  }
+  ~> exec { 'httpd-dropin-reload':
+    command     => 'systemctl daemon-reload',
+    refreshonly => true,
+    path        => $::path,
+  }
+
   if $enable_status_listener {
     if !defined(Apache::Listen[$status_listener]) {
       ::apache::listen {$status_listener: }
