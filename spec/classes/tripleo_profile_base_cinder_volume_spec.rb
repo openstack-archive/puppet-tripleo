@@ -136,6 +136,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           params.merge!({
             :cinder_enable_rbd_backend => true,
             :cinder_enable_iscsi_backend  => false,
+            :cinder_rbd_client_name      => 'openstack'
           })
         end
         it 'should configure only ceph' do
@@ -147,6 +148,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('cinder::backends').with(
             :enabled_backends => ['tripleo_ceph']
           )
+          is_expected.to contain_exec('exec-setfacl-openstack-cinder')
         end
       end
 

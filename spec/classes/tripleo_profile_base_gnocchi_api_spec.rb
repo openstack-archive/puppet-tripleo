@@ -19,7 +19,9 @@ require 'spec_helper'
 describe 'tripleo::profile::base::gnocchi::api' do
   shared_examples_for 'tripleo::profile::base::gnocchi::api' do
     let(:pre_condition) do
-      "class { '::tripleo::profile::base::gnocchi': step => #{params[:step]}, }"
+      "
+        class { '::tripleo::profile::base::gnocchi': step => #{params[:step]}, }
+      "
     end
 
     context 'with step less than 3' do
@@ -91,7 +93,8 @@ describe 'tripleo::profile::base::gnocchi::api' do
         :step => 4,
         :gnocchi_backend => 'rbd',
         :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1'
+        :redis_vip => '127.0.0.1',
+        :gnocchi_rbd_client_name => 'openstack'
       } }
 
       it {
@@ -101,6 +104,7 @@ describe 'tripleo::profile::base::gnocchi::api' do
           :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
         is_expected.to contain_class('gnocchi::storage::ceph')
+        is_expected.to contain_exec('exec-setfacl-openstack-gnocchi')
       }
     end
 

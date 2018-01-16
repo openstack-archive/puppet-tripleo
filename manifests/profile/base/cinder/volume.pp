@@ -58,6 +58,10 @@
 #   (Optional) List of additional backend stanzas to activate
 #   Defaults to hiera('cinder_user_enabled_backends')
 #
+# [*cinder_rbd_client_name*]
+#   (Optional) Name of RBD client
+#   Defaults to hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -74,6 +78,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_rbd_backend         = false,
   $cinder_enable_scaleio_backend     = false,
   $cinder_user_enabled_backends      = hiera('cinder_user_enabled_backends', undef),
+  $cinder_rbd_client_name            = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name','openstack'),
   $step                              = hiera('step'),
 ) {
   include ::tripleo::profile::base::cinder
@@ -134,6 +139,12 @@ class tripleo::profile::base::cinder::volume (
     if $cinder_enable_rbd_backend {
       include ::tripleo::profile::base::cinder::volume::rbd
       $cinder_rbd_backend_name = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph')
+      exec{ "exec-setfacl-${cinder_rbd_client_name}-cinder":
+        path    => ['/bin', '/usr/bin'],
+        command => "setfacl -m u:cinder:r-- /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring",
+        unless  => "getfacl /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring | grep -q user:cinder:r--",
+      }
+      Ceph::Key<| title == "client.${cinder_rbd_client_name}" |> -> Exec["exec-setfacl-${cinder_rbd_client_name}-cinder"]
     } else {
       $cinder_rbd_backend_name = undef
     }
