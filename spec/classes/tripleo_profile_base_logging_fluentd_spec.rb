@@ -28,6 +28,7 @@ describe 'tripleo::profile::base::logging::fluentd' do
 
       it 'should do nothing' do
         is_expected.to_not contain_class('fluentd')
+	is_expected.to_not contain_class('systemd::systemctl::daemon_reload')
         is_expected.to_not contain_fluentd__plugin('rubygem-fluent-plugin-add')
       end
     end
@@ -36,6 +37,7 @@ describe 'tripleo::profile::base::logging::fluentd' do
       let(:params) { { :step => 4 } }
 
       it { is_expected.to contain_class('fluentd') }
+      it { is_expected.to contain_class('systemd::systemctl::daemon_reload') }
       it { is_expected.to contain_fluentd__plugin('rubygem-fluent-plugin-add').with(
         :plugin_provider => 'yum',
       ) }
@@ -54,6 +56,7 @@ describe 'tripleo::profile::base::logging::fluentd' do
       } }
 
       it { is_expected.to contain_class('fluentd') }
+      it { is_expected.to contain_class('systemd::systemctl::daemon_reload') }
       it { is_expected.to contain_fluentd__plugin('rubygem-fluent-plugin-add').with(
         :plugin_provider => 'yum',
       ) }
@@ -128,6 +131,55 @@ describe 'tripleo::profile::base::logging::fluentd' do
         :membership => 'minimum'
       ) }
     end
+
+    context 'fluentd user and managed groups' do
+      let(:params) { {
+        :step => 4,
+        :fluentd_service_user => 'fluentd',
+        :fluentd_manage_groups => true,
+        :fluentd_groups => [ 'fluentd' ]
+      } }
+
+      it { is_expected.to contain_class('fluentd') }
+      it { is_expected.to contain_class('systemd::systemctl::daemon_reload') }
+      it { is_expected.to contain_service('fluentd') }
+
+      it { is_expected.to contain_file('/etc/systemd/system/fluentd.service.d/fluentd_user.conf')
+      .with( {
+        :ensure  => 'file',
+        :content =>  [ "# This file is maintained by puppet.\n[Service]\nUser=fluentd\n" ]
+      } ) }
+
+      it { is_expected.to contain_service('fluentd') }
+      it { is_expected.to contain_user('fluentd').with(
+        :ensure =>'present',
+        :groups => [ 'fluentd','ceilometer' ],
+        :membership => 'minimum'
+      ) }
+    end
+
+    context 'root user, no matter about groups' do
+      let(:params) { {
+        :step => 4,
+        :fluentd_service_user => 'root',
+        :fluentd_manage_groups => true,
+        :fluentd_groups => [ 'fluentd' ]
+      } }
+
+      it { is_expected.to contain_class('fluentd') }
+      it { is_expected.to contain_class('systemd::systemctl::daemon_reload') }
+      it { is_expected.to contain_service('fluentd') }
+
+      it { is_expected.to contain_file('/etc/systemd/system/fluentd.service.d/fluentd_user.conf')
+      .with( {
+        :ensure  => 'file',
+        :content =>  [ "# This file is maintained by puppet.\n[Service]\nUser=root\n" ]
+      } ) }
+
+      it { is_expected.to contain_service('fluentd') }
+      it { is_expected.to_not contain_user('fluentd') }
+    end
+
 
   end
 
