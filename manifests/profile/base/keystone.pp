@@ -99,6 +99,31 @@ class tripleo::profile::base::keystone (
       include ::keystone::endpoint
     }
 
+    # Automatic restart for Apache service
+    # Note: there is no tripleo-specific file to configure Apache;
+    # However all OpenStack services that use Apache rely on keystone,
+    # so generating the drop-in file here is enough to guarantee that
+    # Apache automatic restart will be enabled on nodes where
+    # OpenStack API are deployed.
+    file { '/etc/systemd/system/httpd.service.d':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
+    -> file { '/etc/systemd/system/httpd.service.d/httpd.conf':
+      ensure  => file,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => "[Service]\nRestart=always\n",
+    }
+    ~> exec { 'httpd-dropin-reload':
+      command     => 'systemctl daemon-reload',
+      refreshonly => true,
+      path        => $::path,
+    }
+
   }
 
   if $step >= 5 and $manage_db_purge {
