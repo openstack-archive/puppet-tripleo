@@ -65,6 +65,9 @@ describe 'tripleo::profile::base::logging::fluentd' do
           'source' => params[:fluentd_sources]
         }
       ) }
+      it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-sources.conf').with_content(
+      /^\s*path \/var\/log\/keystone\/keystone\.log$/
+      ) }
     end
 
     context 'step greater than 3 and a fluentd source with transformation' do
@@ -115,7 +118,42 @@ describe 'tripleo::profile::base::logging::fluentd' do
        :default_format => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/'
       ) }
       it { is_expected.to contain_fluentd__config('100-openstack-ceilometer_agent_central.conf') }
-      it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-ceilometer_agent_central.conf') }
+      it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-ceilometer_agent_central.conf').with_content(
+      /^\s*path \/var\/log\/ceilometer\/central\.log$/
+      ) }
+    end
+
+    context 'Config by service -- ceilometer_agent_central with path trasnformation' do
+      let(:params) { {
+        :step => 4,
+        :fluentd_default_format => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/',
+        :fluentd_manage_groups => false,
+        :fluentd_pos_file_path => '/var/cache/fluentd/',
+        :service_names => [ 'ceilometer_agent_central' ],
+        :fluentd_path_transform => [
+          '/var/log/',
+          '/var/log/containers/',
+        ]
+      } }
+      it { is_expected.to contain_class('fluentd') }
+      it { is_expected.to contain_file('/var/cache/fluentd/') }
+      it { is_expected.to contain_tripleo__profile__base__logging__fluentd__fluentd_service('ceilometer_agent_central').with(
+       :pos_file_path => '/var/cache/fluentd/',
+       :default_format => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/'
+      ) }
+      it { is_expected.to contain_fluentd__config('100-openstack-ceilometer_agent_central.conf').with(
+        :config => {
+          'source' =>  [ {
+          'format' => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/',
+          'path' => '/var/log/containers/ceilometer/central.log',
+          'pos_file' => '/var/cache/fluentd//openstack.ceilometer.agent.central.pos',
+          'tag' => 'openstack.ceilometer.agent.central',
+          'type' => 'tail'
+        } ],
+          'filter' => [],
+          'match' => []
+        }
+      ) }
     end
 
     context 'Groups by service -- ceilometer_agent_central added ceilometer' do
