@@ -169,8 +169,13 @@ class tripleo::profile::base::docker (
       $mirror_changes = [ 'rm dict/entry[. = "registry-mirrors"]', ]
     }
 
-    $debug_changes = ['set dict/entry[. = "debug"] "debug"',
-                      "set dict/entry[. = \"debug\"]/const \"${debug}\"",]
+    if $debug {
+      $debug_changes = [
+        'set dict/entry[. = "debug"] "debug"',
+        "set dict/entry[. = \"debug\"]/const \"${debug}\"",]
+    } else {
+      $debug_changes = [ 'rm dict/entry[. = "debug"]', ]
+    }
 
     file { '/etc/docker/daemon.json':
       ensure  => 'present',
@@ -180,14 +185,24 @@ class tripleo::profile::base::docker (
       require => Package['docker']
     }
 
-    augeas { 'docker-daemon.json':
+    augeas { 'docker-daemon.json-mirror':
       lens      => 'Json.lns',
       incl      => '/etc/docker/daemon.json',
-      changes   => concat($mirror_changes, $debug_changes),
+      changes   => $mirror_changes,
       subscribe => Package['docker'],
       notify    => Service['docker'],
       require   => File['/etc/docker/daemon.json'],
     }
+
+    augeas { 'docker-daemon.json-debug':
+      lens      => 'Json.lns',
+      incl      => '/etc/docker/daemon.json',
+      changes   => $debug_changes,
+      subscribe => Package['docker'],
+      notify    => Service['docker'],
+      require   => File['/etc/docker/daemon.json'],
+    }
+
     if $configure_storage {
       if $storage_options == undef {
         fail('You must provide a $storage_options in order to configure storage')
