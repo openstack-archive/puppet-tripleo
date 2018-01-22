@@ -25,4 +25,5 @@ fluentd::plugin_provider: "yum"
 fluentd::repo_install: false
 fluentd::service_name: "fluentd"
 fluentd::service_provider: "systemd"
-
+neutron::plugins::ovs::opendaylight::odl_username: 'admin'
+neutron::plugins::ovs::opendaylight::odl_password: 'admin'

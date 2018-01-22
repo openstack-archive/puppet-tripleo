@@ -83,6 +83,16 @@
 #   it will create.
 #   Defaults to hiera('tripleo::profile::base::etcd::certificate_specs', {}).
 #
+# [*odl_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('tripleo::profile::base::odl::certificate_specs', {}).
+#
+# [*ovs_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('tripleo::profile::base::ovs::certificate_specs', {}).
+#
 class tripleo::profile::base::certmonger_user (
   $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
   $apache_postsave_cmd        = undef,
@@ -94,6 +104,8 @@ class tripleo::profile::base::certmonger_user (
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
   $etcd_certificate_specs     = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
+  $odl_certificate_specs      = hiera('tripleo::profile::base::neutron::opendaylight::certificate_specs', {}),
+  $ovs_certificate_specs      = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
 ) {
   unless empty($haproxy_certificates_specs) {
     $reload_haproxy = ['systemctl reload haproxy']
@@ -139,5 +151,11 @@ class tripleo::profile::base::certmonger_user (
   }
   unless empty($etcd_certificate_specs) {
     ensure_resource('class', 'tripleo::certmonger::etcd', $etcd_certificate_specs)
+  }
+  unless empty($odl_certificate_specs) {
+    ensure_resource('class', 'tripleo::certmonger::opendaylight', $odl_certificate_specs)
+  }
+  unless empty($ovs_certificate_specs) {
+    ensure_resource('class', 'tripleo::certmonger::openvswitch', $ovs_certificate_specs)
   }
 }

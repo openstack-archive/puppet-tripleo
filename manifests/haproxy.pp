@@ -672,6 +672,7 @@ class tripleo::haproxy (
   $nova_osapi_network          = hiera('nova_api_network', undef),
   $nova_placement_network      = hiera('nova_placement_network', undef),
   $octavia_network             = hiera('octavia_api_network', undef),
+  $opendaylight_network        = hiera('opendaylight_api_network', undef),
   $panko_network               = hiera('panko_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $ec2_api_network             = hiera('ec2_api_network', undef),
@@ -1465,23 +1466,27 @@ class tripleo::haproxy (
 
   if $opendaylight {
     ::tripleo::haproxy::endpoint { 'opendaylight':
-      internal_ip    => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
-      service_port   => $ports[opendaylight_api_port],
-      ip_addresses   => hiera('opendaylight_api_node_ips', $controller_hosts_real),
-      server_names   => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
-      mode           => 'http',
-      listen_options => {
+      internal_ip     => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
+      service_port    => $ports[opendaylight_api_port],
+      ip_addresses    => hiera('opendaylight_api_node_ips', $controller_hosts_real),
+      server_names    => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
+      mode            => 'http',
+      member_options  => union($haproxy_member_options, $internal_tls_member_options),
+      service_network => $opendaylight_network,
+      listen_options  => {
         'balance' => 'source',
       },
     }
 
     ::tripleo::haproxy::endpoint { 'opendaylight_ws':
-      internal_ip    => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
-      service_port   => $ports[opendaylight_ws_port],
-      ip_addresses   => hiera('opendaylight_api_node_ips', $controller_hosts_real),
-      server_names   => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
-      mode           => 'http',
-      listen_options => {
+      internal_ip               => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
+      service_port              => $ports[opendaylight_ws_port],
+      ip_addresses              => hiera('opendaylight_api_node_ips', $controller_hosts_real),
+      server_names              => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
+      mode                      => 'http',
+      haproxy_listen_bind_param => [],  # We don't use a transparent proxy (diverting non-destined haproxy traffic)
+      service_network           => $opendaylight_network,
+      listen_options            => {
         # NOTE(jaosorior): Websockets have more overhead in establishing
         # connections than regular HTTP connections. Also, since it begins
         # as an HTTP connection and then "upgrades" to a TCP connection, some

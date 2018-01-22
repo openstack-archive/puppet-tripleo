@@ -1,2 +1,5 @@
 ---
 step: 1
+opendaylight_api_node_ips:
+ - '192.0.2.5'
+opendaylight::tls_keystore_password: 'password'
