@@ -63,6 +63,16 @@
 #   certificate is renewed.
 #   Defaults to undef
 #
+# [*libvirt_vnc_certificates_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('libvirt_vnc_certificates_specs', {}).
+#
+# [*libvirt_vnc_postsave_cmd*]
+#   (Optional) If set, it overrides the default way to restart services when the
+#   certificate is renewed.
+#   Defaults to undef
+#
 # [*mongodb_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -110,6 +120,8 @@ class tripleo::profile::base::certmonger_user (
   $haproxy_postsave_cmd       = undef,
   $libvirt_certificates_specs = hiera('libvirt_certificates_specs', {}),
   $libvirt_postsave_cmd       = undef,
+  $libvirt_vnc_certificates_specs = hiera('libvirt_vnc_certificates_specs', {}),
+  $libvirt_vnc_postsave_cmd       = undef,
   $mongodb_certificate_specs  = hiera('mongodb_certificate_specs',{}),
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
@@ -133,6 +145,7 @@ class tripleo::profile::base::certmonger_user (
   }
   Certmonger_certificate<||> -> Class['::tripleo::certmonger::ca::crl']
   include ::tripleo::certmonger::ca::libvirt
+  include ::tripleo::certmonger::ca::libvirt_vnc
 
   unless empty($apache_certificates_specs) {
     include ::tripleo::certmonger::apache_dirs
@@ -143,6 +156,11 @@ class tripleo::profile::base::certmonger_user (
     include ::tripleo::certmonger::libvirt_dirs
     ensure_resources('tripleo::certmonger::libvirt', $libvirt_certificates_specs,
                       {'postsave_cmd' => $libvirt_postsave_cmd})
+  }
+  unless empty($libvirt_vnc_certificates_specs) {
+    include ::tripleo::certmonger::libvirt_vnc_dirs
+    ensure_resources('tripleo::certmonger::libvirt_vnc', $libvirt_vnc_certificates_specs,
+                      {'postsave_cmd' => $libvirt_vnc_postsave_cmd})
   }
   unless empty($haproxy_certificates_specs) {
     include ::tripleo::certmonger::haproxy_dirs
