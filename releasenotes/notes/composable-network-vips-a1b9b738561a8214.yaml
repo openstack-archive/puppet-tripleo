@@ -1,0 +1,11 @@
+---
+deprecations:
+  - The hardcoded parameter names for network vips in hiera have been
+    deprecated and replaced with the network_virtual_ips dict that includes
+    composable networks.  Likewise the hardcoded network parameters to
+    class tripleo::keepalived have been deprecated.
+fixes:
+  - The new network_virtual_ips hiera parameter is used to generate all
+    network VIP resources in haproxy, haproxy_bundle, and keepalived
+    manifests.  Since additional custom networks may be added, the
+    virtual_router_ids in keepalived have been reordered.
