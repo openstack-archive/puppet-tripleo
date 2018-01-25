@@ -11,7 +11,8 @@ module Puppet::Parser::Functions
         ip1 = IPAddr.new(arg[0])
         Dir.foreach('/sys/class/net/') do |interface|
           next if interface == '.' || interface == '..'
-          iface_no_dash = interface.gsub('-', '_')
+          # puppet downcases fact names, interface names can have capitals
+          iface_no_dash = interface.gsub('-', '_').downcase
 
           if ip1.ipv4?
             ipaddress_name = "ipaddress_#{iface_no_dash}"
