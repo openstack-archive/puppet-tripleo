@@ -28,5 +28,25 @@ class tripleo::profile::base::memcached (
 ) {
   if $step >= 1 {
       include ::memcached
+
+      # Automatic restart
+      file { '/etc/systemd/system/memcached.service.d':
+        ensure => directory,
+        owner  => 'root',
+        group  => 'root',
+        mode   => '0755',
+      }
+      -> file { '/etc/systemd/system/memcached.service.d/memcached.conf':
+        ensure  => file,
+        owner   => 'root',
+        group   => 'root',
+        mode    => '0644',
+        content => "[Service]\nRestart=always\n",
+      }
+      ~> exec { 'memcached-dropin-reload':
+        command     => 'systemctl daemon-reload',
+        refreshonly => true,
+        path        => $::path,
+      }
   }
 }
