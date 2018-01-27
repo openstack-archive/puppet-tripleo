@@ -125,6 +125,10 @@
 #   Notification topics that keystone should use for ceilometer to consume.
 #   Defaults to []
 #
+# [*barbican_notification_topics*]
+#   Notification topics that keystone should use for barbican to consume.
+#   Defaults to []
+#
 # [*extra_notification_topics*]
 #   Extra notification topics that keystone should produce.
 #   Defaults to []
@@ -159,6 +163,7 @@ class tripleo::profile::base::keystone (
   $oslomsg_notify_username        = hiera('keystone::rabbit_userid', 'guest'),
   $oslomsg_use_ssl                = hiera('keystone::rabbit_use_ssl', '0'),
   $ceilometer_notification_topics = [],
+  $barbican_notification_topics   = [],
   $extra_notification_topics      = [],
   $step                           = Integer(hiera('step')),
 ) {
@@ -214,7 +219,9 @@ class tripleo::profile::base::keystone (
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_use_ssl_real,
       }),
-      notification_topics        => union($ceilometer_notification_topics, $extra_notification_topics)
+      notification_topics        => union($ceilometer_notification_topics,
+                                          $barbican_notification_topics,
+                                          $extra_notification_topics)
     }
 
     if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{

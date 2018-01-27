@@ -1,0 +1,3 @@
+---
+features:
+  - Add keystone notification topic for barbican keystone listener to consume.
