@@ -36,7 +36,7 @@
 #
 # [*oslomsg_rpc_username*]
 #   Username for oslo messaging rpc service
-#   Defaults to hiera('neutron::rabbit_userid', 'guest')
+#   Defaults to hiera('neutron::rabbit_user', 'guest')
 #
 # [*oslomsg_rpc_password*]
 #   Password for oslo messaging rpc service
@@ -56,7 +56,7 @@
 #
 # [*oslomsg_notify_username*]
 #   Username for oslo messaging notify service
-#   Defaults to hiera('neutron::rabbit_userid', 'guest')
+#   Defaults to hiera('neutron::rabbit_user', 'guest')
 #
 # [*oslomsg_notify_password*]
 #   Password for oslo messaging notify service
@@ -85,12 +85,12 @@ class tripleo::profile::base::neutron (
   $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
   $oslomsg_rpc_password    = hiera('neutron::rabbit_password'),
   $oslomsg_rpc_port        = hiera('neutron::rabbit_port', '5672'),
-  $oslomsg_rpc_username    = hiera('neutron::rabbit_userid', 'guest'),
+  $oslomsg_rpc_username    = hiera('neutron::rabbit_user', 'guest'),
   $oslomsg_notify_proto    = hiera('messaging_notify_service_name', 'rabbit'),
   $oslomsg_notify_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
   $oslomsg_notify_password = hiera('neutron::rabbit_password'),
   $oslomsg_notify_port     = hiera('neutron::rabbit_port', '5672'),
-  $oslomsg_notify_username = hiera('neutron::rabbit_userid', 'guest'),
+  $oslomsg_notify_username = hiera('neutron::rabbit_user', 'guest'),
   $oslomsg_use_ssl         = hiera('neutron::rabbit_use_ssl', '0'),
   $dhcp_agents_per_network = undef,
   $dhcp_nodes              = hiera('neutron_dhcp_short_node_names', []),
