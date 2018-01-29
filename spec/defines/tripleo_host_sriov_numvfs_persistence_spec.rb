@@ -68,29 +68,46 @@ describe 'tripleo::host::sriov::numvfs_persistence' do
     it 'configures persistence' do
       is_expected.to contain_file('/etc/sysconfig/allocate_vfs').with(
         :ensure  => 'file',
-        :content => "Hashbang\nif [ \"eth0\" == \"$1\" ]
+        :content => "Hashbang\nset -eux
+set -o pipefail
+
+if [ \"eth0\" == \"$1\" ]
 then
-  echo 10 > /sys/class/net/eth0/device/sriov_numvfs
-  if [ `cat /sys/class/net/eth0/device/vendor` == \"0x15b3\" ]
+  exec 1> >(logger -s -t $(basename $0)) 2>&1
+  if [ \"$(cat /sys/class/net/eth0/device/sriov_numvfs)\" == \"0\" ]
   then
-    for pci in `cat /sys/class/net/eth0/device/virtfn*/uevent | grep PCI_SLOT_NAME | cut -d'=' -f2`
+    echo 10 > /sys/class/net/eth0/device/sriov_numvfs
+  else
+    exit 0
+  fi
+  if [ \"$(cat /sys/class/net/eth0/device/vendor)\" == \"0x15b3\" ]
+  then
+    vfs_pci_list=$(grep PCI_SLOT_NAME /sys/class/net/eth0/device/virtfn*/uevent | cut -d'=' -f2)
+    for pci in $vfs_pci_list
     do
-      echo \$pci > /sys/bus/pci/drivers/mlx5_core/unbind
+      echo \"$pci\" > /sys/bus/pci/drivers/mlx5_core/unbind
     done
   fi
-  interface_pci=`ethtool -i eth0 | grep bus-info | awk {'print\$2'}`
-  devlink dev eswitch set pci/\$interface_pci mode switchdev
-  interface_device=`cat /sys/class/net/eth0/device/device`
-  if [ $interface_device == \"0x1013\" ] || [ $interface_device == \"0x1015\" ]
+  interface_pci=$(grep PCI_SLOT_NAME /sys/class/net/eth0/device/uevent | cut -d'=' -f2)
+  /usr/sbin/devlink dev eswitch set pci/\"$interface_pci\" mode switchdev
+  if [[ \"$(/usr/sbin/devlink dev eswitch show pci/\"$interface_pci\")\" =~ \"mode switchdev\" ]]
   then
-    devlink dev eswitch set pci/$interface_pci inline-mode transport
+    echo \"PCI device $interface_pci set to mode switchdev.\"
+  else
+    echo \"Failed to set PCI device $interface_pci to mode switchdev.\"
+    exit 1
   fi
-  ethtool -K eth0 hw-tc-offload on
-  if [ `cat /sys/class/net/eth0/device/vendor` == \"0x15b3\" ]
+  interface_device=$(cat /sys/class/net/eth0/device/device)
+  if [ \"$interface_device\" == \"0x1013\" ] || [ \"$interface_device\" == \"0x1015\" ]
   then
-    for pci in `cat /sys/class/net/eth0/device/virtfn*/uevent | grep PCI_SLOT_NAME | cut -d'=' -f2`
+    /usr/sbin/devlink dev eswitch set pci/\"$interface_pci\" inline-mode transport
+  fi
+  /usr/sbin/ethtool -K eth0 hw-tc-offload on
+  if [ \"$(cat /sys/class/net/eth0/device/vendor)\" == \"0x15b3\" ]
+  then
+    for pci in $vfs_pci_list
     do
-      echo \$pci > /sys/bus/pci/drivers/mlx5_core/bind;
+      echo \"$pci\" > /sys/bus/pci/drivers/mlx5_core/bind
     done
   fi
 fi\n[ \"eth1\" == \"\$1\" ] && echo 8 > /sys/class/net/eth1/device/sriov_numvfs\n",
