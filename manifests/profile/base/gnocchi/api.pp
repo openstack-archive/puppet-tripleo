@@ -101,7 +101,7 @@ class tripleo::profile::base::gnocchi::api (
       # NOTE(sileht): We upgrade only the database on step 3.
       # the storage will be updated on step4 when swift is ready
       if ($step == 3 and $gnocchi_backend == 'swift') {
-        $db_sync_extra_opts = '--skip-storage --skip-incoming'
+        $db_sync_extra_opts = '--skip-storage'
       } else {
         $db_sync_extra_opts = undef
       }
