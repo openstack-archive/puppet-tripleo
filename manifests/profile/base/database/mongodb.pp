@@ -48,6 +48,26 @@ class tripleo::profile::base::database::mongodb (
 
     include ::tripleo::profile::base::database::mongodbcommon
 
+    # Automatic restart
+    file { '/etc/systemd/system/mongod.service.d':
+      ensure => directory,
+      owner  => 'root',
+      group  => 'root',
+      mode   => '0755',
+    }
+    -> file { '/etc/systemd/system/mongod.service.d/mongod.conf':
+      ensure  => file,
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0644',
+      content => "[Service]\nRestart=always\n",
+    }
+    ~> exec { 'mongod-dropin-reload':
+      command     => 'systemctl daemon-reload',
+      refreshonly => true,
+      path        => $::path,
+    }
+
     if $bootstrap_node == $::hostname {
       # make sure we can connect to all servers before forming the replset
       tripleo::profile::pacemaker::database::mongodbvalidator {
