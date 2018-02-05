@@ -79,62 +79,82 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
         options           => '--ipc=host --privileged=true --user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => {
-          'cinder-backup-cfg-files'      => {
+          'cinder-backup-cfg-files'               => {
             'source-dir' => '/var/lib/kolla/config_files/cinder_backup.json',
             'target-dir' => '/var/lib/kolla/config_files/config.json',
             'options'    => 'ro',
           },
-          'cinder-backup-cfg-data'       => {
+          'cinder-backup-cfg-data'                => {
             'source-dir' => '/var/lib/config-data/puppet-generated/cinder/',
             'target-dir' => '/var/lib/kolla/config_files/src',
             'options'    => 'ro',
           },
-          'cinder-backup-hosts'          => {
+          'cinder-backup-hosts'                   => {
             'source-dir' => '/etc/hosts',
             'target-dir' => '/etc/hosts',
             'options'    => 'ro',
           },
-          'cinder-backup-localtime'      => {
+          'cinder-backup-localtime'               => {
             'source-dir' => '/etc/localtime',
             'target-dir' => '/etc/localtime',
             'options'    => 'ro',
           },
-          'cinder-backup-dev'            => {
+          'cinder-backup-dev'                     => {
             'source-dir' => '/dev',
             'target-dir' => '/dev',
             'options'    => 'rw',
           },
-          'cinder-backup-run'            => {
+          'cinder-backup-run'                     => {
             'source-dir' => '/run',
             'target-dir' => '/run',
             'options'    => 'rw',
           },
-          'cinder-backup-sys'            => {
+          'cinder-backup-sys'                     => {
             'source-dir' => '/sys',
             'target-dir' => '/sys',
             'options'    => 'rw',
           },
-          'cinder-backup-lib-modules'    => {
+          'cinder-backup-lib-modules'             => {
             'source-dir' => '/lib/modules',
             'target-dir' => '/lib/modules',
             'options'    => 'ro',
           },
-          'cinder-backup-iscsi'          => {
+          'cinder-backup-iscsi'                   => {
             'source-dir' => '/etc/iscsi',
             'target-dir' => '/var/lib/kolla/config_files/src-iscsid',
             'options'    => 'ro',
           },
-          'cinder-backup-var-lib-cinder' => {
+          'cinder-backup-var-lib-cinder'          => {
             'source-dir' => '/var/lib/cinder',
             'target-dir' => '/var/lib/cinder',
             'options'    => 'rw',
           },
-          'cinder-backup-var-log'        => {
+          'cinder-backup-pki-extracted'           => {
+            'source-dir' => '/etc/pki/ca-trust/extracted',
+            'target-dir' => '/etc/pki/ca-trust/extracted',
+            'options'    => 'ro',
+          },
+          'cinder-backup-pki-ca-bundle-crt'       => {
+            'source-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
+            'target-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
+            'options'    => 'ro',
+          },
+          'cinder-backup-pki-ca-bundle-trust-crt' => {
+            'source-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
+            'target-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
+            'options'    => 'ro',
+          },
+          'cinder-backup-pki-cert'                => {
+            'source-dir' => '/etc/pki/tls/cert.pem',
+            'target-dir' => '/etc/pki/tls/cert.pem',
+            'options'    => 'ro',
+          },
+          'cinder-backup-var-log'                 => {
             'source-dir' => '/var/log/containers/cinder',
             'target-dir' => '/var/log/cinder',
             'options'    => 'rw',
           },
-          'cinder-backup-ceph-cfg-dir'   => {
+          'cinder-backup-ceph-cfg-dir'            => {
             'source-dir' => '/etc/ceph',
             'target-dir' => '/var/lib/kolla/config_files/src-ceph',
             'options'    => 'ro',
