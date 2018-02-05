@@ -49,18 +49,13 @@ class tripleo::profile::base::database::mongodb (
     include ::tripleo::profile::base::database::mongodbcommon
 
     # Automatic restart
-    file { '/etc/systemd/system/mongod.service.d':
-      ensure => directory,
-      owner  => 'root',
-      group  => 'root',
-      mode   => '0755',
-    }
-    -> file { '/etc/systemd/system/mongod.service.d/mongod.conf':
+    file { '/etc/systemd/system/mongod.service.d/mongod.conf':
       ensure  => file,
       owner   => 'root',
       group   => 'root',
       mode    => '0644',
       content => "[Service]\nRestart=always\n",
+      require => File['/etc/systemd/system/mongod.service.d'],
     }
     ~> exec { 'mongod-dropin-reload':
       command     => 'systemctl daemon-reload',
