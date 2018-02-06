@@ -77,3 +77,7 @@ mod 'collectd',
   :git => 'https://github.com/voxpupuli/puppet-collectd',
   :ref => 'master'
 
+# see https://github.com/rdo-packages/puppet-keepalived-distgit/blob/rpm-master/puppet-keepalived.spec
+mod 'keepalived',
+  :git => 'https://github.com/Unyonsys/puppet-module-keepalived',
+  :ref => 'bbca37ade629a9178f09366fd0368187fb645f4e'

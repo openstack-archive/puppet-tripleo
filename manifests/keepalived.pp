@@ -74,8 +74,12 @@
 #  be used to override the distro defaults in this module.
 #  Defaults to false.
 #
-
-
+# [*network_vips*]
+#  A hash of networks with related ip address information.
+#  Example:
+#   { 'internal_api' => { 'ip_address' => '10.0.0.1', 'index' => 1' } }
+#  Defaults to hiera('network_virtual_ips', {})
+#
 class tripleo::keepalived (
   $controller_virtual_ip,
   $control_virtual_interface,
@@ -84,11 +88,12 @@ class tripleo::keepalived (
   $redis_virtual_ip        = false,
   $ovndbs_virtual_ip       = false,
   $virtual_router_id_base  = 50,
+  $custom_vrrp_script      = false,
+  $network_vips            = hiera('network_virtual_ips', {}),
   # DEPRECATED PARAMETERS
   $internal_api_virtual_ip = false,
   $storage_virtual_ip      = false,
   $storage_mgmt_virtual_ip = false,
-  $custom_vrrp_script      = false,
 ) {
 
   case $::osfamily {
@@ -171,7 +176,6 @@ class tripleo::keepalived (
   $last_fixed_vrouter_id = $virtual_router_id_base + 4
 
   # Set up all vips for isolated networks, the vrouter id is based on a sequential index
-  $network_vips = hiera('network_virtual_ips', {})
   $network_vips.each |String $net_name, $vip_info| {
     $virtual_ip = $vip_info[ip_address]
     if $virtual_ip and $virtual_ip != $controller_virtual_ip {
