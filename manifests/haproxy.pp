@@ -1433,7 +1433,7 @@ class tripleo::haproxy (
       ports             => '6379',
       ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
       server_names      => hiera('redis_node_names', $controller_hosts_names_real),
-      options           => union($haproxy_member_options, $redis_ssl_member_options),
+      options           => union($haproxy_member_options, $redis_ssl_member_options, ['on-marked-down shutdown-sessions']),
       verifyhost        => false,
     }
     if $manage_firewall {
