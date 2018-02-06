@@ -58,7 +58,7 @@ class tripleo::fencing(
     'try_sleep' => $try_sleep,
   }
   # We will create stonith levels *only* if the node is a compute instanceha one
-  if member(hiera('compute_instanceha_short_node_names'), downcase($::hostname)) {
+  if member(hiera('compute_instanceha_short_node_names', []), downcase($::hostname)) {
     $is_compute_instanceha_node = true
   } else {
     $is_compute_instanceha_node = false
