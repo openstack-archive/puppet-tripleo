@@ -138,6 +138,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*keystone_enable_member*]
+#   (Optional) Whether _member_ role is managed or not (required for Horizon).
+#   Defaults to hiera('keystone_enable_member', false)
+#
 class tripleo::profile::base::keystone (
   $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
   $bootstrap_node                 = hiera('bootstrap_nodeid', undef),
@@ -166,6 +170,7 @@ class tripleo::profile::base::keystone (
   $barbican_notification_topics   = [],
   $extra_notification_topics      = [],
   $step                           = Integer(hiera('step')),
+  $keystone_enable_member         = hiera('keystone_enable_member', false),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -280,6 +285,11 @@ class tripleo::profile::base::keystone (
 
   if $step == 3 and $manage_roles {
     include ::keystone::roles::admin
+    if $keystone_enable_member {
+      keystone_role { '_member_':
+        ensure => present,
+      }
+    }
   }
 
   if $step == 3 and $manage_endpoint {
