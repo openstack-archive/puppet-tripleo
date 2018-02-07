@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    IPtables rules managed by Neutron won't be persistent on the host anymore.
+    Instead, they'll be removed (if exist) from /etc/sysconfig/iptables.
