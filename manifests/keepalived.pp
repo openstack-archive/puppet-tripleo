@@ -69,6 +69,12 @@
 #  An integer.
 #  Defaults to 50
 #
+# [*custom_vrrp_script*]
+#  A custom vrrp script used to check if haproxy is running. Can
+#  be used to override the distro defaults in this module.
+#  Defaults to false.
+#
+
 
 class tripleo::keepalived (
   $controller_virtual_ip,
@@ -82,6 +88,7 @@ class tripleo::keepalived (
   $internal_api_virtual_ip = false,
   $storage_virtual_ip      = false,
   $storage_mgmt_virtual_ip = false,
+  $custom_vrrp_script      = false,
 ) {
 
   case $::osfamily {
@@ -100,10 +107,16 @@ class tripleo::keepalived (
     }
   }
 
+  if $custom_vrrp_script {
+    $keepalived_vrrp_script_real = $custom_vrrp_script
+  } else {
+    $keepalived_vrrp_script_real = $keepalived_vrrp_script
+  }
+
   class { '::keepalived': }
   keepalived::vrrp_script { 'haproxy':
     name_is_process => $keepalived_name_is_process,
-    script          => $keepalived_vrrp_script,
+    script          => $keepalived_vrrp_script_real,
   }
 
   # KEEPALIVE INSTANCE CONTROL
