@@ -77,21 +77,23 @@ class tripleo::profile::base::ceph::rgw (
   if $step >= 4 {
     if $rgw_keystone_version == 'v2.0' {
       ceph::rgw::keystone { $rgw_name:
-        rgw_keystone_accepted_roles => ['admin', 'Member'],
-        use_pki                     => false,
-        rgw_keystone_admin_token    => $keystone_admin_token,
-        rgw_keystone_url            => $keystone_url,
-        user                        => 'ceph',
+        rgw_keystone_accepted_roles      => ['admin', 'Member'],
+        use_pki                          => false,
+        rgw_keystone_admin_token         => $keystone_admin_token,
+        rgw_keystone_url                 => $keystone_url,
+        user                             => 'ceph',
+        rgw_keystone_revocation_interval => 0,
       }
     }
     else
     {
       ceph::rgw::keystone { $rgw_name:
-        rgw_keystone_accepted_roles => ['admin', 'Member'],
-        use_pki                     => false,
-        rgw_keystone_url            => $keystone_url,
-        rgw_keystone_version        => $rgw_keystone_version,
-        user                        => 'ceph',
+        rgw_keystone_accepted_roles      => ['admin', 'Member'],
+        use_pki                          => false,
+        rgw_keystone_url                 => $keystone_url,
+        rgw_keystone_version             => $rgw_keystone_version,
+        user                             => 'ceph',
+        rgw_keystone_revocation_interval => 0,
       }
     }
   }
