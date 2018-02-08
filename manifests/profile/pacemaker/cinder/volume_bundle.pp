@@ -22,6 +22,14 @@
 #   (Optional) The docker image to use for creating the pacemaker bundle
 #   Defaults to hiera('tripleo::profile::pacemaker::cinder::volume_bundle::cinder_docker_image', undef)
 #
+# [*docker_volumes*]
+#   (Optional) The list of volumes to be mounted in the docker container
+#   Defaults to []
+#
+# [*docker_environment*]
+#   (Optional) The list of environment variables set in the docker container
+#   Defaults to ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS']
+#
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
@@ -39,6 +47,8 @@
 class tripleo::profile::pacemaker::cinder::volume_bundle (
   $bootstrap_node             = hiera('cinder_volume_short_bootstrap_node_name'),
   $cinder_volume_docker_image = hiera('tripleo::profile::pacemaker::cinder::volume_bundle::cinder_volume_docker_image', undef),
+  $docker_volumes             = [],
+  $docker_environment         = ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS'],
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
 ) {
@@ -67,18 +77,14 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
     if $pacemaker_master {
       $cinder_volume_nodes_count = count(hiera('cinder_volume_short_node_names', []))
 
-      pacemaker::resource::bundle { $::cinder::params::volume_service:
-        image             => $cinder_volume_docker_image,
-        replicas          => 1,
-        location_rule     => {
-          resource_discovery => 'exclusive',
-          score              => 0,
-          expression         => ['cinder-volume-role eq true'],
-        },
-        container_options => 'network=host',
-        options           => '--ipc=host --privileged=true --user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
-        run_command       => '/bin/bash /usr/local/bin/kolla_start',
-        storage_maps      => {
+      $docker_vol_arr = delete(any2array($docker_volumes), '').flatten()
+
+      unless empty($docker_vol_arr) {
+        $storage_maps = docker_volumes_to_storage_maps($docker_vol_arr, 'cinder-volume')
+      } else {
+        notice('Using fixed list of docker volumes for cinder-volume bundle')
+        # Default to previous hard-coded list
+        $storage_maps = {
           'cinder-volume-cfg-files'               => {
             'source-dir' => '/var/lib/kolla/config_files/cinder_volume.json',
             'target-dir' => '/var/lib/kolla/config_files/config.json',
@@ -159,7 +165,24 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
             'target-dir' => '/var/lib/kolla/config_files/src-ceph/',
             'options'    => 'ro',
           },
+        }
+      }
+
+      $docker_env_arr = delete(any2array($docker_environment), '').flatten()
+      $docker_env = join($docker_env_arr.map |$var| { "-e ${var}" }, ' ')
+
+      pacemaker::resource::bundle { $::cinder::params::volume_service:
+        image             => $cinder_volume_docker_image,
+        replicas          => 1,
+        location_rule     => {
+          resource_discovery => 'exclusive',
+          score              => 0,
+          expression         => ['cinder-volume-role eq true'],
         },
+        container_options => 'network=host',
+        options           => "--ipc=host --privileged=true --user=root --log-driver=journald ${docker_env}",
+        run_command       => '/bin/bash /usr/local/bin/kolla_start',
+        storage_maps      => $storage_maps,
       }
     }
   }
