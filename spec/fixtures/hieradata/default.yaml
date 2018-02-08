@@ -27,6 +27,14 @@ ceph::profile::params::rgw_keystone_admin_project: 'keystone_project'
 ceph::profile::params::rgw_keystone_admin_user: 'keystone_admin_user'
 ceph::profile::params::rgw_keystone_admin_password: 'keystone_admin_password'
 # cinder related items
+cinder_backup_short_bootstrap_node_name: 'node.example.com'
+cinder_backup_short_node_names:
+ - 'c-bak-1'
+ - 'c-bak-2'
+cinder_volume_short_bootstrap_node_name: 'node.example.com'
+cinder_volume_short_node_names:
+ - 'c-vol-1'
+ - 'c-vol-2'
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
 # gnocchi related items
