@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Allow to let puppet-keystone managing _member_ role which is required
+    by Horizon. Can be enabled with keystone_enable_member parameter (disabled
+    by default.)
