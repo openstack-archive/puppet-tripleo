@@ -64,6 +64,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*incoming_storage_driver*]
+#   (Optional)  Storage driver to use for incoming metric data
+#   Defaults to hiera('incoming_storage_driver', undef)
+#
 class tripleo::profile::base::gnocchi::api (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -74,6 +78,7 @@ class tripleo::profile::base::gnocchi::api (
   $redis_vip                     = hiera('redis_vip'),
   $gnocchi_rbd_client_name       = hiera('gnocchi::storage::ceph::ceph_username','openstack'),
   $step                          = Integer(hiera('step')),
+  $incoming_storage_driver       = hiera('incoming_storage_driver', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -120,8 +125,10 @@ class tripleo::profile::base::gnocchi::api (
       coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
     }
 
-    class { '::gnocchi::storage::incoming::redis':
-      redis_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
+    if $incoming_storage_driver == 'redis' {
+      class { '::gnocchi::storage::incoming::redis':
+        redis_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
+      }
     }
 
     case $gnocchi_backend {

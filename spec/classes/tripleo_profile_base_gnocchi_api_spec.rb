@@ -75,7 +75,8 @@ describe 'tripleo::profile::base::gnocchi::api' do
         :step => 4,
         :gnocchi_backend => 'file',
         :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1'
+        :redis_vip => '127.0.0.1',
+        :incoming_storage_driver => 'redis',
       } }
 
       it {
@@ -97,7 +98,8 @@ describe 'tripleo::profile::base::gnocchi::api' do
         :gnocchi_backend => 'rbd',
         :gnocchi_redis_password => 'gnocchi',
         :redis_vip => '127.0.0.1',
-        :gnocchi_rbd_client_name => 'openstack'
+        :gnocchi_rbd_client_name => 'openstack',
+        :incoming_storage_driver => 'redis',
       } }
 
       it {
@@ -111,6 +113,20 @@ describe 'tripleo::profile::base::gnocchi::api' do
         )
         is_expected.to contain_class('gnocchi::storage::ceph')
         is_expected.to contain_exec('exec-setfacl-openstack-gnocchi')
+      }
+    end
+
+    context 'skip incoming storage in step 4' do
+      let(:params) { {
+        :step => 4,
+        :gnocchi_backend => 'rbd',
+        :gnocchi_redis_password => 'gnocchi',
+        :redis_vip => '127.0.0.1',
+        :incoming_storage_driver => '',
+      } }
+
+      it {
+        is_expected.not_to contain_class('gnocchi::storage::incoming::redis')
       }
     end
 
