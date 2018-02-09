@@ -43,6 +43,10 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('panko_api_network', undef)
 #
+# [*enable_panko_expirer*]
+#   (Optional) Whether panko expirer should be configured
+#   Defaults to hiera('enable_panko_expirer', true)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -53,6 +57,7 @@ class tripleo::profile::base::panko::api (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $panko_network                 = hiera('panko_api_network', undef),
+  $enable_panko_expirer          = hiera('enable_panko_expirer', true),
   $step                          = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -78,6 +83,9 @@ class tripleo::profile::base::panko::api (
     include ::panko::db
     class { '::panko::api':
       sync_db => $sync_db,
+    }
+    if $enable_panko_expirer {
+      include ::panko::expirer
     }
     include ::tripleo::profile::base::apache
     class { '::panko::wsgi::apache':
