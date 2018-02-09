@@ -29,7 +29,7 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
           is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
-            "set OPTIONS '\"--log-driver=journald --signature-verification=false --iptables=false\"'",
+            "set OPTIONS '\"--log-driver=journald --signature-verification=false --iptables=false --live-restore\"'",
           ])
       }
     end

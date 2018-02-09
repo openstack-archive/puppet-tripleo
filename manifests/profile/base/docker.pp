@@ -33,7 +33,7 @@
 #   OPTIONS that are used to startup the docker service.  NOTE:
 #   --selinux-enabled is dropped due to recommendations here:
 #   https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/7.2_Release_Notes/technology-preview-file_systems.html
-#   Defaults to '--log-driver=journald --signature-verification=false --iptables=false'
+#   Defaults to '--log-driver=journald --signature-verification=false --iptables=false --live-restore'
 #
 # [*configure_network*]
 #   Boolean. Whether to configure the docker network. Defaults to false.
@@ -73,7 +73,7 @@
 class tripleo::profile::base::docker (
   $insecure_registries = undef,
   $registry_mirror     = false,
-  $docker_options      = '--log-driver=journald --signature-verification=false --iptables=false',
+  $docker_options      = '--log-driver=journald --signature-verification=false --iptables=false --live-restore',
   $configure_network   = false,
   $network_options     = '',
   $configure_storage   = true,
