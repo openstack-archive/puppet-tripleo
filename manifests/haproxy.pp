@@ -256,10 +256,6 @@
 #  (optional) Enable or not Heat API binding
 #  Defaults to hiera('heat_api_enabled', false)
 #
-# [*heat_cloudwatch*]
-#  (optional) Enable or not Heat Cloudwatch API binding
-#  Defaults to hiera('heat_api_cloudwatch_enabled', false)
-#
 # [*heat_cfn*]
 #  (optional) Enable or not Heat CFN API binding
 #  Defaults to hiera('heat_api_cfn_enabled', false)
@@ -397,10 +393,6 @@
 # [*heat_cfn_network*]
 #  (optional) Specify the network heat_cfn is running on.
 #  Defaults to hiera('heat_api_cfn_network', undef)
-#
-# [*heat_cloudwatch_network*]
-#  (optional) Specify the network heat_cloudwatch is running on.
-#  Defaults to hiera('heat_api_cloudwatch_network', undef)
 #
 # [*horizon_network*]
 #  (optional) Specify the network horizon is running on.
@@ -623,7 +615,6 @@ class tripleo::haproxy (
   $mistral                     = hiera('mistral_api_enabled', false),
   $swift_proxy_server          = hiera('swift_proxy_enabled', false),
   $heat_api                    = hiera('heat_api_enabled', false),
-  $heat_cloudwatch             = hiera('heat_api_cloudwatch_enabled', false),
   $heat_cfn                    = hiera('heat_api_cfn_enabled', false),
   $horizon                     = hiera('horizon_enabled', false),
   $ironic                      = hiera('ironic_api_enabled', false),
@@ -657,7 +648,6 @@ class tripleo::haproxy (
   $gnocchi_network             = hiera('gnocchi_api_network', undef),
   $heat_api_network            = hiera('heat_api_network', undef),
   $heat_cfn_network            = hiera('heat_api_cfn_network', undef),
-  $heat_cloudwatch_network     = hiera('heat_api_cloudwatch_network', undef),
   $horizon_network             = hiera('horizon_network', undef),
   $ironic_inspector_network    = hiera('ironic_inspector_network', undef),
   $ironic_network              = hiera('ironic_api_network', undef),
@@ -1211,21 +1201,6 @@ class tripleo::haproxy (
       listen_options    => $heat_options,
       public_ssl_port   => $ports[heat_api_ssl_port],
       service_network   => $heat_api_network,
-      member_options    => union($haproxy_member_options, $internal_tls_member_options),
-    }
-  }
-
-  if $heat_cloudwatch {
-    ::tripleo::haproxy::endpoint { 'heat_cloudwatch':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $heat_api_vip,
-      service_port      => $ports[heat_cw_port],
-      ip_addresses      => $heat_ip_addresses,
-      server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      listen_options    => $heat_options,
-      public_ssl_port   => $ports[heat_cw_ssl_port],
-      service_network   => $heat_cloudwatch_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
