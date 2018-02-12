@@ -109,6 +109,11 @@
 #  (optional) Enable or not Keystone Admin API binding
 #  Defaults to hiera('keystone_enabled', false)
 #
+# [*keystone_admin_public*]
+#  (optional) Enable or not Keystone Admin API binding on the public network.
+#  Note that this only works if the keystone admin API is enabled.
+#  Defaults to true
+#
 # [*keystone_public*]
 #  (optional) Enable or not Keystone Public API binding
 #  Defaults to hiera('keystone_enabled', false)
@@ -325,6 +330,7 @@ class tripleo::haproxy (
   $ssl_options               = 'no-sslv3',
   $haproxy_stats_certificate = undef,
   $keystone_admin            = hiera('keystone_enabled', false),
+  $keystone_admin_public     = true,
   $keystone_public           = hiera('keystone_enabled', false),
   $neutron                   = hiera('neutron_api_enabled', false),
   $cinder                    = hiera('cinder_api_enabled', false),
@@ -534,18 +540,25 @@ class tripleo::haproxy (
   }
 
   if $keystone_admin {
+    if $keystone_admin_public {
+      $keystone_admin_public_ip = $public_virtual_ip
+    } else {
+      $keystone_admin_public_ip = undef
+    }
     ::tripleo::haproxy::endpoint { 'keystone_admin':
-      internal_ip     => hiera('keystone_admin_api_vip', $controller_virtual_ip),
-      service_port    => $ports[keystone_admin_api_port],
-      ip_addresses    => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
-      server_names    => hiera('keystone_admin_api_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      listen_options  => {
+      public_virtual_ip => $keystone_admin_public_ip,
+      internal_ip       => hiera('keystone_admin_api_vip', $controller_virtual_ip),
+      service_port      => $ports[keystone_admin_api_port],
+      ip_addresses      => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
+      server_names      => hiera('keystone_admin_api_node_names', $controller_hosts_names_real),
+      mode              => 'http',
+      listen_options    => {
           'http-request' => [
             'set-header X-Forwarded-Proto https if { ssl_fc }',
             'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
       },
-      service_network => hiera('keystone_admin_api_network', undef)
+      service_network   => hiera('keystone_admin_api_network', undef),
+      public_ssl_port   => 13357
     }
   }
 
