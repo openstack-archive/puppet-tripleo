@@ -119,8 +119,17 @@ describe 'tripleo::profile::base::logging::fluentd' do
       ) }
       it { is_expected.to contain_fluentd__config('100-openstack-ceilometer_agent_central.conf') }
       it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-ceilometer_agent_central.conf').with_content(
-      /^\s*path \/var\/log\/ceilometer\/central\.log$/
+"# This file is managed by Puppet, do not edit manually.
+<source>
+  format /(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/
+  path /var/log/ceilometer/central.log
+  pos_file /var/cache/fluentd//openstack.ceilometer.agent.central.pos
+  tag openstack.ceilometer.agent.central
+  @type tail
+</source>
+"
       ) }
+
     end
 
     context 'Config by service -- ceilometer_agent_central with path trasnformation' do
@@ -141,19 +150,18 @@ describe 'tripleo::profile::base::logging::fluentd' do
        :pos_file_path => '/var/cache/fluentd/',
        :default_format => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/'
       ) }
-      it { is_expected.to contain_fluentd__config('100-openstack-ceilometer_agent_central.conf').with(
-        :config => {
-          'source' =>  [ {
-          'format' => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/',
-          'path' => '/var/log/containers/ceilometer/central.log',
-          'pos_file' => '/var/cache/fluentd//openstack.ceilometer.agent.central.pos',
-          'tag' => 'openstack.ceilometer.agent.central',
-          'type' => 'tail'
-        } ],
-          'filter' => [],
-          'match' => []
-        }
-      ) }
+      it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-ceilometer_agent_central.conf').with_content (
+"# This file is managed by Puppet, do not edit manually.
+<source>
+  format /(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/
+  path /var/log/containers/ceilometer/central.log
+  pos_file /var/cache/fluentd//openstack.ceilometer.agent.central.pos
+  tag openstack.ceilometer.agent.central
+  @type tail
+</source>
+"
+       ) }
+
     end
 
     context 'Groups by service -- ceilometer_agent_central added ceilometer' do
@@ -188,7 +196,6 @@ describe 'tripleo::profile::base::logging::fluentd' do
         :content =>  [ "# This file is maintained by puppet.\n[Service]\nUser=fluentd\n" ]
       } ) }
 
-      it { is_expected.to contain_service('fluentd') }
       it { is_expected.to contain_user('fluentd').with(
         :ensure =>'present',
         :groups => [ 'fluentd','ceilometer' ],
@@ -214,7 +221,6 @@ describe 'tripleo::profile::base::logging::fluentd' do
         :content =>  [ "# This file is maintained by puppet.\n[Service]\nUser=root\n" ]
       } ) }
 
-      it { is_expected.to contain_service('fluentd') }
       it { is_expected.to_not contain_user('fluentd') }
     end
 

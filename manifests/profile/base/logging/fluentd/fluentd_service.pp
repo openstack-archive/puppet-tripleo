@@ -30,7 +30,7 @@ define tripleo::profile::base::logging::fluentd::fluentd_service (
   # stub config files.
   if !empty($sources) or !empty($filters) or !empty($matches) {
     if $fluentd_transform and !empty($sources) {
-      $new_source = map($sources) |$source| {
+      $new_source = {} + map($sources) |$source| {
           if $source['path'] {
             $newpath = {
               'path' => regsubst($source['path'],
@@ -44,14 +44,12 @@ define tripleo::profile::base::logging::fluentd::fluentd_service (
           }
       }
     }else{
-      $new_source = $sources
+      $new_source = {} + $sources
     }
     # Insert default values into list of sources.
-    $_sources = $new_source.map |$src| {
-      $default_source
-      + {pos_file => "${pos_file_path}/${src['tag']}.pos"}
-      + $src
-    }
+    $_sources = { 'pos_file' => "${pos_file_path}/${new_source['tag']}.pos" }
+      + $default_source + $new_source
+
     ::fluentd::config { "100-openstack-${title}.conf":
       config => {
         'source' => $_sources,
