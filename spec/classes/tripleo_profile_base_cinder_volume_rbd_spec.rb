@@ -42,6 +42,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
         it 'should trigger complete configuration' do
           is_expected.to contain_cinder__backend__rbd('tripleo_ceph').with(
             :backend_host    => 'hostgroup',
+            :rbd_ceph_conf   => '/etc/ceph/ceph.conf',
             :rbd_pool        => 'volumes',
             :rbd_user        => 'openstack',
           )
@@ -53,6 +54,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
           params.merge!({
             :backend_name            => 'poodles',
             :cinder_rbd_backend_host => 'fe80::fc54:ff:fe9e:7846',
+            :cinder_rbd_ceph_conf    => '/etc/ceph/mycluster.conf',
             :cinder_rbd_pool_name    => 'poolname',
             :cinder_rbd_extra_pools  => ['aplenty', 'galore'],
             :cinder_rbd_secret_uuid  => 'secretuuid',
@@ -62,18 +64,21 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
         it 'should trigger complete configuration' do
           is_expected.to contain_cinder__backend__rbd('poodles').with(
             :backend_host    => 'fe80::fc54:ff:fe9e:7846',
+            :rbd_ceph_conf   => '/etc/ceph/mycluster.conf',
             :rbd_pool        => 'poolname',
             :rbd_user        => 'kcatsnepo',
             :rbd_secret_uuid => 'secretuuid'
           )
           is_expected.to contain_cinder__backend__rbd('poodles_aplenty').with(
             :backend_host    => 'fe80::fc54:ff:fe9e:7846',
+            :rbd_ceph_conf   => '/etc/ceph/mycluster.conf',
             :rbd_pool        => 'aplenty',
             :rbd_user        => 'kcatsnepo',
             :rbd_secret_uuid => 'secretuuid'
           )
           is_expected.to contain_cinder__backend__rbd('poodles_galore').with(
             :backend_host    => 'fe80::fc54:ff:fe9e:7846',
+            :rbd_ceph_conf   => '/etc/ceph/mycluster.conf',
             :rbd_pool        => 'galore',
             :rbd_user        => 'kcatsnepo',
             :rbd_secret_uuid => 'secretuuid'
