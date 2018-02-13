@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Add support to configure Dell EMC Xtremio iscsi cinder backend
