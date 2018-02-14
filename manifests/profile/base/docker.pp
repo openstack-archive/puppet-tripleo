@@ -54,6 +54,10 @@
 #   Boolean. Value to configure docker daemon's debug configuration.
 #   Defaults to false
 #
+# [*deployment_user*]
+#   String. Value to configure the deployment user.
+#   Defaults to hiera('deployment_user', undef)
+#
 # DEPRECATED PARAMETERS
 #
 # [*insecure_registry_address*]
@@ -80,6 +84,7 @@ class tripleo::profile::base::docker (
   $storage_options     = '-s overlay2',
   $step                = Integer(hiera('step')),
   $debug               = false,
+  $deployment_user     = hiera('deployment_user', undef),
   # DEPRECATED PARAMETERS
   $insecure_registry_address = undef,
   $docker_namespace = undef,
@@ -228,6 +233,23 @@ class tripleo::profile::base::docker (
       changes => $network_changes,
       notify  => Service['docker'],
       require => Package['docker'],
+    }
+
+    if $deployment_user {
+      ensure_resource('group', 'docker', {
+        'ensure' => 'present',
+      })
+      ensure_resource('user', $deployment_user, {
+        'name'   => $deployment_user,
+        'groups' => 'docker',
+        # We need to add the user into docker group
+        # before docker starts otherwise the user won't
+        # be able to use Docker CLI.
+        # See background:
+        # https://review.openstack.org/#/c/390549/3/elements/puppet-stack-config/puppet-stack-config.pp
+        # https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user
+        'notify'  => Service['docker'],
+      })
     }
 
   }
