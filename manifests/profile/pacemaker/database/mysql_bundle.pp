@@ -113,13 +113,14 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $pacemaker_master = false
   }
 
-  $galera_node_names_lookup = hiera('mysql_short_node_names', $::hostname)
-  $galera_fqdns_names_lookup = hiera('mysql_node_names', $::hostname)
+  # FQDN are lowercase in /etc/hosts, so are pacemaker node names
+  $galera_node_names_lookup = downcase(hiera('mysql_short_node_names', $::hostname))
+  $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names', $::hostname))
 
   if is_array($galera_node_names_lookup) {
-    $galera_nodes = downcase(join($galera_fqdns_names_lookup, ','))
+    $galera_nodes = join($galera_fqdns_names_lookup, ',')
   } else {
-    $galera_nodes = downcase($galera_node_names_lookup)
+    $galera_nodes = $galera_node_names_lookup
   }
   $galera_nodes_array = split($galera_nodes, ',')
   $galera_nodes_count = count($galera_nodes_array)
