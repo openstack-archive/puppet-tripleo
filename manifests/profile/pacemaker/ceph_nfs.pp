@@ -64,13 +64,18 @@ class tripleo::profile::pacemaker::ceph_nfs (
   }
 
   if $step >= 2 {
-    pacemaker::property { 'ceph-nfs-role-node-property':
-      property => 'ceph-nfs-role',
-      value    => true,
-      tries    => $pcs_tries,
-      node     => $::hostname,
-    }
     if $pacemaker_master {
+      # At step2 we only create the node property on master so that
+      # both VIP and (later at step5) ceph-nfs service can start on master
+      # node only. This way we can guarantee that the VIP and ceph-nfs are
+      # colocated. Later we expand the properties on all nodes where ceph_nfs
+      # is supposed to run.
+      pacemaker::property { 'ceph-nfs-role-node-property':
+        property => 'ceph-nfs-role',
+        value    => true,
+        tries    => $pcs_tries,
+        node     => $::hostname,
+      }
       pacemaker::resource::ip { 'ganesha_vip':
         ip_address    => $ganesha_vip,
         cidr_netmask  => $netmask,
@@ -116,9 +121,21 @@ class tripleo::profile::pacemaker::ceph_nfs (
       tag               => 'pacemaker_constraint',
     }
 
+    # See comment on pacemaker::property at step2
+    $ceph_nfs_short_node_names = hiera('ceph_nfs_short_node_names')
+    $ceph_nfs_short_node_names.each |String $node_name| {
+      pacemaker::property { "ceph-nfs-role-${node_name}":
+        property => 'ceph-nfs-role',
+        value    => true,
+        tries    => $pcs_tries,
+        node     => $node_name,
+      }
+    }
+
     Pacemaker::Resource::Ip['ganesha_vip']
       -> Pacemaker::Resource::Service['ceph-nfs']
         -> Pacemaker::Constraint::Order['ganesha_vip-then-ganesha']
           -> Pacemaker::Constraint::Colocation['ganesha_vip-with-ganesha']
+            -> Pacemaker::Property<||>
   }
 }
