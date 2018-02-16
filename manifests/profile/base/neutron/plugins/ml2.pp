@@ -98,5 +98,9 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include ::neutron::plugins::ml2::mellanox
       include ::neutron::plugins::ml2::mellanox::mlnx_sdn_assist
     }
+
+    if 'baremetal' in $mechanism_drivers {
+      include ::tripleo::profile::base::neutron::plugins::ml2::networking_baremetal
+    }
   }
 }
