@@ -171,6 +171,28 @@ describe 'tripleo::firewall' do
       it_raises 'a Puppet::Error', /500 wrong tcp rule firewall rule cannot be created. TCP or UDP rules for INPUT or OUTPUT need port or sport or dport./
     end
 
+    context 'with firewall chain' do
+      before :each do
+        params.merge!(
+          :manage_firewall => true,
+          :firewall_chains => {
+            'FORWARD:filter:IPv4' => {
+              'ensure' => 'present',
+              'policy' => 'accept',
+              'purge'  => false
+            }
+          })
+      end
+
+      it {
+        is_expected.to contain_firewallchain('FORWARD:filter:IPv4').with(
+          'ensure' => 'present',
+          'policy' => 'accept',
+          'purge'  => false)
+      }
+
+    end
+
   end
 
   on_supported_os.each do |os, facts|

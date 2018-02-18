@@ -24,10 +24,18 @@
 #  (false means disabled, and true means enabled)
 #  Defaults to false
 #
+# [*firewall_chains*]
+#   (optional) Manage firewall chains
+#   Default to {}
+#
 # [*firewall_rules*]
 #   (optional) Allow to add custom firewall rules
 #   Should be an hash.
 #   Default to {}
+#
+# [*purge_firewall_chains*]
+#   (optional) Boolean, purge all firewalli rules in a given chain
+#   Defaults to false
 #
 # [*purge_firewall_rules*]
 #   (optional) Boolean, purge all firewall resources
@@ -44,14 +52,22 @@
 #   Default to {}
 #
 class tripleo::firewall(
-  $manage_firewall      = false,
-  $firewall_rules       = {},
-  $purge_firewall_rules = false,
-  $firewall_pre_extras  = {},
-  $firewall_post_extras = {},
+  $manage_firewall       = false,
+  $firewall_chains       = {},
+  $firewall_rules        = {},
+  $purge_firewall_chains = false,
+  $purge_firewall_rules  = false,
+  $firewall_pre_extras   = {},
+  $firewall_post_extras  = {},
 ) {
 
   if $manage_firewall {
+
+    if $purge_firewall_chains {
+      resources { 'firewallchain':
+        purge => true
+      }
+    }
 
     # Only purges IPv4 rules
     if $purge_firewall_rules {
@@ -59,6 +75,17 @@ class tripleo::firewall(
         purge => true
       }
     }
+
+    # To manage the chains they must be named in specific ways
+    # https://github.com/puppetlabs/puppetlabs-firewall#type-firewallchain
+    # Example Hiera:
+    # tripleo::firewall::firewall_chains:
+    #   'FORWARD:filter:IPv4':
+    #     ensure: present
+    #     policy: accept
+    #     purge: false
+    #
+    create_resources('firewallchain', $firewall_chains)
 
     # anyone can add your own rules
     # example with Hiera:

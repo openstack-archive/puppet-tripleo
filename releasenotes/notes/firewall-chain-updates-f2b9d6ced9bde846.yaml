@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Add ability to update firewall chains with the tripleo::firewall class.
