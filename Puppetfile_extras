@@ -14,7 +14,7 @@ mod 'java',
   :ref => '1.4.2'
 
 mod 'cassandra',
-  :git => 'https://github.com/locp/cassandra',
+  :git => 'https://github.com/voxpupuli/puppet-cassandra',
   :ref => '1.9.2'
 
 mod 'zookeeper',
