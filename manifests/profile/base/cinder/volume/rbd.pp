@@ -26,6 +26,10 @@
 #   (Optional) String to use as backend_host in the backend stanza
 #   Defaults to 'cinder::host'
 #
+# [*cinder_rbd_ceph_conf*]
+#   (Optional) The path to the Ceph cluster config file
+#   Defaults to '/etc/ceph/ceph.conf'
+#
 # [*cinder_rbd_pool_name*]
 #   (Optional) The name of the RBD pool to use
 #   Defaults to 'volumes'
@@ -51,6 +55,7 @@
 class tripleo::profile::base::cinder::volume::rbd (
   $backend_name            = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph'),
   $cinder_rbd_backend_host = hiera('cinder::host', 'hostgroup'),
+  $cinder_rbd_ceph_conf    = hiera('cinder::backend::rbd::rbd_ceph_conf', '/etc/ceph/ceph.conf'),
   $cinder_rbd_pool_name    = 'volumes',
   $cinder_rbd_extra_pools  = undef,
   $cinder_rbd_secret_uuid  = hiera('ceph::profile::params::fsid', undef),
@@ -62,6 +67,7 @@ class tripleo::profile::base::cinder::volume::rbd (
   if $step >= 4 {
     cinder::backend::rbd { $backend_name :
       backend_host    => $cinder_rbd_backend_host,
+      rbd_ceph_conf   => $cinder_rbd_ceph_conf,
       rbd_pool        => $cinder_rbd_pool_name,
       rbd_user        => $cinder_rbd_user_name,
       rbd_secret_uuid => $cinder_rbd_secret_uuid,
@@ -71,6 +77,7 @@ class tripleo::profile::base::cinder::volume::rbd (
       $cinder_rbd_extra_pools.each |$pool_name| {
         cinder::backend::rbd { "${backend_name}_${pool_name}" :
           backend_host    => $cinder_rbd_backend_host,
+          rbd_ceph_conf   => $cinder_rbd_ceph_conf,
           rbd_pool        => $pool_name,
           rbd_user        => $cinder_rbd_user_name,
           rbd_secret_uuid => $cinder_rbd_secret_uuid,
