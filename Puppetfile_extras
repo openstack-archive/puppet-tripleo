@@ -57,3 +57,6 @@ mod 'snmp',
   :git => 'https://github.com/razorsedge/puppet-snmp',
   :ref => 'master'
 
+mod 'pacemaker',
+  :git => 'https://github.com/openstack/puppet-pacemaker',
+  :ref => 'master'
