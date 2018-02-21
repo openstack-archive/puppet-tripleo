@@ -97,8 +97,8 @@
 #  Public IP or group of IPs to bind the pools
 #  Can be a string or an array.
 #  Defaults to undef
-# [*haproxy_stats_user*]
 #
+# [*haproxy_stats_user*]
 #  Username for haproxy stats authentication.
 #  A string.
 #  Defaults to 'admin'
@@ -751,6 +751,13 @@ class tripleo::haproxy (
     zaqar_ws_ssl_port => 9000,
   }
   $ports = merge($default_service_ports, $service_ports)
+
+  if !is_ip_addresses($controller_virtual_ip) {
+    fail("controller_virtual_ip param: ${controller_virtual_ip}, is not a proper IP address.")
+  }
+  if !is_ip_addresses($public_virtual_ip) {
+    fail("public_virtual_ip: ${public_virtual_ip}, is not a proper IP address.")
+  }
 
   if $enable_internal_tls {
     $base_internal_tls_member_options = ['ssl', 'verify required', "ca-file ${ca_bundle}"]
