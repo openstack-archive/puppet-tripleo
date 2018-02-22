@@ -1299,12 +1299,16 @@ class tripleo::haproxy (
       mode             => 'http',
       collect_exported => false,
     }
-    haproxy::balancermember { 'horizon':
-      listening_service => 'horizon',
-      ports             => '80',
-      ipaddresses       => hiera('horizon_node_ips', $controller_hosts_real),
-      server_names      => hiera('horizon_node_names', $controller_hosts_names_real),
-      options           => union($haproxy_member_options, ["cookie ${::hostname}"]),
+    $horizon_ip_addresses = hiera('horizon_node_ips', $controller_hosts_real)
+    $horizon_server_names = hiera('horizon_node_names', $controller_hosts_names_real)
+    hash(zip($horizon_ip_addresses, $horizon_server_names)).each | $ip, $server | {
+      haproxy::balancermember { "horizon_${ip}_${server}":
+        listening_service => 'horizon',
+        ports             => '80',
+        ipaddresses       => $ip,
+        server_names      => $server,
+        options           => union($haproxy_member_options, ["cookie ${server}"]),
+      }
     }
   }
 
