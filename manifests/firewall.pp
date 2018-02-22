@@ -130,6 +130,35 @@ class tripleo::firewall(
     #     action: accept
     $service_names = hiera('service_names', [])
     tripleo::firewall::service_rules { $service_names: }
-  }
 
+    # puppetlabs-firewall manages security rules via Puppet but make the rules
+    # consistent by default. Since Neutron also creates some rules, we don't
+    # want them to be consistent so we have to ensure that they're not stored
+    # into sysconfig.
+    # https://bugzilla.redhat.com/show_bug.cgi?id=1541528
+    # Also, we need to restart IPtables after the cleanup to make sure rules aren't persistent
+    # anymore.
+    exec { 'nonpersistent_v4_rules_cleanup':
+      command => '/bin/sed -i /neutron-/d /etc/sysconfig/iptables',
+      onlyif  => '/bin/test -f /etc/sysconfig/iptables && /bin/grep -v neutron- /etc/sysconfig/iptables',
+      notify  => Exec['restart_iptables'],
+    }
+    exec { 'restart_iptables':
+      command     => 'sudo service iptables restart',
+      path        => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
+      refreshonly => true,
+    }
+    exec { 'nonpersistent_v6_rules_cleanup':
+      command => '/bin/sed -i /neutron-/d /etc/sysconfig/ip6tables',
+      onlyif  => '/bin/test -f /etc/sysconfig/ip6tables && /bin/grep -v neutron- /etc/sysconfig/ip6tables',
+      notify  => Exec['restart_ip6tables'],
+    }
+    exec { 'restart_ip6tables':
+      command     => 'sudo service ip6tables restart',
+      path        => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
+      refreshonly => true,
+    }
+    Firewall<| |> -> Exec['nonpersistent_v4_rules_cleanup']
+    Firewall<| |> -> Exec['nonpersistent_v6_rules_cleanup']
+  }
 }
