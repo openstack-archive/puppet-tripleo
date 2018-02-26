@@ -111,4 +111,8 @@ tripleo::haproxy_basic_auth::haproxy_userlists:
       - 'luke insecure-password jedi'
       - 'anakin insecure-password darthvador'
       - 'sith password $5$h9LsKUOeCr$UlD62CNEpuZQkGYdBoiFJLsM6TlXluRLBlhEnpjDdaC'
+# OpenDaylight
+neutron::plugins::ovs::opendaylight::odl_port: '8081'
+neutron::plugins::ovs::opendaylight::odl_username: 'admin'
+neutron::plugins::ovs::opendaylight::odl_password: 'admin'
 

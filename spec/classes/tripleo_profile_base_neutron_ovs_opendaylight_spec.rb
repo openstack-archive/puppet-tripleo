@@ -17,24 +17,67 @@
 require 'spec_helper'
 
 describe 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
+
+  shared_examples_for 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
+
   let :params do
     { :step          => 4,
       :odl_port      => 8081,
-      :odl_check_url => 'restconf/operational/network-topology:network-topology/topology/netvirt:1'
+      :odl_check_url => 'restconf/operational/network-topology:network-topology/topology/netvirt:1',
+      :odl_api_ips   => ['192.0.2.5'],
+      :odl_url_ip    => '192.0.2.6',
+      :tunnel_ip     => '11.0.0.5',
     }
-  end
-  shared_examples_for 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
+    end
+
     before :each do
       facts.merge!({ :step => params[:step] })
+    end
+
+    context 'with defaults for all parameters at step 3' do
+      before do
+        params.merge!({ :step => 3 })
+        facts.merge!({ :step => params[:step] })
+      end
+      it 'should do nothing' do
+        is_expected.not_to contain_file('/var/lib/vhostuser_sockets')
+      end
+    end
+
+    context 'with vhostuser_socketdir configured at step 3' do
+      before do
+        params.merge!({ :step => 3,
+                        :vhostuser_socket_dir => '/var/lib/vhostuser_sockets' })
+        facts.merge!({ :step => params[:step] })
+      end
+      it { is_expected.to contain_file('/var/lib/vhostuser_sockets').with(
+        :ensure => 'directory',
+        :owner  => 'qemu',
+        :group  => 'qemu',
+        :mode   => '0775',
+      ) }
+    end
+
+    context 'with vhostuser_socketdir and its user/group configured' do
+      before do
+        params.merge!({ :step => 3,
+                        :vhostuser_socket_dir => '/var/lib/vhostuser_sockets',
+                        :vhostuser_socket_group => 'hugetlbfs',
+                        :vhostuser_socket_user  => 'openvswitch'})
+        facts.merge!({ :step => params[:step] })
+      end
+      it { is_expected.to contain_file('/var/lib/vhostuser_sockets').with(
+        :ensure => 'directory',
+        :owner  => 'openvswitch',
+        :group  => 'hugetlbfs',
+        :mode   => '0775',
+      ) }
     end
 
     context 'with empty OpenDaylight API IPs' do
       before do
         params.merge!({
-          :odl_api_ips => [],
-          :tunnel_ip   => '11.0.0.5',
-          :odl_url_ip  => '192.0.2.6',
-          :odl_port    => 8081
+          :odl_api_ips => []
         })
       end
       it 'should fail to configure OVS' do
@@ -45,10 +88,7 @@ describe 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
     context 'with empty OpenDaylight VIP' do
       before do
         params.merge!({
-          :odl_api_ips => ['192.0.2.5'],
-          :odl_url_ip  => [],
-          :tunnel_ip   => '11.0.0.5',
-          :odl_port    => 8081
+          :odl_url_ip  => []
         })
       end
       it 'should fail to configure OVS' do
@@ -57,14 +97,7 @@ describe 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
     end
 
     context 'with no TLS' do
-      before do
-        params.merge!({
-          :odl_api_ips => ['192.0.2.5'],
-          :odl_url_ip  => '192.0.2.6',
-          :tunnel_ip   => '11.0.0.5',
-          :odl_port    => 8081
-        })
-      end
+
       it 'should configure OVS for ODL' do
         is_expected.to contain_class('neutron::plugins::ovs::opendaylight').with(
           :tunnel_ip       => params[:tunnel_ip],
@@ -82,12 +115,8 @@ describe 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
         File.stubs(:file?).returns(true)
         File.stubs(:readlines).returns(["MIIFGjCCBAKgAwIBAgICA"])
         params.merge!({
-          :odl_api_ips         => ['192.0.2.5'],
-          :odl_url_ip          => '192.0.2.6',
-          :tunnel_ip           => '11.0.0.5',
           :enable_internal_tls => true,
           :conn_proto          => 'https',
-          :odl_port            => 8081,
           :certificate_specs => {
              "service_certificate" => "/etc/pki/tls/certs/ovs.crt",
              "service_key" => "/etc/pki/tls/private/ovs.key"}
