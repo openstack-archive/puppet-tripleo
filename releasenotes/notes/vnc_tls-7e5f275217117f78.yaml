@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Add support for libvirt VNC TLS with option of a dedicated CA
+
+    Configures ca/certs/key for nova-novnc vencrypt.
+
+    A dedicated IPA sub-CA can optionally be used to restrict access.
+    A custom certmonger helper is used to support this as certmonger currently
+    has limited support for IPA sub-CAs.
