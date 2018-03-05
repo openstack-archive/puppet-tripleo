@@ -136,25 +136,28 @@ class tripleo::firewall(
     # want them to be consistent so we have to ensure that they're not stored
     # into sysconfig.
     # https://bugzilla.redhat.com/show_bug.cgi?id=1541528
-    # Also, we need to restart IPtables after the cleanup to make sure rules aren't persistent
+    # Also, we need to reload IPtables after the cleanup to make sure rules aren't persistent
     # anymore.
+    # NOTE(aschultz): this needs to be a reload and not a restart due to
+    # BZ#1520534 where iptables my unload modules (like openvswitch) when it
+    # restarts.
     exec { 'nonpersistent_v4_rules_cleanup':
       command => '/bin/sed -i /neutron-/d /etc/sysconfig/iptables',
       onlyif  => '/bin/test -f /etc/sysconfig/iptables && /bin/grep -v neutron- /etc/sysconfig/iptables',
-      notify  => Exec['restart_iptables'],
+      notify  => Exec['reload_iptables'],
     }
-    exec { 'restart_iptables':
-      command     => 'sudo service iptables restart',
+    exec { 'reload_iptables':
+      command     => 'systemctl reload iptables',
       path        => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
       refreshonly => true,
     }
     exec { 'nonpersistent_v6_rules_cleanup':
       command => '/bin/sed -i /neutron-/d /etc/sysconfig/ip6tables',
       onlyif  => '/bin/test -f /etc/sysconfig/ip6tables && /bin/grep -v neutron- /etc/sysconfig/ip6tables',
-      notify  => Exec['restart_ip6tables'],
+      notify  => Exec['reload_ip6tables'],
     }
-    exec { 'restart_ip6tables':
-      command     => 'sudo service ip6tables restart',
+    exec { 'reload_ip6tables':
+      command     => 'systemctl reload ip6tables',
       path        => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
       refreshonly => true,
     }
