@@ -1302,7 +1302,10 @@ class tripleo::haproxy (
     $horizon_ip_addresses = hiera('horizon_node_ips', $controller_hosts_real)
     $horizon_server_names = hiera('horizon_node_names', $controller_hosts_names_real)
     hash(zip($horizon_ip_addresses, $horizon_server_names)).each | $ip, $server | {
-      haproxy::balancermember { "horizon_${ip}_${server}":
+      # We need to be sure the IP (IPv6) don't have colons
+      # which is a reserved character to reference manifests
+      $non_colon_ip = regsubst($ip, ':', '-', 'G')
+      haproxy::balancermember { "horizon_${non_colon_ip}_${server}":
         listening_service => 'horizon',
         ports             => '80',
         ipaddresses       => $ip,
