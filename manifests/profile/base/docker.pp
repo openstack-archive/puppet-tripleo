@@ -95,6 +95,9 @@ class tripleo::profile::base::docker (
     package {'docker':
       ensure => installed,
     }
+    # NOTE(aschultz): LP#1750194 - need to set ip_forward before docker starts
+    # so lets set it before we install the package if we're managing it.
+    Sysctl::Value<| title == 'net.ipv4.ip_forward' |> -> Package['docker']
 
     $docker_unit_override="[Service]\nMountFlags=\n"
 
