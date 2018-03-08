@@ -1,0 +1,9 @@
+---
+other:
+  - |
+    Added unit test for tripleo::keepalived class.
+  - |
+    Added network_vips parameter to the tripleo::keepalived class where
+    previously it was only exposed via the network_virtual_ips hiera data key.
+    The new parameter still uses the network_virtual_ips hiera data for the
+    default value or falls back to an empty hash.
