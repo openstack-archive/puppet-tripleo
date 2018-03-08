@@ -143,5 +143,6 @@ class tripleo::profile::base::neutron::server (
       sync_db => $sync_db,
       l3_ha   => $l3_ha,
     }
+    include ::neutron::quota
   }
 }
