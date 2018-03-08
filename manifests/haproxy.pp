@@ -153,7 +153,7 @@
 #
 # [*ssl_options*]
 #  String that sets the default ssl options to force on all "bind" lines.
-#  Defaults to 'no-sslv3'
+#  Defaults to 'no-sslv3 no-tlsv10'
 #
 # [*ca_bundle*]
 #  Path to the CA bundle to be used for HAProxy to validate the certificates of
@@ -605,7 +605,7 @@ class tripleo::haproxy (
   $internal_certificates_specs = {},
   $enable_internal_tls         = hiera('enable_internal_tls', false),
   $ssl_cipher_suite            = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
-  $ssl_options                 = 'no-sslv3',
+  $ssl_options                 = 'no-sslv3 no-tlsv10',
   $ca_bundle                   = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
   $crl_file                    = undef,
   $haproxy_stats_certificate   = undef,
