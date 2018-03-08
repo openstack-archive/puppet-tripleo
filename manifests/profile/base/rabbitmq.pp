@@ -160,9 +160,20 @@ class tripleo::profile::base::rabbitmq (
     }
   }
 
-  if $step >= 2 {
+  if $::hostname == downcase($bootstrap_node) {
+    $rabbitmq_bootstrapnode = true
+  } else {
+    $rabbitmq_bootstrapnode = false
+  }
+
+  if $rabbitmq_bootstrapnode and $step >= 2 {
     # In case of HA, starting of rabbitmq-server is managed by pacemaker, because of which, a dependency
     # to Service['rabbitmq-server'] will not work. Sticking with UPDATE action.
+    # When need to enforce the rabbitmq user inside a bootstrap node check for two reasons:
+    # a) on HA the users get replicated by the cluster anyway
+    # b) in the pacemaker profiles for rabbitmq we have an Exec['rabbitmq-ready'] -> Rabbitmq_User<||> collector
+    #    which is applied only on the bootstrap node (because enforcing the readiness on all nodes can be problematic
+    #    in situations like controller replacement)
     if $stack_action == 'UPDATE' {
       # Required for changing password on update scenario. Password will be changed only when
       # called explicity, if the rabbitmq service is already running.
@@ -171,14 +182,9 @@ class tripleo::profile::base::rabbitmq (
         admin    => true,
       }
     }
+    if hiera('veritas_hyperscale_controller_enabled', false) {
+      include ::veritas_hyperscale::hs_rabbitmq
+    }
   }
 
-  if $::hostname == downcase($bootstrap_node) {
-    $rabbitmq_bootstrapnode = true
-  } else {
-    $rabbitmq_bootstrapnode = false
-  }
-  if $rabbitmq_bootstrapnode and $step >= 2 and hiera('veritas_hyperscale_controller_enabled', false) {
-    include ::veritas_hyperscale::hs_rabbitmq
-  }
 }
