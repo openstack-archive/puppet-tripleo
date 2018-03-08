@@ -1,0 +1,4 @@
+---
+security:
+  - |
+    TLS v1.0 connections are no longer accepted by our HAProxy configuration.

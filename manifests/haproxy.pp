@@ -98,7 +98,7 @@
 #
 # [*ssl_options*]
 #  String that sets the default ssl options to force on all "bind" lines.
-#  Defaults to 'no-sslv3'
+#  Defaults to 'no-sslv3 no-tlsv10'
 #
 # [*haproxy_stats_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
@@ -327,7 +327,7 @@ class tripleo::haproxy (
   $service_certificate       = undef,
   $internal_certificate      = undef,
   $ssl_cipher_suite          = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
-  $ssl_options               = 'no-sslv3',
+  $ssl_options               = 'no-sslv3 no-tlsv10',
   $haproxy_stats_certificate = undef,
   $keystone_admin            = hiera('keystone_enabled', false),
   $keystone_admin_public     = true,
