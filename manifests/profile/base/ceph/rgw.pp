@@ -70,10 +70,11 @@ class tripleo::profile::base::ceph::rgw (
 
   if $step >= 4 {
     ceph::rgw::keystone { $rgw_name:
-      rgw_keystone_accepted_roles => ['admin', '_member_', 'Member'],
-      use_pki                     => false,
-      rgw_keystone_admin_token    => $keystone_admin_token,
-      rgw_keystone_url            => $keystone_url,
+      rgw_keystone_accepted_roles      => ['admin', '_member_', 'Member'],
+      use_pki                          => false,
+      rgw_keystone_admin_token         => $keystone_admin_token,
+      rgw_keystone_url                 => $keystone_url,
+      rgw_keystone_revocation_interval => 0,
     }
   }
 }
