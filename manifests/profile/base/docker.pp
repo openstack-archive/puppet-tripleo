@@ -33,6 +33,10 @@
 #   OPTIONS that are used to startup the docker service.
 #   Defaults to '--log-driver=journald --signature-verification=false --iptables=false --live-restore'
 #
+# [*additional_sockets*]
+#   Array of addtional domain sockets for the docker daemon to bind to.
+#   Defaults to undef
+#
 # [*configure_network*]
 #   Boolean. Whether to configure the docker network. Defaults to false.
 #
@@ -82,6 +86,7 @@ class tripleo::profile::base::docker (
   $insecure_registries = undef,
   $registry_mirror     = false,
   $docker_options      = '--log-driver=journald --signature-verification=false --iptables=false --live-restore',
+  $additional_sockets  = undef,
   $configure_network   = false,
   $network_options     = '',
   $configure_storage   = true,
@@ -132,7 +137,15 @@ class tripleo::profile::base::docker (
       } else {
         $selinux_enabled_string = ''
       }
-      $options_changes = [ "set OPTIONS '\"${docker_options}${selinux_enabled_string}\"'" ]
+      if $additional_sockets {
+        $arg_string = join(prefix(any2array($additional_sockets), '-H unix://'), ' ')
+        # We include the typical default socket to make sure other docker clients
+        # will work.
+        $add_sockets = " -H unix:///run/docker.sock ${arg_string}"
+      } else {
+        $add_sockets = ''
+      }
+      $options_changes = [ "set OPTIONS '\"${docker_options}${add_sockets}${selinux_enabled_string}\"'" ]
     } else {
       $options_changes = [ 'rm OPTIONS' ]
     }
@@ -250,10 +263,24 @@ class tripleo::profile::base::docker (
       require => Package['docker'],
     }
 
-    if $deployment_user {
+    if $additional_sockets {
+      # When specifying additional sockets, ensure that the directory
+      # exists for each one.
+      any2array($additional_sockets).each | String $sock_path | {
+        file {dirname($sock_path):
+          ensure => directory,
+          notify => Service['docker']
+        }
+      }
+    }
+
+    if $deployment_user or $additional_sockets {
       ensure_resource('group', 'docker', {
-        'ensure' => 'present',
+        'ensure' => 'present'
       })
+    }
+
+    if $deployment_user {
       ensure_resource('user', $deployment_user, {
         'name'   => $deployment_user,
         'groups' => 'docker',
