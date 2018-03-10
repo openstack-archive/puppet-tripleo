@@ -81,6 +81,7 @@ class tripleo::profile::base::mistral::api (
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::mistral::api
+    include ::mistral::cron_trigger
     # Temporarily disable Mistral API deployed in WSGI
     # https://bugs.launchpad.net/tripleo/+bug/1724607
     if $mistral_api_wsgi_enabled {
