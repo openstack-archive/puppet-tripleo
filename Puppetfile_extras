@@ -33,9 +33,10 @@ mod 'ntp',
   :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
   :ref => '4.2.x'
 
+# NOTE(aschultz): Pinned due to LP#1755211
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
-  :ref => 'master'
+  :ref => '20a465b0d8751bc08913b556d0a5b7fdac139271'
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
