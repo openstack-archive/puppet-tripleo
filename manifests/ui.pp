@@ -71,8 +71,16 @@
 #  The mistral proxy endpoint url
 #  Defaults to undef
 #
+# [*endpoint_proxy_nova*]
+#  The nova proxy endpoint url
+#  Defaults to undef
+#
 # [*endpoint_config_mistral*]
 #  The mistral config endpoint url
+#  Defaults to undef
+#
+# [*endpoint_config_nova*]
+#  The nova config endpoint url
 #  Defaults to undef
 #
 # [*endpoint_proxy_swift*]
@@ -112,6 +120,7 @@ class tripleo::ui (
   $endpoint_proxy_ironic            = undef,
   $endpoint_proxy_ironic_inspector  = undef,
   $endpoint_proxy_mistral           = undef,
+  $endpoint_proxy_nova              = undef,
   $endpoint_proxy_swift             = undef,
   $endpoint_config_zaqar            = undef,
   $endpoint_config_keystone         = undef,
@@ -119,6 +128,7 @@ class tripleo::ui (
   $endpoint_config_ironic           = undef,
   $endpoint_config_ironic_inspector = undef,
   $endpoint_config_mistral          = undef,
+  $endpoint_config_nova             = undef,
   $endpoint_config_swift            = undef,
   $enabled_loggers                  = ['console', 'zaqar'],
 
@@ -168,6 +178,11 @@ class tripleo::ui (
       'path'         => '/mistral',
       'url'          => $endpoint_proxy_mistral,
       'reverse_urls' => $endpoint_proxy_mistral
+    },
+    {
+      'path'         => '/nova',
+      'url'          => $endpoint_proxy_nova,
+      'reverse_urls' => $endpoint_proxy_nova
     },
     {
       'path'         => '/swift',
