@@ -78,6 +78,8 @@ class tripleo::haproxy::horizon_endpoint (
   $internal_certificates_specs = {},
   $service_network             = undef,
 ) {
+  # Let users override the options on a per-service basis
+  $custom_options = hiera('tripleo::haproxy::horizon::options', undef)
   # service exposed to the public network
   if $public_certificate {
     if $use_internal_certificates {
@@ -110,7 +112,7 @@ class tripleo::haproxy::horizon_endpoint (
       "${public_virtual_ip}:80"  => $haproxy_listen_bind_param,
       "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]),
     }
-    $horizon_options = {
+    $horizon_options = merge({
       'cookie'       => 'SERVERID insert indirect nocache',
       'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
@@ -119,16 +121,16 @@ class tripleo::haproxy::horizon_endpoint (
       'http-request' => [
           'set-header X-Forwarded-Proto https if { ssl_fc }',
           'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-    }
+    }, $custom_options)
   } else {
     $horizon_bind_opts = {
       "${internal_ip}:80" => $haproxy_listen_bind_param,
       "${public_virtual_ip}:80" => $haproxy_listen_bind_param,
     }
-    $horizon_options = {
+    $horizon_options = merge({
       'cookie' => 'SERVERID insert indirect nocache',
       'option' => [ 'forwardfor', 'httpchk' ],
-    }
+    }, $custom_options)
   }
 
   if $use_internal_certificates {
