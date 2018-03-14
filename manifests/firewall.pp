@@ -131,35 +131,24 @@ class tripleo::firewall(
     $service_names = hiera('service_names', [])
     tripleo::firewall::service_rules { $service_names: }
 
-    # puppetlabs-firewall manages security rules via Puppet but make the rules
-    # consistent by default. Since Neutron also creates some rules, we don't
-    # want them to be consistent so we have to ensure that they're not stored
-    # into sysconfig.
+
+    # puppetlabs-firewall only manages the current state of iptables
+    # rules and writes out the rules to a file to ensure they are
+    # persisted. We are specifically running the following commands after the
+    # iptables rules to ensure the persisted file does not contain any
+    # ephemeral neutron rules. Neutron assumes the iptables rules are not
+    # persisted so it may cause an issue if the rule is loaded on boot
+    # (or via iptables restart). If an operator needs to reload iptables
+    # for any reason, they may need to manually reload the appropriate
+    # neutron agent to restore these iptables rules.
     # https://bugzilla.redhat.com/show_bug.cgi?id=1541528
-    # Also, we need to reload IPtables after the cleanup to make sure rules aren't persistent
-    # anymore.
-    # NOTE(aschultz): this needs to be a reload and not a restart due to
-    # BZ#1520534 where iptables my unload modules (like openvswitch) when it
-    # restarts.
     exec { 'nonpersistent_v4_rules_cleanup':
       command => '/bin/sed -i /neutron-/d /etc/sysconfig/iptables',
-      onlyif  => '/bin/test -f /etc/sysconfig/iptables && /bin/grep -v neutron- /etc/sysconfig/iptables',
-      notify  => Exec['reload_iptables'],
-    }
-    exec { 'reload_iptables':
-      command     => 'systemctl reload iptables',
-      path        => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
-      refreshonly => true,
+      onlyif  => '/bin/test -f /etc/sysconfig/iptables && /bin/grep -q neutron- /etc/sysconfig/iptables',
     }
     exec { 'nonpersistent_v6_rules_cleanup':
       command => '/bin/sed -i /neutron-/d /etc/sysconfig/ip6tables',
-      onlyif  => '/bin/test -f /etc/sysconfig/ip6tables && /bin/grep -v neutron- /etc/sysconfig/ip6tables',
-      notify  => Exec['reload_ip6tables'],
-    }
-    exec { 'reload_ip6tables':
-      command     => 'systemctl reload ip6tables',
-      path        => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
-      refreshonly => true,
+      onlyif  => '/bin/test -f /etc/sysconfig/ip6tables && /bin/grep -q neutron- /etc/sysconfig/ip6tables',
     }
     Firewall<| |> -> Exec['nonpersistent_v4_rules_cleanup']
     Firewall<| |> -> Exec['nonpersistent_v6_rules_cleanup']
