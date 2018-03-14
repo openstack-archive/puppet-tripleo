@@ -30,9 +30,7 @@
 #   (defaults to false)
 #
 # [*docker_options*]
-#   OPTIONS that are used to startup the docker service.  NOTE:
-#   --selinux-enabled is dropped due to recommendations here:
-#   https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/7.2_Release_Notes/technology-preview-file_systems.html
+#   OPTIONS that are used to startup the docker service.
 #   Defaults to '--log-driver=journald --signature-verification=false --iptables=false --live-restore'
 #
 # [*configure_network*]
@@ -57,6 +55,12 @@
 # [*deployment_user*]
 #   String. Value to configure the deployment user.
 #   Defaults to hiera('deployment_user', undef)
+#
+# [*selinux_enabled*]
+#   Boolean. Whether to enable SELinux for docker or not. NOTE:
+#   --selinux-enabled is disabled by default due to recommendations here:
+#   https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/7.2_Release_Notes/technology-preview-file_systems.html
+#   Defaults to false
 #
 # DEPRECATED PARAMETERS
 #
@@ -85,6 +89,7 @@ class tripleo::profile::base::docker (
   $step                = Integer(hiera('step')),
   $debug               = false,
   $deployment_user     = hiera('deployment_user', undef),
+  $selinux_enabled     = false,
   # DEPRECATED PARAMETERS
   $insecure_registry_address = undef,
   $docker_namespace = undef,
@@ -122,7 +127,12 @@ class tripleo::profile::base::docker (
     }
 
     if $docker_options {
-      $options_changes = [ "set OPTIONS '\"${docker_options}\"'" ]
+      if $selinux_enabled {
+        $selinux_enabled_string = ' --selinux-enabled'
+      } else {
+        $selinux_enabled_string = ''
+      }
+      $options_changes = [ "set OPTIONS '\"${docker_options}${selinux_enabled_string}\"'" ]
     } else {
       $options_changes = [ 'rm OPTIONS' ]
     }

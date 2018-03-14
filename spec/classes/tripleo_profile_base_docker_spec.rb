@@ -126,6 +126,23 @@ describe 'tripleo::profile::base::docker' do
       }
     end
 
+    context 'with step 1 and selinux enabled' do
+      let(:params) { {
+          :step            => 1,
+          :selinux_enabled => true,
+      } }
+
+      it { is_expected.to contain_class('tripleo::profile::base::docker') }
+      it { is_expected.to contain_package('docker') }
+      it { is_expected.to contain_service('docker') }
+      it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
+      it {
+          is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
+            "set OPTIONS '\"--log-driver=journald --signature-verification=false --iptables=false --live-restore --selinux-enabled\"'",
+          ])
+      }
+    end
+
     context 'with step 1 and storage_options configured' do
       let(:params) { {
           :step              => 1,
