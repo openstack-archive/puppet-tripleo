@@ -1323,7 +1323,7 @@ class tripleo::haproxy (
     haproxy::balancermember { 'rabbitmq':
       listening_service => 'rabbitmq',
       ports             => '5672',
-      ipaddresses       => hiera('rabbitmq_network', $controller_hosts_real),
+      ipaddresses       => hiera('rabbitmq_node_ips', $controller_hosts_real),
       server_names      => hiera('rabbitmq_node_names', $controller_hosts_names_real),
       options           => $haproxy_member_options,
     }
