@@ -118,6 +118,8 @@ define tripleo::haproxy::endpoint (
   $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
   $authorized_userlist         = undef,
 ) {
+  # Let users override the options on a per-service basis
+  $custom_options = hiera("tripleo::haproxy::${name}::options", undef)
   if $public_virtual_ip {
     # service exposed to the public network
 
@@ -128,20 +130,20 @@ define tripleo::haproxy::endpoint (
           'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
           'option'       => 'forwardfor',
         }
-        $listen_options_real = merge($tls_listen_options, $listen_options)
+        $listen_options_real = merge($tls_listen_options, $listen_options, $custom_options)
       } else {
-        $listen_options_real = $listen_options
+        $listen_options_real = merge($listen_options, $custom_options)
       }
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${public_ssl_port}"),
                                         union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
     } else {
-      $listen_options_real = $listen_options
+      $listen_options_real = merge($listen_options, $custom_options)
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${service_port}"), $haproxy_listen_bind_param)
     }
   } else {
     # internal service only
     $public_bind_opts = {}
-    $listen_options_real = $listen_options
+    $listen_options_real = merge($listen_options, $custom_options)
   }
 
   if $use_internal_certificates {
