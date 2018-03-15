@@ -57,6 +57,9 @@ define tripleo::pacemaker::haproxy_with_vip(
   $ensure        = true)
 {
   if($ensure) {
+    if !is_ip_addresses($ip_address) {
+      fail("Haproxy VIP: ${ip_address} is not a proper IP address.")
+    }
     # NB: Until the IPaddr2 RA has a fix for https://bugzilla.redhat.com/show_bug.cgi?id=1445628
     # we need to specify the nic when creating the ipv6 vip.
     if is_ipv6_address($ip_address) {

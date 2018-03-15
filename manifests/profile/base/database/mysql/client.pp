@@ -53,7 +53,7 @@ class tripleo::profile::base::database::mysql::client (
   $step                      = Integer(hiera('step')),
 ) {
   if $step >= 1 {
-    if is_ip_address($mysql_client_bind_address) {
+    if is_ip_addresses($mysql_client_bind_address) {
       $client_bind_changes = [
         "set ${mysql_read_default_group}/bind-address '${mysql_client_bind_address}'"
       ]
