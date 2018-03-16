@@ -8,7 +8,7 @@
 <%- end %>
   postrotate
     /sbin/lsof -nPs +L1 +D /var/log 2>&1|\
-    /bin/perl -ne '/\S+\s+(\d+).*\/var\/log\/.*\(deleted\)/ && print "$1\n"' |\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/.*\(deleted\)/ {print $2}' |\
     /bin/xargs -n1 -r -t kill -HUP
   endscript
 }
