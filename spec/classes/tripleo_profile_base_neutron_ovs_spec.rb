@@ -25,11 +25,11 @@ describe 'tripleo::profile::base::neutron::ovs' do
     end
 
     context 'with defaults for all parameters' do
-      let(:params) { { :step => 5 } }
+      let(:params) { { :step => 3 } }
 
-      it 'should do nothing' do
+      it 'should do nothing in step 3' do
         is_expected.to contain_class('tripleo::profile::base::neutron')
-        is_expected.to contain_class('neutron::agents::ml2::ovs')
+        is_expected.to_not contain_class('neutron::agents::ml2::ovs')
         is_expected.not_to contain_file('/var/lib/vhostuser_sockets')
       end
     end
@@ -44,13 +44,12 @@ describe 'tripleo::profile::base::neutron::ovs' do
     context 'with vhostuser_socketdir configured' do
       let :params do
         {
-          :step => 5,
+          :step => 3,
           :vhostuser_socket_dir => '/var/lib/vhostuser_sockets'
         }
       end
 
       it { is_expected.to contain_class('tripleo::profile::base::neutron') }
-      it { is_expected.to contain_class('neutron::agents::ml2::ovs') }
       it { is_expected.to contain_file('/var/lib/vhostuser_sockets').with(
         :ensure => 'directory',
         :owner  => 'qemu',
@@ -59,10 +58,10 @@ describe 'tripleo::profile::base::neutron::ovs' do
       ) }
     end
 
-    context 'with vhostuser_socketdir and its permissions configured' do
+    context 'with vhostuser_socketdir and group/user specified' do
       let :params do
         {
-          :step => 5,
+          :step => 3,
           :vhostuser_socket_dir   => '/var/lib/vhostuser_sockets',
           :vhostuser_socket_group => 'hugetlbfs',
           :vhostuser_socket_user  => 'openvswitch'
@@ -70,7 +69,6 @@ describe 'tripleo::profile::base::neutron::ovs' do
       end
 
       it { is_expected.to contain_class('tripleo::profile::base::neutron') }
-      it { is_expected.to contain_class('neutron::agents::ml2::ovs') }
       it { is_expected.to contain_file('/var/lib/vhostuser_sockets').with(
         :ensure => 'directory',
         :owner  => 'openvswitch',
