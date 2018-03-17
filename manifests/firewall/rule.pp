@@ -43,6 +43,10 @@
 #  (optional) The chain to jump to.
 #  If present, overrides action
 #
+# [*table*]
+#  (optional) The table where the rule is created.
+#  Defaults to undef
+#
 # [*state*]
 #  (optional) Array of states associated to the rule..
 #  Defaults to ['NEW']
@@ -80,6 +84,7 @@ define tripleo::firewall::rule (
   $destination = undef,
   $extras      = {},
   $jump        = undef,
+  $table       = undef,
 ) {
 
   if $port == 'all' {
@@ -109,6 +114,7 @@ define tripleo::firewall::rule (
     'chain'       => $chain,
     'destination' => $destination,
     'jump'        => $jump_real,
+    'table'       => $table,
   }
   if $proto == 'icmp' {
     $ipv6 = {
@@ -140,7 +146,7 @@ define tripleo::firewall::rule (
   # If we don't do this sanity check, a user could create some TCP/UDP
   # rules without port, and the result would be an iptables rule that allow any
   # traffic on the host.
-  if ($proto in ['tcp', 'udp']) and (! ($port or $dport or $sport) and ($chain != 'FORWARD')) {
+  if ($proto in ['tcp', 'udp']) and (! ($port or $dport or $sport) and ($chain != 'FORWARD') and ($table != 'nat')) {
     fail("${title} firewall rule cannot be created. TCP or UDP rules for INPUT or OUTPUT need port or sport or dport.")
   }
   if $source or $destination {

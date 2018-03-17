@@ -109,6 +109,7 @@ describe 'tripleo::firewall' do
             '304 add custom application 4' => {'sport' => '1000', 'proto' => 'tcp', 'action' => 'accept'},
             '305 add gre rule'             => {'proto' => 'gre'},
             '306 add custom cidr 2'        => {'port' => 'all', 'destination' => '::1/24'},
+            '307 add custom nat rule'      => {'table' => 'nat', 'source' => '192.168.0.0/24', 'destination' => '192.168.0.0/24', 'jump' => 'RETURN'},
           }
         )
       end
@@ -155,6 +156,12 @@ describe 'tripleo::firewall' do
           :destination => '::1/24',
           :action      => 'accept',
           :provider    => 'ip6tables',
+        )
+        is_expected.to contain_firewall('307 add custom nat rule ipv4').with(
+          :destination => '192.168.0.0/24',
+          :source      => '192.168.0.0/24',
+          :jump        => 'RETURN',
+          :table       => 'nat',
         )
       end
     end
