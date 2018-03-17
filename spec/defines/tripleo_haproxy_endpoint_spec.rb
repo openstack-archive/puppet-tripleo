@@ -29,7 +29,10 @@ describe 'tripleo::haproxy::endpoint' do
             ['10.0.0.1:9696', ['transparent']],
             ['192.168.0.1:9696', ['transparent']]
           ],
-          :options          => {'option' => []},
+          :options          => {'option' => [],
+                                'timeout client' => '90m',
+                                'timeout server' => '90m',
+                               },
         )
       end
     end
@@ -67,9 +70,11 @@ describe 'tripleo::haproxy::endpoint' do
         is_expected.to compile.with_all_deps
         is_expected.to contain_haproxy__listen('neutron').with(
           :options => {
-            'option'       => [],
-            'acl'          => 'acl Authneutron http_auth(starwars)',
-            'http-request' => 'auth realm neutron if !Authneutron',
+            'option'         => [],
+            'timeout client' => '90m',
+            'timeout server' => '90m',
+            'acl'            => 'acl Authneutron http_auth(starwars)',
+            'http-request'   => 'auth realm neutron if !Authneutron',
           }
         )
       end
