@@ -90,6 +90,10 @@ class tripleo::profile::base::pacemaker (
     fail("Count of ${remote_short_node_names} is not equal to count of ${remote_node_ips}")
   }
 
+  if hiera('hacluster_pwd', undef) == undef {
+    fail("The 'hacluster_pwd' hiera key is undefined, did you forget to include ::tripleo::profile::base::pacemaker in your role?")
+  }
+
   Pcmk_resource <| |> {
     tries     => 10,
     try_sleep => 3,
