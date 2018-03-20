@@ -146,7 +146,7 @@ class tripleo::certmonger::ca::crl (
 
   if $ensure == 'present' {
     # Fetch CRL in cron job and notify needed services
-    $cmd_list = concat(["${sleep}curl -s -L -o ${fetched_crl} ${crl_source}"], $process_cmd, $reload_cmds)
+    $cmd_list = concat(["${sleep}curl -g -s -L -o ${fetched_crl} ${crl_source}"], $process_cmd, $reload_cmds)
     $cron_cmd = join($cmd_list, ' && ')
   } else {
     $cron_cmd = absent
