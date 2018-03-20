@@ -38,6 +38,7 @@ class tripleo::profile::base::ironic_inspector (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
+    include ::ironic::inspector::cors
     class { '::ironic::inspector':
       sync_db => $sync_db,
     }
