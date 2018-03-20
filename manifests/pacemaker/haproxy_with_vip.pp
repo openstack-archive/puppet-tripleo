@@ -40,6 +40,14 @@
 #  }
 #  Defaults to undef
 #
+# [*meta_params*]
+#   (optional) Additional meta parameters to pass to "pcs resource create" for the VIP
+#   Defaults to ''
+#
+# [*op_params*]
+#   (optional) Additional op parameters to pass to "pcs resource create" for the VIP
+#   Defaults to ''
+#
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to 1
@@ -53,6 +61,8 @@ define tripleo::pacemaker::haproxy_with_vip(
   $vip_name,
   $ip_address,
   $location_rule = undef,
+  $meta_params   = '',
+  $op_params     = '',
   $pcs_tries     = 1,
   $ensure        = true)
 {
@@ -83,8 +93,9 @@ define tripleo::pacemaker::haproxy_with_vip(
       cidr_netmask   => $netmask,
       nic            => $nic,
       ipv6_addrlabel => $ipv6_addrlabel,
-      meta_params    => 'resource-stickiness=INFINITY',
+      meta_params    => "resource-stickiness=INFINITY ${meta_params}",
       location_rule  => $location_rule,
+      op_params      => $op_params,
       tries          => $pcs_tries,
     }
 
