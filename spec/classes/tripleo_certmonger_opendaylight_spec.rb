@@ -47,13 +47,9 @@ describe 'tripleo::certmonger::opendaylight' do
         :wait         => true,
       )
       is_expected.to contain_file(params[:service_certificate]).with(
-        :owner   => 'odl',
-        :group   => 'odl',
         :require => 'Certmonger_certificate[opendaylight]'
       )
       is_expected.to contain_file(params[:service_key]).with(
-        :owner   => 'odl',
-        :group   => 'odl',
         :require => 'Certmonger_certificate[opendaylight]'
       )
     end
