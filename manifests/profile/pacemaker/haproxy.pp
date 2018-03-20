@@ -31,6 +31,14 @@
 #  (false means disabled, and true means enabled)
 #  Defaults to hiera('tripleo::firewall::manage_firewall', true)
 #
+# [*meta_params*]
+#   (optional) Additional meta parameters to pass to "pcs resource create" for the VIP
+#   Defaults to ''
+#
+# [*op_params*]
+#   (optional) Additional op parameters to pass to "pcs resource create" for the VIP
+#   Defaults to ''
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -44,6 +52,8 @@ class tripleo::profile::pacemaker::haproxy (
   $bootstrap_node       = hiera('haproxy_short_bootstrap_node_name'),
   $enable_load_balancer = hiera('enable_load_balancer', true),
   $manage_firewall      = hiera('tripleo::firewall::manage_firewall', true),
+  $meta_params          = '',
+  $op_params            = '',
   $step                 = Integer(hiera('step')),
   $pcs_tries            = hiera('pcs_tries', 20),
 ) {
@@ -93,6 +103,8 @@ class tripleo::profile::pacemaker::haproxy (
         vip_name      => 'control',
         ip_address    => $control_vip,
         location_rule => $haproxy_location_rule,
+        meta_params   => $meta_params,
+        op_params     => $op_params,
         pcs_tries     => $pcs_tries,
         require       => Pacemaker::Property['haproxy-role-node-property'],
       }
@@ -103,6 +115,8 @@ class tripleo::profile::pacemaker::haproxy (
         vip_name      => 'public',
         ip_address    => $public_vip,
         location_rule => $haproxy_location_rule,
+        meta_params   => $meta_params,
+        op_params     => $op_params,
         pcs_tries     => $pcs_tries,
         require       => Pacemaker::Property['haproxy-role-node-property'],
       }
@@ -113,6 +127,8 @@ class tripleo::profile::pacemaker::haproxy (
         vip_name      => 'redis',
         ip_address    => $redis_vip,
         location_rule => $haproxy_location_rule,
+        meta_params   => $meta_params,
+        op_params     => $op_params,
         pcs_tries     => $pcs_tries,
         require       => Pacemaker::Property['haproxy-role-node-property'],
       }
@@ -126,6 +142,8 @@ class tripleo::profile::pacemaker::haproxy (
           vip_name      => $net_name,
           ip_address    => $virtual_ip,
           location_rule => $haproxy_location_rule,
+          meta_params   => $meta_params,
+          op_params     => $op_params,
           pcs_tries     => $pcs_tries,
           require       => Pacemaker::Property['haproxy-role-node-property'],
         }
