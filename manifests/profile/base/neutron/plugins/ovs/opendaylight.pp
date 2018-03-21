@@ -63,17 +63,44 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*vhostuser_socket_group*]
+#   (Optional) Group name for vhostuser socket dir.
+#   Defaults to qemu
+#
+# [*vhostuser_socket_user*]
+#   (Optional) User name for vhostuser socket dir.
+#   Defaults to qemu
+#
+# [*vhostuser_socket_dir*]
+#   (Optional) vhostuser socket dir, The directory where $vhostuser_socket_dir
+#   will be created with correct permissions, inorder to support vhostuser
+#   client mode.
+#
 class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
-  $odl_port            = hiera('opendaylight::odl_rest_port'),
-  $odl_check_url       = hiera('opendaylight_check_url'),
-  $odl_api_ips         = hiera('opendaylight_api_node_ips'),
-  $odl_url_ip          = hiera('opendaylight_api_vip'),
-  $conn_proto          = 'http',
-  $certificate_specs   = {},
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $tunnel_ip           = hiera('neutron::agents::ml2::ovs::local_ip'),
-  $step                = Integer(hiera('step')),
-) {
+  $odl_port               = hiera('opendaylight::odl_rest_port'),
+  $odl_check_url          = hiera('opendaylight_check_url'),
+  $odl_api_ips            = hiera('opendaylight_api_node_ips'),
+  $odl_url_ip             = hiera('opendaylight_api_vip'),
+  $conn_proto             = 'http',
+  $certificate_specs      = {},
+  $enable_internal_tls    = hiera('enable_internal_tls', false),
+  $tunnel_ip              = hiera('neutron::agents::ml2::ovs::local_ip'),
+  $step                   = Integer(hiera('step')),
+  $vhostuser_socket_group = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::vhostuser_socket_group', 'qemu'),
+  $vhostuser_socket_user  = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::vhostuser_socket_user', 'qemu'),
+  $vhostuser_socket_dir   = hiera('neutron::plugins::ovs::opendaylight::vhostuser_socket_dir', undef),
+  ) {
+
+  if $step >= 3 {
+    if $vhostuser_socket_dir {
+      file { $vhostuser_socket_dir:
+        ensure => directory,
+        owner  => $vhostuser_socket_user,
+        group  => $vhostuser_socket_group,
+        mode   => '0775',
+      }
+    }
+  }
 
   if $step >= 4 {
 

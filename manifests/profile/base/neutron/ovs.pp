@@ -44,7 +44,7 @@ class tripleo::profile::base::neutron::ovs(
 ) {
   include ::tripleo::profile::base::neutron
 
-  if $step >= 5 {
+  if $step >= 3 {
     if $vhostuser_socket_dir {
       file { $vhostuser_socket_dir:
         ensure => directory,
@@ -53,7 +53,9 @@ class tripleo::profile::base::neutron::ovs(
         mode   => '0775',
       }
     }
+  }
 
+  if $step >= 5 {
     include ::neutron::agents::ml2::ovs
 
     # Optional since manage_service may be false and neutron server may not be colocated.
