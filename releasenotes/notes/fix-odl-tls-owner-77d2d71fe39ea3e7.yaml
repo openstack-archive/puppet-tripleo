@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes a bug where TLS certificates for ODL could not be generated correctly
+    for deployment due to wrong owner/group applied to the files.
