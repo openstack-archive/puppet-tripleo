@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds a new parameter to validate whether run
+    the archive or purge manifest for deleted instances
+    in Nova.
