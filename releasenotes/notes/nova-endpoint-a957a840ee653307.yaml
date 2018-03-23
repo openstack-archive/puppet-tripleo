@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Added variables for endpoint_proxy_nova, endpoint_config_nova, and Apache
+    mod_proxy configuration to proxy nova service just like similar services
