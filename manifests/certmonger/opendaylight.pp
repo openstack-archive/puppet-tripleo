@@ -62,13 +62,9 @@ class tripleo::certmonger::opendaylight (
     require      => Class['::certmonger'],
   }
   file { $service_certificate :
-    owner   => 'odl',
-    group   => 'odl',
     require => Certmonger_certificate['opendaylight']
   }
   file { $service_key :
-    owner   => 'odl',
-    group   => 'odl',
     require => Certmonger_certificate['opendaylight']
   }
 
