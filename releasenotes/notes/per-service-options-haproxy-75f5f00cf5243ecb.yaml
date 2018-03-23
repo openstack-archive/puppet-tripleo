@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Add support via hiera keys like 'tripleo::haproxy::${name}::listen_options' to
+    customize the options of an haproxy service stanza. For example passing the by setting
+    the 'tripleo::haproxy::cinder::options' hiera key to a hash made composed of:
+    'timeout client': '90m'
+    'timeout server': '90m'
+
