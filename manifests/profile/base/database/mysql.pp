@@ -177,6 +177,9 @@ class tripleo::profile::base::database::mysql (
     if hiera('congress_enabled', false) {
       include ::congress::db::mysql
     }
+    if hiera('designate_api_enabled', false) {
+      include ::designate::db::mysql
+    }
     if hiera('glance_api_enabled', false) {
       include ::glance::db::mysql
     }

@@ -315,6 +315,9 @@ class tripleo::profile::base::keystone (
     if hiera('congress_enabled', false) {
       include ::congress::keystone::auth
     }
+    if hiera('designate_api_enabled', false) {
+      include ::designate::keystone::auth
+    }
     if hiera('glance_api_enabled', false) {
       include ::glance::keystone::auth
     }
