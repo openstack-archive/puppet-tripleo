@@ -35,6 +35,7 @@ cinder_volume_short_bootstrap_node_name: 'node.example.com'
 cinder_volume_short_node_names:
  - 'c-vol-1'
  - 'c-vol-2'
+cinder::backup::nfs::backup_share: '/mnt/backup'
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
 # gnocchi related items
