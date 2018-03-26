@@ -301,9 +301,16 @@ MYSQL_HOST=localhost\n",
           'target-dir' => '/var/lib/mysql',
           'options'    => 'rw',
         },
+        # NOTE: we cannot remove this bind mount until the resource-agent
+        # can use the configured log-file for initial bootstrap operations
         'mysql-log-mariadb' => {
           'source-dir' => '/var/log/mariadb',
           'target-dir' => '/var/log/mariadb',
+          'options'    => 'rw',
+        },
+        'mysql-log'         => {
+          'source-dir' => '/var/log/containers/mysql',
+          'target-dir' => '/var/log/mysql',
           'options'    => 'rw',
         },
         'mysql-dev-log'     => {
@@ -363,7 +370,7 @@ MYSQL_HOST=localhost\n",
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true container-attribute-target=host",
         op_params       => 'promote timeout=300s on-fail=block',
-        resource_params => "additional_parameters='--open-files-limit=16384' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map_string}'",
+        resource_params => "log='/var/log/mysql/mysqld.log' additional_parameters='--open-files-limit=16384' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map_string}'",
         tries           => $pcs_tries,
         location_rule   => {
           resource_discovery => 'exclusive',

@@ -153,6 +153,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           'target-dir' => '/etc/pki/tls/cert.pem',
           'options'    => 'ro',
         },
+        'rabbitmq-log'                     => {
+          'source-dir' => '/var/log/containers/rabbitmq',
+          'target-dir' => '/var/log/rabbitmq',
+          'options'    => 'rw',
+        },
         'rabbitmq-dev-log'                 => {
           'source-dir' => '/dev/log',
           'target-dir' => '/dev/log',
