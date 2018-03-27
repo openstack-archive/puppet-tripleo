@@ -141,6 +141,11 @@ class tripleo::profile::pacemaker::haproxy_bundle (
             'target-dir' => '/etc/localtime',
             'options'    => 'ro',
           },
+          'haproxy-var-lib'                 => {
+            'source-dir' => '/var/lib/haproxy',
+            'target-dir' => '/var/lib/haproxy',
+            'options'    => 'rw',
+          },
           'haproxy-pki-extracted'           => {
             'source-dir' => '/etc/pki/ca-trust/extracted',
             'target-dir' => '/etc/pki/ca-trust/extracted',
