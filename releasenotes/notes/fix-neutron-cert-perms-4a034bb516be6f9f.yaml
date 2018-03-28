@@ -1,0 +1,4 @@
+---
+fixes:
+  - |
+    Removes neutron ownership of certificates.
