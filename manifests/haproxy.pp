@@ -978,6 +978,7 @@ class tripleo::haproxy (
       service_port      => $ports[sahara_api_port],
       ip_addresses      => hiera('sahara_api_node_ips', $controller_hosts_real),
       server_names      => hiera('sahara_api_node_names', $controller_hosts_names_real),
+      mode              => 'http',
       public_ssl_port   => $ports[sahara_api_ssl_port],
       service_network   => $sahara_network,
     }
@@ -1003,6 +1004,7 @@ class tripleo::haproxy (
       service_port      => $ports[trove_api_port],
       ip_addresses      => hiera('trove_api_node_ips', $controller_hosts_real),
       server_names      => hiera('trove_api_node_names', $controller_hosts_names_real),
+      mode              => 'http',
       public_ssl_port   => $ports[trove_api_ssl_port],
       service_network   => $trove_network,
     }
@@ -1059,6 +1061,7 @@ class tripleo::haproxy (
       service_port    => $ports[nova_metadata_port],
       ip_addresses    => hiera('nova_metadata_node_ips', $controller_hosts_real),
       server_names    => hiera('nova_metadata_node_names', $controller_hosts_names_real),
+      mode            => 'http',
       service_network => $nova_metadata_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -1104,6 +1107,7 @@ class tripleo::haproxy (
       service_port    => $ports[ec2_api_metadata_port],
       ip_addresses    => hiera('ec2_api_node_ips', $controller_hosts_real),
       server_names    => hiera('ec2_api_node_names', $controller_hosts_names_real),
+      mode            => 'http',
       service_network => $ec2_api_metadata_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -1131,6 +1135,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('panko_api_node_ips', $controller_hosts_real),
       server_names      => hiera('panko_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[panko_api_ssl_port],
+      mode              => 'http',
       service_network   => $panko_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -1145,6 +1150,7 @@ class tripleo::haproxy (
       server_names      => hiera('barbican_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[barbican_api_ssl_port],
       service_network   => $barbican_network,
+      mode              => 'http',
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
@@ -1170,6 +1176,7 @@ class tripleo::haproxy (
       service_port      => $ports[mistral_api_port],
       ip_addresses      => hiera('mistral_api_node_ips', $controller_hosts_real),
       server_names      => hiera('mistral_api_node_names', $controller_hosts_names_real),
+      mode              => 'http',
       public_ssl_port   => $ports[mistral_api_ssl_port],
       service_network   => $mistral_network,
     }
@@ -1261,6 +1268,7 @@ class tripleo::haproxy (
       service_port      => $ports[ironic_api_port],
       ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ironic_api_node_names', $controller_hosts_names_real),
+      mode              => 'http',
       public_ssl_port   => $ports[ironic_api_ssl_port],
       service_network   => $ironic_network,
     }
@@ -1275,6 +1283,7 @@ class tripleo::haproxy (
       server_names      => hiera('ironic_inspector_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
+      mode              => 'http',
       listen_options    => { 'http-check' => ['expect rstring .*200.*'], },
     }
   }
@@ -1286,6 +1295,7 @@ class tripleo::haproxy (
       service_port      => $ports[designate_api_port],
       ip_addresses      => hiera('designate_node_ips', $controller_hosts_real),
       server_names      => hiera('designate_node_names', $controller_hosts_names_real),
+      mode              => 'http',
       public_ssl_port   => $ports[designate_api_ssl_port],
       service_network   => $designate_network,
     }
