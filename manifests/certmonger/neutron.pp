@@ -62,13 +62,9 @@ class tripleo::certmonger::neutron (
     require      => Class['::certmonger'],
   }
   file { $service_certificate :
-    owner   => 'neutron',
-    group   => 'neutron',
     require => Certmonger_certificate['neutron']
   }
   file { $service_key :
-    owner   => 'neutron',
-    group   => 'neutron',
     require => Certmonger_certificate['neutron']
   }
 
