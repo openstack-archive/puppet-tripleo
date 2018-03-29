@@ -34,6 +34,14 @@
 #   (Optional) Nova tenant name
 #   Defaults to hiera('nova_os_tenant_name')
 #
+# [*enable_vrs*]
+#   (Optional) Enable VRS or not
+#   Defaults to true
+#
+# [*enable_metadata*]
+#   (Optional) Enable Nuage Metadata or not
+#   Defaults to true
+#
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
@@ -43,16 +51,22 @@ class tripleo::profile::base::neutron::agents::nuage (
   $nova_metadata_ip    = hiera('nova_metadata_node_ips', ''),
   $nova_os_password    = hiera('nova_password', ''),
   $nova_os_tenant_name = hiera('nova::api::admin_tenant_name', ''),
+  $enable_vrs          = true,
+  $enable_metadata     = true,
   $step                = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::nuage::vrs
+    if $enable_vrs {
+      include ::nuage::vrs
+    }
 
-    class { '::nuage::metadataagent':
-      nova_os_tenant_name => $nova_os_tenant_name,
-      nova_os_password    => $nova_os_password,
-      nova_metadata_ip    => $nova_metadata_ip,
-      nova_auth_ip        => $nova_auth_ip,
+    if $enable_metadata {
+      class { '::nuage::metadataagent':
+        nova_os_tenant_name => $nova_os_tenant_name,
+        nova_os_password    => $nova_os_password,
+        nova_metadata_ip    => $nova_metadata_ip,
+        nova_auth_ip        => $nova_auth_ip,
+      }
     }
   }
 }
