@@ -10,8 +10,11 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
 
   def create
     if File.file?(sriov_numvfs_path)
-      _set_numvfs
-      _apply_hw_offload
+      if ovs_mode == "switchdev"
+        _apply_hw_offload
+      else
+        _set_numvfs
+      end
     else
       warning("#{sriov_numvfs_path} doesn't exist. Check if #{sriov_get_interface} is a valid network interface supporting SR-IOV")
     end
@@ -45,25 +48,53 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
 
   def _apply_hw_offload
     # Changing the mode of virtual functions to hw-offload
-    if ovs_mode == "switchdev"
-      cur_value = File.read(vendor_path).strip
-      if cur_value == "0x15b3"
-        vfs_pcis = get_vfs_pcis
-        # Unbinding virtual functions
-        vfs_pcis.each do|vfs_pci|
-          File.write("/sys/bus/pci/drivers/mlx5_core/unbind",vfs_pci)
+
+    bond_enabled = get_bond_enabled
+    vendor_id = File.read(vendor_path).strip
+
+    # Adding the VF LAG
+    if vendor_id == "0x15b3" and bond_enabled
+      bond_masters = get_bond_masters
+      bond_master_hash = {}
+      bond_masters.each do |bond|
+        bond_interfaces = get_bond_interfaces(bond)
+        bond_master_hash[bond] = bond_interfaces
+      end
+      # Removing the slaves from the bond interfaces
+      bond_master_hash.each do |bond, bond_interfaces|
+        bond_interfaces.each do |bond_interface|
+          %x{echo "-#{bond_interface}" > /sys/class/net/#{bond}/bonding/slaves}
         end
       end
-      # Changing the mode of sriov interface to switchdev mode
-      %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} mode switchdev}
-      if get_interface_device == "0x1013" || get_interface_device == "0x1015"
-        %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} inline-mode transport}
+    end
+    # Setting the number of vfs
+    _set_numvfs
+
+    # Applying the hardware offloading
+    if vendor_id == "0x15b3"
+      vfs_pcis = get_vfs_pcis
+      # Unbinding virtual functions
+      vfs_pcis.each do|vfs_pci|
+        File.write("/sys/bus/pci/drivers/mlx5_core/unbind",vfs_pci)
       end
-      %x{/usr/sbin/ethtool -K #{sriov_get_interface} hw-tc-offload on}
-      if cur_value == "0x15b3"
-        # Binding virtual functions
-        vfs_pcis.each do|vfs_pci|
-          File.write("/sys/bus/pci/drivers/mlx5_core/bind",vfs_pci)
+    end
+    # Changing the mode of sriov interface to switchdev mode
+    %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} mode switchdev}
+    if get_interface_device == "0x1013" || get_interface_device == "0x1015"
+      %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} inline-mode transport}
+    end
+    %x{/usr/sbin/ethtool -K #{sriov_get_interface} hw-tc-offload on}
+    if vendor_id == "0x15b3"
+      # Binding virtual functions
+      vfs_pcis.each do|vfs_pci|
+        File.write("/sys/bus/pci/drivers/mlx5_core/bind",vfs_pci)
+      end
+    end
+    if vendor_id and bond_enabled
+    # Adding the slaves back to the bond interfaces
+      bond_master_hash.each do |bond, bond_interfaces|
+        bond_interfaces.each do |bond_interface|
+        %x{echo "+#{bond_interface}" > /sys/class/net/#{bond}/bonding/slaves}
         end
       end
     end
@@ -104,4 +135,33 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
   def get_interface_device
     %x{cat /sys/class/net/#{sriov_get_interface}/device/device}.strip
   end
+
+  def get_bond_enabled
+    if %x{lsmod | grep bonding}.strip.length > 0
+        true
+    else
+        false
+    end
+  end
+
+  def bond_masters_path
+    "/sys/class/net/bonding_masters"
+  end
+
+  def get_bond_masters
+    if File.file?(bond_masters_path)
+      File.read(bond_masters_path).split()
+    end
+  end
+
+  def get_bond_interfaces_path(bond)
+    "/sys/class/net/#{bond}/bonding/slaves"
+  end
+
+  def get_bond_interfaces(bond)
+    if File.file?(get_bond_interfaces_path(bond))
+      File.read(get_bond_interfaces_path(bond)).split()
+    end
+  end
+
 end
