@@ -1,0 +1,9 @@
+---
+features:
+  - Split up neutron-lbaas service plugin and agent
+
+upgrade:
+  - Class tripleo::profile::base::neutron::lbaas will only configure the
+    Neutron LBaaS service plugin from now on. Use class
+    tripleo::profile::base::neutron::agents::lbaas to configure the Neutron
+    LBaaS agent.
