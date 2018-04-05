@@ -27,9 +27,15 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*docker_group*]
+#   (Optional) Add the mistral user to the docker group to allow actions to
+#   perform docker operations
+#   Defaults to false
+#
 class tripleo::profile::base::mistral::executor (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step           = Integer(hiera('step')),
+  $docker_group   = false,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -41,5 +47,14 @@ class tripleo::profile::base::mistral::executor (
 
   if $step >= 4 or ($step >= 3 and $sync_db)  {
     include ::mistral::executor
+    if $docker_group {
+      ensure_resource('group', 'docker', {
+        'ensure' => 'present',
+      })
+      ensure_resource('user', 'mistral', {
+        'name'   => 'mistral',
+        'groups' => 'docker',
+      })
+    }
   }
 }
