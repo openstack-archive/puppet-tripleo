@@ -74,6 +74,10 @@
 #   (Optional) Whether to enable the Veritas HyperScale backend
 #   Defaults to false
 #
+#[*cinder_enable_nvmeof_backend*]
+#   (Optional) Whether to enable the NVMeOF backend
+#   Defaults to false
+#
 # [*cinder_user_enabled_backends*]
 #   (Optional) List of additional backend stanzas to activate
 #   Defaults to hiera('cinder_user_enabled_backends')
@@ -102,6 +106,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_rbd_backend                   = false,
   $cinder_enable_scaleio_backend               = false,
   $cinder_enable_vrts_hs_backend               = false,
+  $cinder_enable_nvmeof_backend                = false,
   $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
   $cinder_rbd_client_name                      = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name','openstack'),
   $step                                        = Integer(hiera('step')),
@@ -228,6 +233,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_veritas_hyperscale_backend_name = undef
     }
 
+    if $cinder_enable_nvmeof_backend {
+      include ::tripleo::profile::base::cinder::volume::nvmeof
+      $cinder_nvmeof_backend_name = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof')
+    } else {
+      $cinder_nvmeof_backend_name = undef
+    }
+
     $backends = delete_undef_values(concat([], $cinder_iscsi_backend_name,
                                       $cinder_rbd_backend_name,
                                       $cinder_rbd_extra_backend_names,
@@ -243,7 +255,8 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_nfs_backend_name,
                                       $cinder_scaleio_backend_name,
                                       $cinder_veritas_hyperscale_backend_name,
-                                      $cinder_user_enabled_backends))
+                                      $cinder_user_enabled_backends,
+                                      $cinder_nvmeof_backend_name))
     # NOTE(aschultz): during testing it was found that puppet 3 may incorrectly
     # include a "" in the previous array which is not removed by the
     # delete_undef_values function. So we need to make sure we don't have any
