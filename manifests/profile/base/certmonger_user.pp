@@ -12,6 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
+# [*certmonger_ca*]
+#   (Optional) The CA that certmonger will use to generate the certificates.
+#   Defaults to hiera('certmonger_ca', 'local').
+#
 # == class: tripleo::profile::base::certmonger_user
 #
 # Profile that ensures that the relevant certmonger certificates have been
@@ -114,6 +118,7 @@
 #   Defaults to hiera('tripleo::profile::base::neutron::certificate_specs', {}).
 #
 class tripleo::profile::base::certmonger_user (
+  $certmonger_ca              = hiera('certmonger_ca', 'local'),
   $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
   $apache_postsave_cmd        = undef,
   $haproxy_certificates_specs = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
@@ -131,6 +136,13 @@ class tripleo::profile::base::certmonger_user (
   $ovs_certificate_specs      = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
   $neutron_certificate_specs  = hiera('tripleo::profile::base::neutron::certificate_specs', {}),
 ) {
+  include ::certmonger
+
+  # This is only needed for certmonger's local CA. For any other CA this
+  # operation (trusting the CA) should be done by the deployer.
+  if $certmonger_ca == 'local' {
+      include ::tripleo::certmonger::ca::local
+  }
   unless empty($haproxy_certificates_specs) {
     $reload_haproxy = ['systemctl reload haproxy']
     Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>

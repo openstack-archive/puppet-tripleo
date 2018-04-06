@@ -60,10 +60,7 @@ define tripleo::certmonger::haproxy (
 ){
     include ::certmonger
     include ::haproxy::params
-    # This is only needed for certmonger's local CA. For any other CA this
-    # operation (trusting the CA) should be done by the deployer.
     if $certmonger_ca == 'local' {
-      include ::tripleo::certmonger::ca::local
       if defined(Class['::haproxy']) {
         Class['::tripleo::certmonger::ca::local'] ~> Class['::haproxy']
       }
