@@ -1,0 +1,5 @@
+---
+features:
+  - Add support for either rabbitmq server nodes or new
+    oslo.messaging service nodes for separated rpc and notify
+    communications

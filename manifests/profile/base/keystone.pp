@@ -77,13 +77,17 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('keystone_public_api_network', undef)
 #
+# [*rabbit_hosts*]
+#   list of the oslo messaging rpc host fqdns
+#   Defaults to hiera('rabbitmq_node_names', undef)
+#
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
 #   Defaults to hiera('messaging_rpc_service_name', rabbit)
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
+#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
@@ -103,7 +107,7 @@
 #
 # [*oslomsg_notify_hosts*]
 #   list of the oslo messaging notify host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
+#   Defaults to hiera('oslo_messaging_notify_node_names', undef)
 #
 # [*oslomsg_notify_port*]
 #   IP port for oslo messaging notify service
@@ -155,13 +159,14 @@ class tripleo::profile::base::keystone (
   $ldap_backend_enable            = false,
   $manage_db_purge                = hiera('keystone_enable_db_purge', true),
   $public_endpoint_network        = hiera('keystone_public_api_network', undef),
+  $rabbit_hosts                   = hiera('rabbitmq_node_names', undef),
   $oslomsg_rpc_proto              = hiera('messaging_rpc_service_name', 'rabbit'),
-  $oslomsg_rpc_hosts              = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_rpc_hosts              = hiera('oslo_messaging_rpc_node_names', undef),
   $oslomsg_rpc_password           = hiera('keystone::rabbit_password'),
   $oslomsg_rpc_port               = hiera('keystone::rabbit_port', '5672'),
   $oslomsg_rpc_username           = hiera('keystone::rabbit_userid', 'guest'),
   $oslomsg_notify_proto           = hiera('messaging_notify_service_name', 'rabbit'),
-  $oslomsg_notify_hosts           = any2array(hiera('rabbitmq_node_names', undef)),
+  $oslomsg_notify_hosts           = hiera('oslo_messaging_notify_node_names', undef),
   $oslomsg_notify_password        = hiera('keystone::rabbit_password'),
   $oslomsg_notify_port            = hiera('keystone::rabbit_port', '5672'),
   $oslomsg_notify_username        = hiera('keystone::rabbit_userid', 'guest'),
@@ -205,12 +210,14 @@ class tripleo::profile::base::keystone (
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
+    $oslomsg_rpc_hosts_real = any2array(pick($rabbit_hosts, $oslomsg_rpc_hosts, []))
+    $oslomsg_notify_hosts_real = any2array(pick($rabbit_hosts, $oslomsg_notify_hosts, []))
     class { '::keystone':
       sync_db                    => $sync_db,
       enable_bootstrap           => $sync_db,
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
-        'hosts'     => $oslomsg_rpc_hosts,
+        'hosts'     => $oslomsg_rpc_hosts_real,
         'port'      => $oslomsg_rpc_port,
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,
@@ -218,7 +225,7 @@ class tripleo::profile::base::keystone (
       }),
       notification_transport_url => os_transport_url({
         'transport' => $oslomsg_notify_proto,
-        'hosts'     => $oslomsg_notify_hosts,
+        'hosts'     => $oslomsg_notify_hosts_real,
         'port'      => $oslomsg_notify_port,
         'username'  => $oslomsg_notify_username,
         'password'  => $oslomsg_notify_password,

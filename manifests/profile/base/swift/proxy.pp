@@ -74,6 +74,10 @@
 #   (Optional) List of memcache servers
 #   Defaults to hiera('memcached_node_ips')
 #
+# [*oslomsg_rpc_hosts*]
+#   list of the oslo messaging rpc host fqdns
+#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -103,7 +107,7 @@ class tripleo::profile::base::swift::proxy (
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $ceilometer_enabled            = true,
   $ceilometer_messaging_driver   = hiera('messaging_notify_service_name', 'rabbit'),
-  $ceilometer_messaging_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
+  $ceilometer_messaging_hosts    = hiera('rabbitmq_node_names', undef),
   $ceilometer_messaging_password = hiera('swift::proxy::ceilometer::rabbit_password', undef),
   $ceilometer_messaging_port     = hiera('tripleo::profile::base::swift::proxy::rabbit_port', '5672'),
   $ceilometer_messaging_use_ssl  = '0',
@@ -112,6 +116,7 @@ class tripleo::profile::base::swift::proxy (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $memcache_port                 = 11211,
   $memcache_servers              = hiera('memcached_node_ips'),
+  $oslomsg_rpc_hosts             = hiera('oslo_messaging_rpc_node_names', undef),
   $step                          = Integer(hiera('step')),
   $swift_proxy_network           = hiera('swift_proxy_network', undef),
   $tls_proxy_bind_ip             = undef,
@@ -160,11 +165,12 @@ class tripleo::profile::base::swift::proxy (
     include ::swift::proxy::formpost
     include ::swift::proxy::bulk
     $ceilometer_messaging_use_ssl_real = sprintf('%s', bool2num(str2bool($ceilometer_messaging_use_ssl)))
+    $ceilometer_messaging_hosts_real = any2array(pick($ceilometer_messaging_hosts,$oslomsg_rpc_hosts, []))
     if $ceilometer_enabled {
       class { '::swift::proxy::ceilometer':
         default_transport_url => os_transport_url({
           'transport' => $ceilometer_messaging_driver,
-          'hosts'     => $ceilometer_messaging_hosts,
+          'hosts'     => $ceilometer_messaging_hosts_real,
           'port'      => sprintf('%s', $ceilometer_messaging_port),
           'username'  => $ceilometer_messaging_username,
           'password'  => $ceilometer_messaging_password,

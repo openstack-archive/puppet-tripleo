@@ -57,8 +57,12 @@
 #   Defaults to hiera('step')
 #
 # [*rabbit_hosts*]
-#   list of the rabbbit host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
+#   list of the oslo messaging rpc host fqdns
+#   Defaults to hiera('rabbitmq_node_names', undef)
+#
+# [*oslomsg_rpc_hosts*]
+#   list of the oslo messaging rpc host fqdns
+#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
 #
 # [*rabbit_port*]
 #   IP port for rabbitmq service
@@ -91,6 +95,7 @@ class tripleo::profile::base::glance::api (
   $glance_nfs_enabled            = false,
   $step                          = Integer(hiera('step')),
   $rabbit_hosts                  = hiera('rabbitmq_node_names', undef),
+  $oslomsg_rpc_hosts             = hiera('oslo_messaging_rpc_node_names', undef),
   $rabbit_port                   = hiera('glance::notify::rabbitmq::rabbit_port', 5672),
   $tls_proxy_bind_ip             = undef,
   $tls_proxy_fqdn                = undef,
@@ -156,7 +161,8 @@ class tripleo::profile::base::glance::api (
       stores  => $glance_store,
       sync_db => $sync_db,
     }
-    $rabbit_endpoints = suffix(any2array($rabbit_hosts), ":${rabbit_port}")
+    $oslomsg_rpc_hosts_real = pick($rabbit_hosts, $oslomsg_rpc_hosts, [])
+    $rabbit_endpoints = suffix(any2array($oslomsg_rpc_hosts_real), ":${rabbit_port}")
     class { '::glance::notify::rabbitmq' :
       rabbit_hosts => $rabbit_endpoints,
     }

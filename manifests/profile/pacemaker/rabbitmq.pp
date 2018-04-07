@@ -18,9 +18,13 @@
 #
 # === Parameters
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
+# [*rabbit_bootstrap_node*]
+#   (Optional) The hostname of the rabbit node responsible for bootstrapping tasks
 #   Defaults to hiera('rabbitmq_short_bootstrap_node_name')
+#
+# [*oslomsg_rpc_bootstrap_node*]
+#   (Optional) The hostname of the rpc node responsible for bootstrapping tasks
+#   Defaults to hiera('oslo_messaging_rpc_short_bootstrap_node_name')
 #
 # [*erlang_cookie*]
 #   (Optional) Content of erlang cookie.
@@ -36,6 +40,10 @@
 #   (Optional) The list of rabbitmq nodes names
 #   Defaults to hiera('rabbitmq_node_names')
 #
+# [*oslomsg_rpc_nodes*]
+#   (Optional) The list of oslo messaging rpc nodes names
+#   Defaults to hiera('oslo_messaging_rpc_node_names')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -46,13 +54,16 @@
 #   Defaults to hiera('pcs_tries', 20)
 #
 class tripleo::profile::pacemaker::rabbitmq (
-  $bootstrap_node = hiera('rabbitmq_short_bootstrap_node_name'),
-  $erlang_cookie  = hiera('rabbitmq::erlang_cookie'),
-  $user_ha_queues = hiera('rabbitmq::nr_ha_queues', 0),
-  $rabbit_nodes   = hiera('rabbitmq_node_names'),
-  $pcs_tries      = hiera('pcs_tries', 20),
-  $step           = Integer(hiera('step')),
+  $rabbit_bootstrap_node      = hiera('rabbitmq_short_bootstrap_node_name', undef),
+  $oslomsg_rpc_bootstrap_node = hiera('oslo_messaging_rpc_short_bootstrap_node_name', undef),
+  $erlang_cookie              = hiera('rabbitmq::erlang_cookie'),
+  $user_ha_queues             = hiera('rabbitmq::nr_ha_queues', 0),
+  $rabbit_nodes               = hiera('rabbitmq_node_names', undef),
+  $oslomsg_rpc_nodes          = hiera('oslo_messaging_rpc_node_names', undef),
+  $pcs_tries                  = hiera('pcs_tries', 20),
+  $step                       = Integer(hiera('step')),
 ) {
+  $bootstrap_node = pick($rabbit_bootstrap_node, $oslomsg_rpc_bootstrap_node, [])
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
@@ -88,7 +99,8 @@ class tripleo::profile::pacemaker::rabbitmq (
       include ::stdlib
       # The default nr of ha queues is ceiling(N/2)
       if $user_ha_queues == 0 {
-        $nr_rabbit_nodes = size($rabbit_nodes)
+        $messaging_nodes = pick($rabbit_nodes, $oslomsg_rpc_nodes, [])
+        $nr_rabbit_nodes = size($messaging_nodes)
         $nr_ha_queues = $nr_rabbit_nodes / 2 + ($nr_rabbit_nodes % 2)
         $params = "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'"
       } elsif $user_ha_queues == -1 {
