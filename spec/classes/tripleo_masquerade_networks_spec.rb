@@ -55,6 +55,21 @@ describe 'tripleo::masquerade_networks' do
           :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
         )
       end
+
+      it 'configure FORWARD rules' do
+        is_expected.to contain_firewall('139 routed_network forward source 192.168.24.0/24 ipv4').with(
+          :source      => '192.168.24.0/24',
+          :chain       => 'FORWARD',
+          :proto       => 'all',
+          :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
+        )
+        is_expected.to contain_firewall('140 routed_network forward destinations 192.168.24.0/24 ipv4').with(
+          :destination => ['192.168.24.0/24', '192.168.25.0/24'],
+          :chain       => 'FORWARD',
+          :proto       => 'all',
+          :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
+        )
+      end
     end
 
   end

@@ -43,7 +43,19 @@ class tripleo::masquerade_networks (
           'chain'       => 'POSTROUTING',
           'proto'       => 'all',
           'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
-        }
+        },
+        "139 routed_network forward source ${source}" => {
+          'source'      => $source,
+          'chain'       => 'FORWARD',
+          'proto'       => 'all',
+          'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
+        },
+        "140 routed_network forward destinations ${source}" => {
+          'destination' => $destinations,
+          'chain'       => 'FORWARD',
+          'proto'       => 'all',
+          'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
+        },
       })
     }
   }
