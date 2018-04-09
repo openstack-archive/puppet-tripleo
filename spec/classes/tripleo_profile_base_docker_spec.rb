@@ -86,8 +86,8 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-daemon.json-mirror').with_changes(
-            ['set dict/entry[. = "registry-mirrors"] "registry-mirrors',
-             "set dict/entry[. = \"registry-mirrors\"]/array/string \"http://foo/bar\""])
+            ["set dict/entry[. = 'registry-mirrors'] registry-mirrors",
+             "set dict/entry[. = 'registry-mirrors']/array/string \"http://foo/bar\""])
       }
     end
 
@@ -103,8 +103,8 @@ describe 'tripleo::profile::base::docker' do
       it { is_expected.to contain_file('/etc/systemd/system/docker.service.d/99-unset-mountflags.conf') }
       it {
         is_expected.to contain_augeas('docker-daemon.json-debug').with_changes(
-            ['set dict/entry[. = "debug"] "debug"',
-             "set dict/entry[. = \"debug\"]/const \"true\""])
+            ["set dict/entry[. = 'debug'] debug",
+             "set dict/entry[. = 'debug']/const true"])
       }
     end
 
