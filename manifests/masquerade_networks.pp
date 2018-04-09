@@ -33,12 +33,16 @@ class tripleo::masquerade_networks (
           'destination' => $destinations,
           'jump'        => 'RETURN',
           'chain'       => 'POSTROUTING',
+          'proto'       => 'all',
+          'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
         },
         "138 routed_network masquerade ${source}" => {
           'table'       => 'nat',
           'source'      => $source,
           'jump'        => 'MASQUERADE',
           'chain'       => 'POSTROUTING',
+          'proto'       => 'all',
+          'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
         }
       })
     }

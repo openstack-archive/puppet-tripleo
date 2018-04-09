@@ -40,6 +40,8 @@ describe 'tripleo::masquerade_networks' do
           :destination => ['192.168.24.0/24', '192.168.25.0/24'],
           :jump        => 'RETURN',
           :chain       => 'POSTROUTING',
+          :proto       => 'all',
+          :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
         )
       end
 
@@ -49,6 +51,8 @@ describe 'tripleo::masquerade_networks' do
           :source      => '192.168.24.0/24',
           :jump        => 'MASQUERADE',
           :chain       => 'POSTROUTING',
+          :proto       => 'all',
+          :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
         )
       end
     end
