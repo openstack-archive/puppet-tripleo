@@ -25,9 +25,14 @@
 #   (Optional) The mechanism drivers to use with the Ml2 plugin
 #   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
 #
+# [*enable_vrs*]
+#   (Optional) Enable VRS or not
+#   Defaults to false
+#
 class tripleo::profile::base::neutron::plugins::ml2::nuage (
   $step              = hiera('step'),
   $mechanism_drivers = hiera('neutron::plugins::ml2::mechanism_drivers'),
+  $enable_vrs        = false,
 ) {
 
   if $step >= 4 {
@@ -35,6 +40,10 @@ class tripleo::profile::base::neutron::plugins::ml2::nuage (
 
     if 'sriovnicswitch' in $mechanism_drivers {
       include ::nova::patch::config
+    }
+
+    if $enable_vrs {
+      include ::nuage::vrs
     }
   }
 }
