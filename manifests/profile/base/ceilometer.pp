@@ -110,5 +110,6 @@ class tripleo::profile::base::ceilometer (
       }),
     }
     include ::ceilometer::config
+    include ::ceilometer::dispatcher::gnocchi
   }
 }
