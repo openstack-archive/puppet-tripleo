@@ -173,19 +173,21 @@ class tripleo::profile::base::docker (
 
     if $registry_mirror {
       $mirror_changes = [
-        'set dict/entry[. = "registry-mirrors"] "registry-mirrors',
-        "set dict/entry[. = \"registry-mirrors\"]/array/string \"${registry_mirror}\""
+        "set dict/entry[. = 'registry-mirrors'] registry-mirrors",
+        "set dict/entry[. = 'registry-mirrors']/array/string \"${registry_mirror}\""
       ]
     } else {
-      $mirror_changes = [ 'rm dict/entry[. = "registry-mirrors"]', ]
+      $mirror_changes = [ "rm dict/entry[. = 'registry-mirrors']", ]
     }
 
     if $debug {
       $debug_changes = [
-        'set dict/entry[. = "debug"] "debug"',
-        "set dict/entry[. = \"debug\"]/const \"${debug}\"",]
+        "set dict/entry[. = 'debug'] debug",
+        "set dict/entry[. = 'debug']/const true", ]
     } else {
-      $debug_changes = [ 'rm dict/entry[. = "debug"]', ]
+      $debug_changes = [
+        "set dict/entry[. = 'debug'] debug",
+        "set dict/entry[. = 'debug']/const false", ]
     }
 
     file { '/etc/docker/daemon.json':
