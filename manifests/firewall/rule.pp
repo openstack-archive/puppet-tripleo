@@ -150,10 +150,10 @@ define tripleo::firewall::rule (
     fail("${title} firewall rule cannot be created. TCP or UDP rules for INPUT or OUTPUT need port or sport or dport.")
   }
   if $source or $destination {
-    if ('.' in $destination or '.' in $source) {
+    if (/[.]/ in $destination or /[.]/ in $source) {
       create_resources('firewall', { "${title} ipv4" => $ipv4_rule })
     }
-    if (':' in $destination or ':' in $source) {
+    if (/[:]/ in $destination or /[:]/ in $source) {
       create_resources('firewall', { "${title} ipv6" => $ipv6_rule })
     }
   } else {
