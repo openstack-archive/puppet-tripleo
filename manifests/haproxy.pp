@@ -646,7 +646,8 @@ class tripleo::haproxy (
   $ovn_dbs                     = hiera('ovn_dbs_enabled', false),
   $ovn_dbs_manage_lb           = false,
   $zaqar_ws                    = hiera('zaqar_api_enabled', false),
-  $ui                          = hiera('enable_ui', false),
+  # For backward compatibility with instack-undercloud, keep enable_ui support)
+  $ui                          = pick(hiera('tripleo_ui_enabled', undef), hiera('enable_ui', undef), false),
   $aodh_network                = hiera('aodh_api_network', undef),
   $barbican_network            = hiera('barbican_api_network', false),
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
