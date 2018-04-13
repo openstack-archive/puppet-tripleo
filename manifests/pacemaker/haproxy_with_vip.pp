@@ -80,6 +80,7 @@ define tripleo::pacemaker::haproxy_with_vip(
       cidr_netmask   => $netmask,
       nic            => $nic,
       ipv6_addrlabel => $ipv6_addrlabel,
+      meta_params    => 'resource-stickiness=INFINITY',
       location_rule  => $location_rule,
       tries          => $pcs_tries,
     }
