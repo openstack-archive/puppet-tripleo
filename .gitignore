@@ -5,6 +5,7 @@ spec/fixtures/modules
 spec/fixtures/manifests
 .vagrant/
 .bundle/
+.bundle*/
 coverage/
 .idea/
 *.swp
