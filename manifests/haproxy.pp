@@ -765,13 +765,6 @@ class tripleo::haproxy (
   }
   $ports = merge($default_service_ports, $service_ports)
 
-  if !is_ip_addresses($controller_virtual_ip) {
-    fail("controller_virtual_ip param: ${controller_virtual_ip}, is not a proper IP address.")
-  }
-  if !is_ip_addresses($public_virtual_ip) {
-    fail("public_virtual_ip: ${public_virtual_ip}, is not a proper IP address.")
-  }
-
   if $enable_internal_tls {
     $base_internal_tls_member_options = ['ssl', 'verify required', "ca-file ${ca_bundle}"]
 
