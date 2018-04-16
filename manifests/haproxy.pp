@@ -1463,14 +1463,13 @@ class tripleo::haproxy (
     }
 
     ::tripleo::haproxy::endpoint { 'opendaylight_ws':
-      internal_ip               => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
-      service_port              => $ports[opendaylight_ws_port],
-      ip_addresses              => hiera('opendaylight_api_node_ips', $controller_hosts_real),
-      server_names              => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
-      mode                      => 'http',
-      haproxy_listen_bind_param => [],  # We don't use a transparent proxy (diverting non-destined haproxy traffic)
-      service_network           => $opendaylight_network,
-      listen_options            => {
+      internal_ip     => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
+      service_port    => $ports[opendaylight_ws_port],
+      ip_addresses    => hiera('opendaylight_api_node_ips', $controller_hosts_real),
+      server_names    => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
+      mode            => 'http',
+      service_network => $opendaylight_network,
+      listen_options  => {
         # NOTE(jaosorior): Websockets have more overhead in establishing
         # connections than regular HTTP connections. Also, since it begins
         # as an HTTP connection and then "upgrades" to a TCP connection, some
