@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes OpenDaylight Websocket HA Proxy configuration to use transparent
+    binding type.  See https://bugs.launchpad.net/tripleo/+bug/1764514
