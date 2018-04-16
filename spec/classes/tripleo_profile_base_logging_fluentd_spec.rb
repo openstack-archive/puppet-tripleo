@@ -38,8 +38,34 @@ describe 'tripleo::profile::base::logging::fluentd' do
 
       it { is_expected.to contain_class('fluentd') }
       it { is_expected.to contain_class('systemd::systemctl::daemon_reload') }
+
       it { is_expected.to contain_fluentd__plugin('rubygem-fluent-plugin-add').with(
         :plugin_provider => 'yum',
+      ) }
+
+      it { is_expected.to contain_fluentd__config('110-monitoring-agent.conf') }
+      it { is_expected.to contain_file('/etc/fluentd/config.d/110-monitoring-agent.conf').with_content(
+"# This file is managed by Puppet, do not edit manually.
+<source>
+  bind 127.0.0.1
+  port 24220
+  @type monitor_agent
+</source>
+"
+      ) }
+
+      it { is_expected.to contain_fluentd__config('110-system-sources.conf') }
+      it { is_expected.to contain_file('/etc/rsyslog.d/fluentd.conf').with_content(
+"*.* @127.0.0.1:42185"
+      ) }
+      it { is_expected.to contain_file('/etc/fluentd/config.d/110-system-sources.conf').with_content(
+"# This file is managed by Puppet, do not edit manually.
+<source>
+  port 42185
+  tag system.messages
+  @type syslog
+</source>
+"
       ) }
     end
 
