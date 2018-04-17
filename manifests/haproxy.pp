@@ -1492,9 +1492,6 @@ class tripleo::haproxy (
       mode            => 'http',
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
       service_network => $opendaylight_network,
-      listen_options  => {
-        'balance' => 'source',
-      },
     }
 
     ::tripleo::haproxy::endpoint { 'opendaylight_ws':
@@ -1513,7 +1510,6 @@ class tripleo::haproxy (
         # The following values were taken from the following site:
         # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
         'timeout' => ['connect 5s', 'client 25s', 'server 25s', 'tunnel 3600s'],
-        'balance' => 'source',
       },
     }
   }
