@@ -1168,7 +1168,7 @@ class tripleo::haproxy (
       service_port      => $ports[swift_proxy_port],
       ip_addresses      => hiera('swift_proxy_node_ips', $controller_hosts_real),
       server_names      => hiera('swift_proxy_node_names', $controller_hosts_names_real),
-      listen_options    => $swift_proxy_server_listen_options,
+      listen_options    => merge($default_listen_options, $swift_proxy_server_listen_options),
       public_ssl_port   => $ports[swift_proxy_ssl_port],
       service_network   => $swift_proxy_server_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
