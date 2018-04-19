@@ -89,8 +89,23 @@ class tripleo::profile::base::nova (
   $migration_ssh_localaddrs_real = unique($migration_ssh_localaddrs)
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
+
+    if hiera('stack_action', undef) == 'UPDATE' {
+      if empty($::current_nova_host) {
+        # We fail instead of blindly changing that value as it can
+        # break the overcloud.
+        fail("We couldn't get the live value of the nova agent, please contact support.")
+      } else {
+        $host_real = $::current_nova_host
+      }
+    }    else {
+      $host_real = hiera('nova::host')
+    }
+
+
     $rabbit_endpoints = suffix(any2array(normalize_ip_for_uri($rabbit_hosts)), ":${rabbit_port}")
     class { '::nova' :
+      host         => $host_real,
       rabbit_hosts => $rabbit_endpoints,
     }
     include ::nova::config

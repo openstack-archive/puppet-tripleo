@@ -43,6 +43,7 @@ describe 'tripleo::profile::base::nova' do
       it {
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('nova').with(
+          :host         => 'node.example.com',
           :rabbit_hosts => ['127.0.0.1:5672']
 
         )
@@ -496,13 +497,35 @@ describe 'tripleo::profile::base::nova' do
       }
     end
 
+    context 'during upgrade' do
+      let(:params) { {
+        :step => 4,
+      } }
+      let(:facts) { super().merge({:heat_stack_action => '_update'})}
+
+      context 'when current nova host is different from fqdn' do
+        let(:facts) { super().merge({:current_nova_host => 'node'})}
+        it "should use the current_host" do
+          is_expected.to contain_class('nova').with(
+                           :host => 'node',
+                         )
+        end
+      end
+      context 'when current nova host cannot be found' do
+        let(:facts) { super().merge({:current_nova_host => ''})}
+        it "fails" do
+          is_expected.to compile.and_raise_error(/live value of the nova/)
+        end
+      end
+    end
+
   end
 
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) do
-        facts.merge({ :hostname => 'node.example.com' })
+        facts.merge({:hostname => 'node.example.com'})
       end
 
       it_behaves_like 'tripleo::profile::base::nova'

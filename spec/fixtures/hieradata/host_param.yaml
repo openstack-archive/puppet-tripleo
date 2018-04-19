@@ -1,0 +1,3 @@
+---
+neutron::host: 'node.example.com'
+nova::host: 'node.example.com'

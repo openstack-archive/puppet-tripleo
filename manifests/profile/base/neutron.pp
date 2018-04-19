@@ -63,8 +63,25 @@ class tripleo::profile::base::neutron (
     elsif $dhcp_agent_count > 0 {
       $dhcp_agents_per_net = $dhcp_agent_count
     }
+    if hiera('stack_action', undef) == 'UPDATE' {
+      if !empty($::current_neutron_host) {
+        $host_real = $::current_neutron_host
+      }
+      # Try nova value as we could be on a compute node without all
+      # the necessary neutron definition.  The host value will be identical.
+      elsif !empty($::current_nova_host) {
+        $host_real = $::current_nova_host
+      } else {
+        # We fail instead of blindly changing that value as it can
+        # break the overcloud.
+        fail("We couldn't get the live value of the neutron agent, please contact support.")
+      }
+    } else {
+      $host_real = hiera('neutron::host')
+    }
 
     class { '::neutron' :
+      host                    => $host_real,
       rabbit_hosts            => $rabbit_endpoints,
       dhcp_agents_per_network => $dhcp_agents_per_net,
     }
