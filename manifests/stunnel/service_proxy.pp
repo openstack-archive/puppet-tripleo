@@ -42,6 +42,10 @@
 #   Host where the tunnel will be proxying to.
 #   Defaults to 'localhost'
 #
+# [*ssl_version*]
+#   (Optional) select the TLS protocol version
+#   Defaults to 'TLSv1.2'
+#
 define tripleo::stunnel::service_proxy (
   $accept_host,
   $accept_port,
@@ -50,6 +54,7 @@ define tripleo::stunnel::service_proxy (
   $key,
   $client = 'no',
   $connect_host = 'localhost',
+  $ssl_version = 'TLSv1.2'
 ) {
   concat::fragment { "stunnel-service-${name}":
     target  => '/etc/stunnel/stunnel.conf',
