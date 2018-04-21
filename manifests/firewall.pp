@@ -150,7 +150,29 @@ class tripleo::firewall(
       command => '/bin/sed -i /neutron-/d /etc/sysconfig/ip6tables',
       onlyif  => '/bin/test -f /etc/sysconfig/ip6tables && /bin/grep -q neutron- /etc/sysconfig/ip6tables',
     }
+
+    # Do not persist ephemeral firewall rules mananged by ironic-inspector
+    # pxe_filter 'iptables' driver.
+    # https://bugs.launchpad.net/tripleo/+bug/1765700
+    # https://storyboard.openstack.org/#!/story/2001890
+    exec { 'nonpersistent_ironic_inspector_pxe_filter_v4_rules_cleanup':
+      command => '/bin/sed -i "/-m comment --comment/p;/ironic-inspector/d" /etc/sysconfig/iptables',
+      onlyif  => [
+          '/bin/test -f /etc/sysconfig/iptables',
+          '/bin/grep -v "\-m comment \--comment" /etc/sysconfig/iptables | /bin/grep -q ironic-inspector'
+      ]
+    }
+    exec { 'nonpersistent_ironic_inspector_pxe_filter_v6_rules_cleanup':
+      command => '/bin/sed -i "/-m comment --comment/p;/ironic-inspector/d" /etc/sysconfig/ip6tables',
+      onlyif  => [
+          '/bin/test -f /etc/sysconfig/ip6tables',
+          '/bin/grep -v "\-m comment \--comment" /etc/sysconfig/ip6tables | /bin/grep -q ironic-inspector'
+      ]
+    }
+
     Firewall<| |> -> Exec['nonpersistent_v4_rules_cleanup']
     Firewall<| |> -> Exec['nonpersistent_v6_rules_cleanup']
+    Firewall<| |> -> Exec['nonpersistent_ironic_inspector_pxe_filter_v4_rules_cleanup']
+    Firewall<| |> -> Exec['nonpersistent_ironic_inspector_pxe_filter_v6_rules_cleanup']
   }
 }
