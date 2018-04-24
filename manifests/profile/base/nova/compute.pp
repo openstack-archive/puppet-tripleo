@@ -27,6 +27,10 @@
 #   (Optional) Whether or not Cinder is backed by NFS.
 #   Defaults to hiera('cinder_enable_nfs_backend', false)
 #
+# [*nova_nfs_enabled*]
+#   (Optional) Whether or not Nova is backed by NFS.
+#   Defaults to false
+#
 # [*keymgr_backend*]
 #   (Optional) The encryption key manager backend. The default value
 #   ensures Nova's legacy key manager is enabled when no hiera value is
@@ -44,6 +48,7 @@
 class tripleo::profile::base::nova::compute (
   $step               = Integer(hiera('step')),
   $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
+  $nova_nfs_enabled   = hiera('nova_nfs_enabled', false),
   $keymgr_backend     = hiera('nova::compute::keymgr_backend', 'nova.keymgr.conf_key_mgr.ConfKeyManager'),
   # DEPRECATED PARAMETERS
   $keymgr_api_class   = undef,
@@ -74,8 +79,8 @@ class tripleo::profile::base::nova::compute (
     include ::nova::network::neutron
   }
 
-  # If NFS is used as a Cinder backend
-  if $cinder_nfs_backend {
+  # If NFS is used as a Cinder or Nova backend
+  if $cinder_nfs_backend or $nova_nfs_enabled {
     ensure_packages('nfs-utils', { ensure => present })
     Package['nfs-utils'] -> Service['nova-compute']
     if str2bool($::selinux) {
