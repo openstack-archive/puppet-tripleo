@@ -1,4 +1,4 @@
-# Copyright 2016 Red Hat, Inc.
+# Copyright 2018 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,22 +14,28 @@
 #
 # == Class: tripleo::profile::base::neutron::lbaas
 #
-# Neutron LBaaS Service plugin profile for TripleO
+# Neutron LBaaS Agent profile for TripleO
 #
 # === Parameters
+#
+# [*manage_haproxy_package*]
+#   (Optional) Whether to manage the haproxy package.
+#   Defaults to hiera('manage_haproxy_package', false)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-class tripleo::profile::base::neutron::lbaas(
+class tripleo::profile::base::neutron::agents::lbaas(
+  $manage_haproxy_package = hiera('manage_haproxy_package', false),
   $step                   = Integer(hiera('step')),
 ) {
 
-  include ::tripleo::profile::base::neutron
-
-  if $step >= 4 {
-    include ::neutron::services::lbaas
+  #LBaaS Driver needs to be run @ $step>=5 as the neutron service needs to already be active which is run @ $step==4
+  if $step >= 5 {
+    class {'::neutron::agents::lbaas':
+      manage_haproxy_package => $manage_haproxy_package
+    }
   }
 }
