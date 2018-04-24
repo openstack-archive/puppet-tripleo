@@ -52,6 +52,18 @@
 #   (Required if fluentd_use_ssl is true) Shared secret key for fluentd
 #   secure-foward plugin.
 #
+# [*fluentd_monitoring*]
+#   (Optional, default true) When true, fluentd will have REST API interface
+#   for monitoring purposes.
+#
+# [*fluentd_monitoring_bind*]
+#   (Optional, default '127.0.0.1') Interface on which fluentd monitoring
+#   interface should listen if $fluentd_monitoring is true.
+#
+# [*fluentd_monitoring_port*]
+#   (Optional, default 24220) Port on which fluentd monitoring interface
+#   should listen if $fluentd_monitoring is true.
+#
 # [*fluentd_listen_syslog*]
 #   (Optional, default true) When true, fluentd will listen for syslog
 #   messages on a local UDP port.
@@ -97,6 +109,9 @@ class tripleo::profile::base::logging::fluentd (
   $fluentd_pos_file_path = undef,
   $fluentd_default_format = undef,
   $fluentd_service_user = undef,
+  $fluentd_monitoring = true,
+  $fluentd_monitoring_bind = '127.0.0.1',
+  $fluentd_monitoring_port = 24220,
   $service_names = hiera('service_names', [])
 ) {
   if $step >= 4 {
@@ -187,6 +202,19 @@ class tripleo::profile::base::logging::fluentd (
       ::fluentd::config { '100-openstack-sources.conf':
         config => {
           'source' => $_fluentd_sources,
+        }
+      }
+    }
+
+    if $fluentd_monitoring {
+      # fluentd will open port for monitoring REST API interface
+      ::fluentd::config { '110-monitoring-agent.conf':
+        config => {
+          'source' => {
+            'type' => 'monitor_agent',
+            'bind' => $fluentd_monitoring_bind,
+            'port' => $fluentd_monitoring_port,
+          }
         }
       }
     }
