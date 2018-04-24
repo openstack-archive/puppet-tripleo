@@ -30,6 +30,7 @@ class tripleo::network::os_net_config {
       Package['openvswitch'],
       Service['openvswitch'],
     ],
+    onlyif  => "/bin/grep -q '[^[:space:]]' /etc/os-net-config/config.json",
     notify  => Exec['trigger-keepalived-restart'],
   }
 
