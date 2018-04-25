@@ -20,11 +20,11 @@
 #
 #
 # [*vts_url_ip*]
-#   IP address for VTS Api Service
-#   Defaults to hiera('vts_ip')
+#   (Optional) IP address of the VTS Server
+#   Defaults to undefined
 #
 # [*vts_port*]
-#   (Optional) VTS server Neutron service port
+#   (Optional) VTS Server Neutron service port
 #   Defaults to '8888'
 #
 # [*step*]
@@ -33,17 +33,19 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::plugins::ml2::vts (
-  $vts_url_ip   = hiera('vts::vts_ip'),
+  $vts_url_ip   = hiera('vts::vts_ip', undef),
   $vts_port     = hiera('vts::vts_port', 8888),
   $step         = hiera('step'),
 ) {
 
   if $step >= 4 {
 
-    $vts_url_ip_out = normalize_ip_for_uri($vts_url_ip)
+    if $vts_url_ip != undef {
+      $vts_url_ip_out = normalize_ip_for_uri($vts_url_ip)
 
-    class { '::neutron::plugins::ml2::cisco::vts':
-      vts_url => "https://${vts_url_ip_out}:${vts_port}/api/running/openstack"
+      class { '::neutron::plugins::ml2::cisco::vts':
+        vts_url => "https://${vts_url_ip_out}:${vts_port}/api/running/openstack"
+      }
     }
   }
 }
