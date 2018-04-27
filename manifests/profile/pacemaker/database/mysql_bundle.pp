@@ -67,10 +67,21 @@
 #   one step.
 #   Defaults to hiera('innodb_flush_log_at_trx_commit', '1')
 #
+# [*cipher_list*]
+#   (Optional) When enable_internal_tls is true, defines the list of allowed
+#   ciphers for the mysql server and Galera (including SST).
+#   Defaults to '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1'
+#
+# [*gcomm_cipher*]
+#   (Optional) When enable_internal_tls is true, defines the cipher
+#   used by Galera for the gcomm replication traffic.
+#   Defaults to 'AES128-SHA256'
+#
 # [*sst_tls_cipher*]
 #   (Optional) When enable_internal_tls is true, defines the list of
-#   ciphers that the socat may use to tunnel SST connections.
-#   Defaults to '!SSLv2:kEEH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES'
+#   ciphers that the socat may use to tunnel SST connections. Deprecated,
+#   now socat is configured based on option cipher_list.
+#   Defaults to undef
 #
 # [*sst_tls_options*]
 #   (Optional) When enable_internal_tls is true, defines additional
@@ -97,11 +108,13 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $bootstrap_node                 = hiera('mysql_short_bootstrap_node_name'),
   $bind_address                   = $::hostname,
   $ca_file                        = undef,
+  $cipher_list                    = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1',
+  $gcomm_cipher                   = 'AES128-SHA256',
   $certificate_specs              = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $enable_internal_tls            = hiera('enable_internal_tls', false),
   $gmcast_listen_addr             = hiera('mysql_bind_host'),
   $innodb_flush_log_at_trx_commit = hiera('innodb_flush_log_at_trx_commit', '1'),
-  $sst_tls_cipher                 = '!SSLv2:kEEH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
+  $sst_tls_cipher                 = undef,
   $sst_tls_options                = undef,
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
   $pcs_tries                      = hiera('pcs_tries', 20),
@@ -147,14 +160,20 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
       $tls_ca_options = ''
       $sst_tca = {}
     }
-    $tls_options = "socket.ssl_key=${tls_keyfile};socket.ssl_cert=${tls_certfile};${tls_ca_options};"
+    $tls_options = "socket.ssl_key=${tls_keyfile};socket.ssl_cert=${tls_certfile};socket.ssl_cipher=${gcomm_cipher};${tls_ca_options};"
     $wsrep_sst_method = 'rsync_tunnel'
     if $ipv6 {
       $sst_ipv6 = 'pf=ip6'
     } else {
       $sst_ipv6 = undef
     }
-    $all_sst_options = ["cipher=${sst_tls_cipher}", $sst_tls_options, $sst_ipv6]
+    if defined(sst_tls_cipher) {
+      warning('The sst_tls_cipher parameter is deprecated, use cipher_list')
+      $sst_cipher = $sst_tls_cipher
+    } else {
+      $sst_cipher = $cipher_list
+    }
+    $all_sst_options = ["cipher=${sst_cipher}", $sst_tls_options, $sst_ipv6]
     $sst_sockopt = {
       'sockopt' => join(delete_undef_values($all_sst_options), ',')
     }
@@ -258,6 +277,7 @@ MYSQL_HOST=localhost\n",
       manage_resources        => false,
       remove_default_accounts => $remove_default_accounts,
       mysql_server_options    => $mysqld_options,
+      cipher_list             => $cipher_list
     }
 
     if $pacemaker_master {
