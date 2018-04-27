@@ -38,6 +38,11 @@
 #       principal: "mysql/<overcloud controller fqdn>"
 #   Defaults to {}.
 #
+# [*cipher_list*]
+#   (Optional) When enable_internal_tls is true, defines the list of allowed
+#   ciphers for the mysql server.
+#   Defaults to '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1'
+#
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
@@ -78,6 +83,7 @@ class tripleo::profile::base::database::mysql (
   $bind_address                  = $::hostname,
   $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $certificate_specs             = {},
+  $cipher_list                   = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1',
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $generate_dropin_file_limit    = false,
   $innodb_buffer_pool_size       = hiera('innodb_buffer_pool_size', undef),
@@ -100,12 +106,14 @@ class tripleo::profile::base::database::mysql (
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
+    $tls_cipher_list = $cipher_list
 
     # Force users/grants created to use TLS connections
     Openstacklib::Db::Mysql <||> { tls_options => ['SSL'] }
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
+    $tls_cipher_list = undef
   }
 
   # non-ha scenario
@@ -136,6 +144,7 @@ class tripleo::profile::base::database::mysql (
         'ssl'                     => $enable_internal_tls,
         'ssl-key'                 => $tls_keyfile,
         'ssl-cert'                => $tls_certfile,
+        'ssl-cipher'              => $tls_cipher_list,
         'ssl-ca'                  => undef,
       }
     }
