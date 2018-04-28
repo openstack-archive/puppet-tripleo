@@ -147,7 +147,7 @@ class tripleo::profile::base::docker (
       $registry_changes = [ "set INSECURE_REGISTRY '\"--insecure-registry ${insecure_registry_address}\"'" ]
     } elsif $insecure_registries {
       $registry_changes = [ join(['set INSECURE_REGISTRY \'"--insecure-registry ',
-                                  join($insecure_registries, ' --insecure-registry '),
+                                  join(any2array($insecure_registries), ' --insecure-registry '),
                                   '"\''], '') ]
     } else {
       $registry_changes = [ 'rm INSECURE_REGISTRY' ]
