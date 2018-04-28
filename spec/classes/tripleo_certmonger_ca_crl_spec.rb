@@ -47,7 +47,7 @@ describe 'tripleo::certmonger::ca::crl' do
       end
 
       let :cron_cmd do
-        "curl -s -L -o #{params[:crl_preprocessed]} #{params[:crl_source]} && #{process_cmd}"
+        "curl -g -s -L -o #{params[:crl_preprocessed]} #{params[:crl_source]} && #{process_cmd}"
       end
 
       it 'should create and process CRL file' do
@@ -75,7 +75,7 @@ describe 'tripleo::certmonger::ca::crl' do
       end
 
       let :cron_cmd do
-        "curl -s -L -o #{params[:crl_dest]} #{params[:crl_source]}"
+        "curl -g -s -L -o #{params[:crl_dest]} #{params[:crl_source]}"
       end
 
       it 'should create and process CRL file' do
