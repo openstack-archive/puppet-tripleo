@@ -31,10 +31,6 @@
 #   directly because it requires a string and we have a number.
 #   Defaults to hiera('tripleo::profile::base::qdr::qdr_listener_port', 5672)
 #
-# [*rabbit_hosts*]
-#   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('rabbitmq_node_names', undef)
-#
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
 #   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
@@ -48,11 +44,10 @@ class tripleo::profile::base::qdr (
   $qdr_username      = undef,
   $qdr_password      = undef,
   $qdr_listener_port = hiera('tripleo::profile::base::qdr::qdr_listener_port', 5672),
-  $step              = Integer(hiera('step')),
-  $rabbit_hosts      = hiera('rabbitmq_node_names', undef),
   $oslomsg_rpc_hosts = hiera('oslo_messaging_rpc_node_names', undef),
+  $step              = Integer(hiera('step')),
 ) {
-  $qdr_node_names = pick($oslomsg_rpc_hosts, $rabbit_hosts, [])
+  $qdr_node_names = $oslomsg_rpc_hosts
   if $step >= 1 {
     # For multi-node deployments of the dispatch router, a mesh of
     # inter-router links is created. Bi-directional links must
