@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes HA Proxy with OpenDaylight to use the correct HTTP URL for backend
+    check.  See https://bugs.launchpad.net/tripleo/+bug/1768037

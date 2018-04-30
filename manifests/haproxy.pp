@@ -1457,6 +1457,8 @@ class tripleo::haproxy (
       mode            => 'http',
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
       service_network => $opendaylight_network,
+      listen_options  => merge($default_listen_options,
+        { 'option' => [ 'httpchk GET /controller/nb/v2/neutron', 'httplog' ] }),
     }
 
     ::tripleo::haproxy::endpoint { 'opendaylight_ws':
