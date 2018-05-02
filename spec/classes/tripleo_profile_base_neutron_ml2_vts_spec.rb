@@ -48,6 +48,12 @@ describe 'tripleo::profile::base::neutron::plugins::ml2::vts' do
       end
     end
 
+    context 'with no IP address' do
+      it 'should not configure vts ml2 plugin' do
+        is_expected.not_to contain_class('neutron::plugins::ml2::cisco::vts')
+      end
+    end
+
     context 'with VTS IPv4 and port 9999' do
       before do
         params.merge!({
