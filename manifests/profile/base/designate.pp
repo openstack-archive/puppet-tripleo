@@ -24,39 +24,39 @@
 #
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
-#   Defaults to hiera('messaging_rpc_service_name', rabbit)
+#   Defaults to hiera('oslo_messaging_rpc_scheme', rabbit)
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('rabbitmq_node_names')
+#   Defaults to hiera('oslo_messaging_rpc_node_names')
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
-#   Defaults to hiera('designate::rabbit_port', 5672)
+#   Defaults to hiera('oslo_messaging_rpc_port', 5672)
 #
 # [*oslomsg_rpc_username*]
 #   Username for oslo messaging rpc service
-#   Defaults to hiera('designate::rabbit_userid', 'guest')
+#   Defaults to hiera('oslo_messaging_rpc_user_name', 'guest')
 #
 # [*oslomsg_rpc_password*]
 #   Password for oslo messaging rpc service
-#   Defaults to hiera('designate::rabbit_password')
+#   Defaults to hiera('oslo_messaging_rpc_password')
 #
-# [*oslomsg_use_ssl*]
+# [*oslomsg_rpc_use_ssl*]
 #   Enable ssl oslo messaging services
-#   Defaults to hiera('designate::rabbit_use_ssl', '0')
+#   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
 
 class tripleo::profile::base::designate (
   $step                 = Integer(hiera('step')),
-  $oslomsg_rpc_proto    = hiera('messaging_rpc_service_name', 'rabbit'),
-  $oslomsg_rpc_hosts    = any2array(hiera('rabbitmq_node_names', undef)),
-  $oslomsg_rpc_password = hiera('designate::rabbit_password'),
-  $oslomsg_rpc_port     = hiera('designate::rabbit_port', '5672'),
-  $oslomsg_rpc_username = hiera('designate::rabbit_userid', 'guest'),
-  $oslomsg_use_ssl      = hiera('designate::rabbit_use_ssl', '0'),
+  $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
+  $oslomsg_rpc_hosts    = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
+  $oslomsg_rpc_password = hiera('oslo_messaging_rpc_password'),
+  $oslomsg_rpc_port     = hiera('oslo_messaging_rpc_port', '5672'),
+  $oslomsg_rpc_username = hiera('oslo_messaging_rpc_user_name', 'guest'),
+  $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
 ) {
   if $step >= 3 {
-    $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
+    $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     class { '::designate' :
       default_transport_url => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
@@ -64,7 +64,7 @@ class tripleo::profile::base::designate (
         'port'      => sprintf('%s', $oslomsg_rpc_port),
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,
-        'ssl'       => $oslomsg_use_ssl_real,
+        'ssl'       => $oslomsg_rpc_use_ssl_real,
         }),
     }
     include ::designate::config
