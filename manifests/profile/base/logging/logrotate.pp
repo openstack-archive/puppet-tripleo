@@ -54,6 +54,10 @@
 #    (optional) Defaults to True.
 #    Configures the logrotate delaycompress parameter.
 #
+#  [*compress*]
+#    (optional) Defaults to True.
+#    Configures the logrotate compress parameter.
+#
 #  [*size*]
 #    (optional) Defaults to '10M'.
 #    Configures the logrotate size parameter.
@@ -73,6 +77,7 @@ class tripleo::profile::base::logging::logrotate (
   Integer $maxdelay = 90,
   $user             = 'root',
   $delaycompress    = true,
+  $compress         = true,
   $size             = '10M',
   $rotate           = 14,
 ) {
