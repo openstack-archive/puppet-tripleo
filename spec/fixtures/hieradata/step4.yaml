@@ -10,12 +10,20 @@ cinder::backend::eqlx::eqlx_chap_login: 'user'
 cinder::backend::eqlx::eqlx_chap_password: 'user'
 service_names:
  - 'ceilometer_agent_central'
+ - 'horizon'
 tripleo_fluentd_groups_ceilometer_agent_central:
  - 'ceilometer'
 tripleo_fluentd_sources_ceilometer_agent_central:
  - 'path': '/var/log/ceilometer/central.log'
    'tag': 'openstack.ceilometer.agent.central'
-
+tripleo_fluentd_groups_horizon:
+ - 'horizon'
+tripleo_fluentd_sources_horizon:
+ - 'path': '/var/log/horizon/test.log'
+   'tag': 'openstack.horizon.test'
+   'pos_file' : '/var/cache/fluentd/horizon-test.pos'
+ - 'path': '/var/log/horizon/access.log'
+   'tag': 'openstack.horizon.access'
 fluentd::config_file: "/etc/fluentd/fluent.conf"
 fluentd::config_group: "fluentd"
 fluentd::config_owner: "fluentd"

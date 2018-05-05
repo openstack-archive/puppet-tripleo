@@ -190,6 +190,39 @@ describe 'tripleo::profile::base::logging::fluentd' do
 
     end
 
+    context 'Multifiles -- horizon' do
+      let(:params) { {
+        :step => 4,
+        :fluentd_default_format => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/',
+        :fluentd_manage_groups => false,
+        :fluentd_pos_file_path => '/var/cache/fluentd/',
+        :service_names => [ 'horizon' ],
+        :fluentd_path_transform => [
+          '/var/log/',
+          '/var/log/containers/'
+        ]
+      } }
+      it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-horizon.conf').with_content (
+"# This file is managed by Puppet, do not edit manually.
+<source>
+  format /(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/
+  path /var/log/containers/horizon/test.log
+  pos_file /var/cache/fluentd/horizon-test.pos
+  tag openstack.horizon.test
+  @type tail
+</source>
+<source>
+  format /(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/
+  path /var/log/containers/horizon/access.log
+  pos_file /var/cache/fluentd//openstack.horizon.access.pos
+  tag openstack.horizon.access
+  @type tail
+</source>
+"
+       ) }
+
+    end
+
     context 'Groups by service -- ceilometer_agent_central added ceilometer' do
       let(:params) { {
         :step => 4,
@@ -199,7 +232,7 @@ describe 'tripleo::profile::base::logging::fluentd' do
       it { is_expected.to contain_class('fluentd') }
       it { is_expected.to contain_user('fluentd').with(
         :ensure =>'present',
-        :groups => [ 'fluentd', 'ceilometer' ],
+        :groups => [ 'fluentd', 'ceilometer', 'horizon' ],
         :membership => 'minimum'
       ) }
     end
@@ -224,7 +257,7 @@ describe 'tripleo::profile::base::logging::fluentd' do
 
       it { is_expected.to contain_user('fluentd').with(
         :ensure =>'present',
-        :groups => [ 'fluentd','ceilometer' ],
+        :groups => [ 'fluentd','ceilometer','horizon' ],
         :membership => 'minimum'
       ) }
     end

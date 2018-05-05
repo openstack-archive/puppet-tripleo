@@ -26,33 +26,27 @@ define tripleo::profile::base::logging::fluentd::fluentd_service (
     type   => 'tail',
   }
 
-  # Check that we have something to configure to avoid creating
-  # stub config files.
   if !empty($sources) or !empty($filters) or !empty($matches) {
-    if $fluentd_transform and !empty($sources) {
-      $new_source = {} + map($sources) |$source| {
-          if $source['path'] {
-            $newpath = {
-              'path' => regsubst($source['path'],
-                        $fluentd_transform[0],
-                        $fluentd_transform[1])
-            }
-
-            $source + $newpath
-          } else {
-            $source
-          }
+    if !empty($sources) {
+      $all = map($sources) |$values| {
+        { 'pos_file' => "${pos_file_path}/${values['tag']}.pos" }
+        + $default_source
+        + $values
       }
-    }else{
+      if $fluentd_transform {
+        $new_source = map($all) |$values| { $values.filter|$index,$value| {$index != 'path'} +
+          $values.filter|$index,$value|
+            {$index == 'path'}.reduce({})|$memo,$x| {$memo + {'path' => regsubst($x[1], $fluentd_transform[0], $fluentd_transform[1]) } } }
+      } else{
+        $new_source = {} + $all
+      }
+    } else {
       $new_source = {} + $sources
     }
-    # Insert default values into list of sources.
-    $_sources = { 'pos_file' => "${pos_file_path}/${new_source['tag']}.pos" }
-      + $default_source + $new_source
 
     ::fluentd::config { "100-openstack-${title}.conf":
       config => {
-        'source' => $_sources,
+        'source' => $new_source,
         'filter' => $filters,
         'match'  => $matches,
       }
