@@ -177,6 +177,18 @@ describe 'tripleo::profile::base::docker' do
       }
     end
 
+    context 'with additional domains sockets' do
+      let(:params) { {
+          :step              => 1,
+          :additional_sockets => ['/var/lib/openstack/docker.sock', '/var/run/some-other/docker.sock']
+      } }
+      it {
+        is_expected.to contain_augeas('docker-sysconfig-options').with_changes([
+            "set OPTIONS '\"--log-driver=journald --signature-verification=false --iptables=false --live-restore -H unix:///run/docker.sock -H unix:///var/lib/openstack/docker.sock -H unix:///var/run/some-other/docker.sock\"'",
+        ])
+      }
+
+    end
   end
 
   on_supported_os.each do |os, facts|

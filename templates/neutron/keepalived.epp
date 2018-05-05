@@ -1,0 +1,32 @@
+<%- | String $image_name = '', String $ns_prefix = '', String $bind_socket = '' | -%>
+#!/bin/bash
+
+export DOCKER_HOST="<%=$bind_socket%>"
+ARGS="$@"
+
+# Extract the network namespace UUID from the command line args provided by
+# neutron. Typically of the form (with dnsmasq as an example):
+#
+# dnsmasq --no-hosts --no-resolv --except-interface=lo \
+#   --pid-file=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/pid  \
+#   --dhcp-hostsfile=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/host ...
+ROUTER_ID=$(echo $ARGS| awk '{if (match($0, /(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})/,m)) print m[0] }')
+NAME=neutron-keepalived-<%=$ns_prefix%>-${ROUTER_ID}
+
+docker stop $NAME || true
+docker rm -f $NAME || true
+
+docker run --detach \
+    -v /var/lib/config-data/puppet-generated/neutron/etc/neutron:/etc/neutron:ro \
+    -v /lib/modules:/lib/modules:ro \
+    -v /sbin/modprobe:/sbin/modprobe:ro \
+    -v /run/netns:/run/netns:shared \
+    -v /var/lib/neutron:/var/lib/neutron \
+    --net host \
+    --pid host \
+    --privileged \
+    --rm=true \
+    -u root \
+    --name $NAME \
+    <%=$image_name%> \
+    ip netns exec <%=$ns_prefix%>-${ROUTER_ID} /usr/sbin/keepalived -n -l -D $ARGS

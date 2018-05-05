@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Added parameters to generate wrapper scripts for the neutron dhcp and l3 agents
+    to run dnsmasq and keepalived, respectively, in separate containers.
+  - Added `tripleo::profile::base::docker::additional_sockets` to allow configuring
+    additional domain sockets bindings on dockerd. This facilitates creating
+    containers that need to access dockerd without having to mount /run.
