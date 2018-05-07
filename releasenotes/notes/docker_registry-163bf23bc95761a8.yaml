@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    tripleo::profile::base::docker(_registry) are deprecated (replaced by ansible-role-container-registry)
+    and will be removed in the next release.
