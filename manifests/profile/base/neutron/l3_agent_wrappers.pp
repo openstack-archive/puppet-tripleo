@@ -82,7 +82,7 @@
 # [*bind_sockets*]
 #   (Optional) Domain sockets that the wrappers should use for accessing
 #   the docker daemon.
-#   Defaults to hiera('tripleo::profile::base::docker::additional_sockets', ['/run/docker.sock'])
+#   Defaults to hiera('docker_additional_sockets', ['/var/lib/openstack/docker.sock'])
 #
 class tripleo::profile::base::neutron::l3_agent_wrappers (
   $enable_haproxy_wrapper             = false,
@@ -98,7 +98,7 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
   $enable_dibbler_wrapper             = false,
   $dibbler_process_wrapper            = undef,
   $dibbler_image                      = undef,
-  $bind_sockets                       = hiera('tripleo::profile::base::docker::additional_sockets', ['/run/docker.sock']),
+  $bind_sockets                       = hiera('docker_additional_sockets', ['/var/lib/openstack/docker.sock']),
 ) {
   unless $bind_sockets {
     fail('The wrappers require a domain socket for accessing the docker daemon')
