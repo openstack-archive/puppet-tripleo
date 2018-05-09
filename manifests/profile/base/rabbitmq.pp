@@ -38,6 +38,20 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to undef
 #
+# [*ssl_versions*]
+#   (Optional) When enable_internal_tls is in use, list the enabled
+#   TLS protocol version.
+#   Defaults to undef
+#
+# [*inter_node_ciphers*]
+#   (Optional) When enable_internal_tls is in use, list the allowed ciphers
+#   for the encrypted inter-node communication.
+# lint:ignore:140chars
+#   Defaults to "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:AES256-GCM-SHA384:AES256-SHA256:AES128-GCM-SHA256:AES128-SHA256:DHE-DSS-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA256:DHE-DSS-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-SHA256:DHE-DSS-AES128-SHA256"
+# lint:endignore
+#   which is the list of ciphers enabled out of the openssl cipher list format
+#   !SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1
+#
 # [*environment*]
 #   (Optional) RabbitMQ environment.
 #   Defaults to hiera('rabbitmq_environment').
@@ -85,6 +99,10 @@ class tripleo::profile::base::rabbitmq (
   $config_variables              = hiera('rabbitmq_config_variables'),
   $enable_internal_tls           = undef,  # TODO(jaosorior): pass this via t-h-t
   $environment                   = hiera('rabbitmq_environment'),
+  $ssl_versions                  = undef,
+  # lint:ignore:140chars
+  $inter_node_ciphers            = 'ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:AES256-GCM-SHA384:AES256-SHA256:AES128-GCM-SHA256:AES128-SHA256:DHE-DSS-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA256:DHE-DSS-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-SHA256:DHE-DSS-AES128-SHA256',
+  # lint:endignore
   $inet_dist_interface           = hiera('rabbitmq::interface', undef),
   $ipv6                          = str2bool(hiera('rabbit_ipv6', false)),
   $kernel_variables              = hiera('rabbitmq_kernel_variables'),
@@ -100,17 +118,26 @@ class tripleo::profile::base::rabbitmq (
     $tls_keyfile = $certificate_specs['service_key']
     $cert_option = "-ssl_dist_opt server_certfile ${tls_certfile}"
     $key_option = "-ssl_dist_opt server_keyfile ${tls_keyfile}"
+    $ciphers_option = "-ssl_dist_opt server_ciphers ${inter_node_ciphers}"
     $secure_renegotiate = '-ssl_dist_opt server_secure_renegotiate true -ssl_dist_opt client_secure_renegotiate true'
 
-    $rabbitmq_additional_erl_args = "\"${cert_option} ${key_option} ${secure_renegotiate}\""
+    $rabbitmq_additional_erl_args = "\"${cert_option} ${key_option} ${ciphers_option} ${secure_renegotiate}\""
     $environment_real = merge($environment, {
       'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS' => $rabbitmq_additional_erl_args,
       'RABBITMQ_CTL_ERL_ARGS' => $rabbitmq_additional_erl_args
     })
+    # Configure a list of secure transport protocols, unless the
+    # user explicitly sets one
+    if !defined(ssl_versions) {
+      $configured_ssl_versions = ['tlsv1.2', 'tlsv1.1']
+    } else {
+      $configured_ssl_versions = $ssl_versions
+    }
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
     $environment_real = $environment
+    $configured_ssl_versions = undef
   }
 
   if $inet_dist_interface {
@@ -135,8 +162,10 @@ class tripleo::profile::base::rabbitmq (
         # TLS options
         ssl_cert                => $tls_certfile,
         ssl_key                 => $tls_keyfile,
+        ssl_versions            => $configured_ssl_versions,
         ipv6                    => $ipv6,
       }
+
       # when running multi-nodes without Pacemaker
       if $manage_service {
         rabbitmq_policy { 'ha-all@/':
@@ -155,6 +184,7 @@ class tripleo::profile::base::rabbitmq (
         # TLS options
         ssl_cert                => $tls_certfile,
         ssl_key                 => $tls_keyfile,
+        ssl_versions            => $configured_ssl_versions,
         ipv6                    => $ipv6,
       }
     }
