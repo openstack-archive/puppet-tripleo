@@ -23,21 +23,27 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*backend_cephfs_enabled*]
+#   (Optional) Whether or not the cephfs backend is enabled
+#   Defaults to hiera('manila_backend_cephfs_enabled', false)
+#
 class tripleo::profile::base::manila::share (
-  $step = hiera('step'),
+  $backend_cephfs_enabled = hiera('manila_backend_cephfs_enabled', false),
+  $step                   = hiera('step'),
 ) {
   include ::tripleo::profile::base::manila
 
   if $step >= 4 {
     include ::manila::share
-    $cephfs_auth_id = hiera('manila::backend::cephfsnative::cephfs_auth_id')
-    $keyring_path = "/etc/ceph/ceph.client.${cephfs_auth_id}.keyring"
-    exec{ "exec-setfacl-${cephfs_auth_id}":
-      path    => ['/bin', '/usr/bin' ],
-      command => "setfacl -m u:manila:r-- ${keyring_path}",
-      unless  => "getfacl ${keyring_path} | grep -q user:manila:r--",
+    if $backend_cephfs_enabled {
+      $cephfs_auth_id = hiera('manila::backend::cephfsnative::cephfs_auth_id')
+      $keyring_path = "/etc/ceph/ceph.client.${cephfs_auth_id}.keyring"
+      exec{ "exec-setfacl-${cephfs_auth_id}":
+        path    => ['/bin', '/usr/bin' ],
+        command => "setfacl -m u:manila:r-- ${keyring_path}",
+        unless  => "getfacl ${keyring_path} | grep -q user:manila:r--",
+      }
+      Ceph::Key<| title == "client.${cephfs_auth_id}" |> -> Exec["exec-setfacl-${cephfs_auth_id}"]
     }
-    Ceph::Key<| title == "client.${cephfs_auth_id}" |> -> Exec["exec-setfacl-${cephfs_auth_id}"]
-
   }
 }
