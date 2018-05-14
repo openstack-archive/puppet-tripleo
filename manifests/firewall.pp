@@ -156,14 +156,14 @@ class tripleo::firewall(
     # https://bugs.launchpad.net/tripleo/+bug/1765700
     # https://storyboard.openstack.org/#!/story/2001890
     exec { 'nonpersistent_ironic_inspector_pxe_filter_v4_rules_cleanup':
-      command => '/bin/sed -i "/-m comment --comment/p;/ironic-inspector/d" /etc/sysconfig/iptables',
+      command => '/bin/sed -i "/-m comment --comment.*ironic-inspector/p;/ironic-inspector/d" /etc/sysconfig/iptables',
       onlyif  => [
           '/bin/test -f /etc/sysconfig/iptables',
           '/bin/grep -v "\-m comment \--comment" /etc/sysconfig/iptables | /bin/grep -q ironic-inspector'
       ]
     }
     exec { 'nonpersistent_ironic_inspector_pxe_filter_v6_rules_cleanup':
-      command => '/bin/sed -i "/-m comment --comment/p;/ironic-inspector/d" /etc/sysconfig/ip6tables',
+      command => '/bin/sed -i "/-m comment --comment.*ironic-inspector/p;/ironic-inspector/d" /etc/sysconfig/ip6tables',
       onlyif  => [
           '/bin/test -f /etc/sysconfig/ip6tables',
           '/bin/grep -v "\-m comment \--comment" /etc/sysconfig/ip6tables | /bin/grep -q ironic-inspector'
