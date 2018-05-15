@@ -1,3 +1,5 @@
+require 'tempfile'
+
 def get_auth(component)
   provider = Object.const_get "Puppet::Provider::#{component.capitalize}"
   auth_func = "#{component}_credentials"
@@ -46,7 +48,7 @@ def get_nova_live_value
     File.open(nova_stdin, 'w') do |nova_cmd|
       nova_cmd.puts("import nova.conf\nprint nova.conf.CONF.host")
     end
-    Facter::Core::Execution.execute("nova-manage shell python 2>/dev/null < #{nova_stdin} | sed -e 's/^[> ]*//'")
+    Facter::Core::Execution.execute("nova-manage shell python 2>/dev/null < #{nova_stdin.path} | sed -e 's/^[> ]*//'")
   end
 end
 
