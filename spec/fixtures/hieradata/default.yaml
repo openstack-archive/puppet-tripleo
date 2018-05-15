@@ -10,7 +10,7 @@ redis::bind: '10.0.0.1'
 aodh::auth::auth_password: 'password'
 aodh::db::mysql::password: 'password'
 aodh::keystone::authtoken::password: 'password'
-# babican profile required hieradata
+# barbican profile required hieradata
 barbican::api::rabbit_password: 'password'
 barbican::db::mysql::password: 'password'
 barbican::keystone::authtoken::password: 'password'
