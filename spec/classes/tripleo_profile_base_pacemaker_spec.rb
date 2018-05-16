@@ -49,7 +49,7 @@ describe 'tripleo::profile::base::pacemaker' do
         })
         is_expected.to contain_pcmk_resource('compute-unfence-trigger').with({
           :resource_type   => "ocf:pacemaker:Dummy",
-          :op_params       => "start requires=unfencing",
+          :meta_params     => "requires=unfencing",
         })
         is_expected.to contain_pcmk_resource('nova-evacuate').with({
           :resource_type   => "ocf:openstack:NovaEvacuate",
