@@ -96,7 +96,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
 
     pacemaker::resource::ocf { 'compute-unfence-trigger':
       ocf_agent_name => 'pacemaker:Dummy',
-      op_params      => 'start requires=unfencing',
+      meta_params    => 'requires=unfencing',
       clone_params   => true,
       tries          => $pcs_tries,
       location_rule  => {
