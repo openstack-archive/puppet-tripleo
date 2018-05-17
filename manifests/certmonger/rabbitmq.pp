@@ -66,13 +66,9 @@ class tripleo::certmonger::rabbitmq (
   }
 
   file { $service_certificate :
-    owner   => $::rabbitmq::params::rabbitmq_user,
-    group   => $::rabbitmq::params::rabbitmq_group,
     require => Certmonger_certificate['rabbitmq'],
   }
   file { $service_key :
-    owner   => $::rabbitmq::params::rabbitmq_user,
-    group   => $::rabbitmq::params::rabbitmq_group,
     require => Certmonger_certificate['rabbitmq'],
   }
 
