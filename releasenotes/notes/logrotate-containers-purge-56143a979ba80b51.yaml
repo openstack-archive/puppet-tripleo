@@ -1,0 +1,26 @@
+---
+upgrade:
+  - |
+    Rotated logs of containerized services in /var/log/containers
+    will be purged with the next containerized logrotate run
+    triggered via cron, if the rotated logs have been kept longer
+    than `purge_after_days` (defaults to a 14 days).
+
+    Containerized logrotate now always compresses the rotated
+    /var/log/containers logs and this can no longer be delayed
+    with delaycompress. Size parameter does not honor time-based
+    constraints and is disabled as not GDPR compliant. From now on,
+    it configures maxsize instead. Minsize is set to a 1 byte to
+    put all /var/log/containers logs under the containerized
+    logrotate control.
+security:
+  - |
+    Forcibly purge rotated /var/log/containers logs after
+    `purge_after_days` (defaults to a 14 days). New param `rotation`
+    additionally allows to alter logrotate rotation interval.
+    Defaults to a 'daily'. Make sure to adjust `purge_after_days` as
+    needed.
+
+    Any files in /var/log/containers, if not managed by
+    the containerized logrotate, will be purged forcibly with each
+    containerized logrotate run triggered via cron.

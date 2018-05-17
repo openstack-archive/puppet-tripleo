@@ -50,6 +50,29 @@
 #  [*user*]
 #    (optional) Defaults to 'root'. Configures cron job for logrotate.
 #
+#  [*maxsize*]
+#    (optional) Defaults to '10M'.
+#    Configures the logrotate maxsize parameter.
+#
+#  [*rotation*]
+#    (optional) Defaults to 'daily'.
+#    Configures the logrotate rotation interval.
+#
+#  [*rotate*]
+#    (optional) Defaults to 14.
+#    Configures the logrotate rotate parameter.
+#
+#  [*purge_after_days*]
+#    (optional) Defaults to 14.
+#    Configures forced purge period for rotated logs.
+#    Overrides the rotation and rotate settings.
+#
+# DEPRECATED PARAMETERS
+#
+#  [*size*]
+#    DEPRECATED: (optional) Defaults to '10M'.
+#    Configures the logrotate size parameter.
+#
 #  [*delaycompress*]
 #    (optional) Defaults to True.
 #    Configures the logrotate delaycompress parameter.
@@ -57,14 +80,6 @@
 #  [*compress*]
 #    (optional) Defaults to True.
 #    Configures the logrotate compress parameter.
-#
-#  [*size*]
-#    (optional) Defaults to '10M'.
-#    Configures the logrotate size parameter.
-#
-#  [*rotate*]
-#    (optional) Defaults to 14.
-#    Configures the logrotate rotate parameter.
 #
 class tripleo::profile::base::logging::logrotate (
   $step             = Integer(hiera('step')),
@@ -76,13 +91,25 @@ class tripleo::profile::base::logging::logrotate (
   $weekday          = '*',
   Integer $maxdelay = 90,
   $user             = 'root',
-  $delaycompress    = true,
-  $compress         = true,
-  $size             = '10M',
+  $rotation         = 'daily',
+  $maxsize          = '10M',
   $rotate           = 14,
+  $purge_after_days = 14,
+  # DEPRECATED PARAMETERS
+  $size             = undef,
+  $delaycompress    = false,
+  $compress         = true,
 ) {
 
   if $step >= 4 {
+    if (! $compress or $delaycompress or $size != undef) {
+      warning('Size and delaycompress are DISABLED to enforce GDPR.')
+      warning('Size configures maxsize instead of size.')
+      warning('Compress cannot be delayed or turned off.')
+      $maxsize = pick($size, $maxsize)
+      $compress = true
+      $delaycompress = false
+    }
     if $maxdelay == 0 {
       $sleep = ''
     } else {
