@@ -170,13 +170,26 @@ class tripleo::profile::base::pacemaker (
     if $pacemaker_master and count($remote_short_node_names) > 0 {
       # Creates a { "node" => "ip_address", ...} hash
       $remotes_hash = hash(zip($remote_short_node_names, $remote_node_ips))
-      pacemaker::resource::remote { $remote_short_node_names:
-        remote_address     => $remotes_hash[$title],
-        reconnect_interval => $remote_reconnect_interval,
-        op_params          => "monitor interval=${remote_monitor_interval}",
-        verify_on_create   => true,
-        tries              => $remote_tries,
-        try_sleep          => $remote_try_sleep,
+      $remote_short_node_names.each |String $remote_short_node| {
+        pacemaker::resource::remote { $remote_short_node:
+          remote_address     => $remotes_hash[$remote_short_node],
+          reconnect_interval => $remote_reconnect_interval,
+          op_params          => "monitor interval=${remote_monitor_interval}",
+          tries              => $remote_tries,
+          try_sleep          => $remote_try_sleep,
+          before             => Exec["exec-wait-for-${remote_short_node}"],
+          notify             => Exec["exec-wait-for-${remote_short_node}"],
+        }
+        $check_command = "pcs status | grep -q -e \"${remote_short_node}.*Started\""
+        exec { "exec-wait-for-${remote_short_node}":
+          path      => '/usr/sbin:/usr/bin:/sbin:/bin',
+          command   => $check_command,
+          unless    => $check_command,
+          timeout   => 30,
+          tries     => 180,
+          try_sleep => 10,
+          tag       => 'remote_ready',
+        }
       }
     }
   }
