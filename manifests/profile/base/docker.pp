@@ -101,6 +101,8 @@ class tripleo::profile::base::docker (
   $insecure_registry = false,
 ) {
 
+  warning('tripleo::profile::base::docker(_registry) are deprecated and will be removed in the future.')
+
   if $step >= 1 {
     package {'docker':
       ensure => installed,
