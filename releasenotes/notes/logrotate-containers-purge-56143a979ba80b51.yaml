@@ -6,21 +6,33 @@ upgrade:
     triggered via cron, if the rotated logs have been kept longer
     than `purge_after_days` (defaults to a 14 days).
 
-    Containerized logrotate now always compresses the rotated
-    /var/log/containers logs and this can no longer be delayed
-    with delaycompress. Size parameter does not honor time-based
+    The logrotate maxage parameter is set to `purge_after_days`
+    as well.
+
+    The size parameter does not honor time-based
     constraints and is disabled as not GDPR compliant. From now on,
     it configures maxsize instead. Minsize is set to a 1 byte to
     put all /var/log/containers logs under the containerized
     logrotate control.
+
+    New param `rotation` additionally allows to alter logrotate
+    rotation interval, like 'hourly' or 'weekly'.
 security:
   - |
-    Forcibly purge rotated /var/log/containers logs after
-    `purge_after_days` (defaults to a 14 days). New param `rotation`
-    additionally allows to alter logrotate rotation interval.
-    Defaults to a 'daily'. Make sure to adjust `purge_after_days` as
-    needed.
+    Retention rules of files in /var/log/containers additionally
+    defined in the containerized logrotate postrotate script and
+    based on any of the listed criteria met:
 
-    Any files in /var/log/containers, if not managed by
-    the containerized logrotate, will be purged forcibly with each
-    containerized logrotate run triggered via cron.
+    * time of last access of contents (atime) exceeds
+      `purge_after_days`,
+    * time of last modification of contents (mtime) exceeds
+      `purge_after_days`,
+    * time of last modification of the inode (metadata, ctime)
+      exceeds `purge_after_days`.
+
+    Expired files will be purged forcibly with each containerized
+    logrotate run triggered via cron. Note that the files creation
+    time (the Birth attribute) is not taken into account as it
+    cannot be accessed normally by system operators (depends on FS
+    type). Retention policies based on the creation time must
+    be managed elsewhere.

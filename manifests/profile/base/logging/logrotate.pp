@@ -50,6 +50,14 @@
 #  [*user*]
 #    (optional) Defaults to 'root'. Configures cron job for logrotate.
 #
+#  [*delaycompress*]
+#    (optional) Defaults to True.
+#    Configures the logrotate delaycompress parameter.
+#
+#  [*compress*]
+#    (optional) Defaults to True.
+#    Configures the logrotate compress parameter.
+#
 #  [*maxsize*]
 #    (optional) Defaults to '10M'.
 #    Configures the logrotate maxsize parameter.
@@ -73,14 +81,6 @@
 #    DEPRECATED: (optional) Defaults to '10M'.
 #    Configures the logrotate size parameter.
 #
-#  [*delaycompress*]
-#    (optional) Defaults to True.
-#    Configures the logrotate delaycompress parameter.
-#
-#  [*compress*]
-#    (optional) Defaults to True.
-#    Configures the logrotate compress parameter.
-#
 class tripleo::profile::base::logging::logrotate (
   $step             = Integer(hiera('step')),
   $ensure           = present,
@@ -91,24 +91,21 @@ class tripleo::profile::base::logging::logrotate (
   $weekday          = '*',
   Integer $maxdelay = 90,
   $user             = 'root',
+  $delaycompress    = true,
+  $compress         = true,
   $rotation         = 'daily',
   $maxsize          = '10M',
   $rotate           = 14,
   $purge_after_days = 14,
   # DEPRECATED PARAMETERS
   $size             = undef,
-  $delaycompress    = false,
-  $compress         = true,
 ) {
 
   if $step >= 4 {
-    if (! $compress or $delaycompress or $size != undef) {
-      warning('Size and delaycompress are DISABLED to enforce GDPR.')
+    if ($size != undef) {
+      warning('The size parameter is DISABLED to enforce GDPR.')
       warning('Size configures maxsize instead of size.')
-      warning('Compress cannot be delayed or turned off.')
       $maxsize = pick($size, $maxsize)
-      $compress = true
-      $delaycompress = false
     }
     if $maxdelay == 0 {
       $sleep = ''
