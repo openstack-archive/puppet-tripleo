@@ -82,6 +82,10 @@
 #   of available agents.
 #   Defaults to hiera('neutron_dhcp_short_node_names') or []
 #
+# [*designate_api_enabled*]
+#   (Optional) Indicate whether Designate is available in the deployment.
+#   Defaults to hiera('designate_api_enabled') or false
+#
 
 class tripleo::profile::base::neutron (
   $step                    = Integer(hiera('step')),
@@ -99,6 +103,7 @@ class tripleo::profile::base::neutron (
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $dhcp_agents_per_network = undef,
   $dhcp_nodes              = hiera('neutron_dhcp_short_node_names', []),
+  $designate_api_enabled   = hiera('designate_api_enabled', false),
 ) {
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
@@ -134,5 +139,9 @@ class tripleo::profile::base::neutron (
       dhcp_agents_per_network    => $dhcp_agents_per_net,
     }
     include ::neutron::config
+
+    if $designate_api_enabled {
+      include ::neutron::designate
+    }
   }
 }
