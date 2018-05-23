@@ -41,7 +41,7 @@
 #
 # [*cinder_rbd_secret_uuid*]
 #   (Optional) UUID of the of the libvirt secret storing the Cephx key
-#   Defaults to 'ceph::profile::params::fsid'
+#   Defaults to undef
 #
 # [*cinder_rbd_user_name*]
 #   (Optional) The user name for the RBD client
@@ -58,7 +58,7 @@ class tripleo::profile::base::cinder::volume::rbd (
   $cinder_rbd_ceph_conf    = hiera('cinder::backend::rbd::rbd_ceph_conf', '/etc/ceph/ceph.conf'),
   $cinder_rbd_pool_name    = 'volumes',
   $cinder_rbd_extra_pools  = undef,
-  $cinder_rbd_secret_uuid  = hiera('ceph::profile::params::fsid', undef),
+  $cinder_rbd_secret_uuid  = undef,
   $cinder_rbd_user_name    = 'openstack',
   $step                    = Integer(hiera('step')),
 ) {

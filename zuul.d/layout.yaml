@@ -12,7 +12,6 @@
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/aodh.*$
               - ^manifests/profile/(base|pacemaker)/ceilometer.*$
-              - ^manifests/profile/(base|pacemaker)/ceph.*$
               - ^manifests/profile/(base|pacemaker)/cinder.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/gnocchi.*$
@@ -42,7 +41,6 @@
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
-              - ^manifests/profile/(base|pacemaker)/ceph.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/manila.*$
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
@@ -61,7 +59,6 @@
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/aodh.*$
               - ^manifests/profile/(base|pacemaker)/ceilometer.*$
-              - ^manifests/profile/(base|pacemaker)/ceph.*$
               - ^manifests/profile/(base|pacemaker)/cinder.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/gnocchi.*$
@@ -91,7 +88,6 @@
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
-              - ^manifests/profile/(base|pacemaker)/ceph.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/manila.*$
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
