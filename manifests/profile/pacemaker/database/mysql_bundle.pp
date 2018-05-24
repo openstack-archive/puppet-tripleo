@@ -271,7 +271,7 @@ MYSQL_HOST=localhost\n",
           property => 'galera-role',
           value    => true,
           tries    => $pcs_tries,
-          node     => $node_name,
+          node     => downcase($node_name),
           before   => Pacemaker::Resource::Bundle['galera-bundle'],
         }
         # lint:endignore

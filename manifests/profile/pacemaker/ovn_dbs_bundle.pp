@@ -90,7 +90,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
           property => 'ovn-dbs-role',
           value    => true,
           tries    => $pcs_tries,
-          node     => $node_name,
+          node     => downcase($node_name),
           before   => Pacemaker::Resource::Bundle['ovn-dbs-bundle'],
         }
       }

@@ -102,7 +102,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           property => 'rabbitmq-role',
           value    => true,
           tries    => $pcs_tries,
-          node     => $node_name,
+          node     => downcase($node_name),
           before   => Pacemaker::Resource::Bundle['rabbitmq-bundle'],
         }
       }

@@ -64,7 +64,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
           property => 'redis-role',
           value    => true,
           tries    => $pcs_tries,
-          node     => $node_name,
+          node     => downcase($node_name),
           before   => Pacemaker::Resource::Bundle['redis-bundle'],
         }
       }
