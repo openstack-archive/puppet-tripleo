@@ -1,0 +1,9 @@
+---
+upgrade:
+  - |
+    The following hieradata updates for cinder netapp integration should be done.
+    cinder::backend::netapp::netapp_pool_name_search_pattern should be used as
+    cinder::backend::netapp::netapp_storage_pools and
+    cinder::backend::netapp::netapp_volume_list have been removed.
+    cinder::backend::netapp::netapp_host_type should be configured instead of
+    cinder::backend::netapp::netapp_eseries_host_type
