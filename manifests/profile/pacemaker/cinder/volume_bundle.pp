@@ -67,7 +67,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
         property => 'cinder-volume-role',
         value    => true,
         tries    => $pcs_tries,
-        node     => $node_name,
+        node     => downcase($node_name),
         before   => Pacemaker::Resource::Bundle[$::cinder::params::volume_service],
       }
     }
