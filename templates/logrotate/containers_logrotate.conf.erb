@@ -1,6 +1,7 @@
 /var/log/containers/*/*log /var/log/containers/*/*/*log {
   <%= @rotation %>
   rotate <%= @rotate %>
+  maxage <%= @purge_after_days %>
   # minsize 1 is required for GDPR compliance, all files in
   # /var/log/containers not managed with logrotate will be purged!
   minsize 1
@@ -9,17 +10,20 @@
   maxsize <%= @maxsize %>
   missingok
   notifempty
-  # Do not use delaycompress as it's not compatible with the postrotate script.
-  # Compress always is required for the postrotate script compatibility.
+<%- if @delaycompress %>
+  delaycompress
+<%- end %>
+<%- if @compress %>
   compress
+<%- end %>
   sharedscripts
   postrotate
+    /usr/bin/find /var/log/containers -type f \
+    \( -mtime +<%= @purge_after_days %> -or \
+    -atime +<%= @purge_after_days %> -or \
+    -ctime +<%= @purge_after_days %> \) -exec rm -f {} \;;
     /sbin/lsof -nPs +L1 +D /var/log 2>&1|\
     awk '/\S+\s+[0-9]+\s.*\/var\/log\/.*\(deleted\)/ {print $2}' |\
-    /bin/xargs -n1 -r -t kill -HUP;
-    /usr/bin/find /var/log/containers -type f \
-    \( -not -name "*.gz"  -and  -not -name "*.[0-9]*" \) -exec rm -f {} \;;
-    /usr/bin/find /var/log/containers -type f \
-    -mtime +<%= @purge_after_days %> -exec rm -f {} \;
+    /bin/xargs -n1 -r -t kill -HUP
   endscript
 }
