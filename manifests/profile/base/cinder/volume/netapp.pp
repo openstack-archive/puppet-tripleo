@@ -63,6 +63,7 @@ class tripleo::profile::base::cinder::volume::netapp (
       netapp_partner_backend_name     => hiera('cinder::backend::netapp::netapp_partner_backend_name', undef),
       nfs_shares                      => $cinder_netapp_nfs_shares,
       nfs_shares_config               => hiera('cinder::backend::netapp::nfs_shares_config', undef),
+      nfs_mount_options               => hiera('cinder::backend::netapp::nfs_mount_options', undef),
       netapp_copyoffload_tool_path    => hiera('cinder::backend::netapp::netapp_copyoffload_tool_path', undef),
       netapp_controller_ips           => hiera('cinder::backend::netapp::netapp_controller_ips', undef),
       netapp_sa_password              => hiera('cinder::backend::netapp::netapp_sa_password', undef),
