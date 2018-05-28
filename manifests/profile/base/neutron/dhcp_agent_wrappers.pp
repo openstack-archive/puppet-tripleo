@@ -82,7 +82,6 @@ class tripleo::profile::base::neutron::dhcp_agent_wrappers (
     tripleo::profile::base::neutron::wrappers::haproxy{'dhcp_haproxy_process_wrapper':
       haproxy_process_wrapper => $haproxy_process_wrapper,
       haproxy_image           => $haproxy_image,
-      ns_prefix               => 'qdhcp',
       bind_socket             => $bind_socket
     }
   }

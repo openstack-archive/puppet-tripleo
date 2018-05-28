@@ -29,7 +29,6 @@ describe 'tripleo::profile::base::neutron::wrappers::keepalived' do
         {
           :keepalived_process_wrapper  => '/usr/local/bin/keepalived',
           :keepalived_image            => 'a_registry/some_container_name:some_tag',
-          :ns_prefix                   => 'puppet-test',
           :bind_socket                 => 'unix:///run/another/docker.sock'
         }
       }

@@ -21,22 +21,17 @@
 # [*keepalived_state_change_wrapper*]
 #   Filename for neutron-keepalived-state-change wrapper script.
 #
-# [*ns_prefix*]
-#   Prefix for namespace (e.g. qrouter-, qdhcp-)
-#
 # [*bind_socket*]
 #   Socket for accessing the docker daemon.
 #
 define tripleo::profile::base::neutron::wrappers::keepalived_state_change (
   $keepalived_state_change_wrapper,
-  $ns_prefix,
   $bind_socket,
 ) {
     file { $keepalived_state_change_wrapper:
       ensure  => file,
       mode    => '0755',
       content => epp('tripleo/neutron/neutron-keepalived-state-change.epp', {
-        'ns_prefix'   => $ns_prefix,
         'bind_socket' => $bind_socket
         })
     }

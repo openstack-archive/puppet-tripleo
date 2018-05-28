@@ -24,16 +24,12 @@
 # [*haproxy_image*]
 #   Docker image name for haproxy.
 #
-# [*ns_prefix*]
-#   Prefix for namespace (e.g. qrouter-, qdhcp-)
-#
 # [*bind_socket*]
 #   Socket for accessing the docker daemon.
 #
 define tripleo::profile::base::neutron::wrappers::haproxy (
   $haproxy_process_wrapper,
   $haproxy_image,
-  $ns_prefix,
   $bind_socket,
 ) {
     file { $haproxy_process_wrapper:
@@ -41,7 +37,6 @@ define tripleo::profile::base::neutron::wrappers::haproxy (
       mode    => '0755',
       content => epp('tripleo/neutron/haproxy.epp', {
         'image_name'  => $haproxy_image,
-        'ns_prefix'   => $ns_prefix,
         'bind_socket' => $bind_socket,
         })
     }

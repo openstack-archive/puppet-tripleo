@@ -10,9 +10,9 @@ ARGS="$@"
 # dnsmasq --no-hosts --no-resolv --except-interface=lo \
 #   --pid-file=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/pid  \
 #   --dhcp-hostsfile=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/host ...
-NETWORK_ID=$(echo $ARGS| awk '{if (match($0, /(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})/,m)) print m[0] }')
+NETNS=$(ip netns identify)
+NAME=neutron-dnsmasq-${NETNS}
 
-NAME=neutron-dnsmasq-${NETWORK_ID}
 docker stop $NAME || true
 docker rm -f $NAME || true
 
@@ -27,4 +27,4 @@ docker run --detach \
      -u root \
      --name $NAME \
     <%=$image_name%> \
-    ip netns exec qdhcp-${NETWORK_ID} /usr/sbin/dnsmasq -k $ARGS
+    ip netns exec ${NETNS} /usr/sbin/dnsmasq -k $ARGS
