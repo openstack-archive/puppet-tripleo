@@ -28,7 +28,6 @@ describe 'tripleo::profile::base::neutron::wrappers::keepalived_state_change' do
       let(:params) {
         {
           :keepalived_state_change_wrapper  => '/usr/local/bin/keepalived-state-change',
-          :ns_prefix                        => 'puppet-test',
           :bind_socket                      => 'unix:///run/another/docker.sock'
         }
       }
@@ -38,7 +37,7 @@ describe 'tripleo::profile::base::neutron::wrappers::keepalived_state_change' do
           :mode   => '0755'
         )
         is_expected.to contain_file('/usr/local/bin/keepalived-state-change').with_content(
-          /ip.netns.exec.*puppet-test.*neutron-keepalived-state-change/
+          /ip.netns.exec.*neutron-keepalived-state-change/
         )
         is_expected.to contain_file('/usr/local/bin/keepalived-state-change').with_content(
           /export DOCKER_HOST="unix:...run.another.docker.sock/
