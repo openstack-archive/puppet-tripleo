@@ -62,7 +62,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
         property => 'manila-share-role',
         value    => true,
         tries    => $pcs_tries,
-        node     => $node_name,
+        node     => downcase($node_name),
         before   => Pacemaker::Resource::Bundle[$::manila::params::share_service],
       }
     }

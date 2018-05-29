@@ -217,7 +217,7 @@ slave-announce-port ${local_tuple[0][2]}
           property => 'redis-role',
           value    => true,
           tries    => $pcs_tries,
-          node     => $node_name,
+          node     => downcase($node_name),
           before   => Pacemaker::Resource::Bundle['redis-bundle'],
         }
       }
