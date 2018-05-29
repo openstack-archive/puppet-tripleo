@@ -31,10 +31,15 @@
 #   container.
 #   Defaults to 'no'
 #
+# [*debug*]
+#   (Optional) Sets the debug level in stunnel.conf
+#   Defaults to '4' which translates to 'warning'.
+#
 class tripleo::stunnel (
   $manage_service = true,
   $service_ensure = 'running',
   $foreground     = 'no',
+  $debug          = 'warning',
 ){
   package { 'stunnel':
     ensure => 'present'
