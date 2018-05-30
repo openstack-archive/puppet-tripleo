@@ -18,41 +18,67 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::metrics::collectd' do
   shared_examples_for 'tripleo::profile::base::metrics::collectd' do
-   context 'with step less than 3' do
-      let(:params) { { :step => 2 } }
-     it 'should do nothing' do
+    context 'with step less than 3' do
+      let(:params) { { :step => 2, :gnocchi_server => 'localhost' } }
+      it 'should do nothing' do
         is_expected.to_not contain_class('collectd')
-        is_expected.to_not contain_class('collectd::plugin::logfile')
-     end
+      end
     end
 
-    context 'with defaults and step greater than 3' do
-      let(:params) { { :step => 3 } }
-     it 'only have the collectd' do
+    context 'with defaults and step greater than 3, gnocchi deploy' do
+      let(:params) { { :step => 3, :gnocchi_server => 'localhost' } }
+      it 'has collectd class with gnocchi plugin and python plugin' do
+        is_expected.to compile.with_all_deps
+        is_expected.to contain_class('collectd').with(
+          :manage_repo => false,
+        )
+        is_expected.to contain_service('collectd').with(
+          :ensure => 'running',
+          :enable => true,
+        )
+        is_expected.to contain_package('python-collectd-gnocchi').with(
+          :ensure => 'present',
+        )
+        is_expected.to contain_package('collectd-python').with(
+          :ensure => 'present',
+        )
+        is_expected.to_not contain_class('epel')
+        is_expected.to_not contain_class('collectd::plugin::amqp1')
+        is_expected.to_not contain_class('collectd::plugin::logfile')
+      end
+    end
+
+    context 'with enabled file_logging and step greater than 3' do
+      let(:params) do
+        { :step => 3,
+          :enable_file_logging => true,
+          :gnocchi_server => 'localhost' }
+      end
+      it 'Contains both' do
+        is_expected.to compile.with_all_deps
+        is_expected.to contain_class('collectd')
+        is_expected.to contain_class('collectd::plugin::logfile')
+      end
+    end
+
+    context 'with defaults and step greater than 3, amqp deploy' do
+      let(:params) do
+          { :step => 3,
+            :amqp_host => 'localhost',
+          }
+      end
+
+      it 'has amqp class' do
        is_expected.to compile.with_all_deps
        is_expected.to contain_class('collectd')
-       is_expected.to_not contain_class('collectd::plugin::logfile')
-       is_expected.to contain_class('collectd').with(
-         :manage_repo => false,
+       is_expected.to contain_class('collectd::plugin::amqp1').with(
+         :manage_package => true,
        )
        is_expected.to contain_service('collectd').with(
          :ensure => 'running',
          :enable => true,
        )
-       is_expected.to_not contain_class('epel')
       end
-    end
-
-    context 'Enabled file_logging  and step greater than 3' do
-      let(:params) { {
-              :step => 3,
-              :enable_file_logging => true
-      } }
-     it 'Contains both' do
-       is_expected.to compile.with_all_deps
-       is_expected.to contain_class('collectd')
-       is_expected.to contain_class('collectd::plugin::logfile')
-     end
     end
   end
 
