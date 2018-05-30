@@ -151,7 +151,6 @@ class tripleo::profile::base::gnocchi::api (
           command => "setfacl -m u:gnocchi:r-- /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring",
           unless  => "getfacl /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q user:gnocchi:r--",
         }
-        Ceph::Key<| title == "client.${gnocchi_rbd_client_name}" |> -> Exec["exec-setfacl-${gnocchi_rbd_client_name}-gnocchi"]
       }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }

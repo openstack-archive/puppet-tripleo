@@ -190,7 +190,6 @@ class tripleo::profile::base::glance::api (
             command => "setfacl -m u:glance:r-- /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring",
             unless  => "getfacl /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring | grep -q user:glance:r--",
           }
-          Ceph::Key<| title == "client.${glance_rbd_client_name}" |> -> Exec["exec-setfacl-${glance_rbd_client_name}-glance"]
         }
         'cinder': { $backend_store = 'cinder' }
         default: { fail('Unrecognized glance_backend parameter.') }

@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::profile::base::cinder::backup::swift
 #
-# Cinder Backup Ceph profile for tripleo
+# Cinder Backup Swift profile for tripleo
 #
 # === Parameters
 #
