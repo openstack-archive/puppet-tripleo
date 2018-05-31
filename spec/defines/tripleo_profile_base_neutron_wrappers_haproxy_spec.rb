@@ -29,7 +29,6 @@ describe 'tripleo::profile::base::neutron::wrappers::haproxy' do
         {
           :haproxy_process_wrapper  => '/usr/local/bin/haproxy',
           :haproxy_image            => 'a_registry/some_container_name:some_tag',
-          :ns_prefix                => 'puppet-test',
           :bind_socket              => 'unix:///run/another/docker.sock'
         }
       }
@@ -42,7 +41,7 @@ describe 'tripleo::profile::base::neutron::wrappers::haproxy' do
           /a_registry.some_container_name.some_tag/
         )
         is_expected.to contain_file('/usr/local/bin/haproxy').with_content(
-          /^NAME=neutron-haproxy-puppet-test-/
+          /^NAME=neutron-haproxy-/
         )
         is_expected.to contain_file('/usr/local/bin/haproxy').with_content(
           /export DOCKER_HOST="unix:...run.another.docker.sock/

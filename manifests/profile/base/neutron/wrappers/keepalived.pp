@@ -24,16 +24,12 @@
 # [*keepalived_image*]
 #   Docker image name for keepalived.
 #
-# [*ns_prefix*]
-#   Prefix for namespace (e.g. qrouter-, qdhcp-)
-#
 # [*bind_socket*]
 #   Socket for accessing the docker daemon.
 #
 define tripleo::profile::base::neutron::wrappers::keepalived (
   $keepalived_process_wrapper,
   $keepalived_image,
-  $ns_prefix,
   $bind_socket,
 ) {
     file { $keepalived_process_wrapper:
@@ -41,7 +37,6 @@ define tripleo::profile::base::neutron::wrappers::keepalived (
       mode    => '0755',
       content => epp('tripleo/neutron/keepalived.epp', {
           'image_name'  => $keepalived_image,
-          'ns_prefix'   => $ns_prefix,
           'bind_socket' => $bind_socket,
         })
     }
