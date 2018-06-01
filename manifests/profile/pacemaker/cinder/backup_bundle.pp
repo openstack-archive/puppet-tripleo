@@ -67,7 +67,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
         property => 'cinder-backup-role',
         value    => true,
         tries    => $pcs_tries,
-        node     => $node_name,
+        node     => downcase($node_name),
         before   => Pacemaker::Resource::Bundle[$::cinder::params::backup_service],
       }
     }
