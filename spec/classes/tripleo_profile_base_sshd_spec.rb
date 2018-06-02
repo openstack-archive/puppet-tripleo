@@ -33,6 +33,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
         is_expected.to_not contain_file('/etc/issue')
@@ -53,6 +54,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
         is_expected.to_not contain_file('/etc/issue')
@@ -61,8 +63,8 @@ describe 'tripleo::profile::base::sshd' do
       end
     end
 
-    context 'with port configured' do
-      let(:params) {{ :port => 123 }}
+    context 'with port and paswword_authentification configured' do
+      let(:params) {{ :port => 123, :password_authentication => 'yes' }}
       it do
         is_expected.to contain_class('ssh::server').with({
           'storeconfigs_enabled' => false,
@@ -73,6 +75,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'yes',
           }
         })
       end
@@ -90,6 +93,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
       end
@@ -107,6 +111,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
       end
@@ -125,6 +130,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
         is_expected.to contain_file('/etc/issue').with({
@@ -156,6 +162,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
         is_expected.to contain_file('/etc/motd').with({
@@ -182,6 +189,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
         is_expected.to_not contain_file('/etc/motd')
@@ -207,6 +215,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
         is_expected.to contain_file('/etc/motd').with({
@@ -253,6 +262,7 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ecdsa_key',
               '/etc/ssh/ssh_host_ed25519_key',
             ],
+            'PasswordAuthentication' => 'no',
           }
         })
         is_expected.to contain_file('/etc/motd').with({

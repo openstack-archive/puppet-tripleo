@@ -36,11 +36,16 @@
 #   SSH port or list of ports to bind to
 #   Defaults to [22]
 
+# [*password_authentication*]
+#   Whether or not disable password authentication
+#   Defaults to 'no'
+
 class tripleo::profile::base::sshd (
   $bannertext = hiera('BannerText', undef),
   $motd = hiera('MOTD', undef),
   $options = {},
   $port = [22],
+  $password_authentication = 'no',
 ) {
 
   if $bannertext and $bannertext != '' {
@@ -88,12 +93,17 @@ class tripleo::profile::base::sshd (
     ]
   }
 
+  $password_auth_options = {
+    'PasswordAuthentication' => $password_authentication
+  }
+
   $sshd_options = merge(
     $options,
     $basic_options,
     $sshd_options_banner,
     $sshd_options_motd,
-    $sshd_options_port
+    $sshd_options_port,
+    $password_auth_options,
   )
 
   # NB (owalsh) in puppet-ssh hiera takes precedence over the class param
