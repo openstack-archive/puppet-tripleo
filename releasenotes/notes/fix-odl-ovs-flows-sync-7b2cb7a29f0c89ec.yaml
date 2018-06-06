@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an issue where OVS may be missing flows post-deployment with
+    OpenDaylight.  For more information see
+    https://bugs.launchpad.net/tripleo/+bug/1775436
