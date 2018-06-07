@@ -205,6 +205,11 @@ class tripleo::profile::base::cinder::volume (
         command => "setfacl -m u:cinder:r-- /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring",
         unless  => "getfacl /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring | grep -q user:cinder:r--",
       }
+      -> exec{ "exec-setfacl-${cinder_rbd_client_name}-cinder-mask":
+        path    => ['/bin', '/usr/bin'],
+        command => "setfacl -m m::r /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring",
+        unless  => "getfacl /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring | grep -q mask::r",
+      }
 
       $cinder_rbd_extra_pools = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef)
       if $cinder_rbd_extra_pools {
