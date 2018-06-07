@@ -190,6 +190,7 @@ describe 'tripleo::profile::base::cinder::volume' do
             :enabled_backends => ['tripleo_ceph']
           )
           is_expected.to contain_exec('exec-setfacl-openstack-cinder')
+          is_expected.to contain_exec('exec-setfacl-openstack-cinder-mask')
         end
       end
 

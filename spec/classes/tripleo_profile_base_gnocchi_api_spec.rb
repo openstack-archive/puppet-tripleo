@@ -111,6 +111,7 @@ describe 'tripleo::profile::base::gnocchi::api' do
         )
         is_expected.to contain_class('gnocchi::storage::ceph')
         is_expected.to contain_exec('exec-setfacl-openstack-gnocchi')
+        is_expected.to contain_exec('exec-setfacl-openstack-gnocchi-mask')
       }
     end
 
