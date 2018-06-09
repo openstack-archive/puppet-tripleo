@@ -19,7 +19,7 @@
 # === Parameters:
 # [*enable_container_images_build*]
 #  (Optional) Whether to install tools to build docker container images
-#  Defaults to hiera('enable_container_images_build', true)
+#  Defaults to hiera('enable_container_images_build', false)
 #
 # [*registry_host*]
 #  (String) IP address or hostname the Docker registry binds to
@@ -36,7 +36,7 @@
 #
 #
 class tripleo::profile::base::docker_registry (
-  $enable_container_images_build = hiera('enable_container_images_build', true),
+  $enable_container_images_build = hiera('enable_container_images_build', false),
   # these are used within the config.yaml below
   $registry_host                 = hiera('controller_host'),
   $registry_port                 = 8787,

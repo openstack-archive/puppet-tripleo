@@ -1,0 +1,9 @@
+---
+other:
+  - |
+
+    The default for
+    tripleo::profile::base::docker_registry::enable_container_images_build is
+    now false by default, so any users relying on this to install
+    openstack-kolla will need to explicitly set this to true in their local
+    hieradata.
