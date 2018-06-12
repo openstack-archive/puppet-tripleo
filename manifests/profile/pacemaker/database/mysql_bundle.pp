@@ -416,10 +416,13 @@ MYSQL_HOST=localhost\n",
       # Galera is up and ready before those get created
       File['/root/.my.cnf'] -> Mysql_database<||>
       File['/root/.my.cnf'] -> Mysql_user<||>
+      File['/root/.my.cnf'] -> Mysql_grant<||>
       File['/etc/sysconfig/clustercheck'] -> Mysql_database<||>
       File['/etc/sysconfig/clustercheck'] -> Mysql_user<||>
+      File['/etc/sysconfig/clustercheck'] -> Mysql_grant<||>
       Exec['galera-ready'] -> Mysql_database<||>
       Exec['galera-ready'] -> Mysql_user<||>
+      Exec['galera-ready'] -> Mysql_grant<||>
     }
   }
 }

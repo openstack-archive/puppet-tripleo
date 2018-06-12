@@ -290,6 +290,7 @@ class tripleo::profile::pacemaker::database::mysql (
       # Galara is up before those get created
       Exec['galera-ready'] -> Mysql_database<||>
       Exec['galera-ready'] -> Mysql_user<||>
+      Exec['galera-ready'] -> Mysql_grant<||>
 
     }
     # This step is to create a sysconfig clustercheck file with the root user and empty password
