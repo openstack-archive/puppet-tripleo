@@ -111,7 +111,6 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
     tripleo::profile::base::neutron::wrappers::haproxy{'l3_haproxy_process_wrapper':
       haproxy_process_wrapper => $haproxy_process_wrapper,
       haproxy_image           => $haproxy_image,
-      ns_prefix               => 'qrouter',
       bind_socket             => $bind_socket,
     }
   }
@@ -134,7 +133,6 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
     tripleo::profile::base::neutron::wrappers::keepalived{'l3_keepalived':
       keepalived_process_wrapper => $keepalived_process_wrapper,
       keepalived_image           => $keepalived_image,
-      ns_prefix                  => 'qrouter',
       bind_socket                => $bind_socket,
     }
     unless $keepalived_state_change_wrapper {
@@ -142,7 +140,6 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
     }
     tripleo::profile::base::neutron::wrappers::keepalived_state_change{'l3_keepalived_state_change':
       keepalived_state_change_wrapper => $keepalived_state_change_wrapper,
-      ns_prefix                       => 'qrouter',
       bind_socket                     => $bind_socket,
     }
   }
