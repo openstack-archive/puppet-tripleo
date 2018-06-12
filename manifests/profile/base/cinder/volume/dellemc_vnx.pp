@@ -34,12 +34,17 @@ class tripleo::profile::base::cinder::volume::dellemc_vnx (
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
+    # Accept recently deprecated 'storage_vnx_pool_name'
+    $storage_vnx_pool_names_real = pick(hiera('cinder::backend::emc_vnx::storage_vnx_pool_names',
+                                        hiera('cinder::backend::emc_vnx::storage_vnx_pool_name',
+                                        undef)))
+
     cinder::backend::emc_vnx { $backend_name :
       san_ip                        => hiera('cinder::backend::emc_vnx::san_ip', undef),
       san_login                     => hiera('cinder::backend::emc_vnx::san_login', undef),
       san_password                  => hiera('cinder::backend::emc_vnx::san_password', undef),
       storage_protocol              => hiera('cinder::backend::emc_vnx::storage_protocol', undef),
-      storage_vnx_pool_name         => hiera('cinder::backend::emc_vnx::storage_vnx_pool_name', undef),
+      storage_vnx_pool_names        => $storage_vnx_pool_names_real,
       default_timeout               => hiera('cinder::backend::emc_vnx::default_timeout', undef),
       max_luns_per_storage_group    => hiera('cinder::backend::emc_vnx::max_luns_per_storage_group', undef),
       initiator_auto_registration   => hiera('cinder::backend::emc_vnx::initiator_auto_registration', undef),
