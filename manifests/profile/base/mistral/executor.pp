@@ -50,9 +50,12 @@ class tripleo::profile::base::mistral::executor (
     if $docker_group {
       ensure_resource('group', 'docker', {
         'ensure' => 'present',
+        'tag'    => 'group',
+        'gid'    => $::docker_group_gid,
       })
       ensure_resource('user', 'mistral', {
         'name'   => 'mistral',
+        'tag'    => 'user',
         'groups' => 'docker',
       })
     }
