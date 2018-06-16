@@ -7,8 +7,8 @@
   delaycompress
 <%- end %>
   postrotate
-    /sbin/lsof -nPs +L1 +D /var/log 2>&1|\
-    awk '/\S+\s+[0-9]+\s.*\/var\/log\/.*\(deleted\)/ {print $2}' |\
-    /bin/xargs -n1 -r -t kill -HUP
+    /sbin/lsof -nPs +L1 +D /var/log/containers 2>&1|\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/.*\(deleted\)/ {print $2}' |\
+    sort -u | /bin/xargs -n1 -r -t kill -HUP
   endscript
 }
