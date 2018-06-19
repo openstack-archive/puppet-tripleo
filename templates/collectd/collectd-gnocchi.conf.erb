@@ -1,7 +1,7 @@
 <Plugin "python">
   Import "collectd_gnocchi"
   <Module "collectd_gnocchi">
-<%- if @auth_mode == 'simple' %>
+<%- if @auth_mode == 'basic' %>
     ### Basic authentication
     Endpoint "<%= @protocol %>://<%= @server %>:<%= @port %>"
     <%- if @user %>
