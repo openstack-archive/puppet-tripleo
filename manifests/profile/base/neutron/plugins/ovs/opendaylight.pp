@@ -130,4 +130,12 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
       tls_cert_file   => $tls_certfile
     }
   }
+
+  if $step >= 5 {
+    $odl_of_mgr = regsubst($odl_ovsdb_str , ':6640', ':6653')
+    # Workaround until OpenDayight is capable of synchronizing flows
+    if ! synchronize_odl_ovs_flows($odl_of_mgr) {
+      fail('Failed to validate OVS OpenFlow pipeline')
+    }
+  }
 }
