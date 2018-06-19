@@ -49,8 +49,8 @@
 #
 # [*gnocchi_auth_mode*]
 #   (Optional) String. Type of authentication Gnocchi server is using.
-#   Supported values are 'simple' and 'keystone'.
-#   Defaults to 'simple'
+#   Supported values are 'basic' and 'keystone'.
+#   Defaults to 'basic'
 #
 # [*gnocchi_protocol*]
 #   (Optional) String. API protocol Gnocchi server is using.
@@ -151,7 +151,7 @@ class tripleo::profile::base::metrics::collectd (
   $collectd_username = undef,
   $collectd_password = undef,
   $collectd_securitylevel = undef,
-  $gnocchi_auth_mode = 'simple',
+  $gnocchi_auth_mode = 'basic',
   $gnocchi_protocol = 'http',
   $gnocchi_server = undef,
   $gnocchi_port = 8041,
