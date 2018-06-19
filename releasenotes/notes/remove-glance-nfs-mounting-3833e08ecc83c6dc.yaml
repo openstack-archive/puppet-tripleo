@@ -1,0 +1,7 @@
+---
+deprecations:
+  - |
+    Glance nfs mount would run via ansible in t-h-t, since the common
+    mount task has been added to host_prep_task for both containerized
+    & baremetal case, puppet-tripleo glance nfs_mount.pp would no longer
+    be used.
