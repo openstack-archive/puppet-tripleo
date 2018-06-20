@@ -847,7 +847,8 @@ class tripleo::haproxy (
     'option'       => [ 'httpchk', 'httplog', ],
     'http-request' => [
       'set-header X-Forwarded-Proto https if { ssl_fc }',
-      'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
+      'set-header X-Forwarded-Proto http if !{ ssl_fc }',
+      'set-header X-Forwarded-Port %[dst_port]'],
   }
   Tripleo::Haproxy::Endpoint {
     haproxy_listen_bind_param   => $haproxy_listen_bind_param,
