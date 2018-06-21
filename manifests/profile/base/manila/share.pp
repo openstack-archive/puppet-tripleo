@@ -212,6 +212,9 @@ class tripleo::profile::base::manila::share (
         vnx_server_container         => hiera('manila::backend::dellemc_vnx::vnx_server_container'),
         vnx_share_data_pools         => hiera('manila::backend::dellemc_vnx::vnx_share_data_pools'),
         vnx_ethernet_ports           => hiera('manila::backend::dellemc_vnx::vnx_ethernet_ports'),
+        network_plugin_ipv6_enabled  => hiera('manila::backend::dellemc_vnx::network_plugin_ipv6_enabled'),
+        emc_ssl_cert_verify          => hiera('manila::backend::dellemc_vnx::emc_ssl_cert_verify'),
+        emc_ssl_cert_path            => hiera('manila::backend::dellemc_vnx::emc_ssl_cert_path'),
       }
     }
 
