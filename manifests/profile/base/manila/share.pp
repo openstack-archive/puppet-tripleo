@@ -198,6 +198,9 @@ class tripleo::profile::base::manila::share (
         unity_server_meta_pool       => hiera('manila::backend::dellemc_unity::unity_server_meta_pool'),
         unity_share_data_pools       => hiera('manila::backend::dellemc_unity::unity_share_data_pools'),
         unity_ethernet_ports         => hiera('manila::backend::dellemc_unity::unity_ethernet_ports'),
+        network_plugin_ipv6_enabled  => hiera('manila::backend::dellemc_unity::network_plugin_ipv6_enabled'),
+        emc_ssl_cert_verify          => hiera('manila::backend::dellemc_unity::emc_ssl_cert_verify'),
+        emc_ssl_cert_path            => hiera('manila::backend::dellemc_unity::emc_ssl_cert_path'),
       }
     }
     # manila vnx:
