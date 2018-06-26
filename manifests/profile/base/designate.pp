@@ -45,27 +45,66 @@
 # [*oslomsg_rpc_use_ssl*]
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
-
+#
+# [*oslomsg_notify_proto*]
+#   Protocol driver for the oslo messaging notify service
+#   Defaults to hiera('oslo_messaging_notify_scheme', rabbit)
+#
+# [*oslomsg_notify_hosts*]
+#   list of the oslo messaging notify host fqdns
+#   Defaults to hiera('oslo_messaging_notify_node_names')
+#
+# [*oslomsg_notify_port*]
+#   IP port for oslo messaging notify service
+#   Defaults to hiera('oslo_messaging_notify_port', 5672)
+#
+# [*oslomsg_notify_username*]
+#   Username for oslo messaging notify service
+#   Defaults to hiera('oslo_messaging_notify_user_name', 'guest')
+#
+# [*oslomsg_notify_password*]
+#   Password for oslo messaging notify service
+#   Defaults to hiera('oslo_messaging_notify_password')
+#
+# [*oslomsg_notify_use_ssl*]
+#   Enable ssl oslo messaging services
+#   Defaults to hiera('oslo_messaging_notify_use_ssl', '0')
+#
 class tripleo::profile::base::designate (
-  $step                 = Integer(hiera('step')),
-  $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
-  $oslomsg_rpc_hosts    = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
-  $oslomsg_rpc_password = hiera('oslo_messaging_rpc_password'),
-  $oslomsg_rpc_port     = hiera('oslo_messaging_rpc_port', '5672'),
-  $oslomsg_rpc_username = hiera('oslo_messaging_rpc_user_name', 'guest'),
-  $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
+  $step                    = Integer(hiera('step')),
+  $oslomsg_rpc_proto       = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
+  $oslomsg_rpc_hosts       = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
+  $oslomsg_rpc_password    = hiera('oslo_messaging_rpc_password'),
+  $oslomsg_rpc_port        = hiera('oslo_messaging_rpc_port', '5672'),
+  $oslomsg_rpc_username    = hiera('oslo_messaging_rpc_user_name', 'guest'),
+  $oslomsg_rpc_use_ssl     = hiera('oslo_messaging_rpc_use_ssl', '0'),
+  $oslomsg_notify_proto    = hiera('oslo_messaging_notify_scheme', 'rabbit'),
+  $oslomsg_notify_hosts    = any2array(hiera('oslo_messaging_notify_node_names', undef)),
+  $oslomsg_notify_password = hiera('oslo_messaging_notify_password'),
+  $oslomsg_notify_port     = hiera('oslo_messaging_notify_port', '5672'),
+  $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
+  $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
 ) {
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
+    $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
     class { '::designate' :
-      default_transport_url => os_transport_url({
+      default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
-        'port'      => sprintf('%s', $oslomsg_rpc_port),
+        'port'      => $oslomsg_rpc_port,
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,
         'ssl'       => $oslomsg_rpc_use_ssl_real,
-        }),
+      }),
+      notification_transport_url => os_transport_url({
+        'transport' => $oslomsg_notify_proto,
+        'hosts'     => $oslomsg_notify_hosts,
+        'port'      => $oslomsg_notify_port,
+        'username'  => $oslomsg_notify_username,
+        'password'  => $oslomsg_notify_password,
+        'ssl'       => $oslomsg_notify_use_ssl_real,
+      }),
     }
     include ::designate::config
     include ::designate::backend::bind9
