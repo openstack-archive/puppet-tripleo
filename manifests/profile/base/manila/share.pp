@@ -147,6 +147,11 @@ class tripleo::profile::base::manila::share (
         command => "setfacl -m u:manila:r-- ${keyring_path}",
         unless  => "getfacl ${keyring_path} | grep -q user:manila:r--",
       }
+      -> exec{ "exec-setfacl-${cephfs_auth_id}-mask":
+        path    => ['/bin', '/usr/bin' ],
+        command => "setfacl -m m::r ${keyring_path}",
+        unless  => "getfacl ${keyring_path} | grep -q mask::r",
+      }
     }
 
     # manila netapp:

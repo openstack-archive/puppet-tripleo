@@ -190,6 +190,7 @@ describe 'tripleo::profile::base::cinder::volume' do
             :enabled_backends => ['tripleo_ceph']
           )
           is_expected.to contain_exec('exec-setfacl-openstack-cinder')
+          is_expected.to contain_exec('exec-setfacl-openstack-cinder-mask')
         end
         context 'additional rbd pools' do
           # The list of additional rbd pools is not an input, but instead comes
