@@ -100,6 +100,7 @@ class tripleo::profile::base::cinder::api (
     }
 
     class { '::cinder::api':
+      sync_db        => $sync_db,
       keymgr_backend => $keymgr_backend_real,
     }
     include ::tripleo::profile::base::apache
