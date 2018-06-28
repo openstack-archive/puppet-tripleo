@@ -83,6 +83,7 @@ class tripleo::profile::base::cinder::api (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     class { '::cinder::api':
+      sync_db          => $sync_db,
       keymgr_api_class => $keymgr_api_class,
     }
     include ::tripleo::profile::base::apache
