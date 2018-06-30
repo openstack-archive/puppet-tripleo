@@ -98,6 +98,13 @@
 #  You'll need to create a tripleo::haproxy::userlist in order to use that option.
 #  Defaults to undef
 #
+# [*sticky_sessions*]
+#  (optional) Enable sticky sessions for this frontend using a cookie
+#
+# [*session_cookie*]
+#  (optional) Cookie name to use for sticky sessions. This should be different
+#  for each service using sticky sessions.
+#
 define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
@@ -117,6 +124,8 @@ define tripleo::haproxy::endpoint (
   $service_network             = undef,
   $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
   $authorized_userlist         = undef,
+  $sticky_sessions             = false,
+  $session_cookie              = 'STICKYSESSION',
 ) {
   # Let users override the options on a per-service basis
   $custom_options = hiera("tripleo::haproxy::${name}::options", undef)
@@ -130,22 +139,29 @@ define tripleo::haproxy::endpoint (
           'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
           'option'       => 'forwardfor',
         }
-        $listen_options_real = merge($tls_listen_options, $listen_options, $custom_options)
+        $listen_options_precookie = merge($tls_listen_options, $listen_options, $custom_options)
       } else {
-        $listen_options_real = merge($listen_options, $custom_options)
+        $listen_options_precookie = merge($listen_options, $custom_options)
       }
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${public_ssl_port}"),
                                         union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
     } else {
-      $listen_options_real = merge($listen_options, $custom_options)
+      $listen_options_precookie = merge($listen_options, $custom_options)
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${service_port}"), $haproxy_listen_bind_param)
     }
   } else {
     # internal service only
     $public_bind_opts = {}
-    $listen_options_real = merge($listen_options, $custom_options)
+    $listen_options_precookie = merge($listen_options, $custom_options)
   }
-
+  if $sticky_sessions {
+    $cookie_options = {
+      'cookie' => "${session_cookie} insert indirect nocache",
+    }
+    $listen_options_real = merge($listen_options_precookie, $cookie_options)
+  } else {
+    $listen_options_real = $listen_options_precookie
+  }
   if $use_internal_certificates {
     if !$service_network {
       fail("The service_network for this service is undefined. Can't configure TLS for the internal network.")
@@ -195,13 +211,29 @@ define tripleo::haproxy::endpoint (
     mode             => $mode,
     options          => $_real_options,
   }
-  haproxy::balancermember { "${name}":
-    listening_service => $name,
-    ports             => $service_port,
-    ipaddresses       => $ip_addresses,
-    server_names      => $server_names,
-    options           => $member_options,
+  if $sticky_sessions {
+    hash(zip($ip_addresses, $server_names)).each | $ip, $server | {
+      # We need to be sure the IP (IPv6) don't have colons
+      # which is a reserved character to reference manifests
+      $non_colon_ip = regsubst($ip, ':', '-', 'G')
+      haproxy::balancermember { "${name}_${non_colon_ip}_${server}":
+        listening_service => $name,
+        ports             => $service_port,
+        ipaddresses       => $ip,
+        server_names      => $server,
+        options           => union($member_options, ["cookie ${server}"]),
+      }
+    }
+  } else {
+    haproxy::balancermember { "${name}":
+      listening_service => $name,
+      ports             => $service_port,
+      ipaddresses       => $ip_addresses,
+      server_names      => $server_names,
+      options           => $member_options,
+    }
   }
+
   if $manage_firewall {
     include ::tripleo::firewall
     # This block will construct firewall rules only when we specify
