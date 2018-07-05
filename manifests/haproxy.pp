@@ -1636,14 +1636,14 @@ class tripleo::haproxy (
 
   if $openshift_master {
     ::tripleo::haproxy::endpoint { 'openshift-master':
-      # Note we don't expose the openshift endpoint via public_virtual_ip
-      internal_ip     => hiera('openshift_master_vip', $controller_virtual_ip),
-      service_port    => $ports[openshift_master_port],
-      ip_addresses    => hiera('openshift_master_node_ips', $controller_hosts_real),
-      server_names    => hiera('openshift_master_node_names', $controller_hosts_names_real),
-      public_ssl_port => $ports[openshift_master_ssl_port],
-      service_network => $openshift_master_network,
-      listen_options  => {
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => hiera('openshift_master_vip', $controller_virtual_ip),
+      service_port      => $ports[openshift_master_port],
+      ip_addresses      => hiera('openshift_master_node_ips', $controller_hosts_real),
+      server_names      => hiera('openshift_master_node_names', $controller_hosts_names_real),
+      public_ssl_port   => $ports[openshift_master_ssl_port],
+      service_network   => $openshift_master_network,
+      listen_options    => {
         'balance' => 'roundrobin',
       }
     }
