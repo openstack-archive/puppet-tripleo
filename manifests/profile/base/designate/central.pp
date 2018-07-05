@@ -27,9 +27,14 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*pools_file_content*]
+#   (Optional) The content of /etc/designate/pools.yaml
+#   Defaults to the content of templates/designate/pools.yaml.erb
+#
 class tripleo::profile::base::designate::central (
   $bootstrap_node = hiera('bootstrap_nodeid', undef),
   $step = Integer(hiera('step')),
+  $pools_file_content = undef,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -37,10 +42,14 @@ class tripleo::profile::base::designate::central (
     $sync_db = false
   }
 
-  # TODO(bnemec): Make this configurable.
+  if $pools_file_content {
+    $pools_file_content_real = $pools_file_content
+  } else {
+    $pools_file_content_real = template('tripleo/designate/pools.yaml.erb')
+  }
   file { 'designate pools':
     path    => '/etc/designate/pools.yaml',
-    content => template('tripleo/designate/pools.yaml.erb'),
+    content => $pools_file_content_real,
   }
   include ::tripleo::profile::base::designate
   if ($step >= 4 or ($step >= 3 and $sync_db)) {
