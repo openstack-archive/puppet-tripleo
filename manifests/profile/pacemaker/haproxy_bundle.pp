@@ -99,12 +99,6 @@ class tripleo::profile::pacemaker::haproxy_bundle (
     $pacemaker_master = false
   }
 
-  if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' and $enable_load_balancer {
-    tripleo::pacemaker::resource_restart_flag { 'haproxy-clone':
-      subscribe => Concat['/etc/haproxy/haproxy.cfg'],
-    }
-  }
-
   if $step >= 2 and $enable_load_balancer {
     if $pacemaker_master {
       $haproxy_short_node_names = hiera('haproxy_short_node_names')

@@ -231,12 +231,6 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $remove_default_accounts = false
   }
 
-  if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
-    tripleo::pacemaker::resource_restart_flag { 'galera-master':
-      subscribe => File['mysql-config-file'],
-    }
-  }
-
   $mysql_root_password = hiera('mysql::server::root_password')
 
   if $step >= 1 {
