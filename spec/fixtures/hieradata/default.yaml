@@ -45,6 +45,13 @@ gnocchi::storage::ceph::ceph_secret: 'password'
 # haproxy related items
 mysql_enabled: true
 controller_node_ips: '10.1.0.1,10.1.0.2'
+# manila related items
+manila::rabbit_password: 'password'
+manila::backend::cephfs::cephfs_protocol_helper_type: 'NFS'
+manila_share_short_bootstrap_node_name: 'node.example.com'
+manila_share_short_node_names:
+ - 'manila-1'
+ - 'manila-2'
 # nova related items
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
