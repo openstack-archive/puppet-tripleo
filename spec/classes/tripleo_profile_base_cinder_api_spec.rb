@@ -45,6 +45,7 @@ describe 'tripleo::profile::base::cinder::api' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder::api').with(
+          :sync_db        => true,
           # Verify legacy key manager is enabled when none is set in hiera.
           :keymgr_backend => 'cinder.keymgr.conf_key_mgr.ConfKeyManager',
         )
@@ -64,14 +65,30 @@ describe 'tripleo::profile::base::cinder::api' do
       end
     end
 
-    context 'with step 4' do
+    context 'with step 4 on bootstrap node' do
       let(:params) { {
-        :step => 4,
+        :step           => 4,
+        :bootstrap_node => 'node.example.com',
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder::api').with(
-          # Verify proper key manager is enabled when value is set in hiera.
+          :sync_db        => true,
+          :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
+        )
+        is_expected.to contain_class('cinder::ceilometer')
+      end
+    end
+
+    context 'with step 4 not on bootstrap node' do
+      let(:params) { {
+        :step           => 4,
+        :bootstrap_node => 'other.example.com',
+      } }
+
+      it 'should trigger complete configuration but with no db sync' do
+        is_expected.to contain_class('cinder::api').with(
+          :sync_db        => false,
           :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
         )
         is_expected.to contain_class('cinder::ceilometer')
