@@ -45,6 +45,7 @@ class tripleo::profile::base::designate::central (
   include ::tripleo::profile::base::designate
   if ($step >= 4 or ($step >= 3 and $sync_db)) {
     include ::designate::central
+    include ::designate::quota
     class { '::designate::db':
       sync_db => $sync_db,
     }
