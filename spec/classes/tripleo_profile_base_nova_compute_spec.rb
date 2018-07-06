@@ -96,6 +96,19 @@ eos
           is_expected.to contain_package('nfs-utils')
         }
       end
+
+      context 'nova nfs enabled' do
+        let(:params) { { :step => 4, :nova_nfs_enabled => true } }
+
+        it {
+          is_expected.to contain_class('tripleo::profile::base::nova::compute')
+          is_expected.to contain_class('tripleo::profile::base::nova')
+          is_expected.to contain_class('tripleo::profile::base::nova')
+          is_expected.to contain_class('nova::compute')
+          is_expected.to contain_class('nova::network::neutron')
+          is_expected.to contain_package('nfs-utils')
+        }
+      end
     end
   end
 
