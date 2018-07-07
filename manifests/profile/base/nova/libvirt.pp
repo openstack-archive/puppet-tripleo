@@ -72,6 +72,7 @@ class tripleo::profile::base::nova::libvirt (
     }
 
     include ::nova::compute::libvirt::qemu
+    include ::nova::migration::qemu
 
     $libvirt_sasl_conf = "
 mech_list: scram-sha-1
