@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    With the change in https://review.openstack.org/#/c/561784/3 we need to
+    make sure that the new port range get applied to the the qemu.conf file.
