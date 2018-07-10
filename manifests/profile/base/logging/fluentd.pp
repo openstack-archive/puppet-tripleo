@@ -63,6 +63,11 @@
 #   (Optional) List. Specifies [find, replace] arguments that will be
 #   used to transform the 'path' value for logging sources using puppet's
 #   regsubst function.
+#
+# [*non_containerized_logs*]
+#   (Optional) List. Log path that are not containerized so the log would
+#   be at path_transformation[2].
+#
 class tripleo::profile::base::logging::fluentd (
   $step = Integer(hiera('step')),
   $fluentd_sources = undef,
@@ -75,7 +80,8 @@ class tripleo::profile::base::logging::fluentd (
   $fluentd_shared_key = undef,
   $fluentd_listen_syslog = true,
   $fluentd_syslog_port = 42185,
-  $fluentd_path_transform = undef
+  $fluentd_path_transform = undef,
+  $non_containerized_logs = []
 ) {
 
   if $step >= 4 {
@@ -108,12 +114,19 @@ class tripleo::profile::base::logging::fluentd (
       if $fluentd_path_transform {
         $_fluentd_sources = map($fluentd_sources) |$source| {
           if $source['path'] {
-            $newpath = {
-              'path' => regsubst($source['path'],
-                        $fluentd_path_transform[0],
-                        $fluentd_path_transform[1])
+            if ($source['path'] in $non_containerized_logs ){
+                $newpath = {
+                'path' => regsubst($source['path'],
+                          $fluentd_path_transform[0],
+                          $fluentd_path_transform[2])
+                }
+            } else {
+              $newpath = {
+                'path' => regsubst($source['path'],
+                          $fluentd_path_transform[0],
+                          $fluentd_path_transform[1])
+              }
             }
-
             $source + $newpath
           } else {
             $source
