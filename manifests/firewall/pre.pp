@@ -36,22 +36,26 @@ class tripleo::firewall::pre(
     proto  => 'all',
     state  => ['RELATED', 'ESTABLISHED'],
     extras => $firewall_settings,
+    tag    => 'tripleo-firewall-prerule',
   }
 
   tripleo::firewall::rule{ '001 accept all icmp':
     proto  => 'icmp',
     extras => $firewall_settings,
+    tag    => 'tripleo-firewall-prerule',
   }
 
   tripleo::firewall::rule{ '002 accept all to lo interface':
     proto   => 'all',
     iniface => 'lo',
     extras  => $firewall_settings,
+    tag     => 'tripleo-firewall-prerule',
   }
 
   tripleo::firewall::rule{ '003 accept ssh':
     dport  => '22',
     extras => $firewall_settings,
+    tag    => 'tripleo-firewall-prerule',
   }
 
   tripleo::firewall::rule{ '004 accept ipv6 dhcpv6':
@@ -59,5 +63,6 @@ class tripleo::firewall::pre(
     proto       => 'udp',
     state       => ['NEW'],
     destination => 'fe80::/64',
+    tag         => 'tripleo-firewall-prerule',
   }
 }
