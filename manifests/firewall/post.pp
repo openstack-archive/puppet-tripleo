@@ -25,21 +25,33 @@
 #
 # [*firewall_settings*]
 #   (optional) Allow to add custom parameters to firewall rules
-#   Should be an hash.
+#   Should be a hash.
+#   Default to {}
+#
+# [*logging_settings*]
+#   (optional) Allow to add custom parameters to the logging firewall rule
+#   Should be a hash.
 #   Default to {}
 #
 class tripleo::firewall::post(
   $debug             = false,
   $firewall_settings = {},
+  $logging_settings  = {},
 ){
 
   if $debug {
     warning('debug is enabled, the traffic is not blocked.')
   } else {
+    $default_logging_extras = {
+      'burst' => '15',
+      'limit' => '20/min',
+    }
+    $logging_extras = merge($default_logging_extras, $logging_settings)
     tripleo::firewall::rule{ '998 log all':
-      proto => 'all',
-      jump  => 'LOG',
-      tag   => 'tripleo-firewall-postrule',
+      proto  => 'all',
+      jump   => 'LOG',
+      tag    => 'tripleo-firewall-postrule',
+      extras => $logging_extras,
     }
     tripleo::firewall::rule{ '999 drop all':
       proto  => 'all',
