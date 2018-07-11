@@ -39,11 +39,13 @@ class tripleo::firewall::post(
     tripleo::firewall::rule{ '998 log all':
       proto => 'all',
       jump  => 'LOG',
+      tag   => 'tripleo-firewall-postrule',
     }
     tripleo::firewall::rule{ '999 drop all':
       proto  => 'all',
       action => 'drop',
       extras => $firewall_settings,
+      tag    => 'tripleo-firewall-postrule',
     }
     notice('At this stage, all network traffic is blocked.')
   }
