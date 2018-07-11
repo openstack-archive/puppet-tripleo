@@ -29,14 +29,16 @@
 #
 class tripleo::profile::base::designate::worker (
   $step = Integer(hiera('step')),
-  $rndc_key = hiera('designate_rndc_key'),
+  $rndc_key = hiera('designate_rndc_key', false),
 ) {
   include ::tripleo::profile::base::designate
 
   if $step >= 4 {
-    file { 'designate rndc key':
-      path    => '/etc/rndc.key',
-      content => template('tripleo/designate/rndc.key.erb')
+    if $rndc_key {
+      file { 'designate rndc key':
+        path    => '/etc/rndc.key',
+        content => template('tripleo/designate/rndc.key.erb')
+      }
     }
     include ::designate::worker
   }
