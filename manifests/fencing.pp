@@ -73,8 +73,11 @@ class tripleo::fencing(
   $ipmilan_devices = local_fence_devices('fence_ipmilan', $all_devices)
   create_resources('pacemaker::stonith::fence_ipmilan', $ipmilan_devices, $common_params)
   if ($enable_instanceha and $is_compute_instanceha_node) {
-    if length($ipmilan_devices) != 1 {
-      fail('Multiple (or zero) IPmilan devices for a single host are not supported with instance HA')
+    if length($ipmilan_devices) < 1 {
+      fail('You must specify an IPmilan device for a host when configuring instance HA')
+    }
+    if length($ipmilan_devices) > 1 {
+      fail('Multiple IPmilan devices for a single host are not supported with instance HA')
     }
     # Get the first (and only) key which is the mac-address
     $mac = keys($ipmilan_devices)[0]
