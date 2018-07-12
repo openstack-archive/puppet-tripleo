@@ -69,19 +69,6 @@ describe 'tripleo::firewall' do
           :state    => ['NEW'],
           :provider => 'ip6tables',
         )
-        is_expected.to contain_firewall('003 accept ssh ipv4').with(
-          :dport   => '22',
-          :proto  => 'tcp',
-          :action => 'accept',
-          :state  => ['NEW'],
-        )
-        is_expected.to contain_firewall('003 accept ssh ipv6').with(
-          :dport    => '22',
-          :proto    => 'tcp',
-          :action   => 'accept',
-          :state    => ['NEW'],
-          :provider => 'ip6tables',
-        )
       end
 
       it 'configure basic post firewall rules' do
