@@ -540,8 +540,6 @@
 #    'heat_api_ssl_port' (Defaults to 13004)
 #    'heat_cfn_port' (Defaults to 8000)
 #    'heat_cfn_ssl_port' (Defaults to 13005)
-#    'heat_cw_port' (Defaults to 8003)
-#    'heat_cw_ssl_port' (Defaults to 13003)
 #    'ironic_api_port' (Defaults to 6385)
 #    'ironic_api_ssl_port' (Defaults to 13385)
 #    'ironic_inspector_port' (Defaults to 5050)
@@ -733,8 +731,6 @@ class tripleo::haproxy (
     heat_api_ssl_port => 13004,
     heat_cfn_port => 8000,
     heat_cfn_ssl_port => 13005,
-    heat_cw_port => 8003,
-    heat_cw_ssl_port => 13003,
     ironic_api_port => 6385,
     ironic_api_ssl_port => 13385,
     ironic_inspector_port => 5050,
