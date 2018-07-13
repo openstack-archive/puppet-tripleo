@@ -107,7 +107,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         masters           => 1,
         location_rule     => $ovn_dbs_location_rule,
         container_options => 'network=host',
-        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
+        options           => '--log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${ovn_dbs_control_port}",
         storage_maps      => {
