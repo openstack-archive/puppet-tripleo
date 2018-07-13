@@ -5,7 +5,7 @@ Puppet::Functions.create_function(:synchronize_odl_ovs_flows) do
 
   def synchronize_odl_ovs_flows(of_controller_uri)
     flow_tables = [
-      17, 18, 19, 20, 22, 23, 24, 43, 45, 48, 50, 51, 60, 80, 81, 90, 210, 211,
+      18, 19, 20, 22, 23, 24, 43, 45, 48, 50, 51, 60, 80, 81, 90, 210, 211,
       212, 213, 214, 215, 216, 217, 239, 240, 241, 242, 243, 244, 245, 246, 247
     ]
     retries = 5
