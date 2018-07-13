@@ -46,8 +46,12 @@
 #   Nova Team discourages it.
 #   Defaults to hiera('nova_wsgi_enabled', false)
 #
+# [*nova_metadata_wsgi_enabled*]
+#   (Optional) Whether or not deploy Nova Metadata in WSGI with Apache.
+#   Defaults to hiera('nova_metadata_wsgi_enabled', false)
+#
 # [*nova_metadata_network*]
-#   (Optional) The network name where the nova metadata endpoint is listening on.
+#   DEPRECATED: (Optional) The network name where the nova metadata endpoint is listening on.
 #   This is set by t-h-t.
 #   Defaults to hiera('nova_metadata_network', undef)
 #
@@ -57,17 +61,17 @@
 #   Defaults to hiera('step')
 #
 # [*metadata_tls_proxy_bind_ip*]
-#   IP on which the TLS proxy will listen on. Required only if
+#   DEPRECATED: IP on which the TLS proxy will listen on. Required only if
 #   enable_internal_tls is set.
 #   Defaults to undef
 #
 # [*metadata_tls_proxy_fqdn*]
-#   fqdn on which the tls proxy will listen on. required only used if
+#   DEPRECATED: fqdn on which the tls proxy will listen on. required only used if
 #   enable_internal_tls is set.
 #   defaults to undef
 #
 # [*metadata_tls_proxy_port*]
-#   port on which the tls proxy will listen on. Only used if
+#   DEPRECATED: port on which the tls proxy will listen on. Only used if
 #   enable_internal_tls is set.
 #   defaults to 8080
 #
@@ -77,6 +81,7 @@ class tripleo::profile::base::nova::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $nova_api_network              = hiera('nova_api_network', undef),
   $nova_api_wsgi_enabled         = hiera('nova_wsgi_enabled', false),
+  $nova_metadata_wsgi_enabled    = hiera('nova_metadata_wsgi_enabled', false),
   $nova_metadata_network         = hiera('nova_metadata_network', undef),
   $step                          = Integer(hiera('step')),
   $metadata_tls_proxy_bind_ip    = undef,
@@ -97,7 +102,7 @@ class tripleo::profile::base::nova::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    if $enable_internal_tls {
+    if $enable_internal_tls and !$nova_api_wsgi_enabled {
       if !$nova_metadata_network {
         fail('nova_metadata_network is not set in the hieradata.')
       }
@@ -115,8 +120,9 @@ class tripleo::profile::base::nova::api (
     }
 
     class { '::nova::api':
-      sync_db     => $sync_db,
-      sync_db_api => $sync_db,
+      sync_db                    => $sync_db,
+      sync_db_api                => $sync_db,
+      nova_metadata_wsgi_enabled => $nova_metadata_wsgi_enabled,
     }
     include ::nova::cors
     include ::nova::network::neutron
