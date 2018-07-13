@@ -26,6 +26,18 @@
 #   (Optional) The docker image to use for creating the pacemaker bundle
 #   Defaults to hiera('tripleo::profile::pacemaker::manila::share_bundle::manila_docker_image', undef)
 #
+# [*docker_volumes*]
+#   (Optional) The list of volumes to be mounted in the docker container
+#   Defaults to []
+#
+# [*docker_environment*]
+#   (Optional) The list of environment variables set in the docker container
+#   Defaults to ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS']
+#
+# [*backend_cephfs_enabled*]
+#   (Optional) Whether the CephFS Manila backend is enabled
+#   Defaults to hiera('manila_backend_cephfs_enabled', false)
+#
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
@@ -43,6 +55,8 @@
 class tripleo::profile::pacemaker::manila::share_bundle (
   $bootstrap_node             = hiera('manila_share_short_bootstrap_node_name'),
   $manila_share_docker_image  = hiera('tripleo::profile::pacemaker::manila::share_bundle::manila_share_docker_image', undef),
+  $docker_volumes             = [],
+  $docker_environment         = ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS'],
   $backend_cephfs_enabled     = hiera('manila_backend_cephfs_enabled', false),
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
@@ -72,88 +86,119 @@ class tripleo::profile::pacemaker::manila::share_bundle (
     if $pacemaker_master {
       $manila_share_nodes_count = count(hiera('manila_share_short_node_names', []))
 
-      $default_storage_maps = {
-        'manila-share-cfg-files'      => {
-          'source-dir' => '/var/lib/kolla/config_files/manila_share.json',
-          'target-dir' => '/var/lib/kolla/config_files/config.json',
-          'options'    => 'ro',
-        },
-        'manila-share-cfg-data'       => {
-          'source-dir' => '/var/lib/config-data/puppet-generated/manila/',
-          'target-dir' => '/var/lib/kolla/config_files/src',
-          'options'    => 'ro',
-        },
-        'manila-share-hosts'          => {
-          'source-dir' => '/etc/hosts',
-          'target-dir' => '/etc/hosts',
-          'options'    => 'ro',
-        },
-        'manila-share-localtime'      => {
-          'source-dir' => '/etc/localtime',
-          'target-dir' => '/etc/localtime',
-          'options'    => 'ro',
-        },
-        'manila-share-dev'            => {
-          'source-dir' => '/dev',
-          'target-dir' => '/dev',
-          'options'    => 'rw',
-        },
-        'manila-share-run'            => {
-          'source-dir' => '/run',
-          'target-dir' => '/run',
-          'options'    => 'rw',
-        },
-        'manila-share-sys'            => {
-          'source-dir' => '/sys',
-          'target-dir' => '/sys',
-          'options'    => 'rw',
-        },
-        'manila-share-lib-modules'    => {
-          'source-dir' => '/lib/modules',
-          'target-dir' => '/lib/modules',
-          'options'    => 'ro',
-        },
-        'manila-share-var-lib-manila' => {
-          'source-dir' => '/var/lib/manila',
-          'target-dir' => '/var/lib/manila',
-          'options'    => 'rw',
-        },
-        'manila-share-var-log'        => {
-          'source-dir' => '/var/log/containers/manila',
-          'target-dir' => '/var/log/manila',
-          'options'    => 'rw',
-        },
-        'ceph-cfg-dir'                => {
-          'source-dir' => '/etc/ceph',
-          'target-dir' => '/etc/ceph',
-          'options'    => 'ro',
-        },
-      }
-
-      # if ceph-nfs backend is used, then DBus is used for dynamic
-      # creation of NFS exports and DBus socket has to be mounted
-      # both to manila-share and ganesha containers so they can talk
-      # to each other
       $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', '')
       $nfs_ganesha = ($backend_cephfs_enabled and $manila_cephfs_protocol_helper_type == 'NFS')
-      if $nfs_ganesha {
-        $extra_storage_maps = {
-          'dbus-docker'                => {
-            'source-dir' => '/var/run/dbus/system_bus_socket',
-            'target-dir' => '/var/run/dbus/system_bus_socket',
+      $docker_vol_arr = delete(any2array($docker_volumes), '').flatten()
+
+      unless empty($docker_vol_arr) {
+        $storage_maps = docker_volumes_to_storage_maps($docker_vol_arr, 'manila-share')
+      } else {
+        notice('Using fixed list of docker volumes for manila-share bundle')
+        # Default to previous hard-coded list
+        $default_storage_maps = {
+          'manila-share-cfg-files'               => {
+            'source-dir' => '/var/lib/kolla/config_files/manila_share.json',
+            'target-dir' => '/var/lib/kolla/config_files/config.json',
+            'options'    => 'ro',
+          },
+          'manila-share-cfg-data'                => {
+            'source-dir' => '/var/lib/config-data/puppet-generated/manila/',
+            'target-dir' => '/var/lib/kolla/config_files/src',
+            'options'    => 'ro',
+          },
+          'manila-share-hosts'                   => {
+            'source-dir' => '/etc/hosts',
+            'target-dir' => '/etc/hosts',
+            'options'    => 'ro',
+          },
+          'manila-share-localtime'               => {
+            'source-dir' => '/etc/localtime',
+            'target-dir' => '/etc/localtime',
+            'options'    => 'ro',
+          },
+          'manila-share-dev'                     => {
+            'source-dir' => '/dev',
+            'target-dir' => '/dev',
             'options'    => 'rw',
           },
-          'etc-ganesha'                => {
-            'source-dir' => '/etc/ganesha',
-            'target-dir' => '/etc/ganesha',
+          'manila-share-run'                     => {
+            'source-dir' => '/run',
+            'target-dir' => '/run',
             'options'    => 'rw',
+          },
+          'manila-share-sys'                     => {
+            'source-dir' => '/sys',
+            'target-dir' => '/sys',
+            'options'    => 'rw',
+          },
+          'manila-share-lib-modules'             => {
+            'source-dir' => '/lib/modules',
+            'target-dir' => '/lib/modules',
+            'options'    => 'ro',
+          },
+          'manila-share-var-lib-manila'          => {
+            'source-dir' => '/var/lib/manila',
+            'target-dir' => '/var/lib/manila',
+            'options'    => 'rw',
+          },
+          'manila-share-pki-extracted'           => {
+            'source-dir' => '/etc/pki/ca-trust/extracted',
+            'target-dir' => '/etc/pki/ca-trust/extracted',
+            'options'    => 'ro',
+          },
+          'manila-share-pki-ca-bundle-crt'       => {
+            'source-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
+            'target-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
+            'options'    => 'ro',
+          },
+          'manila-share-pki-ca-bundle-trust-crt' => {
+            'source-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
+            'target-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
+            'options'    => 'ro',
+          },
+          'manila-share-pki-cert'                => {
+            'source-dir' => '/etc/pki/tls/cert.pem',
+            'target-dir' => '/etc/pki/tls/cert.pem',
+            'options'    => 'ro',
+          },
+          'manila-share-var-log'                 => {
+            'source-dir' => '/var/log/containers/manila',
+            'target-dir' => '/var/log/manila',
+            'options'    => 'rw',
+          },
+          'manila-share-ceph-cfg-dir'            => {
+            'source-dir' => '/etc/ceph',
+            'target-dir' => '/etc/ceph',
+            'options'    => 'ro',
           },
         }
-      } else {
-        $extra_storage_maps = {}
+
+        # if ceph-nfs backend is used, then DBus is used for dynamic
+        # creation of NFS exports and DBus socket has to be mounted
+        # both to manila-share and ganesha containers so they can talk
+        # to each other
+        if $nfs_ganesha {
+          $extra_storage_maps = {
+            'manila-share-dbus-docker' => {
+              'source-dir' => '/var/run/dbus/system_bus_socket',
+              'target-dir' => '/var/run/dbus/system_bus_socket',
+              'options'    => 'rw',
+            },
+            'manila-share-etc-ganesha' => {
+              'source-dir' => '/etc/ganesha',
+              'target-dir' => '/etc/ganesha',
+              'options'    => 'rw',
+            },
+          }
+        } else {
+          $extra_storage_maps = {}
+        }
+
+        $storage_maps = merge($default_storage_maps, $extra_storage_maps)
       }
 
-      $storage_maps = merge($default_storage_maps, $extra_storage_maps)
+      $docker_env_arr = delete(any2array($docker_environment), '').flatten()
+      $docker_env = join($docker_env_arr.map |$var| { "-e ${var}" }, ' ')
 
       pacemaker::resource::bundle { $::manila::params::share_service:
         image             => $manila_share_docker_image,
@@ -164,7 +209,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
           expression         => ['manila-share-role eq true'],
         },
         container_options => 'network=host',
-        options           => '--ipc=host --privileged=true --user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
+        options           => "--ipc=host --privileged=true --user=root --log-driver=journald ${docker_env}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => $storage_maps,
       }
