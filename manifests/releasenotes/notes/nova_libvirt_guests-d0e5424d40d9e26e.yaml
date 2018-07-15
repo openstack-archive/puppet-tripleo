@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    New profile to configure libvirt-guests on compute host. On compute
+    shutdown we might want to gracefully shutdown instances using
+    libvirt-guests. If it gets configured is managed with the tht
+    NovaResumeGuestsStateOnHostBoot parameter. This triggers config of
+    /etc/sysconfig/libvirt-guests via puppet-nova, configures a dependency
+    for virt-guest-shutdown.target to the docker service that instances get
+    shutdown before the libvirt container gets stopped.
