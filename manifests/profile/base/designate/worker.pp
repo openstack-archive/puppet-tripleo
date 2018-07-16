@@ -23,11 +23,21 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rndc_key*]
+#   (Optional) The base64-encoded key secret for /etc/rndc.key.
+#   Defaults to hiera('designate_rndc_key')
+#
 class tripleo::profile::base::designate::worker (
   $step = Integer(hiera('step')),
+  $rndc_key = hiera('designate_rndc_key'),
 ) {
   include ::tripleo::profile::base::designate
+
   if $step >= 4 {
+    file { 'designate rndc key':
+      path    => '/etc/rndc.key',
+      content => template('tripleo/designate/rndc.key.erb')
+    }
     include ::designate::worker
   }
 }
