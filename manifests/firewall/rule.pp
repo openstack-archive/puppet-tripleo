@@ -67,6 +67,12 @@
 #  (optional) The destination cidr associated to the rule.
 #  Defaults to undef
 #
+# [*tag*]
+#  (optional) tag to add to the resource definition.
+#  Used to order any rule that is not pre and post to happen in between
+#  pre and post rules
+#  Defaults to 'tripleo-firewall-rule'
+#
 #  [*extras*]
 #  (optional) Hash of any puppetlabs-firewall supported parameters.
 #  Defaults to {}
@@ -85,6 +91,7 @@ define tripleo::firewall::rule (
   $extras      = {},
   $jump        = undef,
   $table       = undef,
+  $tag         = 'tripleo-firewall-rule',
 ) {
 
   if $port == 'all' {
@@ -115,6 +122,7 @@ define tripleo::firewall::rule (
     'destination' => $destination,
     'jump'        => $jump_real,
     'table'       => $table,
+    'tag'         => $tag,
   }
   if $proto == 'icmp' {
     $ipv6 = {
