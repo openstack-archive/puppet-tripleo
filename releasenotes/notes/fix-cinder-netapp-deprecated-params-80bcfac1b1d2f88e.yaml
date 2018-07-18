@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixed how deprecated parameters for Cinder's Netapp backend are handled
+    so that empty strings are not misinterpreted.
+    Fixes `bug 1782376 <https://bugs.launchpad.net/tripleo/+bug/1782376>`__.
