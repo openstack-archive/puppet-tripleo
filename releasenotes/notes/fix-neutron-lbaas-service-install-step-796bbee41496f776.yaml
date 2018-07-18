@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fix deployment issue where neutron-server would crash on start on
+    split-stack deployments when neutron-lbaas is enabled.

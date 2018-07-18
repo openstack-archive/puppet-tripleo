@@ -34,9 +34,13 @@ class tripleo::profile::base::neutron::lbaas(
 
   include ::tripleo::profile::base::neutron
 
-  #LBaaS Driver needs to be run @ $step>=5 as the neutron service needs to already be active which is run @ $step==4
-  if $step >= 5 {
+  if $step >= 4 {
     include ::neutron::services::lbaas
+  }
+
+  # LBaaS agent needs to be run @ $step>=5 as the neutron service needs to
+  # already be active which is run @ $step==4
+  if $step >= 5 {
     class {'::neutron::agents::lbaas':
       manage_haproxy_package => $manage_haproxy_package
     }
