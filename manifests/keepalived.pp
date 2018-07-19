@@ -99,7 +99,7 @@ class tripleo::keepalived (
   case $::osfamily {
     'RedHat': {
       $keepalived_name_is_process = false
-      $keepalived_vrrp_script     = 'systemctl status haproxy.service'
+      $keepalived_vrrp_script     = 'test -S /var/lib/haproxy/stats && echo "show info" | socat /var/lib/haproxy/stats stdio'
     } # RedHat
     'Debian': {
       $keepalived_name_is_process = true
