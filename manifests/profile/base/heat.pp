@@ -50,10 +50,6 @@
 #   Flag indicating ssl usage.
 #   Defaults to hiera('heat::rabbit_use_ssl', '0')
 #
-# [*notification_driver*]
-#   (Optional) Heat notification driver to use.
-#   Defaults to 'messaging'
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -69,7 +65,6 @@ class tripleo::profile::base::heat (
   $messaging_port      = hiera('heat::rabbit_port', '5672'),
   $messaging_username  = hiera('heat::rabbit_userid', 'guest'),
   $messaging_use_ssl   = hiera('heat::rabbit_use_ssl', '0'),
-  $notification_driver = 'messaging',
   $step                = hiera('step'),
 ) {
   # Domain resources will be created at step5 on the node running keystone.pp
@@ -86,7 +81,6 @@ class tripleo::profile::base::heat (
     # TODO(ccamacho): remove sprintf once we properly type the port, needs
     # to be a string for the os_transport_url function.
     class { '::heat' :
-      notification_driver   => $notification_driver,
       default_transport_url => os_transport_url({
         'transport' => $messaging_driver,
         'hosts'     => $messaging_hosts,
