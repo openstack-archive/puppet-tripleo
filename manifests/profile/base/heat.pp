@@ -26,10 +26,6 @@
 #   (Optional) Whether keystone token flushing should be enabled
 #   Defaults to hiera('keystone_enable_db_purge', true)
 #
-# [*notification_driver*]
-#   (Optional) Heat notification driver to use.
-#   Defaults to 'messaging'
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -82,7 +78,6 @@
 class tripleo::profile::base::heat (
   $bootstrap_node          = downcase(hiera('bootstrap_nodeid')),
   $manage_db_purge         = hiera('heat_enable_db_purge', true),
-  $notification_driver     = 'messaging',
   $step                    = Integer(hiera('step')),
   $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
@@ -108,7 +103,6 @@ class tripleo::profile::base::heat (
     $oslomsg_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_use_ssl)))
 
     class { '::heat' :
-      notification_driver        => $notification_driver,
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
