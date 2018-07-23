@@ -83,7 +83,10 @@ class tripleo::firewall(
       'firewall_settings' => $firewall_post_extras,
     })
 
-    Class['tripleo::firewall::pre'] -> Class['tripleo::firewall::post']
+    Class['tripleo::firewall::pre']
+      -> Firewall<|tag == 'tripleo-firewall-rule'|>
+        -> Class['tripleo::firewall::post']
+
     Service<||> -> Class['tripleo::firewall::post']
 
     # Allow composable services to load their own custom
