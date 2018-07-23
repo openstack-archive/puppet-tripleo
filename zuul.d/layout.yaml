@@ -58,6 +58,7 @@
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/opendaylight.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ovs/opendaylight.*$
               - ^manifests/profile/(base|pacemaker)/neutron/opendaylight.*$
+              - ^lib/puppet/functions/.*odl.*$
     gate:
       queue: tripleo
       jobs:
