@@ -142,6 +142,52 @@
 #   (Optional) Boolean. Whether let collectd enable manage repositories.
 #   If it is set to true the epel repository will be used
 #
+# [*amqp_transport_name*]
+#  (Optional) String. Name of the transport.
+#  Default to 'metrics'
+#
+# [*amqp_host*]
+#  (Optional) String. Hostname or IP address of the AMQP 1.0 intermediary.
+#  Defaults to the undef
+#
+# [*amqp_port*]
+#  (Optional) String. Service name or port number on which the AMQP 1.0
+#  intermediary accepts connections. This argument must be a string,
+#  even if the numeric form is used.
+#  Defaults to undef
+#
+# [*amqp_user*]
+#  (Optional) String. User part of credentials used to authenticate to the
+#  AMQP 1.0 intermediary.
+#  Defaults to undef
+#
+# [*amqp_password*]
+#  (Optional) String. Password part of credentials used to authenticate
+#  to the AMQP 1.0 intermediary.
+#  Defaults to undef
+#
+# [*amqp_address*]
+#  (Optional) String. This option specifies the prefix for the send-to value
+#  in the message.
+#  Defaults to 'collectd'
+#
+# [*amqp_retry_delay*]
+#  (Optional) Number. When the AMQP1 connection is lost, defines the time
+#  in seconds to wait before attempting to reconnect. If not set 1 second
+#  is the implicit default.
+#  Defaults to undef
+#
+# [*amqp_interval*]
+#  (Optional) Number. Interval on which metrics should be sent to AMQP
+#  intermediary. If not set the default for all collectd plugins is used.
+#  Defaults to undef
+#
+# [*amqp_instances*]
+#  (Optional) Hash of hashes. Each inner hash represent Instance block in plugin
+#  configuration file. Key of outter hash represents instance name.
+#  The 'address' value concatenated with the 'name' given will be used
+#  as the send-to address for communications over the messaging link.
+#  Defaults to {}.
 class tripleo::profile::base::metrics::collectd (
   $step = Integer(hiera('step')),
 
@@ -171,6 +217,15 @@ class tripleo::profile::base::metrics::collectd (
   $gnocchi_keystone_endpoint = undef,
   $gnocchi_resource_type = 'collectd',
   $gnocchi_batch_size = 10,
+  $amqp_transport_name = 'metrics',
+  $amqp_host = undef,
+  $amqp_port = undef,
+  $amqp_user = undef,
+  $amqp_password = undef,
+  $amqp_address = 'collectd',
+  $amqp_instances = {},
+  $amqp_retry_delay = undef,
+  $amqp_interval = undef,
   $service_names = hiera('service_names', []),
   $collectd_manage_repo = false
 ) {
@@ -220,6 +275,20 @@ class tripleo::profile::base::metrics::collectd (
         password      => $_collectd_password,
         port          => $_collectd_port,
         securitylevel => $_collectd_securitylevel,
+      }
+    } elsif !empty($amqp_host) {
+      class { '::collectd::plugin::amqp1':
+        ensure         => 'present',
+        manage_package => true,
+        transport      => $amqp_transport_name,
+        host           => $amqp_host,
+        port           => $amqp_port,
+        user           => $amqp_user,
+        password       => $amqp_password,
+        address        => $amqp_address,
+        instances      => $amqp_instances,
+        retry_delay    => $amqp_retry_delay,
+        interval       => $amqp_interval,
       }
     } elsif !empty($gnocchi_server) or !empty($gnocchi_keystone_auth_url) {
       if !empty($gnocchi_server) {
