@@ -55,6 +55,10 @@
 #  (Required) Redis ip address for the coordination url
 #  Defaults to hiera('redis_vip')
 #
+# [*redis_use_tls*]
+#   (Optional) Whether Redis shall be accessed over a TLS tunnel or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*gnocchi_rbd_client_name*]
 #   (Optional) RBD Client username.
 #   Defaults to hiera('gnocchi::storage::ceph::ceph_username')
@@ -72,6 +76,7 @@ class tripleo::profile::base::gnocchi::api (
   $gnocchi_network               = hiera('gnocchi_api_network', undef),
   $gnocchi_redis_password        = hiera('gnocchi_redis_password'),
   $redis_vip                     = hiera('redis_vip'),
+  $redis_use_tls                 = hiera('enable_internal_tls', false),
   $gnocchi_rbd_client_name       = hiera('gnocchi::storage::ceph::ceph_username','openstack'),
   $step                          = Integer(hiera('step')),
 ) {
@@ -89,7 +94,11 @@ class tripleo::profile::base::gnocchi::api (
     }
     $tls_certfile = $certificates_specs["httpd-${gnocchi_network}"]['service_certificate']
     $tls_keyfile = $certificates_specs["httpd-${gnocchi_network}"]['service_key']
-    $tls_query_param = '?ssl=true'
+    if $redis_use_tls {
+      $tls_query_param = '?ssl=true'
+    } else {
+      $tls_query_param = ''
+    }
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
