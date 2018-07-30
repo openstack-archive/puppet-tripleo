@@ -38,6 +38,33 @@ class tripleo::profile::base::cinder::volume::netapp (
       $cinder_netapp_nfs_shares = split(hiera('cinder::backend::netapp::nfs_shares', undef), ',')
     }
 
+    # These cinder::backend::netapp parameters are deprecated, so empty
+    # strings supplied by THT need to be treated as undef.
+    #   netapp_volume_list
+    #   netapp_storage_pools
+    #   netapp_eseries_host_type
+
+    $netapp_volume_list = hiera('cinder::backend::netapp::netapp_volume_list', undef)
+    if $netapp_volume_list == '' {
+      $netapp_volume_list_real = undef
+    } else {
+      $netapp_volume_list_real = $netapp_volume_list
+    }
+
+    $netapp_storage_pools = hiera('cinder::backend::netapp::netapp_storage_pools', undef)
+    if $netapp_storage_pools == '' {
+      $netapp_storage_pools_real = undef
+    } else {
+      $netapp_storage_pools_real = $netapp_storage_pools
+    }
+
+    $netapp_eseries_host_type = hiera('cinder::backend::netapp::netapp_eseries_host_type', undef)
+    if $netapp_eseries_host_type == '' {
+      $netapp_eseries_host_type_real = undef
+    } else {
+      $netapp_eseries_host_type_real = $netapp_eseries_host_type
+    }
+
     cinder::backend::netapp { $backend_name :
       netapp_login                 => hiera('cinder::backend::netapp::netapp_login', undef),
       netapp_password              => hiera('cinder::backend::netapp::netapp_password', undef),
@@ -48,7 +75,7 @@ class tripleo::profile::base::cinder::volume::netapp (
       netapp_storage_protocol      => hiera('cinder::backend::netapp::netapp_storage_protocol', undef),
       netapp_transport_type        => hiera('cinder::backend::netapp::netapp_transport_type', undef),
       netapp_vfiler                => hiera('cinder::backend::netapp::netapp_vfiler', undef),
-      netapp_volume_list           => hiera('cinder::backend::netapp::netapp_volume_list', undef),
+      netapp_volume_list           => $netapp_volume_list_real,
       netapp_vserver               => hiera('cinder::backend::netapp::netapp_vserver', undef),
       netapp_partner_backend_name  => hiera('cinder::backend::netapp::netapp_partner_backend_name', undef),
       nfs_shares                   => $cinder_netapp_nfs_shares,
@@ -57,8 +84,8 @@ class tripleo::profile::base::cinder::volume::netapp (
       netapp_copyoffload_tool_path => hiera('cinder::backend::netapp::netapp_copyoffload_tool_path', undef),
       netapp_controller_ips        => hiera('cinder::backend::netapp::netapp_controller_ips', undef),
       netapp_sa_password           => hiera('cinder::backend::netapp::netapp_sa_password', undef),
-      netapp_storage_pools         => hiera('cinder::backend::netapp::netapp_storage_pools', undef),
-      netapp_eseries_host_type     => hiera('cinder::backend::netapp::netapp_eseries_host_type', undef),
+      netapp_storage_pools         => $netapp_storage_pools_real,
+      netapp_eseries_host_type     => $netapp_eseries_host_type_real,
       netapp_webservice_path       => hiera('cinder::backend::netapp::netapp_webservice_path', undef),
       nas_secure_file_operations   => hiera('cinder::backend::netapp::nas_secure_file_operations', undef),
       nas_secure_file_permissions  => hiera('cinder::backend::netapp::nas_secure_file_permissions', undef),
