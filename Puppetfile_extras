@@ -82,3 +82,9 @@ mod 'collectd',
 mod 'keepalived',
   :git => 'https://github.com/Unyonsys/puppet-module-keepalived',
   :ref => 'bbca37ade629a9178f09366fd0368187fb645f4e'
+
+# NOTE(aschultz) this redis module was dropped from p-o-i due to issues for
+# bionic, so we'll just keep it here for now. LP#1784422
+mod 'redis',
+  :git => 'https://github.com/arioch/puppet-redis',
+  :ref => 'v3.3.0'
