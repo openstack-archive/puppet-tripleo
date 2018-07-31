@@ -345,6 +345,10 @@
 #  specific monitoring we do from HAProxy for Redis
 #  Defaults to undef
 #
+# [*redis_use_tls*]
+#   (Optional) Whether Redis shall be accessed over a TLS tunnel or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*midonet_api*]
 #  (optional) Enable or not MidoNet API binding
 #  Defaults to false
@@ -662,6 +666,7 @@ class tripleo::haproxy (
   $docker_registry             = hiera('enable_docker_registry', false),
   $redis                       = hiera('redis_enabled', false),
   $redis_password              = undef,
+  $redis_use_tls               = hiera('enable_internal_tls', false),
   $midonet_api                 = false,
   $zaqar_api                   = hiera('zaqar_api_enabled', false),
   $ceph_rgw                    = hiera('ceph_rgw_enabled', false),
@@ -1421,7 +1426,7 @@ class tripleo::haproxy (
   }
 
   if $redis {
-    if $enable_internal_tls {
+    if $enable_internal_tls and $redis_use_tls {
       $redis_tcp_check_ssl_options = ['connect ssl']
       $redis_ssl_member_options = ['check-ssl', "ca-file ${ca_bundle}"]
     } else {
