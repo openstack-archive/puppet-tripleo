@@ -76,6 +76,10 @@
 #   will be created with correct permissions, inorder to support vhostuser
 #   client mode.
 #
+# [*enable_ipv6*]
+#   (Optional) Whether all IPs are IPv6 address or not.
+#   Defaults to hiera(''enable_ipv6', false)
+#
 class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
   $odl_port               = hiera('opendaylight::odl_rest_port'),
   $odl_check_url          = hiera('opendaylight_check_url'),
@@ -89,6 +93,7 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
   $vhostuser_socket_group = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::vhostuser_socket_group', 'qemu'),
   $vhostuser_socket_user  = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::vhostuser_socket_user', 'qemu'),
   $vhostuser_socket_dir   = hiera('neutron::plugins::ovs::opendaylight::vhostuser_socket_dir', undef),
+  $enable_ipv6            = hiera('enable_ipv6', false),
   ) {
 
   if $step >= 3 {
@@ -108,17 +113,29 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
 
     if empty($odl_url_ip) { fail('OpenDaylight API VIP is Empty') }
 
+    if $enable_ipv6 {
+      $odl_api_ips_parsed = $odl_api_ips.map |$odl_api_ip| {
+        add_brackets($odl_api_ip)
+      }
+
+      $odl_url_ip_parsed = add_brackets($odl_url_ip)
+
+    } else {
+      $odl_api_ips_parsed = $odl_api_ips
+      $odl_url_ip_parsed = $odl_url_ip
+    }
+
     # Build URL to check if ODL is up before connecting OVS
-    $opendaylight_url = "${conn_proto}://${odl_url_ip}:${odl_port}/${odl_check_url}"
+    $opendaylight_url = "${conn_proto}://${odl_url_ip_parsed}:${odl_port}/${odl_check_url}"
 
     if $enable_internal_tls {
       $tls_certfile = $certificate_specs['service_certificate']
       $tls_keyfile = $certificate_specs['service_key']
-      $odl_ovsdb_str = join(regsubst($odl_api_ips, '.+', 'ssl:\0:6640'), ' ')
+      $odl_ovsdb_str = join(regsubst($odl_api_ips_parsed, '.+', 'ssl:\0:6640'), ' ')
     } else {
       $tls_certfile = undef
       $tls_keyfile = undef
-      $odl_ovsdb_str = join(regsubst($odl_api_ips, '.+', 'tcp:\0:6640'), ' ')
+      $odl_ovsdb_str = join(regsubst($odl_api_ips_parsed, '.+', 'tcp:\0:6640'), ' ')
     }
 
     class { '::neutron::plugins::ovs::opendaylight':
