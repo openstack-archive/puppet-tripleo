@@ -29,11 +29,11 @@ ceph::profile::params::rgw_keystone_admin_password: 'keystone_admin_password'
 # cinder related items
 cinder_backup_short_bootstrap_node_name: 'node.example.com'
 cinder_backup_short_node_names:
- - 'c-bak-1'
+ - 'node.example.com'
  - 'c-bak-2'
 cinder_volume_short_bootstrap_node_name: 'node.example.com'
 cinder_volume_short_node_names:
- - 'c-vol-1'
+ - 'node.example.com'
  - 'c-vol-2'
 cinder::backup::nfs::backup_share: '/mnt/backup'
 cinder::rabbit_password: 'password'
