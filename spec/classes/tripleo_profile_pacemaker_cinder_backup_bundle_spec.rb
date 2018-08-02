@@ -36,8 +36,8 @@ describe 'tripleo::profile::pacemaker::cinder::backup_bundle' do
       } }
 
       it 'should create pacemaker properties' do
-        is_expected.to contain_pacemaker__property('cinder-backup-role-c-bak-1')
-        is_expected.to contain_pacemaker__property('cinder-backup-role-c-bak-2')
+        is_expected.to contain_pacemaker__property('cinder-backup-role-node.example.com')
+        is_expected.to_not contain_pacemaker__property('cinder-backup-role-c-bak-2')
       end
     end
 
@@ -48,7 +48,7 @@ describe 'tripleo::profile::pacemaker::cinder::backup_bundle' do
       } }
 
       it 'should not create pacemaker properties' do
-        is_expected.to_not contain_pacemaker__property('cinder-backup-role-c-bak-1')
+        is_expected.to_not contain_pacemaker__property('cinder-backup-role-node.example.com')
         is_expected.to_not contain_pacemaker__property('cinder-backup-role-c-bak-2')
       end
     end
