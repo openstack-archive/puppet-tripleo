@@ -167,12 +167,6 @@
               - ^manifests/profile/(base|pacemaker)/neutron/ovn.*$
     experimental:
       jobs:
-        - tripleo-ci-centos-7-scenario005-multinode-oooq:
-            files:
-              - ^manifests/haproxy.*$
-              - ^manifests/pacemaker/.*$
-              - ^manifests/profile/pacemaker.*$
-              - manifests/profile/(base|pacemaker)/pacemaker.pp
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
             files:
               - ^manifests/profile/pacemaker/ovn.*$
