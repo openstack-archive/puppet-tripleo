@@ -77,6 +77,7 @@ describe 'tripleo::profile::base::cinder::api' do
           :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
         )
         is_expected.to contain_class('cinder::ceilometer')
+        is_expected.to contain_cinder__type('tripleo')
       end
     end
 
@@ -86,12 +87,13 @@ describe 'tripleo::profile::base::cinder::api' do
         :bootstrap_node => 'other.example.com',
       } }
 
-      it 'should trigger complete configuration but with no db sync' do
+      it 'should trigger complete configuration but with no db sync or default volume type' do
         is_expected.to contain_class('cinder::api').with(
           :sync_db        => false,
           :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
         )
         is_expected.to contain_class('cinder::ceilometer')
+        is_expected.to_not contain_cinder__type('tripleo')
       end
     end
 
