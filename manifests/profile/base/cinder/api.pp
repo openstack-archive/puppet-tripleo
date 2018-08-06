@@ -49,6 +49,10 @@
 #   specified.
 #   Defaults to hiera('cinder::api::keymgr_backend', 'cinder.keymgr.conf_key_mgr.ConfKeyManager')
 #
+# [*default_volume_type*]
+#   (Optional) The name of the default volume type.
+#   Defaults to hiera('cinder::api::default_volume_type', '')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -68,14 +72,17 @@ class tripleo::profile::base::cinder::api (
   $cinder_api_network            = hiera('cinder_api_network', undef),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $keymgr_backend                = hiera('cinder::api::keymgr_backend', 'cinder.keymgr.conf_key_mgr.ConfKeyManager'),
+  $default_volume_type           = hiera('cinder::api::default_volume_type', ''),
   $step                          = Integer(hiera('step')),
   # DEPRECATED PARAMETERS
   $keymgr_api_class              = undef,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
+    $manage_type = true
   } else {
     $sync_db = false
+    $manage_type = false
   }
 
   include ::tripleo::profile::base::cinder
@@ -109,6 +116,10 @@ class tripleo::profile::base::cinder::api (
       ssl_key  => $tls_keyfile,
     }
     include ::cinder::ceilometer
+  }
+
+  if $step == 4 and $manage_type and $default_volume_type != '' {
+    cinder::type { $default_volume_type : }
   }
 
 }
