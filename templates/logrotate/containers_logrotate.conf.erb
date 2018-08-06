@@ -10,6 +10,9 @@
   maxsize <%= @maxsize %>
   missingok
   notifempty
+<%- if @copytruncate %>
+  copytruncate
+<%- end %>
 <%- if @delaycompress %>
   delaycompress
 <%- end %>
@@ -22,8 +25,11 @@
     \( -mtime +<%= @purge_after_days %> -or \
     -atime +<%= @purge_after_days %> -or \
     -ctime +<%= @purge_after_days %> \) -exec rm -f {} \;;
-    /sbin/lsof -nPs +L1 +D /var/log/containers 2>&1|\
-    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/.*\(deleted\)/ {print $2}' |\
-    sort -u | /bin/xargs -n1 -r -t kill -HUP
+    /sbin/lsof -nPs <%- if @copytruncate -%>+L1<%- end -%> +D /var/log/containers 2>&1|\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/<%- if @copytruncate -%>.*\(deleted\)<%- end -%>/ {print $2}' |\
+    sort -u | grep -v httpd | /bin/xargs -n1 -r -t kill -HUP;
+    /sbin/lsof -nPs <%- if @copytruncate -%>+L1<%- end -%> +D /var/log/containers/httpd 2>&1|\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/httpd\/<%- if @copytruncate -%>.*\(deleted\)<%- end -%>/ {print $2}' |\
+    sort -u | /bin/xargs -n1 -r -t kill -USR1
   endscript
 }
