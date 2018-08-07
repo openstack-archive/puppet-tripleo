@@ -108,6 +108,12 @@
 #  List of enabled loggers
 #  Defaults to ['console', 'zaqar']
 #
+# [*httpd_expires*]
+#  A list of strings passed to ::apache::vhost::directories::expires_by_type
+#  [
+#      'text/javascript "access plus 1 months"'
+#  ]
+#
 class tripleo::ui (
   $servername                       = $::fqdn,
   $bind_host                        = hiera('controller_host'),
@@ -131,6 +137,9 @@ class tripleo::ui (
   $endpoint_config_nova             = undef,
   $endpoint_config_swift            = undef,
   $enabled_loggers                  = ['console', 'zaqar'],
+  $httpd_expires                    = [
+      'text/javascript "access plus 1 months"'
+  ]
 
 ) {
   package {'openstack-tripleo-ui': }
@@ -149,6 +158,15 @@ class tripleo::ui (
     docroot          => '/var/www/openstack-tripleo-ui/dist',
     options          => ['Indexes', 'FollowSymLinks'],
     fallbackresource => '/index.html',
+    directories      => [
+    {
+      path            => '/var/www/openstack-tripleo-ui/dist',
+      provider        => 'directory',
+      options         => ['Indexes', 'FollowSymLinks'],
+      expires_active  => bool2str(!empty($httpd_expires), 'On', 'Off'),
+      expires_by_type => $httpd_expires
+    }
+    ],
     proxy_pass       => [
     {
       'path' => '/zaqar',

@@ -49,9 +49,21 @@ describe 'tripleo::ui' do
           :port             => 3000,
           :docroot          => '/var/www/openstack-tripleo-ui/dist',
           :options          => [ 'Indexes', 'FollowSymLinks' ],
-          :fallbackresource => '/index.html'
+          :fallbackresource => '/index.html',
+          :directories      => [
+            {
+              "path"            => '/var/www/openstack-tripleo-ui/dist',
+              "provider"        => 'directory',
+              "options"         => ['Indexes', 'FollowSymLinks'],
+              "expires_active"  => 'On',
+              "expires_by_type" => [
+                'text/javascript "access plus 1 months"'
+              ]
+            }
+          ]
         )
-        is_expected.to contain_file('/etc/httpd/conf.d/openstack-tripleo-ui.conf').with_content(/cleaned by Puppet/)
+        is_expected.to contain_file('/etc/httpd/conf.d/openstack-tripleo-ui.conf')
+            .with_content(/cleaned by Puppet/)
         is_expected.to contain_file('/var/www/openstack-tripleo-ui/dist/tripleo_ui_config.js')
             .with_content(/'keystone': 'https:\/\/127.0.0.1:443\/keystone\/v2.0'/)
             .with_content(/'heat': 'https:\/\/127.0.0.1:443\/heat\/v1\/%\(tenant_id\)s'/)
