@@ -132,7 +132,7 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
   }
 
   if $step >= 5 {
-    $odl_of_mgr = regsubst($odl_ovsdb_str , ':6640', ':6653')
+    $odl_of_mgr = regsubst($odl_ovsdb_str , ':6640', ':6653', 'G')
     # Workaround until OpenDayight is capable of synchronizing flows
     if ! synchronize_odl_ovs_flows($odl_of_mgr) {
       fail('Failed to validate OVS OpenFlow pipeline')
