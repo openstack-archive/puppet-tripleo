@@ -1,0 +1,13 @@
+---
+upgrade:
+  - |
+    Logrotate's copytruncate is used by default for containerized services logs
+    rotation.  The default period to keep old logs remains unchanged (14 days),
+    but rotation will happen on hourly basis instead of daily. That means that
+    old log files will be maintained for 336 versions of it, which represents
+    14 days multiplied by 24 hours per a day.
+fixes:
+  - |
+    Containerized logrotate configuration ensures httpd processes running in
+    containers will be reloaded gracefully via SIGUSR1. Containerized servicies
+    will reliably reopen its logfiles when logrotate happens.
