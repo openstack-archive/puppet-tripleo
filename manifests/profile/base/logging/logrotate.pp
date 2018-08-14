@@ -50,10 +50,6 @@
 #  [*user*]
 #    (optional) Defaults to 'root'. Configures cron job for logrotate.
 #
-#  [*copytruncate*]
-#    (optional) Defaults to True.
-#    Configures the logrotate copytruncate parameter.
-#
 #  [*delaycompress*]
 #    (optional) Defaults to True.
 #    Configures the logrotate delaycompress parameter.
@@ -67,11 +63,11 @@
 #    Configures the logrotate maxsize parameter.
 #
 #  [*rotation*]
-#    (optional) Defaults to 'hourly'.
+#    (optional) Defaults to 'daily'.
 #    Configures the logrotate rotation interval.
 #
 #  [*rotate*]
-#    (optional) Defaults to 336 (corresponds to 14 days).
+#    (optional) Defaults to 14.
 #    Configures the logrotate rotate parameter.
 #
 #  [*purge_after_days*]
@@ -95,12 +91,11 @@ class tripleo::profile::base::logging::logrotate (
   $weekday          = '*',
   Integer $maxdelay = 90,
   $user             = 'root',
-  $copytruncate     = true,
   $delaycompress    = true,
   $compress         = true,
-  $rotation         = 'hourly',
+  $rotation         = 'daily',
   $maxsize          = '10M',
-  $rotate           = 336,
+  $rotate           = 14,
   $purge_after_days = 14,
   # DEPRECATED PARAMETERS
   $size             = undef,
