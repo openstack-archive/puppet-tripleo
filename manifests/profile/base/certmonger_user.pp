@@ -113,16 +113,6 @@
 #   it will create.
 #   Defaults to hiera('tripleo::profile::base::neutron::certificate_specs', {}).
 #
-# [*novnc_proxy_certificates_specs*]
-#   (Optional) The specifications to give to certmonger for the certificate(s)
-#   it will create.
-#   Defaults to hiera('novnc_proxy_certificates_specs',{})
-#
-# [*novnc_proxy_postsave_cmd*]
-#   (Optional) If set, it overrides the default way to restart novnc proxy when the
-#   certificate is renewed.
-#   Defaults to undef
-#
 class tripleo::profile::base::certmonger_user (
   $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
   $apache_postsave_cmd        = undef,
@@ -140,8 +130,6 @@ class tripleo::profile::base::certmonger_user (
   $odl_certificate_specs      = hiera('tripleo::profile::base::neutron::opendaylight::certificate_specs', {}),
   $ovs_certificate_specs      = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
   $neutron_certificate_specs  = hiera('tripleo::profile::base::neutron::certificate_specs', {}),
-  $novnc_proxy_certificates_specs = hiera('novnc_proxy_certificates_specs',{}),
-  $novnc_proxy_postsave_cmd   = undef,
 ) {
   unless empty($haproxy_certificates_specs) {
     $reload_haproxy = ['systemctl reload haproxy']
@@ -205,9 +193,5 @@ class tripleo::profile::base::certmonger_user (
   }
   unless empty($neutron_certificate_specs) {
     ensure_resource('class', 'tripleo::certmonger::neutron', $neutron_certificate_specs)
-  }
-  unless empty($novnc_proxy_certificates_specs) {
-    ensure_resource('class', 'tripleo::certmonger::novnc_proxy', $novnc_proxy_certificates_specs,
-                      {'postsave_cmd' => $novnc_proxy_postsave_cmd})
   }
 }

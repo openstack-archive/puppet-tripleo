@@ -1,7 +1,0 @@
----
-fixes:
-  - |
-    with tls-everywhere enabled the connection from haproxy to the nova novnc
-    proxy was not encrypted. Now we request a certificate and configue haproxy
-    and the novnc proxy to encrypt this remaining part in a vnc connection to
-    be encrypted as well.
