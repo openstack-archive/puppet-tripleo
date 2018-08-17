@@ -29,7 +29,7 @@
 # [*service_names*]
 #   (Optional) List of services enabled on the current role.
 #   We may not want to configure a ml2 plugin for a role,
-#   in spite of the fact that it is in the the drivers list.
+#   in spite of the fact that it is in the drivers list.
 #   Check if the required service is enabled from the service list.
 #   Defaults to hiera('service_names')
 #
