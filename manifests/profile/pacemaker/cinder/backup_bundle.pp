@@ -62,7 +62,9 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
 
   if $step >= 2 and $pacemaker_master {
     $cinder_backup_short_node_names = hiera('cinder_backup_short_node_names')
-    $cinder_backup_short_node_names.each |String $node_name| {
+    $pacemaker_short_node_names = hiera('pacemaker_short_node_names')
+    $pcmk_cinder_backup_nodes = intersection($cinder_backup_short_node_names, $pacemaker_short_node_names)
+    $pcmk_cinder_backup_nodes.each |String $node_name| {
       pacemaker::property { "cinder-backup-role-${node_name}":
         property => 'cinder-backup-role',
         value    => true,
@@ -75,8 +77,6 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
 
   if $step >= 5 {
     if $pacemaker_master {
-      $cinder_backup_nodes_count = count(hiera('cinder_backup_short_node_names', []))
-
       $docker_vol_arr = delete(any2array($docker_volumes), '').flatten()
 
       unless empty($docker_vol_arr) {
