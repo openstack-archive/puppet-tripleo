@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Allows to configure bond over two virtual functions in mellanox interfaces.
