@@ -24,9 +24,7 @@ describe 'tripleo::certmonger::ca::crl' do
 
     context 'with default parameters (no crl_source)' do
       it 'should ensure no CRL nor cron job are present' do
-        is_expected.to contain_file('tripleo-ca-crl').with(
-          :ensure => 'absent'
-        )
+        is_expected.not_to contain_exec('tripleo-ca-crl')
         is_expected.to contain_cron('tripleo-refresh-crl-file').with(
           :ensure => 'absent'
         )
@@ -51,9 +49,16 @@ describe 'tripleo::certmonger::ca::crl' do
       end
 
       it 'should create and process CRL file' do
-        is_expected.to contain_file('tripleo-ca-crl').with(
-          :ensure => 'present',
-          :source => params[:crl_source]
+        is_expected.to contain_exec('tripleo-ca-crl').with(
+          :command   => "curl -Ls --connect-timeout 120 -o #{params[:crl_preprocessed]} #{params[:crl_source]}",
+          :tries     => 5,
+          :try_sleep => 5
+        )
+        is_expected.to contain_file('tripleo-ca-crl-file').with(
+          :group => 'root',
+          :mode  => '0644',
+          :owner => 'root',
+          :path  => "#{params[:crl_preprocessed]}"
         )
         is_expected.to contain_exec('tripleo-ca-crl-process-command').with(
           :command => process_cmd
@@ -79,9 +84,16 @@ describe 'tripleo::certmonger::ca::crl' do
       end
 
       it 'should create and process CRL file' do
-        is_expected.to contain_file('tripleo-ca-crl').with(
-          :ensure => 'present',
-          :source => params[:crl_source]
+        is_expected.to contain_exec('tripleo-ca-crl').with(
+          :command   => "curl -Ls --connect-timeout 120 -o #{params[:crl_dest]} #{params[:crl_source]}",
+          :tries       => 5,
+          :try_sleep   => 5
+        )
+        is_expected.to contain_file('tripleo-ca-crl-file').with(
+          :group => 'root',
+          :mode  => '0644',
+          :owner => 'root',
+          :path  => "#{params[:crl_dest]}"
         )
         is_expected.to_not contain_exec('tripleo-ca-crl-process-command')
         is_expected.to contain_cron('tripleo-refresh-crl-file').with(
