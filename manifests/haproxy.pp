@@ -1059,6 +1059,14 @@ class tripleo::haproxy (
   }
 
   if $nova_novncproxy {
+    if $enable_internal_tls {
+      # we need to make sure we use ssl for checks.
+      $haproxy_member_options_real   = delete($haproxy_member_options, 'check')
+      $novncproxy_ssl_member_options = ['check-ssl']
+    } else {
+      $haproxy_member_options_real   = $haproxy_member_options
+      $novncproxy_ssl_member_options = []
+    }
     ::tripleo::haproxy::endpoint { 'nova_novncproxy':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $nova_api_vip,
@@ -1072,6 +1080,7 @@ class tripleo::haproxy (
       }),
       public_ssl_port   => $ports[nova_novnc_ssl_port],
       service_network   => $nova_novncproxy_network,
+      member_options    => union($haproxy_member_options_real, $internal_tls_member_options, $novncproxy_ssl_member_options),
     }
   }
 
