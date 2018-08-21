@@ -96,42 +96,28 @@ class tripleo::profile::base::manila::share (
 
     # manila cephfs:
     if $backend_cephfs_enabled {
+      $manila_cephfs_backend = hiera('manila::backend::cephfs::title')
+      $cephfs_auth_id = hiera('manila::backend::cephfs::cephfs_auth_id')
       $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', false)
-      if $manila_cephfs_protocol_helper_type {
-        # new manila ceph driver is renamed from 'cephfsnative' to 'cephfs'
-        # and supports both direct cephfs access or access through
-        # nfs-ganesha depending whether 'cephfs_protocol_helper_type' is
-        # set to 'CEPHFS' or 'NFS'
-        $manila_cephfs_backend = hiera('manila::backend::cephfs::title')
-        $cephfs_auth_id = hiera('manila::backend::cephfs::cephfs_auth_id')
-        manila::backend::cephfs { $manila_cephfs_backend :
-          driver_handles_share_servers => hiera('manila::backend::cephfs::driver_handles_share_servers', false),
-          share_backend_name           => hiera('manila::backend::cephfs::share_backend_name'),
-          cephfs_conf_path             => hiera('manila::backend::cephfs::cephfs_conf_path'),
-          cephfs_auth_id               => $cephfs_auth_id,
-          cephfs_cluster_name          => hiera('manila::backend::cephfs::cephfs_cluster_name'),
-          cephfs_enable_snapshots      => hiera('manila::backend::cephfs::cephfs_enable_snapshots'),
-          cephfs_protocol_helper_type  => $manila_cephfs_protocol_helper_type,
-          cephfs_ganesha_server_ip     => hiera('ganesha_vip', undef),
-        }
-        if $manila_cephfs_protocol_helper_type == 'NFS' {
-          manila_config {
-            "${manila_cephfs_backend}/ganesha_rados_store_enable":    value => true;
-            "${manila_cephfs_backend}/ganesha_rados_store_pool_name": value => 'manila_data';
-          }
-        }
-      } else {
-        # for backward compatibility with older heat templates which used
-        # 'cephfsnative' driver
-        $manila_cephfsnative_backend = hiera('manila::backend::cephfsnative::title')
-        $cephfs_auth_id = hiera('manila::backend::cephfsnative::cephfs_auth_id')
-        manila::backend::cephfsnative { $manila_cephfsnative_backend :
-          driver_handles_share_servers => hiera('manila::backend::cephfsnative::driver_handles_share_servers', false),
-          share_backend_name           => hiera('manila::backend::cephfsnative::share_backend_name'),
-          cephfs_conf_path             => hiera('manila::backend::cephfsnative::cephfs_conf_path'),
-          cephfs_auth_id               => $cephfs_auth_id,
-          cephfs_cluster_name          => hiera('manila::backend::cephfsnative::cephfs_cluster_name'),
-          cephfs_enable_snapshots      => hiera('manila::backend::cephfsnative::cephfs_enable_snapshots'),
+
+      manila::backend::cephfs { $manila_cephfs_backend :
+        driver_handles_share_servers => hiera('manila::backend::cephfs::driver_handles_share_servers', false),
+        share_backend_name           => hiera('manila::backend::cephfs::share_backend_name'),
+        cephfs_conf_path             => hiera('manila::backend::cephfs::cephfs_conf_path'),
+        cephfs_auth_id               => $cephfs_auth_id,
+        cephfs_cluster_name          => hiera('manila::backend::cephfs::cephfs_cluster_name'),
+        cephfs_enable_snapshots      => hiera('manila::backend::cephfs::cephfs_enable_snapshots'),
+        cephfs_protocol_helper_type  => $manila_cephfs_protocol_helper_type,
+        cephfs_ganesha_server_ip     => hiera('ganesha_vip', undef),
+      }
+
+      # cephfs supports both direct cephfs access or access through
+      # nfs-ganesha depending whether 'cephfs_protocol_helper_type' is
+      # set to 'CEPHFS' or 'NFS'
+      if $manila_cephfs_protocol_helper_type == 'NFS' {
+        manila_config {
+          "${manila_cephfs_backend}/ganesha_rados_store_enable":    value => true;
+          "${manila_cephfs_backend}/ganesha_rados_store_pool_name": value => 'manila_data';
         }
       }
 
@@ -246,7 +232,6 @@ class tripleo::profile::base::manila::share (
     $manila_enabled_backends = delete_undef_values(
       [
         $manila_generic_backend,
-        $manila_cephfsnative_backend,
         $manila_cephfs_backend,
         $manila_netapp_backend,
         $manila_vmax_backend,
