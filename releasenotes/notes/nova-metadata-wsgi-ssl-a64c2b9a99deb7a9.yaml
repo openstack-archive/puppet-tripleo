@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    With nova metadata api running via wsgi we do not need the ssl proxy when
+    configure tls-everywhere as we terminate ssl direct in the httpd wsgi.
+    With this change we only create the ssl proxy vhost if we do not run nova
+    metadata via wsgi.

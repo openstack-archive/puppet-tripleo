@@ -102,7 +102,7 @@ class tripleo::profile::base::nova::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    if $enable_internal_tls and !$nova_api_wsgi_enabled {
+    if $enable_internal_tls and !$nova_api_wsgi_enabled and !$nova_metadata_wsgi_enabled {
       if !$nova_metadata_network {
         fail('nova_metadata_network is not set in the hieradata.')
       }
