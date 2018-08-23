@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('designate_central_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -32,7 +32,7 @@
 #   Defaults to the content of templates/designate/pools.yaml.erb
 #
 class tripleo::profile::base::designate::central (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node = hiera('designate_central_short_bootstrap_node_name', undef),
   $step = Integer(hiera('step')),
   $pools_file_content = undef,
 ) {
@@ -59,7 +59,7 @@ class tripleo::profile::base::designate::central (
       sync_db => $sync_db,
     }
   }
-  if $step == 5 {
+  if ($step == 5 and $sync_db) {
     exec { 'pool update':
       command => '/bin/designate-manage pool update',
       user    => 'designate',
