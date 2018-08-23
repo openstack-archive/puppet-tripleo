@@ -101,10 +101,14 @@ class tripleo::profile::base::database::mysql::client (
       }
     }
 
+    file { $mysql_read_default_file:
+      ensure => file,
+    }
     augeas { 'tripleo-mysql-client-conf':
       incl    => $mysql_read_default_file,
       lens    => 'Puppet.lns',
       changes => $conf_changes,
+      require => File[$mysql_read_default_file],
     }
 
     # If a profile created a file resource for the parent directory,
