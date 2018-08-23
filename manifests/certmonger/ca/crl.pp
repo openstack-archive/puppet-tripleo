@@ -85,8 +85,35 @@ class tripleo::certmonger::ca::crl (
   $maxdelay                   = 0,
   $reload_cmds                = [],
 ) {
+  if $process {
+    $fetched_crl = $crl_preprocessed
+  } else {
+    $fetched_crl = $crl_dest
+  }
+
+  $esc_fetched_crl = shell_escape($fetched_crl)
+  $esc_crl_src = shell_escape($crl_source)
+
   if $crl_source {
     $ensure = 'present'
+    # LP(1787878): We need to use an explicit command instead of the file
+    # resource, because puppet won't use query parameters when handling
+    # redirects.
+    # If FreeIPA is being installed in a similar time as the overcloud, the tries
+    # and time in between tries gives it a chance to generate the CRL.
+    exec {'tripleo-ca-crl':
+      command   => "curl -Ls --connect-timeout 120 -o ${esc_fetched_crl} ${esc_crl_src}",
+      path      => '/usr/bin/',
+      creates   => $fetched_crl,
+      tries     => 5,
+      try_sleep => 5,
+    } ~>
+    file {'tripleo-ca-crl-file':
+      group => 'root',
+      mode  => '0644',
+      owner => 'root',
+      path  => $fetched_crl,
+    }
   } else {
     $ensure = 'absent'
   }
@@ -97,31 +124,21 @@ class tripleo::certmonger::ca::crl (
     $sleep = "sleep `expr \${RANDOM} \\% ${maxdelay}`; "
   }
 
-  if $process {
-    $fetched_crl = $crl_preprocessed
-  } else {
-    $fetched_crl = $crl_dest
-  }
-
-  file { 'tripleo-ca-crl' :
-    ensure => $ensure,
-    path   => $fetched_crl,
-    source => $crl_source,
-    mode   => '0644',
-  }
-
   if $process and $ensure == 'present' {
     $crl_dest_format = $crl_preprocessed_format ? {
       'PEM' => 'DER',
       'DER' => 'PEM'
     }
     # transform CRL from DER to PEM or viceversa
-    $process_cmd = "openssl crl -in ${$crl_preprocessed} -inform ${crl_preprocessed_format} -outform ${crl_dest_format} -out ${crl_dest}"
+    $process_cmd = "openssl crl -in ${crl_preprocessed} -inform ${crl_preprocessed_format} -outform ${crl_dest_format} -out ${crl_dest}"
     exec { 'tripleo-ca-crl-process-command' :
       command     => $process_cmd,
       path        => '/usr/bin',
       refreshonly => true,
-      subscribe   => File['tripleo-ca-crl']
+      subscribe   => [
+        Exec['tripleo-ca-crl'],
+        File['tripleo-ca-crl-file']
+      ]
     }
   } else {
     $process_cmd = []
