@@ -30,6 +30,9 @@ describe 'tripleo::profile::base::database::mysql::client' do
 
       it {
         is_expected.to contain_exec('directory-create-etc-my.cnf.d')
+        is_expected.to contain_file('/etc/my.cnf.d/tripleo.cnf').with(
+          :ensure => 'file',
+        )
         is_expected.to contain_augeas('tripleo-mysql-client-conf').with(
           :incl    => '/etc/my.cnf.d/tripleo.cnf',
           :changes => [
