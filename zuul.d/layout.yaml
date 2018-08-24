@@ -38,6 +38,7 @@
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/mistral.*$
               - ^manifests/profile/(base|pacemaker)/sahara.*$
+              - ^manifests/profile/(base|pacemaker)/designate.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
@@ -93,6 +94,7 @@
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/mistral.*$
               - ^manifests/profile/(base|pacemaker)/sahara.*$
+              - ^manifests/profile/(base|pacemaker)/designate.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
