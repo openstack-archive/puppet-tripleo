@@ -1,4 +1,4 @@
-/var/log/containers/*/*log /var/log/containers/*/*/*log {
+/var/log/containers/*/*log /var/log/containers/*/*/*log /var/log/containers/*/*err {
   <%= @rotation %>
   rotate <%= @rotate %>
   maxage <%= @purge_after_days %>
@@ -22,12 +22,35 @@
     \( -mtime +<%= @purge_after_days %> -or \
     -atime +<%= @purge_after_days %> -or \
     -ctime +<%= @purge_after_days %> \) -exec rm -f {} \;;
-    /sbin/lsof -nPs +L1 +D /var/log/containers 2>/dev/null|\
-    grep -v /var/log/httpd/ |\
-    awk '/\S+\s+[0-9]+\s.*\/var\/log\/.*\(deleted\)/ {print $2}' |\
+
+    # Send HUP to gracefully restart processes owning rotated files
+    # Httpd, nova-compute and neutron-server processes need to take another approach
+    /sbin/lsof -nPs +D /var/log/containers 2>/dev/null |\
+    grep -v -e /var/log/containers/httpd/ \
+    -e /var/log/containers/neutron/server \
+    -e /var/log/containers/nova/nova-compute |\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/\S+\.[0-9]+\S+?$/ {print $2}' |\
     sort -u | /bin/xargs -n1 -r -t kill -HUP;
-    /sbin/lsof -nPs +L1 +D /var/log/containers 2>/dev/null|\
-    awk '/\S+\s+[0-9]+\s.*\/var\/log\/httpd\/.*\(deleted\)/ {print $2}' |\
-    sort -u | /bin/xargs -n1 -r -t kill -USR1
+    # USR1 to gracefully restart httpd processes owning rotated files
+    /sbin/lsof -nPs +D /var/log/containers/httpd 2>/dev/null |\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/httpd\/\S+\.[0-9]+\S+?$/ {print $2}' |\
+    sort -u | /bin/xargs -n1 -r -t kill -USR1;
+
+    # FIXME(bogdando): Unhealthy containers can't be restarted, until
+    # --exit-on-unhealthy supported. Therefore we cannot send TERM to self-heal.
+
+    # LP(#1780139): HUP does not work with neutron server API process.
+    # Restart the neutron API container instead, if it is
+    # holding rotated server.log.X file.
+    /sbin/lsof -nPs +D /var/log/containers/neutron 2>/dev/null |\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/neutron\/server\S+\.[0-9]+\S+?$/ {print $1}' |\
+    grep -q neutron-s && docker restart neutron_api ||:;
+
+    # LP(#1276694): HUP does not work well with nova compute process.
+    # Restart the nova compute container instead, if it is
+    # holding rotated nova-compute.log.X file.
+    /sbin/lsof -nPs +D /var/log/containers/nova 2>/dev/null |\
+    awk '/\S+\s+[0-9]+\s.*\/var\/log\/containers\/nova\/nova-comp\S+\.[0-9]+\S+?$/ {print $1}' |\
+    grep -q nova-comp && docker restart nova_compute ||:
   endscript
 }
