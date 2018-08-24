@@ -1,6 +1,6 @@
 {
   "name": "openstack-tripleo",
-  "version": "9.2.0",
+  "version": "9.3.0",
   "author": "OpenStack Contributors",
   "summary": "Puppet module for TripleO",
   "license": "Apache-2.0",
