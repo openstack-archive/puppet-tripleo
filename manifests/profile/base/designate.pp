@@ -126,14 +126,18 @@ class tripleo::profile::base::designate (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    class { '::designate::backend::bind9':
-      rndc_controls => {
-        $rndc_host => {
-          'port'              => $rndc_port,
-          'keys'              => $rndc_keys,
-          'allowed_addresses' => $rndc_allowed_addresses,
-        }
-      },
+    if ($rndc_host and $rndc_allowed_addresses) {
+      class { '::designate::backend::bind9':
+        rndc_controls => {
+          $rndc_host => {
+            'port'              => $rndc_port,
+            'keys'              => $rndc_keys,
+            'allowed_addresses' => $rndc_allowed_addresses,
+          }
+        },
+      }
+    } else {
+      include ::designate::backend::bind9
     }
     include ::designate::config
   }
