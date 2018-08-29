@@ -4,6 +4,7 @@
       - tripleo-undercloud-jobs
       - tripleo-multinode-baremetal-minimal
       - tripleo-multinode-container-minimal
+      - release-notes-jobs
     check:
       jobs:
         - puppet-openstack-unit-4.8-centos-7
