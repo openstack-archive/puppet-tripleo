@@ -5,6 +5,7 @@
       - tripleo-undercloud-jobs
       - tripleo-multinode-baremetal-minimal
       - tripleo-multinode-container-minimal
+      - release-notes-jobs
     check:
       jobs:
         - tripleo-ci-centos-7-scenario001-multinode-oooq:
