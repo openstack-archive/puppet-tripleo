@@ -61,6 +61,13 @@
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ovs/opendaylight.*$
               - ^manifests/profile/(base|pacemaker)/neutron/opendaylight.*$
               - ^lib/puppet/functions/.*odl.*$
+        - tripleo-ci-centos-7-scenario010-multinode-oooq-container:
+            files:
+              - ^manifests/haproxy.*$
+              - ^manifests/profile/(base|pacemaker)/glance.*$
+              - ^manifests/profile/(base|pacemaker)/nova.*$
+              - ^manifests/profile/(base|pacemaker)/neutron.*$
+              - ^manifests/profile/(base|pacemaker)/octavia.*$
     gate:
       queue: tripleo
       jobs:
