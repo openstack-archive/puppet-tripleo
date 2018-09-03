@@ -31,7 +31,7 @@ class tripleo::profile::base::ceilometer::expirer (
   if $step >= 4 {
     include ::ceilometer::expirer
     Cron <| title == 'ceilometer-expirer' |>
-      { command => "sleep $((\$(od -A n -t d -N 3 /dev/urandom) % 86400)) && ${::ceilometer::params::expirer_command}" }
+      { command => "sleep $((\$(od -A n -t d -N 3 /dev/urandom) \\% 86400)) && ${::ceilometer::params::expirer_command}" }
   }
 
 }
