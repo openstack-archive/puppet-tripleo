@@ -39,7 +39,7 @@ describe 'tripleo::profile::base::ceilometer::expirer' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('ceilometer::expirer')
         is_expected.to contain_cron('ceilometer-expirer').with(
-          :command => 'sleep $(($(od -A n -t d -N 3 /dev/urandom) % 86400)) && ceilometer-expirer'
+          :command => 'sleep $(($(od -A n -t d -N 3 /dev/urandom) \\% 86400)) && ceilometer-expirer'
         )
       end
     end
