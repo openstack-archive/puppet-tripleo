@@ -195,6 +195,12 @@ class tripleo::profile::base::database::mysql (
     }
   }
 
+  $service_names = hiera('enabled_services', undef)
+
+  if $service_names {
+    tripleo::profile::base::database::mysql::users { $service_names: }
+  }
+
   if $step >= 2 and $sync_db {
     Class['::mysql::server'] -> Mysql_database<||>
     if hiera('aodh_api_enabled', false) {

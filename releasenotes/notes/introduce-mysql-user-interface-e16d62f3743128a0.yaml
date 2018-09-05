@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The interface ``tripleo::<service name>::mysql_user`` was created. It
+    allows service writes to create databases, database users and grants via
+    hieradata instead of having to modify puppet-tripleo.
