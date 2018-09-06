@@ -241,8 +241,10 @@ class tripleo::profile::base::database::mysql (
     if hiera('neutron_api_enabled', false) {
       include ::neutron::db::mysql
     }
+    if hiera('nova_conductor_enabled', false) {
+      include ::nova::db::mysql
+    }
     if hiera('nova_api_enabled', false) {
-      include ::nova::db::mysql
       include ::nova::db::mysql_api
     }
     if hiera('nova_placement_enabled', false) {

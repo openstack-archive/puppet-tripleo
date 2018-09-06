@@ -117,6 +117,11 @@ class tripleo::profile::base::nova (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
+    if hiera('nova_is_additional_cell', undef) {
+      $oslomsg_rpc_hosts_real = any2array(hiera('oslo_messaging_rpc_cell_node_names', undef))
+    } else {
+      $oslomsg_rpc_hosts_real = $oslomsg_rpc_hosts
+    }
     include ::nova::config
     include ::nova::logging
     class { '::nova::cache':
@@ -127,7 +132,7 @@ class tripleo::profile::base::nova (
     class { '::nova':
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
-        'hosts'     => $oslomsg_rpc_hosts,
+        'hosts'     => $oslomsg_rpc_hosts_real,
         'port'      => $oslomsg_rpc_port,
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,

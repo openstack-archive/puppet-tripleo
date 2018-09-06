@@ -133,10 +133,16 @@ class tripleo::profile::base::neutron (
     elsif $dhcp_agent_count > 0 {
       $dhcp_agents_per_net = $dhcp_agent_count
     }
+    if hiera('nova_is_additional_cell', undef) {
+      $oslomsg_rpc_hosts_real = delete($oslomsg_rpc_hosts, any2array(hiera('oslo_messaging_rpc_cell_node_names', undef)))
+    } else {
+      $oslomsg_rpc_hosts_real = $oslomsg_rpc_hosts
+    }
+
     class { '::neutron' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
-        'hosts'     => $oslomsg_rpc_hosts,
+        'hosts'     => $oslomsg_rpc_hosts_real,
         'port'      => $oslomsg_rpc_port,
         'username'  => $oslomsg_rpc_username,
         'password'  => $oslomsg_rpc_password,

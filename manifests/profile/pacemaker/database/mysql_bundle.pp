@@ -149,7 +149,12 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
 
   # FQDN are lowercase in /etc/hosts, so are pacemaker node names
   $galera_node_names_lookup = downcase(hiera('mysql_short_node_names', $::hostname))
-  $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names', $::hostname))
+  # is this an additional nova cell?
+  if hiera('nova_is_additional_cell', undef) {
+    $galera_fqdns_names_lookup = downcase(hiera('mysql_cell_node_names', $::hostname))
+  } else {
+    $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names', $::hostname))
+  }
 
   if is_array($galera_node_names_lookup) {
     $galera_nodes = join($galera_fqdns_names_lookup, ',')
