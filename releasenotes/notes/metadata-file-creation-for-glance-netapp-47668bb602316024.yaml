@@ -1,0 +1,4 @@
+---
+features:
+  - Add support for configuring the metadata file used by
+    Glance Netapp NFS backend.
