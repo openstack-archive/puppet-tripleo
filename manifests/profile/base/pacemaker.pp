@@ -156,6 +156,7 @@ class tripleo::profile::base::pacemaker (
         disable => !$enable_fencing,
         tries   => $pcs_tries,
       }
+      Class['pacemaker::stonith'] -> Exec<|tag == 'pacemaker-scaleup'|>
     }
     if $enable_fencing {
       include ::tripleo::fencing
