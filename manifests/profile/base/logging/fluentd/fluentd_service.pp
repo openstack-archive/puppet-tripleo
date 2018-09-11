@@ -38,10 +38,10 @@ define tripleo::profile::base::logging::fluentd::fluentd_service (
           $values.filter|$index,$value|
             {$index == 'path'}.reduce({})|$memo,$x| {$memo + {'path' => regsubst($x[1], $fluentd_transform[0], $fluentd_transform[1]) } } }
       } else{
-        $new_source = {} + $all
+        $new_source = any2array($all)
       }
     } else {
-      $new_source = {} + $sources
+      $new_source = any2array($sources)
     }
 
     ::fluentd::config { "100-openstack-${title}.conf":
