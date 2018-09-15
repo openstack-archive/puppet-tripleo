@@ -148,6 +148,11 @@ class tripleo::profile::base::pacemaker (
         target => '/usr/lib/systemd/system/docker.service',
         before => Class['pacemaker'],
       }
+      -> systemd::unit_file { 'rhel-push-plugin.service':
+        path   => '/etc/systemd/system/resource-agents-deps.target.wants',
+        target => '/usr/lib/systemd/system/rhel-push-plugin.service',
+        before => Class['pacemaker'],
+      }
       ~> Class['systemd::systemctl::daemon_reload']
     }
 
