@@ -56,6 +56,11 @@ class tripleo::profile::base::pacemaker_remote (
       target => '/usr/lib/systemd/system/docker.service',
       before => Class['pacemaker::remote'],
     }
+    -> systemd::unit_file { 'rhel-push-plugin.service':
+      path   => '/etc/systemd/system/resource-agents-deps.target.wants',
+      target => '/usr/lib/systemd/system/rhel-push-plugin.service',
+      before => Class['pacemaker::remote'],
+    }
     ~> Class['systemd::systemctl::daemon_reload']
   }
   $enable_fencing_real = str2bool($enable_fencing) and $step >= 5
