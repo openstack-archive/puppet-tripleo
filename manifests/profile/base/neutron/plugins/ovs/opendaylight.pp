@@ -56,7 +56,7 @@
 #
 # [*tunnel_ip*]
 #   (Optional) IP to use for Tenant VXLAN/GRE tunneling source address
-#   Defaults to hiera('neutron::agents::ml2::ovs::local_ip')
+#   Defaults to hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::tunnel_ip')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -84,7 +84,7 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
   $conn_proto             = 'http',
   $certificate_specs      = {},
   $enable_internal_tls    = hiera('enable_internal_tls', false),
-  $tunnel_ip              = hiera('neutron::agents::ml2::ovs::local_ip'),
+  $tunnel_ip              = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::tunnel_ip'),
   $step                   = Integer(hiera('step')),
   $vhostuser_socket_group = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::vhostuser_socket_group', 'qemu'),
   $vhostuser_socket_user  = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::vhostuser_socket_user', 'qemu'),
