@@ -28,6 +28,12 @@
 #  Options for the balancer member, specified after the server declaration.
 #  These should go in the member's configuration block.
 #
+# [*base_service_name*]
+#  In cases where the service name doesn't match the endpoint name, you can
+#  specify this option in order to get an appropriate value for $ip_addresses
+#  and $server_names. So, this will be used in hiera to dervice these, if set.
+#  Defaults to undef
+#
 # [*ip_addresses*]
 #  The ordered list of IPs to be used to contact the balancer member.
 #  Defaults to hiera("${name}_node_ips", undef)
@@ -109,6 +115,7 @@ define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
   $member_options,
+  $base_service_name           = undef,
   $ip_addresses                = hiera("${name}_node_ips", undef),
   $server_names                = hiera("${name}_node_names", undef),
   $public_virtual_ip           = undef,
@@ -127,6 +134,17 @@ define tripleo::haproxy::endpoint (
   $sticky_sessions             = false,
   $session_cookie              = 'STICKYSESSION',
 ) {
+
+  if $base_service_name {
+    $ip_addresses_real = hiera("${base_service_name}_node_ips", undef)
+  } else {
+    $ip_addresses_real = $ip_addresses
+  }
+  if $base_service_name {
+    $server_names_real = hiera("${base_service_name}_node_names", undef)
+  } else {
+    $server_names_real = $server_names
+  }
   # Let users override the options on a per-service basis
   $custom_options = hiera("tripleo::haproxy::${name}::options", undef)
   if $public_virtual_ip {
@@ -212,7 +230,7 @@ define tripleo::haproxy::endpoint (
     options          => $_real_options,
   }
   if $sticky_sessions {
-    hash(zip($ip_addresses, $server_names)).each | $ip, $server | {
+    hash(zip($ip_addresses_real, $server_names_real)).each | $ip, $server | {
       # We need to be sure the IP (IPv6) don't have colons
       # which is a reserved character to reference manifests
       $non_colon_ip = regsubst($ip, ':', '-', 'G')
@@ -228,8 +246,8 @@ define tripleo::haproxy::endpoint (
     haproxy::balancermember { "${name}":
       listening_service => $name,
       ports             => $service_port,
-      ipaddresses       => $ip_addresses,
-      server_names      => $server_names,
+      ipaddresses       => $ip_addresses_real,
+      server_names      => $server_names_real,
       options           => $member_options,
     }
   }
