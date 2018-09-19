@@ -67,6 +67,14 @@
 #   one step.
 #   Defaults to hiera('innodb_flush_log_at_trx_commit', '1')
 #
+# [*clustercheck_user*]
+#   (Optional) The name of the clustercheck user.
+#   Defaults to 'clustercheck'
+#
+# [*clustercheck_password*]
+#   (Optional) The password for the clustercheck user.
+#   Defaults to hiera('mysql_clustercheck_password')
+#
 # [*cipher_list*]
 #   (Optional) When enable_internal_tls is true, defines the list of allowed
 #   ciphers for the mysql server and Galera (including SST).
@@ -114,6 +122,8 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $enable_internal_tls            = hiera('enable_internal_tls', false),
   $gmcast_listen_addr             = hiera('mysql_bind_host'),
   $innodb_flush_log_at_trx_commit = hiera('innodb_flush_log_at_trx_commit', '1'),
+  $clustercheck_user              = 'clustercheck',
+  $clustercheck_password          = hiera('mysql_clustercheck_password'),
   $sst_tls_cipher                 = undef,
   $sst_tls_options                = undef,
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
@@ -262,8 +272,8 @@ password=\"${mysql_root_password}\"",
       mode    => '0600',
       owner   => 'root',
       group   => 'root',
-      content => "MYSQL_USERNAME=root\n
-MYSQL_PASSWORD='${mysql_root_password}'\n
+      content => "MYSQL_USERNAME=${clustercheck_user}\n
+MYSQL_PASSWORD='${clustercheck_password}'\n
 MYSQL_HOST=localhost\n",
     }
   }
@@ -411,15 +421,13 @@ MYSQL_HOST=localhost\n",
         environment => ['AVAILABLE_WHEN_READONLY=0'],
         tag         => 'galera_ready'
       }
+      File['/etc/sysconfig/clustercheck'] -> Exec['galera-ready']
 
       # We create databases and users for services at step 2 as well. This ensures
       # Galera is up and ready before those get created
       File['/root/.my.cnf'] -> Mysql_database<||>
       File['/root/.my.cnf'] -> Mysql_user<||>
       File['/root/.my.cnf'] -> Mysql_grant<||>
-      File['/etc/sysconfig/clustercheck'] -> Mysql_database<||>
-      File['/etc/sysconfig/clustercheck'] -> Mysql_user<||>
-      File['/etc/sysconfig/clustercheck'] -> Mysql_grant<||>
       Exec['galera-ready'] -> Mysql_database<||>
       Exec['galera-ready'] -> Mysql_user<||>
       Exec['galera-ready'] -> Mysql_grant<||>
