@@ -121,5 +121,6 @@ class tripleo::profile::base::sahara (
       }),
     }
     include ::sahara::keystone::authtoken
+    include ::sahara::config
   }
 }
