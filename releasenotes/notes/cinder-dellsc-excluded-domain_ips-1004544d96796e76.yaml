@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    The following hieradata updates for cinder dell sc to be done.
+    cinder::backend::dellsc::excluded_domain_ip to be deprecated, use
+    comma separated cinder::backend::netapp::excluded_domain_ips instead.
