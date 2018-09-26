@@ -67,7 +67,7 @@ class tripleo::fencing(
 
   $all_devices = $config['devices']
 
-  if $::uuid != 'docker' {
+  if $::uuid != 'docker' and $::deployment_type != 'containers' {
     $xvm_devices = local_fence_devices('fence_xvm', $all_devices)
     create_resources('pacemaker::stonith::fence_xvm', $xvm_devices, $common_params)
   }

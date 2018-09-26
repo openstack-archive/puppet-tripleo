@@ -82,7 +82,7 @@ class tripleo::profile::base::database::mysql::client (
     # present in the base image but installed as a package afterwards),
     # create it. We do not want to touch the permissions in case it already
     # exists due to the mariadb server package being pre-installed
-    if $::uuid == 'docker' {
+    if $::uuid == 'docker' or $::deployment_type == 'containers' {
       # When generating configuration with docker-puppet, services do
       # not include any profile that would ensure creation of /etc/my.cnf.d,
       # so we enforce the check here.
