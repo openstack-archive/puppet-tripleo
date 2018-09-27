@@ -23,7 +23,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('mongodb_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -36,7 +36,7 @@
 #
 class tripleo::profile::base::database::mongodb (
   $mongodb_replset,
-  $bootstrap_node = downcase(hiera('bootstrap_nodeid')),
+  $bootstrap_node = downcase(hiera('mongodb_short_bootstrap_node_name')),
   $step           = Integer(hiera('step')),
   $memory_limit   = '20G',
 ) {

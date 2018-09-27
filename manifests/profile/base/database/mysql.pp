@@ -24,7 +24,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('mysql_short_bootstrap_node_name')
 #
 # [*certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate
@@ -94,7 +94,7 @@
 #
 class tripleo::profile::base::database::mysql (
   $bind_address                  = $::hostname,
-  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node                = hiera('mysql_short_bootstrap_node_name', undef),
   $certificate_specs             = {},
   $cipher_list                   = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1',
   $enable_internal_tls           = hiera('enable_internal_tls', false),
