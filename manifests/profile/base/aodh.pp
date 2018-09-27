@@ -25,7 +25,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('aodh_api_bootstrap_node_name')
 #
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
@@ -77,7 +77,7 @@
 
 class tripleo::profile::base::aodh (
   $step                    = Integer(hiera('step')),
-  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node          = hiera('aodh_api_bootstrap_node_name', undef),
   $oslomsg_rpc_proto       = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
   $oslomsg_rpc_password    = hiera('oslo_messaging_rpc_password'),

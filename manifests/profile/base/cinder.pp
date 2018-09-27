@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('cinder_api_short_bootstrap_node_name')
 #
 # [*cinder_enable_db_purge*]
 #   (Optional) Wheter to enable db purging
@@ -79,7 +79,7 @@
 #   Defaults to hiera('oslo_messaging_notify_use_ssl', '0')
 
 class tripleo::profile::base::cinder (
-  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node          = hiera('cinder_api_short_bootstrap_node_name', undef),
   $cinder_enable_db_purge  = true,
   $step                    = Integer(hiera('step')),
   $oslomsg_rpc_proto       = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
