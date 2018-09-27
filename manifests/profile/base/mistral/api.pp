@@ -45,7 +45,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('mistral_api_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -53,7 +53,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::mistral::api (
-  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node                = hiera('mistral_api_short_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $mistral_api_network           = hiera('mistral_api_network', undef),

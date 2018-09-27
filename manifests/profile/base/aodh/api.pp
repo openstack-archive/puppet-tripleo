@@ -25,7 +25,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('aodh_api_bootstrap_node_name')
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -51,7 +51,7 @@
 
 class tripleo::profile::base::aodh::api (
   $aodh_network                  = hiera('aodh_api_network', undef),
-  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node                = hiera('aodh_api_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $step                          = Integer(hiera('step')),

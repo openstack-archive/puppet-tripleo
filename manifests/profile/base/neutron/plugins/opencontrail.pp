@@ -18,7 +18,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('contrail_neutron_plugin_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -26,7 +26,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::plugins::opencontrail (
-  $bootstrap_node = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node = hiera('contrail_neutron_plugin_short_bootstrap_node_name', undef),
   $step           = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {

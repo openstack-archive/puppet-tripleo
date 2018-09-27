@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to downcase(hiera('bootstrap_nodeid'))
+#   Defaults to downcase(hiera('heat_engine_short_bootstrap_node_name'))
 #
 # [*manage_db_purge*]
 #   (Optional) Whether keystone token flushing should be enabled
@@ -76,7 +76,7 @@
 #   Defaults to hiera('heat::rabbit_use_ssl', '0')
 
 class tripleo::profile::base::heat (
-  $bootstrap_node          = downcase(hiera('bootstrap_nodeid')),
+  $bootstrap_node          = downcase(hiera('heat_engine_short_bootstrap_node_name')),
   $manage_db_purge         = hiera('heat_enable_db_purge', true),
   $step                    = Integer(hiera('step')),
   $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),

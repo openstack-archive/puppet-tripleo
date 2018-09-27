@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('nova_api_short_bootstrap_node_name')
 #
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
@@ -75,7 +75,7 @@
 #   Defaults to hiera('memcached_node_ips')
 
 class tripleo::profile::base::nova (
-  $bootstrap_node          = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node          = hiera('nova_api_short_bootstrap_node_name', undef),
   $oslomsg_rpc_proto       = hiera('messaging_rpc_service_name', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('rabbitmq_node_names', undef)),
   $oslomsg_rpc_password    = hiera('nova::rabbit_password'),

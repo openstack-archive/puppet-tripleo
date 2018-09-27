@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('ironic_api_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step of the deployment
@@ -51,7 +51,7 @@
 #   Defaults to hiera('ironic::rabbit_use_ssl', '0')
 
 class tripleo::profile::base::ironic (
-  $bootstrap_node       = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node       = hiera('ironic_api_short_bootstrap_node_name', undef),
   $step                 = Integer(hiera('step')),
   $oslomsg_rpc_proto    = hiera('messaging_rpc_service_name', 'rabbit'),
   $oslomsg_rpc_hosts    = any2array(hiera('rabbitmq_node_names', undef)),

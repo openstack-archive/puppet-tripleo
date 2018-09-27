@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('swift_proxy_short_bootstrap_node_name')
 #
 # [*ceilometer_enabled*]
 #   Whether the ceilometer pipeline is enabled.
@@ -100,7 +100,7 @@
 #   defaults to 8080
 #
 class tripleo::profile::base::swift::proxy (
-  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node                = hiera('swift_proxy_short_bootstrap_node_name', undef),
   $ceilometer_enabled            = true,
   $ceilometer_messaging_driver   = hiera('messaging_notify_service_name', 'rabbit'),
   $ceilometer_messaging_hosts    = any2array(hiera('rabbitmq_node_names', undef)),

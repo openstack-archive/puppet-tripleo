@@ -18,9 +18,9 @@
 #
 # === Parameters
 #
-# [*bootstrap_nodeid*]
+# [*redis_short_bootstrap_node_name*]
 #   (Optional) Hostname of Redis master
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('redis_short_bootstrap_node_name')
 #
 # [*certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -67,7 +67,7 @@
 #   defaults to 6379
 #
 class tripleo::profile::base::database::redis (
-  $bootstrap_nodeid    = hiera('bootstrap_nodeid'),
+  $redis_short_bootstrap_node_name    = hiera('redis_short_bootstrap_node_name'),
   $certificate_specs  = hiera('redis_certificate_specs', {}),
   $enable_internal_tls = hiera('enable_internal_tls', false),
   $redis_network       = hiera('redis_network', undef),
@@ -102,10 +102,10 @@ class tripleo::profile::base::database::redis (
         notify       => Class['::redis'],
       }
     }
-    if downcase($bootstrap_nodeid) == $::hostname {
+    if downcase($redis_short_bootstrap_node_name) == $::hostname {
       $slaveof = undef
     } else {
-      $slaveof = "${bootstrap_nodeid} 6379"
+      $slaveof = "${redis_short_bootstrap_node_name} 6379"
     }
     class { '::redis' :
       slaveof => $slaveof,

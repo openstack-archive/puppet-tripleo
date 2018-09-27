@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('neutron_plugin_ml2_short_bootstrap_node_name')
 #
 # [*mechanism_drivers*]
 #   (Optional) The mechanism drivers to use with the Ml2 plugin
@@ -39,7 +39,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::plugins::ml2 (
-  $bootstrap_node    = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node    = hiera('neutron_plugin_ml2_short_bootstrap_node_name', undef),
   $mechanism_drivers = hiera('neutron::plugins::ml2::mechanism_drivers'),
   $service_names     = hiera('service_names'),
   $step              = Integer(hiera('step')),

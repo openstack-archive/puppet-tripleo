@@ -25,11 +25,11 @@
 #
 # [*pacemaker_master*]
 #   (Optional) The hostname of the pacemaker master
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('neutron_lbaas_api_short_bootstrap_node_name')
 #
 class tripleo::profile::pacemaker::neutron::lbaas (
   $step             = Integer(hiera('step')),
-  $pacemaker_master = hiera('bootstrap_nodeid'),
+  $pacemaker_master = hiera('neutron_lbaas_api_short_bootstrap_node_name'),
 ) {
 
   include ::neutron::params
