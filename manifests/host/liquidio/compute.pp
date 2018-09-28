@@ -1,4 +1,4 @@
-# == Class: tripleo::network::cavium::liquidio
+# == Class: tripleo::host::liquidio::compute
 #
 # LiquidioCompute node Configuration
 #
@@ -15,6 +15,10 @@
 # [*tenant_subnet*]
 #   (required) Tenant network's ip of the compute node
 #   Defaults to  hiera('tenant')
+#
+# [*tenant_network_type*]
+#   (required) Type of tenant networks to be configured
+#   Defaults to hiera('neutron::plugins::ml2::tenant_network_types')
 #
 # [*vf_nums*]
 #   (required) Number of VFs to be created on the node
@@ -44,56 +48,53 @@
 # [*controller_virtual_ip*]
 #   (required) used by Liquidio service to communicate with Controller
 #   Defaults to hiera('controller_virtual_ip')
+#
+# [*pci_passthrough*]
+#   (required) used by Liquidio service 
+#   Defaults to hiera('nova::compute::pci::passthrough')
 
-class tripleo::network::cavium::liquidio (
+class tripleo::host::liquidio::compute (
   $vf_nums,
   $configure_mode,
   $bonding_options,
   $enable_bonding,
   $provider_mappings,
-  $step                  = Integer(hiera('step')),
   $tenant_subnet         = hiera('tenant_subnet'),
+  $step                  = Integer(hiera('step')),
   $opendaylight_api_vip  = hiera('opendaylight_api_vip', undef),
   $ovn_dbs_vip           = hiera('ovn_dbs_vip', undef),
   $controller_virtual_ip = hiera('controller_virtual_ip', undef),
+  $pci_passthrough       = hiera('nova::compute::pci::passthrough', undef),
 ) {
 
-  if $step >= 5 {
+    if $step >= 5 {
+        case $configure_mode {
 
-    $controller_node_ip = $configure_mode ? {
-      'ml2-odl' => $opendaylight_api_vip,
-      'ml2-ovn' => $ovn_dbs_vip,
-      Default   => $controller_virtual_ip,
-    }
+          'ml2-odl': { $controller_node_ip = $opendaylight_api_vip }
+          'ml2-ovn': { $controller_node_ip = $ovn_dbs_vip }
+          default  : { $controller_node_ip = $controller_virtual_ip }
 
-    if !$controller_node_ip {
-      fail("No controller node ip set for mode '${configure_mode}'")
-    }
+        }
 
-    $lioconfig = @("LIOCONFIG"/L)
-    [main]
-    controller_node=${controller_node_ip}
-    tenant_ip=${tenant_subnet}
-    vf_num=${vf_nums}
-    configure_mode=${configure_mode}
-    enable_bonding=${enable_bonding}
-    bonding_options=${bonding_options}
-    provider_mappings=${provider_mappings}
-    status=install-completed
-    | LIOCONFIG
+        if !$controller_node_ip {
+            fail("No controller node ip set for mode '${configure_mode}'")
+        }
 
-    file{ '/etc/liquidio.conf':
-      ensure  => 'present',
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0664',
-      content => $lioconfig
-    }
-
-    service { 'liquidio-compute-service':
-      ensure => running,
-      name   => 'liquidio-compute-service',
-      enable => true,
+        liquidio_config {
+            'main/controller_node':   value => $controller_node_ip;
+            'main/tenant_ip':         value => $tenant_subnet;
+            'main/vf_num':            value => $vf_nums;
+            'main/configure_mode':    value => $configure_mode;
+            'main/enable_bonding':    value => $enable_bonding;
+            'main/bonding_options':   value => $bonding_options;
+            'main/provider_mappings': value => $provider_mappings;
+            'main/pci_passthrough':   value => $pci_passthrough;
+            'main/status':            value => 'install-completed';
+        }
+        service { 'liquidio-compute-service':
+          ensure => running,
+          name   => 'liquidio-compute-service',
+          enable => true,
+        }
     }
   }
-}
