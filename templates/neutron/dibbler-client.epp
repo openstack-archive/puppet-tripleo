@@ -1,7 +1,14 @@
-<%- | String $image_name = '', String $bind_socket = '' | -%>
+<%- | String  $image_name    = '',
+      String  $bind_socket   = '',
+      Boolean $debug,
+      String  $container_cli = ''
+| -%>
 #!/bin/bash
+<%- if $debug { -%>set -x<%- } -%>
 
+<%- if $bind_socket { -%>
 export DOCKER_HOST="<%=$bind_socket%>"
+<%- } -%>
 # we want to "eat" the "start" command given by neutron and run
 # this in the foreground.
 shift
@@ -15,19 +22,39 @@ ARGS="$@"
 #   --dhcp-hostsfile=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/host ...
 NETNS=$(ip netns identify)
 NAME=neutron-dibbler-${NETNS}
+<%- if $container_cli == 'docker' { -%>
+CLI='docker'
+CMD="ip netns exec ${NETNS} /usr/sbin/dibbler-client run"
+<%- } elsif $container_cli == 'podman' { -%>
+CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
+CMD='/usr/sbin/dibbler-client run'
+<%- } else { -%>
+CLI='echo noop'
+CMD='echo noop'
+<%- } -%>
+LIST=$($CLI ps -a --filter name=neutron-dibbler- --format '{{.ID}}:{{.Names}}:{{.Status}}' | awk '{print $1}')
 
-docker stop $NAME || true
-docker rm -f $NAME || true
+# Find orphaned containers left for dead after its main process terminated by neutron parent process
+ORPHANTS=$(printf "%s\n" "${LIST}" | grep ":Exited")
+if [ -n "${ORPHANTS}" ]; then
+    for orphant in $(printf "%s\n" "${ORPHANTS}" | awk -F':' '{print $1}'); do
+        echo "Removing orphaned container ${orphant}"
+        $CLI stop ${orphant} || true
+        $CLI rm -f ${orphant} || true
+    done
+fi
 
-docker run --detach \
+# If the NAME is already taken by a container, give it an unique name
+printf "%s\n" "${LIST}" | grep -q "${NAME}$" && NAME="${NAME}-$(date +%Y-%m-%d-%H%M%S-%N)"
+echo "Starting a new child container ${NAME}"
+$CLI run --detach \
      -v /var/lib/config-data/puppet-generated/neutron/etc/neutron:/etc/neutron:ro \
-     -v /run/netns:/run/netns:shared \
-     -v /var/lib/neutron:/var/lib/neutron \
+     -v /run/netns:/run/netns:z,shared \
+     -v /var/lib/neutron:/var/lib/neutron:z,shared \
      --net host \
      --pid host \
      --privileged \
-     --rm=true \
      -u root \
      --name $NAME \
      <%=$image_name%> \
-     ip netns exec ${NETNS} /usr/sbin/dibbler-client run $ARGS
+     $CMD $ARGS

@@ -86,6 +86,12 @@
 #   (Optional) Indicate whether Designate is available in the deployment.
 #   Defaults to hiera('designate_api_enabled') or false
 #
+# [*container_cli*]
+#   (Optional) A container CLI to be used with the wrapper
+#   tooling to manage containers controled by Neutron/OVN
+#   l3/dhcp/metadata agents. Accepts either 'podman' or 'docker'.
+#   Defaults to hiera('container_cli') or 'docker'.
+#
 
 class tripleo::profile::base::neutron (
   $step                    = Integer(hiera('step')),
@@ -104,8 +110,16 @@ class tripleo::profile::base::neutron (
   $dhcp_agents_per_network = undef,
   $dhcp_nodes              = hiera('neutron_dhcp_short_node_names', []),
   $designate_api_enabled   = hiera('designate_api_enabled', false),
+  $container_cli           = hiera('container_cli', 'docker'),
 ) {
   if $step >= 3 {
+    # NOTE(bogdando) validate_* is deprecated and we do not want to use it here
+    if !($container_cli in ['docker', 'podman']) {
+      fail("container_cli ($container_cli) is not supported!")
+    }
+    if $container_cli == 'docker' {
+      warning("Docker runtime is deprecated. Consider switching container_cli to podman")
+    }
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
     $dhcp_agent_count = size($dhcp_nodes)

@@ -27,17 +27,27 @@
 # [*bind_socket*]
 #   Socket for accessing the docker daemon.
 #
+# [*debug*]
+#   Enable debug messages for the wrapper script.
+#
+# [*container_cli*]
+#   Host containers runtime system to use.
+#
 define tripleo::profile::base::neutron::wrappers::keepalived (
   $keepalived_process_wrapper,
   $keepalived_image,
-  $bind_socket,
+  $bind_socket = undef,
+  Boolean $debug,
+  $container_cli,
 ) {
     file { $keepalived_process_wrapper:
-      ensure  => file,
-      mode    => '0755',
-      content => epp('tripleo/neutron/keepalived.epp', {
-          'image_name'  => $keepalived_image,
-          'bind_socket' => $bind_socket,
+      ensure              => file,
+      mode                => '0755',
+      content             => epp('tripleo/neutron/keepalived.epp', {
+          'image_name'    => $keepalived_image,
+          'bind_socket'   => $bind_socket,
+          'debug'         => $debug,
+          'container_cli' => $container_cli,
         })
     }
 }

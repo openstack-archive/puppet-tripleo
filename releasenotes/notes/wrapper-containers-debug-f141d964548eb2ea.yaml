@@ -1,0 +1,17 @@
+---
+features:
+  - |
+    Neutron L3/DHCP and OVN metadata agent wrapper classes are given the
+    ``debug`` and ``container_cli`` parameters. The latter allows 'docker'
+    (deprecated) and 'podman' for Neutron L3/dhcp and OVN metadata rootwrap
+    containers managed by agents.  When ``debug`` enabled, the wrapper
+    containers start writing extended outputs to its stdout, which also may be
+    shown via the ``podman logs`` CLI.
+fixes:
+  - |
+    Neutron/OVN rootwrap containers are managed by agents and will no longer
+    be deleted, when the parent container restarts.
+deprecations:
+  - |
+    Parameter ``bind_sockets`` is deprecated. No sockets are expected to bind
+    mount for podman. So it only works for the docker runtime.
