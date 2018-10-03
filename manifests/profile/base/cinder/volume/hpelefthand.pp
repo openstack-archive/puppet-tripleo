@@ -22,6 +22,10 @@
 #   (Optional) Name given to the Cinder backend stanza
 #   Defaults to 'tripleo_hpelefthand'
 #
+# [*backend_availability_zone*]
+#   (Optional) Availability zone for this volume backend
+#   Defaults to hiera('cinder::backend::hpelefthand_iscsi::backend_availability_zone', undef)
+#
 # [*cinder_hpelefthand_api_url*]
 #   (required) url for api access to lefthand - example https://10.x.x.x:8080/api/v1
 #
@@ -47,6 +51,7 @@
 #
 class tripleo::profile::base::cinder::volume::hpelefthand (
   $backend_name                          = hiera('cinder::backend::hpelefthand_iscsi::volume_backend_name', 'tripleo_hpelefthand'),
+  $backend_availability_zone             = hiera('cinder::backend::hpelefthand_iscsi::backend_availability_zone', undef),
   $cinder_hpelefthand_username           = hiera('cinder::backend::hpelefthand_iscsi::hpelefthand_username', undef),
   $cinder_hpelefthand_password           = hiera('cinder::backend::hpelefthand_iscsi::hpelefthand_password', undef),
   $cinder_hpelefthand_clustername        = hiera('cinder::backend::hpelefthand_iscsi::hpelefthand_clustername', undef),
@@ -59,6 +64,7 @@ class tripleo::profile::base::cinder::volume::hpelefthand (
 
   if $step >= 4 {
     cinder::backend::hpelefthand_iscsi { $backend_name :
+      backend_availability_zone      => $backend_availability_zone,
       hpelefthand_username           => $cinder_hpelefthand_username,
       hpelefthand_password           => $cinder_hpelefthand_password,
       hpelefthand_clustername        => $cinder_hpelefthand_clustername,

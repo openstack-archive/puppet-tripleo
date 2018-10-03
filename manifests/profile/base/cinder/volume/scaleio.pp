@@ -35,6 +35,7 @@ class tripleo::profile::base::cinder::volume::scaleio (
 
   if $step >= 4 {
     cinder::backend::scaleio { $backend_name :
+      backend_availability_zone        => hiera('cinder::backend::scaleio::backend_availability_zone', undef),
       sio_login                        => hiera('cinder::backend::scaleio::sio_login', undef),
       sio_password                     => hiera('cinder::backend::scaleio::sio_password', undef),
       sio_server_hostname              => hiera('cinder::backend::scaleio::sio_server_hostname', undef),

@@ -35,7 +35,8 @@ class tripleo::profile::base::cinder::volume::dellemc_vmax_iscsi (
 
   if $step >= 4 {
     cinder::backend::dellemc_vmax_iscsi { $backend_name :
-      cinder_emc_config_file   => hiera('cinder::backend::dellemc_vmax_iscsi::cinder_emc_config_file', undef),
+      backend_availability_zone => hiera('cinder::backend::dellemc_vmax_iscsi::backend_availability_zone', undef),
+      cinder_emc_config_file    => hiera('cinder::backend::dellemc_vmax_iscsi::cinder_emc_config_file', undef),
     }
   }
 

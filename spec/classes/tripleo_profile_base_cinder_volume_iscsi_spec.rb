@@ -56,16 +56,21 @@ describe 'tripleo::profile::base::cinder::volume::iscsi' do
         end
       end
 
-      context 'with ipv6 address' do
+      context 'with customizations' do
         before :each do
-          params.merge!({ :cinder_iscsi_address => 'fe80::fc54:ff:fe9e:7846' })
+          params.merge!(
+            {
+              :backend_availability_zone => 'my_zone',
+              :cinder_iscsi_address      => 'fe80::fc54:ff:fe9e:7846',
+            })
         end
         it 'should trigger complete configuration' do
           is_expected.to contain_class('cinder::setup_test_volume').with(
             :size => '10280M'
           )
           is_expected.to contain_cinder__backend__iscsi('tripleo_iscsi').with(
-            :iscsi_ip_address => '[fe80::fc54:ff:fe9e:7846]'
+            :backend_availability_zone => 'my_zone',
+            :iscsi_ip_address          => '[fe80::fc54:ff:fe9e:7846]',
           )
         end
       end

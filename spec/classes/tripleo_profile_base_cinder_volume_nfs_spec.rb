@@ -52,6 +52,20 @@ describe 'tripleo::profile::base::cinder::volume::nfs' do
         end
       end
 
+      context 'with customizations' do
+        before :each do
+          params.merge!(
+            {
+              :backend_availability_zone => 'my_zone',
+            })
+        end
+        it 'should trigger complete configuration' do
+          is_expected.to contain_cinder__backend__nfs('tripleo_nfs').with(
+            :backend_availability_zone => 'my_zone',
+          )
+        end
+      end
+
       context 'with selinux' do
         before :each do
           facts.merge!({ :selinux => 'true' })

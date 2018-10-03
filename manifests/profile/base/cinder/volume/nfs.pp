@@ -25,6 +25,10 @@
 #   (Optional) Name given to the Cinder backend stanza
 #   Defaults to 'tripleo_nfs'
 #
+# [*backend_availability_zone*]
+#   (Optional) Availability zone for this volume backend
+#   Defaults to  hiera('cinder::backend::nfs::backend_availability_zone', undef)
+#
 # [*cinder_nfs_mount_options*]
 #   (Optional) List of mount options for the NFS share
 #   Defaults to ''
@@ -54,6 +58,7 @@
 class tripleo::profile::base::cinder::volume::nfs (
   $cinder_nfs_servers,
   $backend_name                       = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs'),
+  $backend_availability_zone          = hiera('cinder::backend::nfs::backend_availability_zone', undef),
   $cinder_nfs_mount_options           = '',
   $cinder_nas_secure_file_operations  = $::os_service_default,
   $cinder_nas_secure_file_permissions = $::os_service_default,
@@ -64,6 +69,7 @@ class tripleo::profile::base::cinder::volume::nfs (
   if $step >= 4 {
     package {'nfs-utils': }
     -> cinder::backend::nfs { $backend_name :
+      backend_availability_zone   => $backend_availability_zone,
       nfs_servers                 => $cinder_nfs_servers,
       nfs_mount_options           => $cinder_nfs_mount_options,
       nfs_shares_config           => '/etc/cinder/shares-nfs.conf',

@@ -46,7 +46,29 @@ describe 'tripleo::profile::base::cinder::volume::nvmeof' do
         end
       end
 
+      context 'with customizations' do
+        before :each do
+          params.merge!(
+            {
+              :backend_availability_zone => 'my_zone',
+            })
+        end
+        it 'should trigger complete configuration' do
+          is_expected.to contain_cinder__backend__nvmeof('tripleo_nvmeof').with(
+            :backend_availability_zone => 'my_zone',
+          )
+        end
+      end
     end
   end
 
+  on_supported_os.each do |os, facts|
+    context "on #{os}" do
+      let(:facts) do
+        facts.merge({ :hostname => 'node.example.com' })
+      end
+
+      it_behaves_like 'tripleo::profile::base::cinder::volume::nvmeof'
+    end
+  end
 end

@@ -38,6 +38,7 @@ class tripleo::profile::base::cinder::volume::veritas_hyperscale (
 
   if $step >= 4 {
     cinder::backend::veritas_hyperscale { $backend_name :
+      backend_availability_zone => hiera('cinder::backend::veritas_hyperscale::backend_availability_zone', undef)
     }
   }
 
