@@ -50,6 +50,10 @@
 #  [*user*]
 #    (optional) Defaults to 'root'. Configures cron job for logrotate.
 #
+#  [*copytruncate*]
+#    (optional) Defaults to True.
+#    Configures the logrotate copytruncate parameter.
+#
 #  [*delaycompress*]
 #    (optional) Defaults to True.
 #    Configures the logrotate delaycompress parameter.
@@ -91,6 +95,7 @@ class tripleo::profile::base::logging::logrotate (
   $weekday          = '*',
   Integer $maxdelay = 90,
   $user             = 'root',
+  $copytruncate     = true,
   $delaycompress    = true,
   $compress         = true,
   $rotation         = 'daily',
