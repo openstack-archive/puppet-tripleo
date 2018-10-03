@@ -26,5 +26,10 @@ class tripleo::profile::base::time::ntp {
     enable => false,
     before => Class['ntp']
   }
+  service { 'chrony-wait':
+    ensure => stopped,
+    enable => false,
+    before => Class['ntp']
+  }
   include ::ntp
 }
