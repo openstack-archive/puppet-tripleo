@@ -34,25 +34,32 @@
 #   (Optional) Nova tenant name
 #   Defaults to hiera('nova_os_tenant_name')
 #
+# [*enable_metadata_agent*]
+#   (Optional) Enable metadata agent
+#   Defaults to true
+#
 # [*step*]
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::agents::nuage (
-  $nova_auth_ip        = hiera('keystone_public_api_virtual_ip', ''),
-  $nova_metadata_ip    = hiera('nova_metadata_node_ips', ''),
-  $nova_os_password    = hiera('nova_password', ''),
-  $nova_os_tenant_name = hiera('nova::api::admin_tenant_name', ''),
-  $step                = Integer(hiera('step')),
+  $nova_auth_ip            = hiera('keystone_public_api_virtual_ip', ''),
+  $nova_metadata_ip        = hiera('nova_metadata_node_ips', ''),
+  $nova_os_password        = hiera('nova_password', ''),
+  $nova_os_tenant_name     = hiera('nova::api::admin_tenant_name', ''),
+  $enable_metadata_agent   = true,
+  $step                    = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     include ::nuage::vrs
 
-    class { '::nuage::metadataagent':
-      nova_os_tenant_name => $nova_os_tenant_name,
-      nova_os_password    => $nova_os_password,
-      nova_metadata_ip    => $nova_metadata_ip,
-      nova_auth_ip        => $nova_auth_ip,
+    if $enable_metadata_agent {
+      class { '::nuage::metadataagent':
+        nova_os_tenant_name => $nova_os_tenant_name,
+        nova_os_password    => $nova_os_password,
+        nova_metadata_ip    => $nova_metadata_ip,
+        nova_auth_ip        => $nova_auth_ip,
+      }
     }
   }
 }
