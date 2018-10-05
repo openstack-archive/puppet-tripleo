@@ -1,0 +1,14 @@
+---
+upgrade:
+  - |
+    The tripleo::profile::base::cinder::volume::rbd::cinder_rbd_backend_host
+    default value has changed, and no longer defaults to "hostgroup" when
+    other hiera variables (cinder::backend_host and cinder::host) are
+    undefined. This ensures cinder's RBD backend_host is only set for
+    pacemaker (HA) deployments, when tripleo-heat-templates sets
+    cinder::backend_host to "hostgroup".
+
+    When upgrading an existing non-HA deployment, the old "hostgroup" default
+    value can be preserved by assigning the hiera variable
+    tripleo::profile::base::cinder::volume::rbd::cinder_rbd_backend_host.
+    New non-HA deployments should leave this variable unset.
