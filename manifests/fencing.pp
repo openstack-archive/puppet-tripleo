@@ -67,8 +67,10 @@ class tripleo::fencing(
 
   $all_devices = $config['devices']
 
-  $xvm_devices = local_fence_devices('fence_xvm', $all_devices)
-  create_resources('pacemaker::stonith::fence_xvm', $xvm_devices, $common_params)
+  if $::uuid != 'docker' {
+    $xvm_devices = local_fence_devices('fence_xvm', $all_devices)
+    create_resources('pacemaker::stonith::fence_xvm', $xvm_devices, $common_params)
+  }
 
   $ipmilan_devices = local_fence_devices('fence_ipmilan', $all_devices)
   create_resources('pacemaker::stonith::fence_ipmilan', $ipmilan_devices, $common_params)
