@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Masquerading and forwarding rules are now correctly created when using
+    routed networks.
+    (See `bug: 1797455 <https://bugs.launchpad.net/tripleo/+bug/1797455>`_.)
