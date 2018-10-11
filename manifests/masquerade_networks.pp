@@ -26,16 +26,20 @@ class tripleo::masquerade_networks (
 ){
   if $masquerade_networks {
     $masquerade_networks.each |$source, $destinations| {
+      $destinations.each |$destination| {
+        create_resources('tripleo::firewall::rule', {
+          "137 routed_network return src ${source} dest ${destination}" => {
+            'table'       => 'nat',
+            'source'      => $source,
+            'destination' => $destination,
+            'jump'        => 'RETURN',
+            'chain'       => 'POSTROUTING',
+            'proto'       => 'all',
+            'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
+          },
+        })
+      }
       create_resources('tripleo::firewall::rule', {
-        "137 routed_network return ${source}" => {
-          'table'       => 'nat',
-          'source'      => $source,
-          'destination' => $destinations,
-          'jump'        => 'RETURN',
-          'chain'       => 'POSTROUTING',
-          'proto'       => 'all',
-          'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
-        },
         "138 routed_network masquerade ${source}" => {
           'table'       => 'nat',
           'source'      => $source,
@@ -51,7 +55,7 @@ class tripleo::masquerade_networks (
           'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
         },
         "140 routed_network forward destinations ${source}" => {
-          'destination' => $destinations,
+          'destination' => $source,
           'chain'       => 'FORWARD',
           'proto'       => 'all',
           'state'       => ['ESTABLISHED', 'NEW', 'RELATED'],
