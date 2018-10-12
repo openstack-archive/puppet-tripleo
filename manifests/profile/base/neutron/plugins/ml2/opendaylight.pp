@@ -51,6 +51,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*enable_ipv6*]
+#   (Optional) Whether all IPs are IPv6 address or not.
+#   Defaults to hiera(''enable_ipv6', false)
+#
 class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
   $odl_port            = hiera('opendaylight::odl_rest_port'),
   $odl_username        = hiera('opendaylight::username'),
@@ -60,12 +64,17 @@ class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
   $enable_internal_tls = hiera('enable_internal_tls', false),
   $internal_api_fqdn   = hiera('cloud_name_internal_api'),
   $step                = Integer(hiera('step')),
+  $enable_ipv6         = hiera('enable_ipv6', false),
 ) {
 
   if $step >= 4 {
     if $enable_internal_tls {
       if empty($internal_api_fqdn) { fail('Internal API FQDN is Empty') }
       $odl_url_addr = $internal_api_fqdn
+    } elsif $enable_ipv6 {
+      # NOTE: Works when both tls and v6 are true as fqdn doesnot need [ ] around it, only v6 IP needs
+      # Needs testing with both TLS and v6 enabled.
+      $odl_url_addr = add_brackets($odl_url_ip)
     } else {
       if empty($odl_url_ip) { fail('OpenDaylight API VIP is Empty') }
       $odl_url_addr = $odl_url_ip
