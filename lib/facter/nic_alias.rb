@@ -15,8 +15,13 @@
 
 Facter.add('nic_alias') do
   setcode do
-    mapping_report =
-      Facter::Core::Execution.execute('/usr/bin/os-net-config -i')
-    mapping_report.delete("{}' ")
+    os_net_config = '/usr/bin/os-net-config'
+    mapping_report = ''
+    if File.exist?(os_net_config)
+      mapping_report =
+        Facter::Core::Execution.execute("#{os_net_config} -i")
+      mapping_report.delete("{}' ")
+    end
+    mapping_report
   end
 end
