@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    Logrotate's copytruncate is used by default for containerized services logs
+    rotation.  The default period to keep old logs remains unchanged (14 days).
