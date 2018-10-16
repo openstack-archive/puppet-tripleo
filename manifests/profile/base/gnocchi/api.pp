@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('gnocchi_api_short_bootstrap_node_name')
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -69,7 +69,7 @@
 #   Defaults to hiera('incoming_storage_driver', undef)
 #
 class tripleo::profile::base::gnocchi::api (
-  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node                = hiera('gnocchi_api_short_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $gnocchi_backend               = downcase(hiera('gnocchi_backend', 'swift')),

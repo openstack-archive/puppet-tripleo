@@ -1,0 +1,8 @@
+---
+upgrade:
+  - |
+    All manifests no longer use the bootstrap_nodeid hiera key, since this
+    was generated per role and can result in multiple bootstrap nodes when
+    a service on more than one role. The SERVICE_short_bootstrap_node_name
+    key is used instead, which is automatically generated in tripleo-heat-templates
+    based on the service_name key of the service template role_data.

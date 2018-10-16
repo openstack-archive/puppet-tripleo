@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('swift_proxy_short_bootstrap_node_name')
 #
 # [*ceilometer_enabled*]
 #   Whether the ceilometer pipeline is enabled.
@@ -100,7 +100,7 @@
 #   defaults to 8080
 #
 class tripleo::profile::base::swift::proxy (
-  $bootstrap_node       = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node       = hiera('swift_proxy_short_bootstrap_node_name', undef),
   $ceilometer_enabled   = true,
   $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
   $oslomsg_rpc_hosts    = any2array(hiera('oslo_messaging_rpc_node_names', undef)),

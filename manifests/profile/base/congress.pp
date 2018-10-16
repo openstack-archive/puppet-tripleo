@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('congress_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step of the deployment
@@ -51,7 +51,7 @@
 #   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
 
 class tripleo::profile::base::congress (
-  $bootstrap_node       = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node       = hiera('congress_short_bootstrap_node_name', undef),
   $step                 = Integer(hiera('step')),
   $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
   $oslomsg_rpc_hosts    = any2array(hiera('oslo_messaging_rpc_node_names', undef)),

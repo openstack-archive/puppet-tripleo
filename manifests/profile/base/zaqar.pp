@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('bootstrap_nodeid')
+#   Defaults to hiera('zaqar_api_short_bootstrap_node_name')
 #
 # [*management_store*]
 #   (Optional) The management store for Zaqar.
@@ -65,7 +65,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::zaqar (
-  $bootstrap_node       = hiera('bootstrap_nodeid', undef),
+  $bootstrap_node       = hiera('zaqar_api_short_bootstrap_node_name', undef),
   $management_store     = 'mongodb',
   $messaging_store      = 'mongodb',
   $certificates_specs   = hiera('apache_certificates_specs', {}),
