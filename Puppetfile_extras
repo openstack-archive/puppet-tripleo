@@ -58,9 +58,10 @@ mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
   :ref => 'v3.0.1'
 
+# NOTE(aschultz): Pinned due to LP#1798131
 mod 'snmp',
   :git => 'https://github.com/razorsedge/puppet-snmp',
-  :ref => 'master'
+  :ref => 'df91395cd829134c53d61d6878232aff1b999905'
 
 mod 'pacemaker',
   :git => 'https://github.com/openstack/puppet-pacemaker',
