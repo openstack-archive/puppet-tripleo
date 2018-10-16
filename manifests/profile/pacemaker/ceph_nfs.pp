@@ -77,13 +77,12 @@ class tripleo::profile::pacemaker::ceph_nfs (
         node     => $::hostname,
       }
       pacemaker::resource::ip { 'ganesha_vip':
-        ip_address    => $ganesha_vip,
-        cidr_netmask  => $netmask,
-        nic           => $nic,
-        #ipv6_addrlabel => $ipv6_addrlabel,
-        #ipv6_addrlabel => '',
-        tries         => $pcs_tries,
-        location_rule => {
+        ip_address     => $ganesha_vip,
+        cidr_netmask   => $netmask,
+        nic            => $nic,
+        ipv6_addrlabel => $ipv6_addrlabel,
+        tries          => $pcs_tries,
+        location_rule  => {
           resource_discovery => 'exclusive',
           score              => 0,
           expression         => ['ceph-nfs-role eq true'],
