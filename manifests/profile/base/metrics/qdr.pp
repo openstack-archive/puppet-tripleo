@@ -76,8 +76,16 @@
 #   from the router. Each hash should contain 'host', 'role' and 'port' key.
 #   Defaults to []
 #
+# [*ssl_profiles*]
+#   (optional) List of hashes containing configuration for ssl profiles
+#   Defaults to []
+#
 # [*addresses*]
 #   (optional) List of hashes containing configuration for addresses.
+#   Defaults to []
+#
+# [*autolink_addresses*]
+#   (optional) List of hashes containing configuration for autoLinks
 #   Defaults to []
 #
 # [*step*]
@@ -100,7 +108,9 @@ class tripleo::profile::base::metrics::qdr (
   $listener_ssl_password    = undef,
   $listener_trusted_certs   = undef,
   $connectors               = [],
+  $ssl_profiles             = [],
   $addresses                = [],
+  $autolink_addresses       = [],
   $step                     = Integer(hiera('step')),
 ) {
   if $step >= 1 {
@@ -121,7 +131,9 @@ class tripleo::profile::base::metrics::qdr (
       #router_mode              => 'edge',
       router_mode              => 'interior',
       connectors               => $connectors,
+      ssl_profiles             => $ssl_profiles,
       extra_addresses          => $addresses,
+      autolink_addresses       => $autolink_addresses,
     }
 
     qdr_user { $username:
