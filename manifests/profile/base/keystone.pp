@@ -290,11 +290,16 @@ class tripleo::profile::base::keystone (
   }
 
   if $step == 3 and $manage_roles {
-    include ::keystone::roles::admin
     if $keystone_enable_member {
       keystone_role { '_member_':
         ensure => present,
       }
+      $admin_roles = ['admin', '_member_']
+    } else {
+      $admin_roles = ['admin']
+    }
+    class { '::keystone::roles::admin':
+      admin_roles => $admin_roles,
     }
   }
 
