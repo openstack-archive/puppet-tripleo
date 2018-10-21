@@ -50,6 +50,7 @@ class tripleo::profile::base::cinder::volume::netapp (
       $netapp_pool_name_search_pattern_fallback = undef
     }
     cinder::backend::netapp { $backend_name :
+      backend_availability_zone       => hiera('cinder::backend::netapp::backend_availability_zone', undef),
       netapp_login                    => hiera('cinder::backend::netapp::netapp_login', undef),
       netapp_password                 => hiera('cinder::backend::netapp::netapp_password', undef),
       netapp_server_hostname          => hiera('cinder::backend::netapp::netapp_server_hostname', undef),

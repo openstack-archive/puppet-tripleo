@@ -35,6 +35,7 @@ class tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi (
 
   if $step >= 4 {
     cinder::backend::dellemc_xtremio_iscsi { $backend_name :
+      backend_availability_zone         => hiera('cinder::backend::dellemc_xtremio_iscsi::backend_availability_zone', undef),
       san_ip                            => hiera('cinder::backend::dellemc_xtremio_iscsi::san_ip', undef),
       san_login                         => hiera('cinder::backend::dellemc_xtremio_iscsi::san_login', undef),
       san_password                      => hiera('cinder::backend::dellemc_xtremio_iscsi::san_password', undef),

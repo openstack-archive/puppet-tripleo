@@ -40,6 +40,7 @@ class tripleo::profile::base::cinder::volume::dellemc_vnx (
                                         undef)))
 
     cinder::backend::emc_vnx { $backend_name :
+      backend_availability_zone     => hiera('cinder::backend::emc_vnx::backend_availability_zone', undef),
       san_ip                        => hiera('cinder::backend::emc_vnx::san_ip', undef),
       san_login                     => hiera('cinder::backend::emc_vnx::san_login', undef),
       san_password                  => hiera('cinder::backend::emc_vnx::san_password', undef),
@@ -51,7 +52,6 @@ class tripleo::profile::base::cinder::volume::dellemc_vnx (
       storage_vnx_auth_type         => hiera('cinder::backend::emc_vnx::storage_vnx_auth_type', undef),
       storage_vnx_security_file_dir => hiera('cinder::backend::emc_vnx::storage_vnx_security_file_dir', undef),
       naviseccli_path               => hiera('cinder::backend::emc_vnx::naviseccli_path', undef),
-
     }
   }
 

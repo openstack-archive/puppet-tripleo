@@ -33,6 +33,10 @@
 #   (Optional) Name given to the Cinder backend
 #   Defaults to 'tripleo_nvmeof'
 #
+# [*backend_availability_zone*]
+#   (Optional) Availability zone for this volume backend
+#   Defaults to hiera('cinder::backend::nvmeof::backend_availability_zone', undef)
+#
 # [*volume_driver*]
 #   (Optional) Driver to use for volume creation
 #   Defaults to 'cinder.volume.drivers.lvm.LVMVolumeDriver'
@@ -47,26 +51,28 @@ class tripleo::profile::base::cinder::volume::nvmeof (
   $target_port,
   $target_helper,
   $target_protocol,
-  $target_prefix        = 'nvme-subsystem',
-  $nvmet_port_id        = '1',
-  $nvmet_ns_id          = '10',
-  $volume_backend_name  = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof'),
-  $volume_driver        = 'cinder.volume.drivers.lvm.LVMVolumeDriver',
-  $step                 = Integer(hiera('step')),
+  $target_prefix             = 'nvme-subsystem',
+  $nvmet_port_id             = '1',
+  $nvmet_ns_id               = '10',
+  $volume_backend_name       = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof'),
+  $backend_availability_zone = hiera('cinder::backend::nvmeof::backend_availability_zone', undef),
+  $volume_driver             = 'cinder.volume.drivers.lvm.LVMVolumeDriver',
+  $step                      = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::nvmeof { $volume_backend_name :
-      target_ip_address   => normalize_ip_for_uri($target_ip_address),
-      target_port         => $target_port,
-      target_helper       => $target_helper,
-      target_protocol     => $target_protocol,
-      target_prefix       => $target_prefix,
-      nvmet_port_id       => $nvmet_port_id,
-      nvmet_ns_id         => $nvmet_ns_id,
-      volume_backend_name => $volume_backend_name,
-      volume_driver       => $volume_driver,
+      target_ip_address         => normalize_ip_for_uri($target_ip_address),
+      target_port               => $target_port,
+      target_helper             => $target_helper,
+      target_protocol           => $target_protocol,
+      target_prefix             => $target_prefix,
+      nvmet_port_id             => $nvmet_port_id,
+      nvmet_ns_id               => $nvmet_ns_id,
+      volume_backend_name       => $volume_backend_name,
+      backend_availability_zone => $backend_availability_zone,
+      volume_driver             => $volume_driver,
     }
   }
 

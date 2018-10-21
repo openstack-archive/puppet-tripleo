@@ -25,6 +25,10 @@
 #   (Optional) Name given to the Cinder backend stanza
 #   Defaults to 'tripleo_iscsi'
 #
+# [*backend_availability_zone*]
+#   (Optional) Availability zone for this volume backend
+#   Defaults to hiera('cinder::backend::iscsi::backend_availability_zone', undef)
+#
 # [*cinder_iscsi_helper*]
 #   (Optional) The iscsi helper to use
 #   Defaults to 'tgtadm'
@@ -45,6 +49,7 @@
 class tripleo::profile::base::cinder::volume::iscsi (
   $cinder_iscsi_address,
   $backend_name                = hiera('cinder::backend::iscsi::volume_backend_name', 'tripleo_iscsi'),
+  $backend_availability_zone   = hiera('cinder::backend::iscsi::backend_availability_zone', undef),
   $cinder_iscsi_helper         = 'tgtadm',
   $cinder_iscsi_protocol       = 'iscsi',
   $cinder_lvm_loop_device_size = '10280',
@@ -61,9 +66,10 @@ class tripleo::profile::base::cinder::volume::iscsi (
     # key: [ipv6]
     # as it will cause hiera parsing errors
     cinder::backend::iscsi { $backend_name :
-      iscsi_ip_address => normalize_ip_for_uri($cinder_iscsi_address),
-      iscsi_helper     => $cinder_iscsi_helper,
-      iscsi_protocol   => $cinder_iscsi_protocol,
+      backend_availability_zone => $backend_availability_zone,
+      iscsi_ip_address          => normalize_ip_for_uri($cinder_iscsi_address),
+      iscsi_helper              => $cinder_iscsi_helper,
+      iscsi_protocol            => $cinder_iscsi_protocol,
     }
   }
 

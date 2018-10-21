@@ -54,6 +54,7 @@ class tripleo::profile::base::cinder::volume::pure (
 
   if $step >= 4 {
     cinder::backend::pure { $backend_name :
+      backend_availability_zone    => hiera('cinder::backend::pure::backend_availability_zone', undef),
       san_ip                       => hiera('cinder::backend::pure::san_ip', undef),
       pure_api_token               => hiera('cinder::backend::pure::pure_api_token', undef),
       pure_storage_protocol        => hiera('cinder::backend::pure::pure_storage_protocol', undef),
