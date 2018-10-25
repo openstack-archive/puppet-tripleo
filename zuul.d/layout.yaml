@@ -1,13 +1,14 @@
 - project:
     templates:
-      - puppet-openstack-check-jobs
-      - puppet-openstack-module-unit-jobs
       - tripleo-undercloud-jobs
       - tripleo-multinode-baremetal-minimal
       - tripleo-multinode-container-minimal
       - release-notes-jobs
     check:
       jobs:
+        - puppet-openstack-lint
+        - puppet-openstack-syntax-4
+        - puppet-openstack-unit-4.8-centos-7
         - tripleo-ci-centos-7-scenario000-multinode-oooq-container-updates:
             files:
               - ^manifests/haproxy.*$
@@ -78,6 +79,9 @@
     gate:
       queue: tripleo
       jobs:
+        - puppet-openstack-lint
+        - puppet-openstack-syntax-4
+        - puppet-openstack-unit-4.8-centos-7
         - tripleo-ci-centos-7-scenario000-multinode-oooq-container-updates:
             files:
               - ^manifests/haproxy.*$
