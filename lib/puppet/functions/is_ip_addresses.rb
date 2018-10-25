@@ -3,15 +3,19 @@ require 'ipaddr'
 # Custom function to verify if the parameter is a string representing an ip address
 # or an array of strings representing an ip address
 # Returns true if all elements are proper ip addresses and false otherwise
-module Puppet::Parser::Functions
-  newfunction(:is_ip_addresses, :type => :rvalue, :doc => "Verify if a string or an array of strings are all IP addresses.") do |arg|
-    if arg[0].class != String and arg[0].class != Array
-      raise Puppet::ParseError, "Syntax error: #{arg[0]} must be a String or an Array"
+Puppet::Functions.create_function(:is_ip_addresses) do
+  dispatch :is_ip_addresses do
+    param 'Variant[Array, String, Undef]', :ip_addr
+  end
+
+  def is_ip_addresses(ip_addr)
+    if not ip_addr
+      return false
     end
-    if arg[0].class == String
-      ips = [arg[0]]
+    if ip_addr.class == String
+      ips = [ip_addr]
     else
-      ips = arg[0]
+      ips = ip_addr
     end
     ips.each do |ip|
       begin

@@ -21,11 +21,17 @@ describe 'tripleo::keepalived' do
 
   shared_examples_for 'tripleo::keeplived' do
 
+    # needed for puppet 4.x
     before(:each) do
       # mock interface_for_ip function
       Puppet::Parser::Functions.newfunction(:interface_for_ip, :type => :rvalue) do |arg|
         return 'br-foo'
       end
+    end
+
+    # needed for puppet 5.5.7+
+    let (:pre_condition) do
+      'function interface_for_ip($a) { return "br-foo" }'
     end
 
     let :default_params do

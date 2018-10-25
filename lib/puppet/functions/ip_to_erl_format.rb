@@ -5,12 +5,13 @@ require 'ipaddr'
 # For example from "172.17.0.16" to {172,17,0,16}
 # See http://erlang.org/doc/man/kernel_app.html and http://erlang.org/doc/man/inet.html
 # for more information.
-module Puppet::Parser::Functions
-  newfunction(:ip_to_erl_format, :type => :rvalue, :doc => "Convert an IP address to the erlang inet format.") do |arg|
-    if arg[0].class != String
-      raise Puppet::ParseError, "Syntax error: #{arg[0]} must be a String"
-    end
-    ip = IPAddr.new arg[0]
+Puppet::Functions.create_function(:ip_to_erl_format) do
+  dispatch :ip_to_erl_format do
+    param 'String', :ip_addr
+  end
+
+  def ip_to_erl_format(ip_addr)
+    ip = IPAddr.new(ip_addr)
     output = '{'
     if ip.ipv6?
       split_char = ':'
