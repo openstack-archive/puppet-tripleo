@@ -40,12 +40,14 @@ class Puppet::Provider::Noop < Puppet::Provider
 
 end
 
-module Puppet::Parser::Functions
-  newfunction(:noop_resource, :type => :rvalue, :doc => "Create a default noop provider for the specified resource.") do |arg|
-    if arg[0].class == String
-        Puppet::Type.type(arg[0].downcase.to_sym).provide(:noop, :parent => Puppet::Provider::Noop) do
-           defaultfor :osfamily => :redhat
-        end
+Puppet::Functions.create_function(:noop_resource) do
+  dispatch :noop_resource do
+    param 'String', :res
+  end
+
+  def noop_resource(res)
+    Puppet::Type.type(res.downcase.to_sym).provide(:noop, :parent => Puppet::Provider::Noop) do
+      defaultfor :osfamily => :redhat
     end
     return true
   end

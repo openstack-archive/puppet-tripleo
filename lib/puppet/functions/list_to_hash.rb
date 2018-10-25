@@ -18,14 +18,14 @@
 # Puppet parser.
 #
 
-module Puppet::Parser::Functions
-  newfunction(:list_to_hash, :type => :rvalue, :doc => <<-EOS
-    This function returns an hash from a specified array
-    EOS
-  ) do |argv|
-    arr1 = argv[0]
-    arr2 = argv[1]
-    h = arr1.each_with_object({}) { |v,h| h[v] = arr2 }
-    return h
+Puppet::Functions.create_function(:list_to_hash) do
+  dispatch :list_to_hash do
+    param 'Array', :arr1
+    param 'Array', :arr2
+  end
+
+  def list_to_hash(arr1, arr2)
+    hh = arr1.each_with_object({}) { |v,h| h[v] = arr2 }
+    return hh
   end
 end

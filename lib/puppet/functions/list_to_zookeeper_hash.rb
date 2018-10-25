@@ -3,12 +3,12 @@
 # because a not-so-good design of the puppet-midonet module
 # and we hope to deprecate it soon.
 
-module Puppet::Parser::Functions
-  newfunction(:list_to_zookeeper_hash, :type => :rvalue, :doc => <<-EOS
-    This function returns Zookeper configuration list of hash
-    EOS
-  ) do |argv|
-    zk_list = argv[0]
+Puppet::Functions.create_function(:list_to_zookeeper_hash) do
+  dispatch :list_to_zookeeper_hash do
+    param 'Variant[Array, String]', :zk_list
+  end
+
+  def list_to_zookeeper_hash(zk_list)
     if zk_list.class != Array
       zk_list = [zk_list]
     end

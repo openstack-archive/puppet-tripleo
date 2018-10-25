@@ -18,22 +18,14 @@
 #       "options"    => "ro",
 #     }
 #   }
-module Puppet::Parser::Functions
-  newfunction(:docker_volumes_to_storage_maps, :arity => 2, :type => :rvalue,
-              :doc => <<-EOS
-    This function converts an array of docker volumes (SOURCE:TARGET[:OPTIONS])
-    to a pacemaker::resource::bundle storage_map (a hash).
-    EOS
-  ) do |argv|
-    docker_volumes = argv[0]
-    prefix = argv[1]
+Puppet::Functions.create_function(:'docker_volumes_to_storage_maps') do
+  dispatch :docker_volumes_to_storage_maps do
+    param 'Array', :docker_volumes
+    param 'String', :prefix
+    return_type 'Hash'
+  end
 
-    unless docker_volumes.is_a?(Array)
-      raise Puppet::ParseError, "docker_volumes_to_storage_maps: Argument 'docker_volumes' must be an array. The value given was: #{docker_volumes}"
-    end
-    unless prefix.is_a?(String)
-      raise Puppet::ParseError, "docker_volumes_to_storage_maps: Argument 'prefix' must be an string. The value given was: #{prefix}"
-    end
+  def docker_volumes_to_storage_maps(docker_volumes, prefix)
     storage_maps = Hash.new
     docker_volumes.each do |docker_vol|
       source, target, options = docker_vol.split(":")
