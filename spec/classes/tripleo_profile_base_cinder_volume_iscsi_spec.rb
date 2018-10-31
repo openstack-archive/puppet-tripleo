@@ -49,9 +49,9 @@ describe 'tripleo::profile::base::cinder::volume::iscsi' do
             :size => '10280M'
           )
           is_expected.to contain_cinder__backend__iscsi('tripleo_iscsi').with(
-            :iscsi_ip_address => '127.0.0.1',
-            :iscsi_helper     => 'tgtadm',
-            :iscsi_protocol   => 'iscsi'
+            :target_ip_address => '127.0.0.1',
+            :target_helper     => 'tgtadm',
+            :target_protocol   => 'iscsi'
           )
         end
       end
@@ -70,7 +70,7 @@ describe 'tripleo::profile::base::cinder::volume::iscsi' do
           )
           is_expected.to contain_cinder__backend__iscsi('tripleo_iscsi').with(
             :backend_availability_zone => 'my_zone',
-            :iscsi_ip_address          => '[fe80::fc54:ff:fe9e:7846]',
+            :target_ip_address         => '[fe80::fc54:ff:fe9e:7846]',
           )
         end
       end

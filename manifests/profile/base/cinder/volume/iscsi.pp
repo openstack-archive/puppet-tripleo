@@ -67,9 +67,9 @@ class tripleo::profile::base::cinder::volume::iscsi (
     # as it will cause hiera parsing errors
     cinder::backend::iscsi { $backend_name :
       backend_availability_zone => $backend_availability_zone,
-      iscsi_ip_address          => normalize_ip_for_uri($cinder_iscsi_address),
-      iscsi_helper              => $cinder_iscsi_helper,
-      iscsi_protocol            => $cinder_iscsi_protocol,
+      target_ip_address         => normalize_ip_for_uri($cinder_iscsi_address),
+      target_helper             => $cinder_iscsi_helper,
+      target_protocol           => $cinder_iscsi_protocol,
     }
   }
 
