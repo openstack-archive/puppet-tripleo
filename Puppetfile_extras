@@ -62,9 +62,11 @@ mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
   :ref => 'v3.0.1'
 
+# NOTE(aschultz): Pine due to LP#1800944
+# Also note, this matches the rdo package pin
 mod 'snmp',
-  :git => 'https://github.com/razorsedge/puppet-snmp',
-  :ref => 'master'
+  :git => 'https://github.com/voxpupuli/puppet-snmp',
+  :ref => '5d73485b9d0c42f8131fc0c761406ac8f0c88152'
 
 mod 'sensu',
   :git => 'https://github.com/sensu/sensu-puppet',
