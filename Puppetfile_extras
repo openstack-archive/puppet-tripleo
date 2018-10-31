@@ -62,9 +62,10 @@ mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
   :ref => 'v3.0.1'
 
+# NOTE(aschultz): Pine due to LP#1800944
 mod 'snmp',
-  :git => 'https://github.com/razorsedge/puppet-snmp',
-  :ref => 'master'
+  :git => 'https://github.com/voxpupuli/puppet-snmp',
+  :ref => '4345049a23cd11e68ac51be13a3a1493a3454370'
 
 mod 'sensu',
   :git => 'https://github.com/sensu/sensu-puppet',
