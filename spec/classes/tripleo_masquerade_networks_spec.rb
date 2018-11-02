@@ -34,10 +34,19 @@ describe 'tripleo::masquerade_networks' do
       end
 
       it 'configure RETURN rule' do
-        is_expected.to contain_firewall('137 routed_network return 192.168.24.0/24 ipv4').with(
+        is_expected.to contain_firewall('137 routed_network return src 192.168.24.0/24 dest 192.168.24.0/24 ipv4').with(
           :table       => 'nat',
           :source      => '192.168.24.0/24',
-          :destination => ['192.168.24.0/24', '192.168.25.0/24'],
+          :destination => '192.168.24.0/24',
+          :jump        => 'RETURN',
+          :chain       => 'POSTROUTING',
+          :proto       => 'all',
+          :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
+        )
+        is_expected.to contain_firewall('137 routed_network return src 192.168.24.0/24 dest 192.168.25.0/24 ipv4').with(
+          :table       => 'nat',
+          :source      => '192.168.24.0/24',
+          :destination => '192.168.25.0/24',
           :jump        => 'RETURN',
           :chain       => 'POSTROUTING',
           :proto       => 'all',
@@ -64,7 +73,7 @@ describe 'tripleo::masquerade_networks' do
           :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
         )
         is_expected.to contain_firewall('140 routed_network forward destinations 192.168.24.0/24 ipv4').with(
-          :destination => ['192.168.24.0/24', '192.168.25.0/24'],
+          :destination => '192.168.24.0/24',
           :chain       => 'FORWARD',
           :proto       => 'all',
           :state       => ['ESTABLISHED', 'NEW', 'RELATED'],
