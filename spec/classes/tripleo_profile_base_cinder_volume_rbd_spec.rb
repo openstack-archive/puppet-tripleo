@@ -41,6 +41,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
       context 'with defaults' do
         it 'should trigger complete configuration' do
           is_expected.to contain_cinder__backend__rbd('tripleo_ceph').with(
+            :backend_host    => 'node.example.com',
             :rbd_ceph_conf   => '/etc/ceph/ceph.conf',
             :rbd_pool        => 'volumes',
             :rbd_user        => 'openstack',
