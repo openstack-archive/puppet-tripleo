@@ -1,7 +1,13 @@
-<%- | String $bind_socket  = '' | -%>
+<%- | String  $bind_socket   = '',
+      Boolean $debug,
+      String  $container_cli = ''
+| -%>
 #!/bin/bash
+<%- if $debug { -%>set -x<%- } -%>
 
+<%- if $bind_socket { -%>
 export DOCKER_HOST="<%=$bind_socket%>"
+<%- } -%>
 ARGS="$@"
 
 # Extract the network namespace UUID from the command line args provided by
@@ -12,12 +18,22 @@ ARGS="$@"
 #   --dhcp-hostsfile=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/host ...
 NETNS=$(ip netns identify)
 NAME=neutron-keepalived-${NETNS}
+<%- if $container_cli == 'docker' { -%>
+CLI='docker'
+CMD="ip netns exec ${NETNS} /usr/bin/neutron-keepalived-state-change"
+<%- } elsif $container_cli == 'podman' { -%>
+CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
+CMD='/usr/bin/neutron-keepalived-state-change'
+<%- } else { -%>
+CLI='echo noop'
+CMD='echo noop'
+<%- } -%>
 
 # The state change daemon only runs as a daemon for the moment so we need to
 # run it within an existing container with a sensibly matching lifetime.  The
 # related keepalived container seems an obvious choice.
 
-container_id=`docker ps --filter name=$NAME --format "{{.ID}}"`
+container_id=$($CLI ps --filter name=$NAME --format "{{.ID}}")
 
 if [[ -z $container_id ]];
 then
@@ -25,8 +41,8 @@ then
     exit 0
 fi
 
-docker exec --detach \
+$CLI exec --detach \
     -u root \
     --privileged \
     $NAME \
-    ip netns exec ${NETNS} /usr/bin/neutron-keepalived-state-change $ARGS
+    $CMD $ARGS
