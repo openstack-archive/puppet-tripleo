@@ -10,6 +10,7 @@
         - puppet-openstack-syntax-4
         - puppet-openstack-unit-4.8-centos-7
         - tripleo-ci-centos-7-scenario001-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/aodh.*$
@@ -22,6 +23,7 @@
               - ^manifests/profile/(base|pacemaker)/monitoring.*$
               - ^manifests/profile/(base|pacemaker)/panko.*$
         - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/aodh.*$
@@ -35,6 +37,7 @@
               - ^manifests/profile/(base|pacemaker)/swift.*$
               - ^manifests/profile/(base|pacemaker)/zaqar.*$
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
@@ -42,11 +45,13 @@
               - ^manifests/profile/(base|pacemaker)/sahara.*$
               - ^manifests/profile/(base|pacemaker)/designate.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/manila.*$
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/profile/pacemaker/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
@@ -69,6 +74,7 @@
         - puppet-openstack-syntax-4
         - puppet-openstack-unit-4.8-centos-7
         - tripleo-ci-centos-7-scenario001-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/aodh.*$
@@ -81,6 +87,7 @@
               - ^manifests/profile/(base|pacemaker)/monitoring.*$
               - ^manifests/profile/(base|pacemaker)/panko.*$
         - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/aodh.*$
@@ -94,6 +101,7 @@
               - ^manifests/profile/(base|pacemaker)/swift.*$
               - ^manifests/profile/(base|pacemaker)/zaqar.*$
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
@@ -101,11 +109,13 @@
               - ^manifests/profile/(base|pacemaker)/sahara.*$
               - ^manifests/profile/(base|pacemaker)/designate.*$
         - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/manila.*$
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
+            voting: true
             files:
               - ^manifests/profile/pacemaker/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
