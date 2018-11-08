@@ -25,6 +25,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to_not contain_class('cinder')
         is_expected.to_not contain_class('cinder::config')
         is_expected.to_not contain_class('cinder::glance')
+        is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -45,6 +46,7 @@ describe 'tripleo::profile::base::cinder' do
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
+        is_expected.to contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end
@@ -59,6 +61,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to_not contain_class('cinder')
         is_expected.to_not contain_class('cinder::config')
         is_expected.to_not contain_class('cinder::glance')
+        is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -79,6 +82,7 @@ describe 'tripleo::profile::base::cinder' do
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
+        is_expected.to contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -98,6 +102,7 @@ describe 'tripleo::profile::base::cinder' do
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
+        is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::cron::db_purge')
       end
     end
@@ -118,6 +123,7 @@ describe 'tripleo::profile::base::cinder' do
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
+        is_expected.to contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end
