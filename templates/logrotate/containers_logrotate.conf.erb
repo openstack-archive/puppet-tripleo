@@ -19,11 +19,4 @@
 <%- if @compress %>
   compress
 <%- end %>
-  sharedscripts
-  postrotate
-    /usr/bin/find /var/log/containers -type f \
-    \( -mtime +<%= @purge_after_days %> -or \
-    -atime +<%= @purge_after_days %> -or \
-    -ctime +<%= @purge_after_days %> \) -exec rm -f {} \;;
-  endscript
 }
