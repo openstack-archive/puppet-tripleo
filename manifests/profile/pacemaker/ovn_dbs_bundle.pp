@@ -52,6 +52,10 @@
 #   The TCP port in which the OVN Southbound DB listens to.
 #   Defaults to 6642
 #
+# [*container_backend*]
+#   (optional) Container backend to use when creating the bundle
+#   Defaults to 'docker'
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
@@ -61,7 +65,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $pcs_tries            = hiera('pcs_tries', 20),
   $ovn_dbs_vip          = hiera('ovn_dbs_vip'),
   $nb_db_port           = 6641,
-  $sb_db_port           = 6642
+  $sb_db_port           = 6642,
+  $container_backend    = 'docker',
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -131,6 +136,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
             'options'    => 'rw',
           },
         },
+        container_backend => $container_backend,
       }
 
       pacemaker::resource::ocf { "${ovndb_servers_resource_name}":

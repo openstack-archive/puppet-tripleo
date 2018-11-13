@@ -75,6 +75,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*container_backend*]
+#   (optional) Container backend to use when creating the bundle
+#   Defaults to 'docker'
+#
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef),
   $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122'),
@@ -89,6 +93,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $enable_internal_tls          = hiera('enable_internal_tls', false),
   $pcs_tries                    = hiera('pcs_tries', 20),
   $step                         = Integer(hiera('step')),
+  $container_backend            = 'docker',
 ) {
   if $rpc_scheme == 'rabbit' {
     $bootstrap_node = $rpc_bootstrap_node
@@ -225,6 +230,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${rabbitmq_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
+        container_backend => $container_backend,
       }
 
       # The default nr of ha queues is ceiling(N/2)

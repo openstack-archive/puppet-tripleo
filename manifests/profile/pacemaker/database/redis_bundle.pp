@@ -91,6 +91,10 @@
 #   enable_internal_tls is set.
 #   defaults to 6379
 #
+# [*container_backend*]
+#   (optional) Container backend to use when creating the bundle
+#   Defaults to 'docker'
+#
 #
 class tripleo::profile::pacemaker::database::redis_bundle (
   $certificate_specs         = hiera('redis_certificate_specs', {}),
@@ -98,6 +102,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $bootstrap_node            = hiera('redis_short_bootstrap_node_name'),
   $redis_docker_image        = hiera('tripleo::profile::pacemaker::database::redis_bundle::redis_docker_image', undef),
   $redis_docker_control_port = hiera('tripleo::profile::pacemaker::database::redis_bundle::control_port', '3124'),
+  $container_backend         = 'docker',
   $pcs_tries                 = hiera('pcs_tries', 20),
   $step                      = Integer(hiera('step')),
   $redis_network             = hiera('redis_network', undef),
@@ -318,6 +323,7 @@ slave-announce-port ${local_tuple[0][2]}
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${redis_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
+        container_backend => $container_backend,
       }
 
       if length($replication_tuples)>1 {

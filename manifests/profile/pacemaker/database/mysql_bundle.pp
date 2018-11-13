@@ -109,6 +109,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*container_backend*]
+#   (optional) Container backend to use when creating the bundle
+#   Defaults to 'docker'
+#
 #
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef),
@@ -127,6 +131,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $sst_tls_cipher                 = undef,
   $sst_tls_options                = undef,
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
+  $container_backend              = 'docker',
   $pcs_tries                      = hiera('pcs_tries', 20),
   $step                           = Integer(hiera('step')),
 ) {
@@ -387,6 +392,7 @@ MYSQL_HOST=localhost\n",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
+        container_backend => $container_backend,
       }
 
       pacemaker::resource::ocf { 'galera':

@@ -67,6 +67,10 @@
 #   (optional) Additional op parameters to pass to "pcs resource create" for the VIP
 #   Defaults to ''
 #
+# [*container_backend*]
+#   (optional) Container backend to use when creating the bundle
+#   Defaults to 'docker'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -88,6 +92,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   $deployed_ssl_cert_path   = hiera('tripleo::haproxy::service_certificate', undef),
   $meta_params              = '',
   $op_params                = '',
+  $container_backend        = 'docker',
   $step                     = Integer(hiera('step')),
   $pcs_tries                = hiera('pcs_tries', 20),
 ) {
@@ -237,6 +242,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => merge($storage_maps, $cert_storage_maps, $storage_maps_internal_tls),
+        container_backend => $container_backend,
       }
       $control_vip = hiera('controller_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_control_vip':
