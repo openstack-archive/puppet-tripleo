@@ -126,6 +126,7 @@ class tripleo::profile::base::cinder (
     }
     include ::cinder::config
     include ::cinder::glance
+    include ::cinder::nova
   }
 
   if $step >= 5 {
