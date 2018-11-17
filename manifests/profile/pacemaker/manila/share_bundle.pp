@@ -51,6 +51,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*container_backend*]
+#   (optional) Container backend to use when creating the bundle
+#   Defaults to 'docker'
+#
 #
 class tripleo::profile::pacemaker::manila::share_bundle (
   $bootstrap_node             = hiera('manila_share_short_bootstrap_node_name'),
@@ -58,6 +62,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
   $docker_volumes             = [],
   $docker_environment         = ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS'],
   $backend_cephfs_enabled     = hiera('manila_backend_cephfs_enabled', false),
+  $container_backend          = 'docker',
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
 ) {
@@ -212,6 +217,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
         options           => "--ipc=host --privileged=true --user=root --log-driver=journald ${docker_env}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => $storage_maps,
+        container_backend => $container_backend,
       }
 
       if $nfs_ganesha {

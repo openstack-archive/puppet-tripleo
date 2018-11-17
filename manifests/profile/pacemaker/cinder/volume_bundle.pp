@@ -43,6 +43,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*container_backend*]
+#   (optional) Container backend to use when creating the bundle
+#   Defaults to 'docker'
+#
 #
 class tripleo::profile::pacemaker::cinder::volume_bundle (
   $bootstrap_node             = hiera('cinder_volume_short_bootstrap_node_name'),
@@ -51,6 +55,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
   $docker_environment         = ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS'],
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
+  $container_backend          = 'docker',
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -183,6 +188,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
         options           => "--ipc=host --privileged=true --user=root --log-driver=journald ${docker_env}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => $storage_maps,
+        container_backend => $container_backend,
       }
     }
   }
