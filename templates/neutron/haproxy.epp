@@ -19,12 +19,13 @@ ARGS="$@"
 #   --dhcp-hostsfile=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/host ...
 NETNS=$(ip netns identify)
 NAME=neutron-haproxy-${NETNS}
+HAPROXY_CMD='$(if [ -f /usr/sbin/haproxy-systemd-wrapper ]; then echo "/usr/sbin/haproxy -Ds"; else echo "/usr/sbin/haproxy -Ws"; fi)'
 <%- if $container_cli == 'docker' { -%>
 CLI='docker'
-CMD="ip netns exec ${NETNS} /usr/sbin/haproxy -Ds"
+CMD="ip netns exec ${NETNS} "'$HAPROXY'
 <%- } elsif $container_cli == 'podman' { -%>
 CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
-CMD='/usr/sbin/haproxy -Ds'
+CMD='$HAPROXY'
 <%- } else { -%>
 CLI='echo noop'
 CMD='echo noop'
@@ -54,4 +55,4 @@ $CLI run --detach \
      -u root \
      --name $NAME \
      <%=$image_name%> \
-     $CMD $ARGS
+     /bin/bash -c "HAPROXY=\"$HAPROXY_CMD\"; exec $CMD $ARGS"

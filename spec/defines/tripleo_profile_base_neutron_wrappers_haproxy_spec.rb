@@ -52,7 +52,7 @@ describe 'tripleo::profile::base::neutron::wrappers::haproxy' do
           /set -x/
         )
         is_expected.to contain_file('/usr/local/bin/haproxy').with_content(
-          /CMD="ip netns exec.*\/usr\/sbin\/haproxy -Ds/
+          /.*haproxy -Ds.*haproxy -Ws.*/
         )
       end
     end
@@ -78,7 +78,7 @@ describe 'tripleo::profile::base::neutron::wrappers::haproxy' do
           /^NAME=neutron-haproxy-/
         )
         is_expected.to contain_file('/usr/local/bin/haproxy').with_content(
-          /CMD='\/usr\/sbin\/haproxy -Ds'/
+          /.*haproxy -Ds.*haproxy -Ws.*/
         )
       end
     end
