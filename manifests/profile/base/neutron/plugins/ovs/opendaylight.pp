@@ -144,7 +144,8 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
       odl_ovsdb_iface => $odl_ovsdb_str,
       enable_tls      => $enable_internal_tls,
       tls_key_file    => $tls_keyfile,
-      tls_cert_file   => $tls_certfile
+      tls_cert_file   => $tls_certfile,
+      enable_ipv6     => $enable_ipv6
     }
   }
 
