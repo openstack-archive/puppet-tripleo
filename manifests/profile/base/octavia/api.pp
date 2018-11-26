@@ -43,6 +43,7 @@ class tripleo::profile::base::octavia::api (
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes
   if ($step >= 4 and $sync_db) or ($step >= 5 and !$sync_db) {
+    include ::octavia::controller
     class { '::octavia::api':
       sync_db => $sync_db,
     }
