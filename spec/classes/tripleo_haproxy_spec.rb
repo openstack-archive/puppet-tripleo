@@ -160,6 +160,32 @@ describe 'tripleo::haproxy' do
         )
       end
     end
+
+    describe "set log facility" do
+      before :each do
+        params.merge!({
+          :haproxy_log_facility => 'local7',
+        })
+      end
+      it 'should set log facility' do
+        is_expected.to contain_class('haproxy').with(
+          :global_options => {
+            'log'     => '/dev/log local7',
+            'pidfile' => '/var/run/haproxy.pid',
+            'user'    => 'haproxy',
+            'group'   => 'haproxy',
+            'maxconn' => 20480,
+            'ssl-default-bind-ciphers' => "!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES",
+            'ssl-default-bind-options' => "no-sslv3 no-tlsv10",
+            'stats'                    => [
+              'socket /var/lib/haproxy/stats mode 600 level user',
+              'timeout 2m'
+            ],
+            'daemon' => '',
+          }
+        )
+      end
+    end
   end
 
   on_supported_os.each do |os, facts|
