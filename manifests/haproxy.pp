@@ -49,6 +49,10 @@
 #  The IPv4, IPv6 or filesystem socket path of the syslog server.
 #  Defaults to '/dev/log'
 #
+# [*haproxy_log_facility*]
+#  The syslog facility for HAProxy.
+#  Defaults to 'local0'
+#
 # [*activate_httplog*]
 #  Globally activate "httplog" option (in defaults section)
 #  In case the listener is NOT set to "http" mode, HAProxy will fallback to "tcplog".
@@ -581,6 +585,7 @@ class tripleo::haproxy (
   $haproxy_listen_bind_param   = [ 'transparent' ],
   $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address         = '/dev/log',
+  $haproxy_log_facility        = 'local0',
   $activate_httplog            = false,
   $haproxy_globals_override    = {},
   $haproxy_defaults_override   = {},
@@ -801,7 +806,7 @@ class tripleo::haproxy (
   }
 
   $haproxy_global_options = {
-    'log'                      => "${haproxy_log_address} local0",
+    'log'                      => "${haproxy_log_address} ${haproxy_log_facility}",
     'pidfile'                  => '/var/run/haproxy.pid',
     'user'                     => 'haproxy',
     'group'                    => 'haproxy',
