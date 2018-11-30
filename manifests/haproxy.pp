@@ -1666,7 +1666,7 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[openshift_master_ssl_port],
       service_network   => $openshift_master_network,
       listen_options    => {
-        'balance' => 'roundrobin',
+        'balance' => 'source',
       }
     }
   }
