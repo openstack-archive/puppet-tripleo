@@ -93,5 +93,8 @@ class tripleo::profile::base::neutron::plugins::ml2 (
     if 'cisco_vts' in $mechanism_drivers {
       include ::tripleo::profile::base::neutron::plugins::ml2::vts
     }
+    if 'ansible' in $mechanism_drivers {
+      include ::tripleo::profile::base::neutron::plugins::ml2::networking_ansible
+    }
   }
 }
