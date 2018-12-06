@@ -29,6 +29,10 @@
 #   (Optional) List of mount options for the NFS share
 #   Defaults to ''
 #
+# [*cinder_nfs_snapshot_support*]
+#   (Optional) Whether to enable support for snapshots in the NFS driver.
+#   Defaults to $::os_service_default
+#
 # [*cinder_nas_secure_file_operations*]
 #   (Optional) Allow network-attached storage systems to operate in a secure
 #   environment where root level access is not permitted. If set to False,
@@ -55,6 +59,7 @@ class tripleo::profile::base::cinder::volume::nfs (
   $cinder_nfs_servers,
   $backend_name                       = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs'),
   $cinder_nfs_mount_options           = '',
+  $cinder_nfs_snapshot_support        = $::os_service_default,
   $cinder_nas_secure_file_operations  = $::os_service_default,
   $cinder_nas_secure_file_permissions = $::os_service_default,
   $step                               = Integer(hiera('step')),
@@ -67,6 +72,7 @@ class tripleo::profile::base::cinder::volume::nfs (
       nfs_servers                 => $cinder_nfs_servers,
       nfs_mount_options           => $cinder_nfs_mount_options,
       nfs_shares_config           => '/etc/cinder/shares-nfs.conf',
+      nfs_snapshot_support        => $cinder_nfs_snapshot_support,
       nas_secure_file_operations  => $cinder_nas_secure_file_operations,
       nas_secure_file_permissions => $cinder_nas_secure_file_permissions,
     }
