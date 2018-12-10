@@ -1511,6 +1511,7 @@ class tripleo::haproxy (
       server_names      => hiera('octavia_api_node_names'),
       public_ssl_port   => $ports[octavia_api_ssl_port],
       service_network   => $octavia_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
