@@ -212,6 +212,10 @@
 #  (optional) Enable or not Nova Placement API binding
 #  Defaults to hiera('nova_placement_enabled', false)
 #
+# [*placement*]
+#  (optional) Enable or not Placement API binding
+#  Defaults to hiera('placement_enabled', false)
+#
 # [*nova_metadata*]
 #  (optional) Enable or not Nova metadata binding
 #  Defaults to hiera('nova_api_enabled', false)
@@ -463,6 +467,10 @@
 #  (optional) Specify the network nova_placement is running on.
 #  Defaults to hiera('nova_placement_network', undef)
 #
+# [*placement_network*]
+#  (optional) Specify the network placement is running on.
+#  Defaults to hiera('placement_network', undef)
+#
 # [*ec2_api_network*]
 #  (optional) Specify the network ec2_api is running on.
 #  Defaults to hiera('ec2_api_network', undef)
@@ -563,6 +571,8 @@
 #    'opendaylight_api_port' (Defaults to 8081)
 #    'panko_api_port' (Defaults to 8977)
 #    'panko_api_ssl_port' (Defaults to 13977)
+#    'placement_port' (Defaults to 8778)
+#    'placement_ssl_port' (Defaults to 13778)
 #    'ovn_nbdb_port' (Defaults to 6641)
 #    'ovn_nbdb_ssl_port' (Defaults to 13641)
 #    'ovn_sbdb_port' (Defaults to 6642)
@@ -625,6 +635,7 @@ class tripleo::haproxy (
   $glance_api                  = hiera('glance_api_enabled', false),
   $nova_osapi                  = hiera('nova_api_enabled', false),
   $nova_placement              = hiera('nova_placement_enabled', false),
+  $placement                   = hiera('placement_enabled', false),
   $nova_metadata               = hiera('nova_api_enabled', false),
   $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
   $ec2_api                     = hiera('ec2_api_enabled', false),
@@ -687,6 +698,7 @@ class tripleo::haproxy (
   $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', undef),
   $nova_osapi_network          = hiera('nova_api_network', undef),
   $nova_placement_network      = hiera('nova_placement_network', undef),
+  $placement_network           = hiera('placement_network', undef),
   $octavia_network             = hiera('octavia_api_network', undef),
   $opendaylight_network        = hiera('opendaylight_api_network', undef),
   $openshift_master_network    = hiera('openshift_master_network', undef),
@@ -753,6 +765,8 @@ class tripleo::haproxy (
     openshift_master_ssl_port => 18443,
     panko_api_port => 8977,
     panko_api_ssl_port => 13977,
+    placement_port => 8778,
+    placement_ssl_port => 13778,
     ovn_nbdb_port => 6641,
     ovn_nbdb_ssl_port => 13641,
     ovn_sbdb_port => 6642,
@@ -1054,6 +1068,21 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[nova_placement_ssl_port],
       service_network   => $nova_placement_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
+    }
+  }
+
+  $placement_vip = hiera('placement_vip', $controller_virtual_ip)
+  if $placement {
+    ::tripleo::haproxy::endpoint { 'placement':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => $placement_vip,
+      service_port      => $ports[placement_port],
+      ip_addresses      => hiera('placement_node_ips', $controller_hosts_real),
+      server_names      => hiera('placement_node_names', $controller_hosts_names_real),
+      mode              => 'http',
+      public_ssl_port   => $ports[placement_ssl_port],
+      service_network   => $placement_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
