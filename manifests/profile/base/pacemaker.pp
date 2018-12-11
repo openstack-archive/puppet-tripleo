@@ -185,7 +185,7 @@ class tripleo::profile::base::pacemaker (
           before             => Exec["exec-wait-for-${remote_short_node}"],
           notify             => Exec["exec-wait-for-${remote_short_node}"],
         }
-        $check_command = "pcs status | grep -q -e \"${remote_short_node}.*Started\""
+        $check_command = "pcs status | grep -q -e \"${remote_short_node}[[:blank:]].*Started\""
         exec { "exec-wait-for-${remote_short_node}":
           path      => '/usr/sbin:/usr/bin:/sbin:/bin',
           command   => $check_command,
