@@ -146,6 +146,13 @@
 #   (Optional) Whether _member_ role is managed or not (required for Horizon).
 #   Defaults to hiera('keystone_enable_member', false)
 #
+# [*keystone_federation_enabled*]
+#   (Optional) Enable federated identity support
+#   Defaults to hiera('keystone_federation_enabled', false)
+#
+# [*keystone_openidc_enabled*]
+#   (Optional) Enable OpenIDC federation
+#   Defaults to hiera('keystone_openidc_enabled', false)
 class tripleo::profile::base::keystone (
   $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
   $bootstrap_node                 = hiera('keystone_short_bootstrap_node_name', undef),
@@ -176,6 +183,8 @@ class tripleo::profile::base::keystone (
   $extra_notification_topics      = [],
   $step                           = Integer(hiera('step')),
   $keystone_enable_member         = hiera('keystone_enable_member', false),
+  $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
+  $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -261,6 +270,14 @@ class tripleo::profile::base::keystone (
       create_resources('::keystone::ldap_backend', $ldap_backends_config, {
         create_domain_entry => $manage_domain,
       })
+    }
+
+    if $keystone_federation_enabled {
+      include ::keystone::federation
+    }
+
+    if $keystone_openidc_enabled {
+      include ::keystone::federation::openidc
     }
   }
 
