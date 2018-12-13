@@ -96,7 +96,7 @@ describe 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
       end
     end
 
-    context 'with no TLS' do
+    context 'with no TLS and no IPv6' do
 
       it 'should configure OVS for ODL' do
         is_expected.to contain_class('neutron::plugins::ovs::opendaylight').with(
@@ -105,12 +105,13 @@ describe 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
           :odl_ovsdb_iface => "tcp:#{params[:odl_api_ips][0]}:6640",
           :enable_tls      => false,
           :tls_key_file    => nil,
-          :tls_cert_file   => nil
+          :tls_cert_file   => nil,
+          :enable_ipv6     => false
         )
       end
     end
 
-    context 'with TLS enabled' do
+    context 'with TLS enabled and no IPv6' do
       before do
         File.stubs(:file?).returns(true)
         File.stubs(:readlines).returns(["MIIFGjCCBAKgAwIBAgICA"])
@@ -129,7 +130,57 @@ describe 'tripleo::profile::base::neutron::plugins::ovs::opendaylight' do
           :odl_ovsdb_iface => "ssl:#{params[:odl_api_ips][0]}:6640",
           :enable_tls      => true,
           :tls_key_file    => params[:certificate_specs]['service_key'],
-          :tls_cert_file   => params[:certificate_specs]['service_certificate']
+          :tls_cert_file   => params[:certificate_specs]['service_certificate'],
+          :enable_ipv6     => false
+        )
+      end
+    end
+
+    context 'with IPv6 and no TLS' do
+      before do
+        params.merge!({
+          :enable_ipv6 => true,
+          :odl_api_ips => ['2001::01'],
+          :odl_url_ip  => '2001::02'
+        })
+      end
+      it 'should configure OVS for ODL' do
+        is_expected.to contain_class('neutron::plugins::ovs::opendaylight').with(
+          :tunnel_ip       => params[:tunnel_ip],
+          :odl_check_url   => "http://[#{params[:odl_url_ip]}]:#{params[:odl_port]}/#{params[:odl_check_url]}",
+          :odl_ovsdb_iface => "tcp:[#{params[:odl_api_ips][0]}]:6640",
+          :enable_tls      => false,
+          :tls_key_file    => nil,
+          :tls_cert_file   => nil,
+          :enable_ipv6     => true
+        )
+      end
+    end
+
+    context 'with TLS and IPv6 enabled' do
+      before do
+        File.stubs(:file?).returns(true)
+        File.stubs(:readlines).returns(["MIIFGjCCBAKgAwIBAgICA"])
+        params.merge!({
+          :enable_internal_tls => true,
+          :conn_proto          => 'https',
+          :certificate_specs => {
+             "service_certificate" => "/etc/pki/tls/certs/ovs.crt",
+             "service_key" => "/etc/pki/tls/private/ovs.key"},
+          :enable_ipv6 => true,
+          :odl_api_ips => ['2001::01'],
+          :odl_url_ip => '2001::02'
+        })
+      end
+      it 'should configure OVS for ODL' do
+        is_expected.to contain_class('neutron::plugins::ovs::opendaylight').with(
+          :tunnel_ip       => params[:tunnel_ip],
+          :odl_check_url   => "https://[#{params[:odl_url_ip]}]:#{params[:odl_port]}/#{params[:odl_check_url]}",
+          :odl_ovsdb_iface => "ssl:[#{params[:odl_api_ips][0]}]:6640",
+          :enable_tls      => true,
+          :tls_key_file    => params[:certificate_specs]['service_key'],
+          :tls_cert_file   => params[:certificate_specs]['service_certificate'],
+          :enable_ipv6     => true
         )
       end
     end
