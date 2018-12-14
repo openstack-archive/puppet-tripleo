@@ -198,6 +198,11 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $wsrep_sst_method = 'rsync'
     $mysqld_options_sst = {}
   }
+  if $ipv6 {
+    $wsrep_provider_options = "gmcast.listen_addr=tcp://[::]:4567;${tls_options}"
+  } else {
+    $wsrep_provider_options = "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}"
+  }
 
   $mysqld_options_mysqld = {
     'mysqld' => {
@@ -227,7 +232,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
       'wsrep_drupal_282555_workaround' => '0',
       'wsrep_causal_reads'             => '0',
       'wsrep_sst_method'               => $wsrep_sst_method,
-      'wsrep_provider_options'         => "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}",
+      'wsrep_provider_options'         => $wsrep_provider_options,
     },
     'mysqld_safe' => {
       'pid-file'                       => '/var/lib/mysql/mariadb.pid',
