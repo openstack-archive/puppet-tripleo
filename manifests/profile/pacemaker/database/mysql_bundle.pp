@@ -100,6 +100,11 @@
 #   (Optional) Whether to deploy MySQL on IPv6 network.
 #   Defaults to str2bool(hiera('mysql_ipv6', false))
 #
+# [*mysql_server_options*]
+#   (Optional) Extras options to deploy MySQL. Useful when deploying Galera cluster.
+#   Should be an hash.
+#   Defaults to hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}
+#
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
@@ -131,6 +136,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $sst_tls_cipher                 = undef,
   $sst_tls_options                = undef,
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
+  $mysql_server_options           = hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}),
   $container_backend              = 'docker',
   $pcs_tries                      = hiera('pcs_tries', 20),
   $step                           = Integer(hiera('step')),
@@ -234,7 +240,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     }
   }
 
-  $mysqld_options = merge($mysqld_options_mysqld, $mysqld_options_sst)
+  $mysqld_options = merge($mysqld_options_mysqld, $mysqld_options_sst, $mysql_server_options)
 
   # remove_default_accounts parameter will execute some mysql commands
   # to remove the default accounts created by MySQL package.
