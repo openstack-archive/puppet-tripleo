@@ -18,6 +18,33 @@
 #
 # === Parameters
 #
+# [*inspection_subnets*]
+#   IP ranges that will be given to nodes during the inspection
+#   process. Either a list of ip ranged or a dictionary with $::hostname as
+#   key to enable HA deployments using disjoint address pools served by the
+#   DHCP instances.
+#
+#    Example for Non-HA deployment, a list of ip-ranges:
+#               - ip_range: 192.168.0.100,192.168.0.120
+#               - ip_range: 192.168.1.100,192.168.1.200
+#                 netmask: 255.255.255.0
+#                 gateway: 192.168.1.254
+#                 tag: subnet1
+#
+#    Example for HA deployment using disjoint address pools:
+#               overcloud-ironic-0:
+#                 - ip_range: 192.168.24.100,192.168.24.119
+#                 - ip_range: 192.168.25.100,192.168.25.119
+#                   netmask: 255.255.255.0
+#                   gateway: 192.168.25.254
+#                   tag: subnet1
+#               overcloud-ironic-1:
+#                 - ip_range: 192.168.24.120,192.168.24.139
+#                 - ip_range: 192.168.25.120,192.168.25.139
+#                   netmask: 255.255.255.0
+#                   gateway: 192.168.25.254
+#                   tag: subnet1
+#
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('ironic_inspector_short_bootstrap_node_name')
@@ -27,8 +54,9 @@
 #   Defaults to hiera('step')
 
 class tripleo::profile::base::ironic_inspector (
-  $bootstrap_node = hiera('ironic_inspector_short_bootstrap_node_name', undef),
-  $step           = Integer(hiera('step')),
+  $inspection_subnets = [],
+  $bootstrap_node     = hiera('ironic_inspector_short_bootstrap_node_name', undef),
+  $step               = Integer(hiera('step')),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -37,10 +65,25 @@ class tripleo::profile::base::ironic_inspector (
     $sync_db = false
   }
 
+  if is_hash($inspection_subnets) {
+    $inspection_subnets_real = $inspection_subnets[$::hostname]
+  } elsif is_array($inspection_subnets) {
+    $inspection_subnets_real = $inspection_subnets
+  }
+
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::ironic::inspector::cors
-    class { '::ironic::inspector':
-      sync_db => $sync_db,
+    # TODO(hjensas): Once https://review.openstack.org/557465 is merged remove
+    # the condition.
+    if $inspection_subnets != [] {
+      class { '::ironic::inspector':
+        sync_db            => $sync_db,
+        dnsmasq_ip_subnets => $inspection_subnets_real,
+      }
+    } else {
+      class { '::ironic::inspector':
+        sync_db => $sync_db,
+      }
     }
 
     include ::ironic::inspector::pxe_filter
