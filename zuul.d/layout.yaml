@@ -18,7 +18,6 @@
       - puppet-openstack-check-jobs
       - puppet-tripleo-module-unit-jobs
       - tripleo-undercloud-jobs
-      - tripleo-multinode-baremetal-minimal
       - tripleo-multinode-container-minimal
       - release-notes-jobs-python3
     check:
