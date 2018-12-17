@@ -196,6 +196,7 @@ class tripleo::profile::base::glance::api (
     # TODO: notifications, scrubber, etc.
     include ::glance
     include ::glance::config
+    include ::glance::api::logging
     # TODO(jaosorior): Remove bind_host when we set it up conditionally in t-h-t
     class { '::glance::api':
       stores  => $glance_store,

@@ -140,5 +140,6 @@ class tripleo::profile::base::designate (
       include ::designate::backend::bind9
     }
     include ::designate::config
+    include ::designate::logging
   }
 }

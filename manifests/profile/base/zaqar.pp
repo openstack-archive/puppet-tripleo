@@ -136,6 +136,7 @@ class tripleo::profile::base::zaqar (
     include ::tripleo::profile::base::apache
     include ::zaqar::transport::wsgi
     include ::zaqar::config
+    include ::zaqar::logging
 
     # TODO (bcrochet): At some point, the transports should be split out to
     # separate services.

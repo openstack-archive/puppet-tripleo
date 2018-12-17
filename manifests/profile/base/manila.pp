@@ -118,5 +118,6 @@ class tripleo::profile::base::manila (
       }),
     }
     include ::manila::config
+    include ::manila::logging
   }
 }

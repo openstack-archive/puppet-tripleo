@@ -68,6 +68,7 @@ class tripleo::profile::base::octavia (
         }),
     }
     include ::octavia::config
+    include ::octavia::logging
     include ::octavia::service_auth
   }
 }

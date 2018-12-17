@@ -30,5 +30,6 @@ class tripleo::profile::base::panko (
   if $step >= 3 {
     include ::panko
     include ::panko::config
+    include ::panko::logging
   }
 }
