@@ -59,7 +59,9 @@
 class tripleo::profile::base::cinder::volume::rbd (
   $backend_name              = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph'),
   $backend_availability_zone = hiera('cinder::backend::rbd::backend_availability_zone', undef),
+  # lint:ignore:parameter_documentation
   $cinder_rbd_backend_host   = hiera('cinder::backend_host', hiera('cinder::host', $::hostname)),
+  # lint:endignore
   $cinder_rbd_ceph_conf      = hiera('cinder::backend::rbd::rbd_ceph_conf', '/etc/ceph/ceph.conf'),
   $cinder_rbd_pool_name      = 'volumes',
   $cinder_rbd_extra_pools    = undef,

@@ -115,10 +115,10 @@ class tripleo::profile::base::neutron (
   if $step >= 3 {
     # NOTE(bogdando) validate_* is deprecated and we do not want to use it here
     if !($container_cli in ['docker', 'podman']) {
-      fail("container_cli ($container_cli) is not supported!")
+      fail("container_cli (${container_cli}) is not supported!")
     }
     if $container_cli == 'docker' {
-      warning("Docker runtime is deprecated. Consider switching container_cli to podman")
+      warning('Docker runtime is deprecated. Consider switching container_cli to podman')
     }
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))

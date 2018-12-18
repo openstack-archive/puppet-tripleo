@@ -52,7 +52,7 @@ class tripleo::profile::base::neutron::ovn_metadata_agent_wrappers (
 ) {
   $container_cli = hiera('tripleo::profile::base::neutron::container_cli', 'docker')
   if $bind_sockets and $container_cli == 'docker' {
-    warning("Docker runtime is deprecated. Consider switching container_cli to podman")
+    warning('Docker runtime is deprecated. Consider switching container_cli to podman')
     $bind_socket = join(['unix://', $bind_sockets[0]], '')
   } else {
     $bind_socket = ''

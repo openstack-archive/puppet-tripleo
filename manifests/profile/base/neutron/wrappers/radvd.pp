@@ -37,14 +37,14 @@
 define tripleo::profile::base::neutron::wrappers::radvd (
   $radvd_process_wrapper,
   $radvd_image,
-  $bind_socket = undef,
   Boolean $debug,
   $container_cli,
+  $bind_socket = undef,
 ) {
     file { $radvd_process_wrapper:
-      ensure              => file,
-      mode                => '0755',
-      content             => epp('tripleo/neutron/radvd.epp', {
+      ensure  => file,
+      mode    => '0755',
+      content => epp('tripleo/neutron/radvd.epp', {
           'image_name'    => $radvd_image,
           'bind_socket'   => $bind_socket,
           'debug'         => $debug,

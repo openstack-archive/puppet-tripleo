@@ -32,14 +32,14 @@
 #
 define tripleo::profile::base::neutron::wrappers::keepalived_state_change (
   $keepalived_state_change_wrapper,
-  $bind_socket = undef,
   Boolean $debug,
   $container_cli,
+  $bind_socket = undef,
 ) {
     file { $keepalived_state_change_wrapper:
-      ensure            => file,
-      mode              => '0755',
-      content           => epp('tripleo/neutron/neutron-keepalived-state-change.epp', {
+      ensure  => file,
+      mode    => '0755',
+      content => epp('tripleo/neutron/neutron-keepalived-state-change.epp', {
         'bind_socket'   => $bind_socket,
         'debug'         => $debug,
         'container_cli' => $container_cli,

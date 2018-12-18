@@ -36,14 +36,14 @@
 define tripleo::profile::base::neutron::wrappers::dibbler_client (
   $dibbler_process_wrapper,
   $dibbler_image,
-  $bind_socket = undef,
   Boolean $debug,
   $container_cli,
+  $bind_socket = undef,
 ) {
     file { $dibbler_process_wrapper:
-      ensure            => file,
-      mode              => '0755',
-      content           => epp('tripleo/neutron/dibbler-client.epp', {
+      ensure  => file,
+      mode    => '0755',
+      content => epp('tripleo/neutron/dibbler-client.epp', {
         'image_name'    => $dibbler_image,
         'bind_socket'   => $bind_socket,
         'debug'         => $debug,

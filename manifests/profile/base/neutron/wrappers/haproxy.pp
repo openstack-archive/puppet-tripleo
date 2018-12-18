@@ -36,14 +36,14 @@
 define tripleo::profile::base::neutron::wrappers::haproxy (
   $haproxy_process_wrapper,
   $haproxy_image,
-  $bind_socket = undef,
   Boolean $debug,
   $container_cli,
+  $bind_socket = undef,
 ) {
     file { $haproxy_process_wrapper:
-      ensure            => file,
-      mode              => '0755',
-      content           => epp('tripleo/neutron/haproxy.epp', {
+      ensure  => file,
+      mode    => '0755',
+      content => epp('tripleo/neutron/haproxy.epp', {
         'image_name'    => $haproxy_image,
         'bind_socket'   => $bind_socket,
         'debug'         => $debug,

@@ -69,7 +69,7 @@ define tripleo::certmonger::qemu (
     dnsname      => $hostname,
     principal    => $principal,
     postsave_cmd => $postsave_cmd_real,
-    ca           => $certmonger_ca_qemu,
+    ca           => $certmonger_ca,
     cacertfile   => $cacertfile,
     wait         => true,
     tag          => 'qemu-cert',

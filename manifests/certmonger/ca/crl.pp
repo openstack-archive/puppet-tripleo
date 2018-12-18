@@ -107,8 +107,7 @@ class tripleo::certmonger::ca::crl (
       creates   => $fetched_crl,
       tries     => 5,
       try_sleep => 5,
-    } ~>
-    file {'tripleo-ca-crl-file':
+    } ~> file {'tripleo-ca-crl-file':
       group => 'root',
       mode  => '0644',
       owner => 'root',

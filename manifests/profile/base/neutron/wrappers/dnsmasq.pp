@@ -36,14 +36,14 @@
 define tripleo::profile::base::neutron::wrappers::dnsmasq (
   $dnsmasq_process_wrapper,
   $dnsmasq_image,
-  $bind_socket = undef,
   Boolean $debug,
   $container_cli,
+  $bind_socket = undef,
 ) {
     file { $dnsmasq_process_wrapper:
-      ensure            => file,
-      mode              => '0755',
-      content           => epp('tripleo/neutron/dnsmasq.epp', {
+      ensure  => file,
+      mode    => '0755',
+      content => epp('tripleo/neutron/dnsmasq.epp', {
         'image_name'    => $dnsmasq_image,
         'bind_socket'   => $bind_socket,
         'debug'         => $debug,

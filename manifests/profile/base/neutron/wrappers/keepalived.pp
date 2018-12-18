@@ -36,14 +36,14 @@
 define tripleo::profile::base::neutron::wrappers::keepalived (
   $keepalived_process_wrapper,
   $keepalived_image,
-  $bind_socket = undef,
   Boolean $debug,
   $container_cli,
+  $bind_socket = undef,
 ) {
     file { $keepalived_process_wrapper:
-      ensure              => file,
-      mode                => '0755',
-      content             => epp('tripleo/neutron/keepalived.epp', {
+      ensure  => file,
+      mode    => '0755',
+      content => epp('tripleo/neutron/keepalived.epp', {
           'image_name'    => $keepalived_image,
           'bind_socket'   => $bind_socket,
           'debug'         => $debug,
