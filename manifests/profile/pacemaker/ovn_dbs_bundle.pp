@@ -137,6 +137,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
           },
         },
         container_backend => $container_backend,
+        tries             => $pcs_tries,
       }
 
       pacemaker::resource::ocf { "${ovndb_servers_resource_name}":

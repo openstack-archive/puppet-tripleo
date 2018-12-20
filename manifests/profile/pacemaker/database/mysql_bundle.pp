@@ -398,6 +398,7 @@ MYSQL_HOST=localhost\n",
         network           => "control-port=${control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
         container_backend => $container_backend,
+        tries             => $pcs_tries,
       }
 
       pacemaker::resource::ocf { 'galera':

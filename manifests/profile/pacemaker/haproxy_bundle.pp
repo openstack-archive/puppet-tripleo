@@ -243,6 +243,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => merge($storage_maps, $cert_storage_maps, $storage_maps_internal_tls),
         container_backend => $container_backend,
+        tries             => $pcs_tries,
       }
       $control_vip = hiera('controller_virtual_ip')
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_control_vip':

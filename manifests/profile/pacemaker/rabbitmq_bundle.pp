@@ -247,6 +247,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         network           => "control-port=${rabbitmq_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
         container_backend => $container_backend,
+        tries             => $pcs_tries,
       }
 
       # The default nr of ha queues is ceiling(N/2)

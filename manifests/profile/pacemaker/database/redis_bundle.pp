@@ -324,6 +324,7 @@ slave-announce-port ${local_tuple[0][2]}
         network           => "control-port=${redis_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
         container_backend => $container_backend,
+        tries             => $pcs_tries,
       }
 
       if length($replication_tuples)>1 {
