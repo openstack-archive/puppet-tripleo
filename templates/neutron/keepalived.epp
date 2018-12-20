@@ -48,7 +48,7 @@ $CLI run --detach \
     -v /var/lib/config-data/puppet-generated/neutron/etc/neutron:/etc/neutron:ro \
     -v /lib/modules:/lib/modules:ro \
     -v /sbin/modprobe:/sbin/modprobe:ro \
-    -v /run/netns:/run/netns:z,shared \
+    -v /run/netns:/run/netns:shared \
     -v /var/lib/neutron:/var/lib/neutron:z,shared \
     --net host \
     --pid host \
