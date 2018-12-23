@@ -28,11 +28,5 @@ class tripleo::profile::base::memcached (
 ) {
   if $step >= 1 {
       include ::memcached
-
-      # Automatic restart
-      ::systemd::dropin_file { 'memcached.conf':
-        unit    => 'memcached.service',
-        content => "[Service]\nRestart=always\n",
-      }
   }
 }
