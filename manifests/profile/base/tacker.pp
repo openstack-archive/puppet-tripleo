@@ -83,5 +83,6 @@ class tripleo::profile::base::tacker (
     include ::tacker::server
     include ::tacker::db
     include ::tacker::config
+    include ::tacker::logging
   }
 }

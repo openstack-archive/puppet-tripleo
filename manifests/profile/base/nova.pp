@@ -112,6 +112,7 @@ class tripleo::profile::base::nova (
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
     include ::nova::config
+    include ::nova::logging
     class { '::nova::cache':
       enabled          => true,
       backend          => 'oslo_cache.memcache_pool',

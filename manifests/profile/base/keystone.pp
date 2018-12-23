@@ -249,6 +249,7 @@ class tripleo::profile::base::keystone (
     }
 
     include ::keystone::config
+    include ::keystone::logging
     include ::tripleo::profile::base::apache
     class { '::keystone::wsgi::apache':
       ssl_cert       => $tls_certfile,

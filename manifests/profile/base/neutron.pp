@@ -153,6 +153,7 @@ class tripleo::profile::base::neutron (
       dhcp_agents_per_network    => $dhcp_agents_per_net,
     }
     include ::neutron::config
+    include ::neutron::logging
 
     if $designate_api_enabled {
       include ::neutron::designate

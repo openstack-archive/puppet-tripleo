@@ -83,5 +83,6 @@ class tripleo::profile::base::congress (
     include ::congress::server
     include ::congress::db
     include ::congress::config
+    include ::congress::logging
   }
 }
