@@ -54,11 +54,12 @@
               - ^manifests/profile/(base|pacemaker)/mistral.*$
               - ^manifests/profile/(base|pacemaker)/sahara.*$
               - ^manifests/profile/(base|pacemaker)/designate.*$
-        - tripleo-ci-centos-7-scenario004-multinode-oooq-container:
+        - tripleo-ci-centos-7-scenario004-standalone:
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/glance.*$
               - ^manifests/profile/(base|pacemaker)/manila.*$
+              - zuul.d/layout.yaml
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
             files:
               - ^manifests/profile/pacemaker/ovn.*$
