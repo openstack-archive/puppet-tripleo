@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds support to configure disjoint address pools for Ironic Inspector. When
+    Inspector is deployed as a HA service disjoint address pools should be
+    served by the DHCP instances to avoid address conflict issues.
