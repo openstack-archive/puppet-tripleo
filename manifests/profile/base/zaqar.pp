@@ -24,11 +24,11 @@
 #
 # [*management_store*]
 #   (Optional) The management store for Zaqar.
-#   Defaults to 'mongodb'
+#   Defaults to 'sqlalchemy'
 #
 # [*messaging_store*]
 #   (Optional) The messaging store for Zaqar.
-#   Defaults to 'mongodb'
+#   Defaults to 'redis'
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -66,8 +66,8 @@
 #
 class tripleo::profile::base::zaqar (
   $bootstrap_node       = hiera('zaqar_api_short_bootstrap_node_name', undef),
-  $management_store     = 'mongodb',
-  $messaging_store      = 'mongodb',
+  $management_store     = 'sqlalchemy',
+  $messaging_store      = 'redis',
   $certificates_specs   = hiera('apache_certificates_specs', {}),
   $enable_internal_tls  = hiera('enable_internal_tls', false),
   $zaqar_api_network    = hiera('zaqar_api_network', undef),
@@ -95,25 +95,8 @@ class tripleo::profile::base::zaqar (
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ::zaqar
 
-    if $messaging_store == 'mongodb' or $management_store == 'mongodb' {
-      if str2bool(hiera('mongodb::server::ipv6', false)) {
-        $mongo_node_ips_with_port_prefixed = prefix(hiera('mongodb_node_ips'), '[')
-        $mongo_node_ips_with_port = suffix($mongo_node_ips_with_port_prefixed, ']:27017')
-      } else {
-        $mongo_node_ips_with_port = suffix(hiera('mongodb_node_ips'), ':27017')
-      }
-      $mongodb_replset = hiera('mongodb::server::replset')
-      $mongo_node_string = join($mongo_node_ips_with_port, ',')
-      $mongo_database_connection = "mongodb://${mongo_node_string}/zaqar?replicaSet=${mongodb_replset}"
-    }
-
-
     if $messaging_store == 'swift' {
       include ::zaqar::messaging::swift
-    } elsif $messaging_store == 'mongodb' {
-      class {'::zaqar::messaging::mongodb':
-        uri => $mongo_database_connection,
-      }
     } elsif $messaging_store == 'redis' {
       class {'::zaqar::messaging::redis':
         uri => join(['redis://:', $zaqar_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
@@ -124,10 +107,6 @@ class tripleo::profile::base::zaqar (
 
     if $management_store == 'sqlalchemy' {
       include ::zaqar::management::sqlalchemy
-    } elsif $management_store == 'mongodb' {
-      class { '::zaqar::management::mongodb':
-        uri => $mongo_database_connection,
-      }
     } else {
       fail("unsupported Zaqar management_store set: ${management_store}")
     }
