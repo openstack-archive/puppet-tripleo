@@ -141,8 +141,9 @@ class tripleo::ui (
     fallbackresource => '/index.html',
     proxy_pass       => [
     {
-      'path' => '/zaqar',
-      'url'  => $endpoint_proxy_zaqar
+      'path'   => '/zaqar',
+      'url'    => $endpoint_proxy_zaqar,
+      'params' => { 'disablereuse' => 'On' }
     },
     {
       'path'         => '/keystone',
