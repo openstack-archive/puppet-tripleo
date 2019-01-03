@@ -56,6 +56,7 @@
               - ^manifests/profile/(base|pacemaker)/mistral.*$
               - ^manifests/profile/(base|pacemaker)/sahara.*$
               - ^manifests/profile/(base|pacemaker)/designate.*$
+              - zuul.d/layout.yaml
         - tripleo-ci-centos-7-scenario004-standalone:
             files:
               - ^manifests/haproxy.*$
