@@ -34,7 +34,7 @@
               - ^manifests/profile/(base|pacemaker)/metrics.*$
               - ^manifests/profile/(base|pacemaker)/monitoring.*$
               - ^manifests/profile/(base|pacemaker)/panko.*$
-        - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
+        - tripleo-ci-centos-7-scenario002-standalone:
             files:
               - ^manifests/haproxy.*$
               - ^manifests/profile/(base|pacemaker)/aodh.*$
@@ -47,6 +47,7 @@
               - ^manifests/profile/(base|pacemaker)/panko.*$
               - ^manifests/profile/(base|pacemaker)/swift.*$
               - ^manifests/profile/(base|pacemaker)/zaqar.*$
+              - zuul.d/layout.yaml
         - tripleo-ci-centos-7-scenario003-multinode-oooq-container:
             files:
               - ^manifests/haproxy.*$
