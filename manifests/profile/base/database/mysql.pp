@@ -267,7 +267,7 @@ class tripleo::profile::base::database::mysql (
       include ::ec2api::db::mysql
     }
     if hiera('zaqar_api_enabled', false) and hiera('zaqar::db::mysql::user', '') == 'zaqar' {
-      # NOTE: by default zaqar uses mongodb
+      # NOTE: by default zaqar uses sqlalchemy
       include ::zaqar::db::mysql
     }
     if hiera('veritas_hyperscale_controller_enabled', false) {

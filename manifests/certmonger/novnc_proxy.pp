@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::certmonger::novnc_proxy
 #
-# Request a certificate for MongoDB and do the necessary setup.
+# Request a certificate for novnc_proxy and do the necessary setup.
 #
 # === Parameters
 #

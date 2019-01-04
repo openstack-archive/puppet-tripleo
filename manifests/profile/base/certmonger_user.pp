@@ -87,11 +87,6 @@
 #   certificate is renewed.
 #   Defaults to undef
 #
-# [*mongodb_certificate_specs*]
-#   (Optional) The specifications to give to certmonger for the certificate(s)
-#   it will create.
-#   Defaults to hiera('mongodb_certificate_specs',{})
-#
 # [*mysql_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -149,7 +144,6 @@ class tripleo::profile::base::certmonger_user (
   $libvirt_vnc_postsave_cmd       = undef,
   $qemu_certificates_specs    = hiera('qemu_certificates_specs', {}),
   $qemu_postsave_cmd          = undef,
-  $mongodb_certificate_specs  = hiera('mongodb_certificate_specs',{}),
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
   $redis_certificate_specs    = hiera('redis_certificate_specs', {}),
@@ -212,9 +206,6 @@ class tripleo::profile::base::certmonger_user (
     # The haproxy fronends (or listen resources) depend on the certificate
     # existing and need to be refreshed if it changed.
     Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
-  }
-  unless empty($mongodb_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::mongodb', $mongodb_certificate_specs)
   }
   unless empty($mysql_certificate_specs) {
     ensure_resource('class', 'tripleo::certmonger::mysql', $mysql_certificate_specs)
