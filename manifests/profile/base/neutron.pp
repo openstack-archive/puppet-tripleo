@@ -82,10 +82,6 @@
 #   of available agents.
 #   Defaults to hiera('neutron_dhcp_short_node_names') or []
 #
-# [*designate_api_enabled*]
-#   (Optional) Indicate whether Designate is available in the deployment.
-#   Defaults to hiera('designate_api_enabled') or false
-#
 # [*container_cli*]
 #   (Optional) A container CLI to be used with the wrapper
 #   tooling to manage containers controled by Neutron/OVN
@@ -109,7 +105,6 @@ class tripleo::profile::base::neutron (
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $dhcp_agents_per_network = undef,
   $dhcp_nodes              = hiera('neutron_dhcp_short_node_names', []),
-  $designate_api_enabled   = hiera('designate_api_enabled', false),
   $container_cli           = hiera('container_cli', 'docker'),
 ) {
   if $step >= 3 {
@@ -154,9 +149,5 @@ class tripleo::profile::base::neutron (
     }
     include ::neutron::config
     include ::neutron::logging
-
-    if $designate_api_enabled {
-      include ::neutron::designate
-    }
   }
 }
