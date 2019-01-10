@@ -75,18 +75,6 @@ if [ \"eth0\" == \"$1\" ]
 then
   exec 1> >(logger -s -t $(basename $0)) 2>&1
   vendor_id=\"$(cat /sys/class/net/eth0/device/vendor)\"
-  if [[ $vendor_id == \"0x15b3\" && $(/sbin/lsmod | grep bonding) ]]
-  then
-    declare -A bonds
-    for bond in `cat /sys/class/net/bonding_masters`
-    do
-      bonds[$bond]=`cat \"/sys/class/net/$bond/bonding/slaves\"`
-      for bond_interface in ${bonds[$bond]}
-      do
-        echo \"-$bond_interface\" > \"/sys/class/net/$bond/bonding/slaves\"
-      done
-    done
-  fi
   if [ \"$(cat /sys/class/net/eth0/device/sriov_numvfs)\" == \"0\" ]
   then
     echo 10 > /sys/class/net/eth0/device/sriov_numvfs
@@ -116,23 +104,6 @@ then
     /usr/sbin/devlink dev eswitch set pci/\"$interface_pci\" inline-mode transport
   fi
   /usr/sbin/ethtool -K eth0 hw-tc-offload on
-  if [ $vendor_id == \"0x15b3\" ]
-  then
-    for pci in $vfs_pci_list
-    do
-      echo \"$pci\" > /sys/bus/pci/drivers/mlx5_core/bind
-    done
-  fi
-  if [[ $vendor_id == \"0x15b3\" && $(/sbin/lsmod | grep bonding) ]]
-  then
-    for bond in \"${!bonds[@]}\"
-    do
-      for bond_interface in ${bonds[$bond]}
-      do
-        echo \"+$bond_interface\" > \"/sys/class/net/$bond/bonding/slaves\"
-      done
-    done
-  fi
 fi\n[ \"eth1\" == \"\$1\" ] && echo 8 > /sys/class/net/eth1/device/sriov_numvfs\n",
         :group   => 'root',
         :mode    => '0755',
