@@ -159,9 +159,12 @@ class tripleo::profile::base::certmonger_user (
   include ::tripleo::certmonger::ca::libvirt
   include ::tripleo::certmonger::ca::libvirt_vnc
 
-  unless empty($apache_certificates_specs) {
+  # Remove apache_certificates_specs where hostname is empty.
+  # Workaround bug: https://bugs.launchpad.net/tripleo/+bug/1811207
+  $apache_certificates_specs_filtered = $apache_certificates_specs.filter | $specs, $keys | { ! empty($keys[hostname]) }
+  unless empty($apache_certificates_specs_filtered) {
     include ::tripleo::certmonger::apache_dirs
-    ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs,
+    ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs_filtered,
                       {'postsave_cmd' => $apache_postsave_cmd})
   }
   unless empty($libvirt_certificates_specs) {
