@@ -100,6 +100,20 @@
               - ^manifests/profile/(base|pacemaker)/monitoring.*$
               - ^manifests/profile/(base|pacemaker)/panko.*$
               - zuul.d/layout.yaml
+        - tripleo-ci-centos-7-scenario002-standalone:
+            files:
+              - ^manifests/haproxy.*$
+              - ^manifests/profile/(base|pacemaker)/aodh.*$
+              - ^manifests/profile/(base|pacemaker)/barbican.*$
+              - ^manifests/profile/(base|pacemaker)/ceilometer.*$
+              - ^manifests/profile/(base|pacemaker)/cinder.*$
+              - ^manifests/profile/(base|pacemaker)/glance.*$
+              - ^manifests/profile/(base|pacemaker)/gnocchi.*$
+              - ^manifests/profile/(base|pacemaker)/nova/ec2.*$
+              - ^manifests/profile/(base|pacemaker)/panko.*$
+              - ^manifests/profile/(base|pacemaker)/swift.*$
+              - ^manifests/profile/(base|pacemaker)/zaqar.*$
+              - zuul.d/layout.yaml
         - tripleo-ci-centos-7-scenario004-standalone:
             files:
               - ^manifests/haproxy.*$
