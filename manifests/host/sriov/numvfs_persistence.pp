@@ -74,9 +74,11 @@ define tripleo::host::sriov::numvfs_persistence(
         'count' => "${count}"
         })
     } else {
-      $vfdef_str = "${content_string}[ \"${interface}\" == \"\$1\" ] && echo ${count} > /sys/class/net/${interface}/device/sriov_numvfs\n"
+      $vfdef_str = "${content_string}[ \"${interface}\" == \"\$1\" ] \
+&& echo ${count} > /sys/class/net/${interface}/device/sriov_numvfs\n"
     }
-    $udev_str = "${udev_rules}KERNEL==\"${interface}\", RUN+=\"/etc/sysconfig/allocate_vfs %k\"\n"
+    $udev_str = "${udev_rules}KERNEL==\"${interface}\", \
+RUN+=\"/etc/sysconfig/allocate_vfs %k\"\n"
     tripleo::host::sriov::numvfs_persistence{"mapped ${interface}":
       vf_defs        => delete_at($vf_defs, 0),
       content_string => $vfdef_str,
@@ -84,4 +86,3 @@ define tripleo::host::sriov::numvfs_persistence(
     }
   }
 }
-
