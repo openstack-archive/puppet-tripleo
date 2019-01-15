@@ -10,8 +10,11 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
 
   def create
     if File.file?(sriov_numvfs_path)
-      _set_numvfs
-      _apply_hw_offload
+      if ovs_mode == "switchdev"
+        _apply_hw_offload
+      else
+        _set_numvfs
+      end
     else
       warning("#{sriov_numvfs_path} doesn't exist. Check if #{sriov_get_interface} is a valid network interface supporting SR-IOV")
     end
@@ -44,29 +47,27 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
   end
 
   def _apply_hw_offload
-    # Changing the mode of virtual functions to hw-offload
-    if ovs_mode == "switchdev"
-      cur_value = File.read(vendor_path).strip
-      if cur_value == "0x15b3"
-        vfs_pcis = get_vfs_pcis
-        # Unbinding virtual functions
-        vfs_pcis.each do|vfs_pci|
-          File.write("/sys/bus/pci/drivers/mlx5_core/unbind",vfs_pci)
-        end
-      end
-      # Changing the mode of sriov interface to switchdev mode
-      %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} mode switchdev}
-      if get_interface_device == "0x1013" || get_interface_device == "0x1015"
-        %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} inline-mode transport}
-      end
-      %x{/usr/sbin/ethtool -K #{sriov_get_interface} hw-tc-offload on}
-      if cur_value == "0x15b3"
-        # Binding virtual functions
-        vfs_pcis.each do|vfs_pci|
-          File.write("/sys/bus/pci/drivers/mlx5_core/bind",vfs_pci)
-        end
+    # Changing the mode of virtual functions to support hw-offload
+
+    vendor_id = File.read(vendor_path).strip
+
+    # Setting the number of vfs
+    _set_numvfs
+
+    # Applying the hardware offloading
+    if vendor_id == "0x15b3"
+      vfs_pcis = get_vfs_pcis
+      # Unbinding virtual functions
+      vfs_pcis.each do|vfs_pci|
+        File.write("/sys/bus/pci/drivers/mlx5_core/unbind",vfs_pci)
       end
     end
+    # Changing the mode of sriov interface to switchdev mode
+    %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} mode switchdev}
+    if get_interface_device == "0x1013" || get_interface_device == "0x1015"
+      %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} inline-mode transport}
+    end
+    %x{/usr/sbin/ethtool -K #{sriov_get_interface} hw-tc-offload on}
   end
 
   def sriov_numvfs_path
