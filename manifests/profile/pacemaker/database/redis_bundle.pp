@@ -215,7 +215,12 @@ slave-announce-port ${local_tuple[0][2]}
 
   if $step >= 2 {
     if $pacemaker_master {
-      $redis_short_node_names = hiera('redis_short_node_names')
+      if (hiera('redis_short_node_names_override', undef)) {
+        $redis_short_node_names = hiera('redis_short_node_names_override')
+      } else {
+        $redis_short_node_names = hiera('redis_short_node_names')
+      }
+
       $redis_nodes_count = count($redis_short_node_names)
       $redis_short_node_names.each |String $node_name| {
         pacemaker::property { "redis-role-${node_name}":

@@ -108,7 +108,12 @@ class tripleo::profile::base::pacemaker (
   $enable_fencing = str2bool(hiera('enable_fencing', false)) and $step >= 5
 
   if $step >= 1 {
-    $pacemaker_short_node_names = join(hiera('pacemaker_short_node_names'), ',')
+    if (hiera('pacemaker_short_node_names_override', undef)) {
+      $pacemaker_short_node_names = join(hiera('pacemaker_short_node_names_override'), ',')
+    } else {
+      $pacemaker_short_node_names = join(hiera('pacemaker_short_node_names'), ',')
+    }
+
     $pacemaker_cluster_members = downcase(regsubst($pacemaker_short_node_names, ',', ' ', 'G'))
     $corosync_ipv6 = str2bool(hiera('corosync_ipv6', false))
     if $corosync_ipv6 {

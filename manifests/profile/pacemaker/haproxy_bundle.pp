@@ -106,7 +106,12 @@ class tripleo::profile::pacemaker::haproxy_bundle (
 
   if $step >= 2 and $enable_load_balancer {
     if $pacemaker_master {
-      $haproxy_short_node_names = hiera('haproxy_short_node_names')
+      if (hiera('haproxy_short_node_names_override', undef)) {
+        $haproxy_short_node_names = hiera('haproxy_short_node_names_override')
+      } else {
+        $haproxy_short_node_names = hiera('haproxy_short_node_names')
+      }
+
       $haproxy_short_node_names.each |String $node_name| {
         pacemaker::property { "haproxy-role-${node_name}":
           property => 'haproxy-role',
