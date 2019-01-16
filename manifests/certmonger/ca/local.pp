@@ -28,12 +28,19 @@ class tripleo::certmonger::ca::local(
   $ca_pkcs12 = '/var/lib/certmonger/local/creds'
   $extract_cmd = "openssl pkcs12 -in ${ca_pkcs12} -out ${ca_pem} -nokeys -nodes -passin pass:''"
   $trust_ca_cmd = 'update-ca-trust extract'
+
+  file { "${ca_pem}":
+    ensure => present,
+    mode   => '0644',
+    owner  => 'root',
+  }
   exec { 'extract-and-trust-ca':
     command   => "${extract_cmd} && ${trust_ca_cmd}",
     path      => '/usr/bin',
     unless    => "test -e ${ca_pem} && openssl x509 -checkend 0 -noout -in ${ca_pem}",
     tries     => 5,
     try_sleep => 1,
+    notify    => File[$ca_pem]
   }
   Service['certmonger'] ~> Exec<| title == 'extract-and-trust-ca' |>
 }
