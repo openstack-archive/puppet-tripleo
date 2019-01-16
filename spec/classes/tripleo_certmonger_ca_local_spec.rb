@@ -37,6 +37,14 @@ describe 'tripleo::certmonger::ca::local' do
         :unless => "test -e #{params[:ca_pem]} && openssl x509 -checkend 0 -noout -in #{params[:ca_pem]}",
       )
     end
+
+    it 'set the correct permissions for the CA certificate file' do
+      is_expected.to contain_file(params[:ca_pem]).with(
+        :ensure => 'present',
+        :mode   => '0644',
+        :owner  => 'root'
+      )
+    end
   end
 
   on_supported_os.each do |os, facts|
