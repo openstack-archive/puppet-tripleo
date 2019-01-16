@@ -35,6 +35,18 @@
 #   This argument must be string, even if the numeric form is used.
 #   Defaults to '5666'
 #
+# [*certificate_specs*]
+#   (optional) The specification to give to certmonger for the certificate
+#   it will create. Note that the certificate nickname must be 'qdr' in
+#   the case of this service.
+#   Example with hiera:
+#     tripleo::profile::base::metrics::qdr::certificate_specs:
+#       hostname: <overcloud controller fqdn>
+#       service_certificate: <service certificate path>
+#       service_key: <service key path>
+#       principal: "qdr/<overcloud controller fqdn>"
+#   Defaults to {}.
+#
 # [*listener_require_encrypt*]
 #   (optional) Require the connection to the peer to be encrypted
 #   Defaults to  'no'
@@ -90,6 +102,7 @@ class tripleo::profile::base::metrics::qdr (
   $password                 = undef,
   $listener_addr            = 'localhost',
   $listener_port            = '5666',
+  $certificate_specs        = {},
   $listener_require_ssl     = false,
   $listener_require_encrypt = false,
   $listener_sasl_mech       = undef,
@@ -118,7 +131,7 @@ class tripleo::profile::base::metrics::qdr (
       # TO-DO(mmagr): Metrics QDRs gonna run in edge mode as soon as we will
       # have a newest version of qpid-dispatch-router. Until then we have to run
       # in interior mode
-      #router_mode              => 'edge',
+      #router_mode             => 'edge',
       router_mode              => 'interior',
       connectors               => $connectors,
       extra_addresses          => $addresses,
