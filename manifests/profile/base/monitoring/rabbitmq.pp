@@ -35,6 +35,8 @@ class tripleo::profile::base::monitoring::rabbitmq (
   $user     = hiera('monitoring_rabbitmq_username', 'sensu'),
   $vhost    = hiera('monitoring_rabbitmq_vhost', '/sensu'),
 ) {
+  warning('Service sensu-client is deprecated. Please take in mind, that it is going to be removed in T release.')
+
   rabbitmq_vhost { 'sensu-rabbit-vhost':
     ensure => present,
     name   => $vhost

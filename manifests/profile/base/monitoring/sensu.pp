@@ -25,6 +25,7 @@
 class tripleo::profile::base::monitoring::sensu (
   $step = Integer(hiera('step')),
 ) {
+  warning('Service sensu-client is deprecated. Please take in mind, that it is going to be removed in T release.')
   include ::sensu
   package { 'osops-tools-monitoring-oschecks':
     ensure => 'present'

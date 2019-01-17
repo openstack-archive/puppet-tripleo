@@ -25,6 +25,7 @@
 class tripleo::profile::base::monitoring::uchiwa (
   $step = Integer(hiera('step')),
 ) {
+  warning('Service uchiwa is deprecated. Please take in mind, that it is going to be removed in T release.')
   if $step >= 3 {
     include ::uchiwa
   }
