@@ -115,6 +115,8 @@ class tripleo::profile::base::logging::fluentd (
   $service_names = hiera('service_names', [])
 ) {
   if $step >= 4 {
+    warning('Service fluentd is deprecated. Please take in mind, that it going to be removed in T release.')
+
     include ::fluentd
     include ::systemd::systemctl::daemon_reload
 
