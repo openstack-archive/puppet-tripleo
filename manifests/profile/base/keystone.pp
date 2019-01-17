@@ -290,6 +290,12 @@ class tripleo::profile::base::keystone (
         ensure => present,
       }
     }
+
+    if hiera('barbican_api_enabled', false) {
+      keystone_role { 'creator':
+        ensure => present
+      }
+    }
   }
 
   if $step == 3 and $manage_endpoint {
