@@ -319,6 +319,12 @@ class tripleo::profile::base::keystone (
     class { '::keystone::roles::admin':
       admin_roles => $admin_roles,
     }
+
+    if hiera('barbican_api_enabled', false) {
+      keystone_role { 'creator':
+        ensure => present
+      }
+    }
   }
 
   if $step == 3 and $manage_endpoint {
