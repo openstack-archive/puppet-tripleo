@@ -110,6 +110,26 @@ class tripleo::firewall(
       'firewall_settings' => $firewall_post_extras,
     })
 
+    # Ensure we don't get any unmanaged rules in the firewall.
+    #
+    # iptables-services package pushes some rules we don't want to see in the
+    # firewall, as they conflict with the ones we are actually managing:
+    # - opens ssh to the world (see https://review.openstack.org/632468)
+    # - reject connections (and this reject happens before the logging we push,
+    #   preventing logging to happen)
+    # - some repetitions like RELATED,ESTABLISHED, and ICMP related rules
+    #
+    # See https://bugzilla.redhat.com/show_bug.cgi?id=1667887
+    # for more context and detail.
+    exec {'save ipv4 rules':
+      command => '/usr/sbin/iptables-save > /etc/sysconfig/iptables',
+      before  => Service[$::firewall::params::service_name, $::firewall::params::service_name_v6],
+    }
+    exec {'save ipv6 rules':
+      command => '/usr/sbin/ip6tables-save > /etc/sysconfig/ip6tables',
+      before  => Service[$::firewall::params::service_name, $::firewall::params::service_name_v6],
+    }
+
     Class['tripleo::firewall::pre']
       -> Firewall<|tag == 'tripleo-firewall-rule'|>
         -> Class['tripleo::firewall::post']
@@ -173,6 +193,8 @@ class tripleo::firewall(
       ]
     }
 
+    Exec['save ipv4 rules'] -> Firewall<| |>
+    Exec['save ipv6 rules'] -> Firewall<| |>
     Firewall<| |> -> Exec['nonpersistent_v4_rules_cleanup']
     Firewall<| |> -> Exec['nonpersistent_v6_rules_cleanup']
     Firewall<| |> -> Exec['nonpersistent_ironic_inspector_pxe_filter_v4_rules_cleanup']
