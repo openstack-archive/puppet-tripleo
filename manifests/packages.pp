@@ -35,7 +35,8 @@ class tripleo::packages (
   # required for stages
   include ::stdlib
 
-  if !str2bool($enable_install) and !str2bool($enable_upgrade) {
+  # if both enable_install and enabled_upgrade are false *or* if we're in containers we noop package installations
+  if (!str2bool($enable_install) and !str2bool($enable_upgrade)) or $::deployment_type == 'containers' {
     case $::osfamily {
       'RedHat': {
         Package <| |> { provider => 'norpm' }
