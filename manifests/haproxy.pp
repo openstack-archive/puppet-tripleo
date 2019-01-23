@@ -908,11 +908,14 @@ class tripleo::haproxy (
   }
 
   if $keystone_admin {
+    # NOTE(jaosorior): Given that the admin endpoint is in the same vhost
+    # nowadays as the public/internal one. We can just loadbalance towards the
+    # same IP.
     ::tripleo::haproxy::endpoint { 'keystone_admin':
       internal_ip     => hiera('keystone_admin_api_vip', $controller_virtual_ip),
       service_port    => $ports[keystone_admin_api_port],
-      ip_addresses    => hiera('keystone_admin_api_node_ips', $controller_hosts_real),
-      server_names    => hiera('keystone_admin_api_node_names', $controller_hosts_names_real),
+      ip_addresses    => hiera('keystone_public_api_node_ips', $controller_hosts_real),
+      server_names    => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
       mode            => 'http',
       listen_options  => merge($default_listen_options, { 'option' => [ 'httpchk GET /v3' ] }),
       service_network => $keystone_admin_network,
