@@ -77,6 +77,11 @@
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
 #   Defaults to hiera('memcached_node_ips')
+#
+# [*enable_cache*]
+#   (Optional) Enable the use of cache. Note that it is unsupported
+#   to disable this key. It is only useful for debugging purposes.
+#   Defaults to true
 
 class tripleo::profile::base::nova (
   $bootstrap_node          = hiera('nova_api_short_bootstrap_node_name', undef),
@@ -94,6 +99,7 @@ class tripleo::profile::base::nova (
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $step                    = Integer(hiera('step')),
   $memcached_ips           = hiera('memcached_node_ips'),
+  $enable_cache            = true,
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -114,7 +120,7 @@ class tripleo::profile::base::nova (
     include ::nova::config
     include ::nova::logging
     class { '::nova::cache':
-      enabled          => true,
+      enabled          => $enable_cache,
       backend          => 'oslo_cache.memcache_pool',
       memcache_servers => $memcache_servers,
     }
