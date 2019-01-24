@@ -28,6 +28,10 @@
 #  Options for the balancer member, specified after the server declaration.
 #  These should go in the member's configuration block.
 #
+# [*haproxy_port*]
+#  An alternative port, on which haproxy will listen for incoming requests.
+#  Defaults to service_port.
+#
 # [*base_service_name*]
 #  In cases where the service name doesn't match the endpoint name, you can
 #  specify this option in order to get an appropriate value for $ip_addresses
@@ -115,6 +119,7 @@ define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
   $member_options,
+  $haproxy_port                = undef,
   $base_service_name           = undef,
   $ip_addresses                = hiera("${name}_node_ips", undef),
   $server_names                = hiera("${name}_node_names", undef),
@@ -134,6 +139,14 @@ define tripleo::haproxy::endpoint (
   $sticky_sessions             = false,
   $session_cookie              = 'STICKYSESSION',
 ) {
+
+  if $haproxy_port {
+    $haproxy_port_real = $haproxy_port
+    $service_port_real = $service_port
+  } else {
+    $haproxy_port_real = $service_port
+    $service_port_real = $service_port
+  }
 
   if $base_service_name {
     $ip_addresses_real = hiera("${base_service_name}_node_ips", undef)
@@ -165,7 +178,7 @@ define tripleo::haproxy::endpoint (
                                         union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
     } else {
       $listen_options_precookie = merge($listen_options, $custom_options)
-      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${service_port}"), $haproxy_listen_bind_param)
+      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${haproxy_port_real}"), $haproxy_listen_bind_param)
     }
   } else {
     # internal service only
@@ -197,14 +210,14 @@ define tripleo::haproxy::endpoint (
       # contain the path that we'll use under 'service_pem'.
       $internal_cert_path = $internal_certificates_specs["haproxy-${service_network}"]['service_pem']
     }
-    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"),
+    $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${haproxy_port_real}"),
                                         union($haproxy_listen_bind_param, ['ssl', 'crt', $internal_cert_path]))
   } else {
     if $service_network == 'external' and $public_certificate {
-      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"),
+      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${haproxy_port_real}"),
                                           union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
     } else {
-      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${service_port}"), $haproxy_listen_bind_param)
+      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${haproxy_port_real}"), $haproxy_listen_bind_param)
     }
   }
   if $authorized_userlist {
@@ -236,7 +249,7 @@ define tripleo::haproxy::endpoint (
       $non_colon_ip = regsubst($ip, ':', '-', 'G')
       haproxy::balancermember { "${name}_${non_colon_ip}_${server}":
         listening_service => $name,
-        ports             => $service_port,
+        ports             => $service_port_real,
         ipaddresses       => $ip,
         server_names      => $server,
         options           => union($member_options, ["cookie ${server}"]),
@@ -245,7 +258,7 @@ define tripleo::haproxy::endpoint (
   } else {
     haproxy::balancermember { "${name}":
       listening_service => $name,
-      ports             => $service_port,
+      ports             => $service_port_real,
       ipaddresses       => $ip_addresses_real,
       server_names      => $server_names_real,
       options           => $member_options,
@@ -258,10 +271,17 @@ define tripleo::haproxy::endpoint (
     # a port for the regular service and also the ssl port for the service.
     # It makes sure we're not trying to create TCP iptables rules where no port
     # is specified.
-    if $service_port {
-      $haproxy_firewall_rules = {
+    if $service_port_real {
+      $service_firewall_rules = {
         "100 ${name}_haproxy"     => {
-          'dport' => $service_port,
+          'dport' => $service_port_real,
+        },
+      }
+    }
+    if $service_port_real != $haproxy_port_real {
+      $haproxy_firewall_rules = {
+        "100 ${name}_haproxy_frontend"     => {
+          'dport' => $haproxy_port_real,
         },
       }
     }
@@ -274,8 +294,8 @@ define tripleo::haproxy::endpoint (
     } else {
       $haproxy_ssl_firewall_rules = {}
     }
-    $firewall_rules = merge($haproxy_firewall_rules, $haproxy_ssl_firewall_rules)
-    if $service_port or $public_ssl_port {
+    $firewall_rules = merge($service_firewall_rules, $haproxy_firewall_rules, $haproxy_ssl_firewall_rules)
+    if $service_port_real or $public_ssl_port {
       create_resources('tripleo::firewall::rule', $firewall_rules)
     }
   }

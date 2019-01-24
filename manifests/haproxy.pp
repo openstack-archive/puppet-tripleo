@@ -913,7 +913,8 @@ class tripleo::haproxy (
     # same IP.
     ::tripleo::haproxy::endpoint { 'keystone_admin':
       internal_ip     => hiera('keystone_admin_api_vip', $controller_virtual_ip),
-      service_port    => $ports[keystone_admin_api_port],
+      service_port    => $ports[keystone_public_api_port],
+      haproxy_port    => $ports[keystone_admin_api_port],
       ip_addresses    => hiera('keystone_public_api_node_ips', $controller_hosts_real),
       server_names    => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
       mode            => 'http',
