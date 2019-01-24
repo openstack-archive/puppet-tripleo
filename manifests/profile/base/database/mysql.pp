@@ -154,7 +154,7 @@ class tripleo::profile::base::database::mysql (
       'mysqld' => {
         'bind-address'            => $bind_address,
         'max_connections'         => $mysql_max_connections,
-        'open_files_limit'        => '-1',
+        'open_files_limit'        => '65536',
         'innodb_buffer_pool_size' => $innodb_buffer_pool_size,
         'innodb_file_per_table'   => 'ON',
         'innodb_log_file_size'    => $innodb_log_file_size,
