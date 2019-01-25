@@ -30,8 +30,29 @@ describe 'tripleo::profile::base::tuned' do
                 is_expected.to contain_exec('tuned-adm')
             end
         end
-    end
+        context 'with custom profile' do
+           let :params do
+               {
+                   :profile => 'custom',
+                   :custom_profile => 'foo'
+               }
+           end
 
+            it 'should create a custom tuned profile' do
+               is_expected.to contain_file('/etc/tuned/custom/tuned.conf').with({
+                 'content' => 'foo',
+                 'owner'   => 'root',
+                 'group'   => 'root',
+                 'mode'    => '0644',
+                 })
+            end
+            it 'should run a tuned-adm exec to set the custom profile' do
+               is_expected.to contain_exec('tuned-adm').with_command(
+                 'tuned-adm profile custom'
+               )
+            end
+        end
+    end
     on_supported_os.each do |os, facts|
         context "on #{os}" do
             let(:facts) {
