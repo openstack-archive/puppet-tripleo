@@ -33,7 +33,6 @@
 #
 # [*postsave_cmd*]
 #   (Optional) Specifies the command to execute after requesting a certificate.
-#   If nothing is given, it will default to: "systemctl restart ${service name}"
 #   Defaults to undef.
 #
 # [*principal*]
@@ -49,6 +48,13 @@ class tripleo::certmonger::redis (
   $principal     = undef,
 ) {
   include ::certmonger
+
+  ensure_resource('file', '/usr/bin/certmonger-redis-refresh.sh', {
+    source  => 'puppet:///modules/tripleo/certmonger-redis-refresh.sh',
+    mode    => '0700',
+    seltype => 'bin_t',
+    notify  => Service['certmonger']
+  })
 
   certmonger_certificate { 'redis' :
     ensure       => 'present',
