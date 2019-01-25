@@ -33,7 +33,6 @@
 #
 # [*postsave_cmd*]
 #   (Optional) Specifies the command to execute after requesting a certificate.
-#   If nothing is given, it will default to: "systemctl restart ${service name}"
 #   Defaults to undef.
 #
 # [*principal*]
@@ -51,7 +50,13 @@ class tripleo::certmonger::rabbitmq (
   include ::certmonger
   include ::rabbitmq::params
 
-  $postsave_cmd_real = pick($postsave_cmd, "systemctl restart ${::rabbitmq::params::service_name}")
+  ensure_resource('file', '/usr/bin/certmonger-rabbitmq-refresh.sh', {
+    source  => 'puppet:///modules/tripleo/certmonger-rabbitmq-refresh.sh',
+    mode    => '0700',
+    seltype => 'bin_t',
+    notify  => Service['certmonger']
+  })
+
   certmonger_certificate { 'rabbitmq' :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -59,7 +64,7 @@ class tripleo::certmonger::rabbitmq (
     hostname     => $hostname,
     dnsname      => $hostname,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd_real,
+    postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
     wait         => true,
     require      => Class['::certmonger'],
