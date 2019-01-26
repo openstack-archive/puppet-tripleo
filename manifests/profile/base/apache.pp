@@ -32,9 +32,17 @@ class tripleo::profile::base::apache(
   Boolean $enable_status_listener = false,
   String  $status_listener        = '127.0.0.1:80',
 ) {
+  include ::apache::params
+  # rhel8/fedora will be python3. See LP#1813053
+  if ($::os['name'] == 'Fedora') or ($::os['family'] == 'RedHat' and Integer.new($::os['release']['major']) > 7) {
+    class { '::apache':
+      mod_packages => merge($::apache::params::mod_packages, { 'wsgi' =>  'python3-mod_wsgi' }),
+      mod_libs     => merge($::apache::params::mod_libs, { 'wsgi' => 'mod_wsgi_python3.so' }),
+    }
+  }
+
   include ::apache::mod::status
   include ::apache::mod::ssl
-
   if $enable_status_listener {
     if !defined(Apache::Listen[$status_listener]) {
       ::apache::listen {$status_listener: }
