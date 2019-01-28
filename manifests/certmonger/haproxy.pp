@@ -88,20 +88,12 @@ define tripleo::certmonger::haproxy (
       $dnsnames_real = $hostname
     }
 
-    if $certmonger_ca == 'local' {
-      $ca_fragment = $ca_pem
-    } else {
-      $ca_fragment = ''
-    }
-
-    $concat_pem = "cat ${service_certificate} ${ca_fragment} ${service_key} > ${service_pem}"
-    if $postsave_cmd {
-      $postsave_cmd_real = "${concat_pem} && ${postsave_cmd}"
-    } else {
-      $reload_haproxy_cmd = 'if systemctl -q is-active haproxy; then systemctl reload haproxy; else true; fi'
-      $postsave_cmd_real = "${concat_pem} && ${reload_haproxy_cmd}"
-    }
-
+    ensure_resource('file', '/usr/bin/certmonger-haproxy-refresh.sh', {
+      source  => 'puppet:///modules/tripleo/certmonger-haproxy-refresh.sh',
+      mode    => '0700',
+      seltype => 'bin_t',
+      notify  => Service['certmonger']
+    })
     certmonger_certificate { "${title}-cert":
       ensure       => 'present',
       ca           => $certmonger_ca,
@@ -109,7 +101,7 @@ define tripleo::certmonger::haproxy (
       dnsname      => $dnsnames_real,
       certfile     => $service_certificate,
       keyfile      => $service_key,
-      postsave_cmd => $postsave_cmd_real,
+      postsave_cmd => $postsave_cmd,
       principal    => $principal_real,
       eku          => ['id-kp-clientAuth', 'id-kp-serverAuth'],
       wait         => true,
@@ -141,6 +133,13 @@ define tripleo::certmonger::haproxy (
         order   => '10',
         tag     => 'haproxy-cert',
         require => Class['tripleo::certmonger::ca::local'],
+      }
+    } elsif $certmonger_ca == 'IPA' {
+      concat::fragment { "${title}-ca-fragment":
+        target => $service_pem,
+        source => '/etc/ipa/ca.crt',
+        order  => '10',
+        tag    => 'haproxy-cert',
       }
     }
 
