@@ -121,6 +121,14 @@ class tripleo::profile::base::pacemaker (
         '--token' => hiera('corosync_token_timeout', 1000)
       }
     }
+    # If hiera('pacemaker_node_ips', []) is not empty we want to create the array
+    # for puppet pacemaker to use as addresses list which is an array of arrays.
+    $pacemaker_node_ips = hiera('pacemaker_node_ips', [])
+    if count($pacemaker_node_ips) > 0 {
+      $pacemaker_node_ips_real = $pacemaker_node_ips.map |$x| { Array([$x]) }
+    } else {
+      $pacemaker_node_ips_real = []
+    }
 
     if $encryption {
       $cluster_setup_extras = merge($cluster_setup_extras_pre, {'--encryption' => '1'})
@@ -135,6 +143,7 @@ class tripleo::profile::base::pacemaker (
       setup_cluster        => $pacemaker_master,
       cluster_setup_extras => $cluster_setup_extras,
       remote_authkey       => $remote_authkey,
+      cluster_members_addr => $pacemaker_node_ips_real,
     }
     if str2bool(hiera('docker_enabled', false)) {
       include ::systemd::systemctl::daemon_reload
