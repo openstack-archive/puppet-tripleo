@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    qemu certs are note used by libvirt and therefore does not need a restart.
+    In case certs gets renewed, right now qemu processes (instances) need to be
+    restarted. This removes the postsave_cmd and also restart libvirt on cert
+    file change.
