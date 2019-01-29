@@ -42,11 +42,6 @@
 #   it will create.
 #   Defaults to hiera('apache_certificate_specs', {}).
 #
-# [*apache_postsave_cmd*]
-#   (Optional) If set, it overrides the default way to restart apache when the
-#   certificate is renewed.
-#   Defaults to undef
-#
 # [*haproxy_certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -134,10 +129,14 @@
 #   certificate is renewed.
 #   Defaults to undef
 #
+# [*apache_postsave_cmd*]
+#   (Optional) If set, it overrides the default way to restart apache when the
+#   certificate is renewed.
+#   Defaults to undef
+#
 class tripleo::profile::base::certmonger_user (
   $certmonger_ca              = hiera('certmonger_ca', 'local'),
   $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
-  $apache_postsave_cmd        = undef,
   $haproxy_certificates_specs = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
   $libvirt_certificates_specs = hiera('libvirt_certificates_specs', {}),
   $libvirt_postsave_cmd       = undef,
@@ -156,6 +155,7 @@ class tripleo::profile::base::certmonger_user (
   $novnc_proxy_postsave_cmd   = undef,
   # Deprecated
   $haproxy_postsave_cmd       = undef,
+  $apache_postsave_cmd        = undef,
 ) {
   include ::certmonger
 
@@ -186,8 +186,7 @@ class tripleo::profile::base::certmonger_user (
   $apache_certificates_specs_filtered = $apache_certificates_specs.filter | $specs, $keys | { ! empty($keys[hostname]) }
   unless empty($apache_certificates_specs_filtered) {
     include ::tripleo::certmonger::apache_dirs
-    ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs_filtered,
-                      {'postsave_cmd' => $apache_postsave_cmd})
+    ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs_filtered)
   }
   unless empty($libvirt_certificates_specs) {
     include ::tripleo::certmonger::libvirt_dirs

@@ -62,7 +62,6 @@ define tripleo::certmonger::httpd (
     $dnsnames_real = $hostname
   }
 
-  $postsave_cmd_real = pick($postsave_cmd, "systemctl reload ${::apache::params::service_name}")
   certmonger_certificate { $name :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -70,7 +69,7 @@ define tripleo::certmonger::httpd (
     hostname     => $hostname,
     dnsname      => $dnsnames_real,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd_real,
+    postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
     wait         => true,
     tag          => 'apache-cert',
