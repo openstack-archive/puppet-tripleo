@@ -37,6 +37,11 @@
 #
 # === Parameters
 #
+# [*step*]
+#   (Optional) The current step in deployment. See tripleo-heat-templates
+#   for more details.
+#   Defaults to hiera('step', 1)
+#
 # [*apache_certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -130,6 +135,7 @@
 #   Defaults to undef
 #
 class tripleo::profile::base::certmonger_user (
+  $step                       = Integer(hiera('step', 1)),
   $certmonger_ca              = hiera('certmonger_ca', 'local'),
   $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
   $haproxy_certificates_specs = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
@@ -153,77 +159,79 @@ class tripleo::profile::base::certmonger_user (
 ) {
   include ::certmonger
 
-  # This is only needed for certmonger's local CA. For any other CA this
-  # operation (trusting the CA) should be done by the deployer.
-  if $certmonger_ca == 'local' {
-      include ::tripleo::certmonger::ca::local
-  }
-  unless empty($haproxy_certificates_specs) {
-    $reload_haproxy = ['systemctl reload haproxy']
-    Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>
-    if defined(Class['::haproxy']) {
-      Class['::tripleo::certmonger::ca::crl'] ~> Class['::haproxy']
+  if $step == 1  {
+    # This is only needed for certmonger's local CA. For any other CA this
+    # operation (trusting the CA) should be done by the deployer.
+    if $certmonger_ca == 'local' {
+        include ::tripleo::certmonger::ca::local
     }
-  } else {
-    $reload_haproxy = []
-  }
-  class { '::tripleo::certmonger::ca::crl' :
-    reload_cmds => $reload_haproxy,
-  }
-  Certmonger_certificate<||> -> Class['::tripleo::certmonger::ca::crl']
-  include ::tripleo::certmonger::ca::libvirt
-  include ::tripleo::certmonger::ca::libvirt_vnc
+    unless empty($haproxy_certificates_specs) {
+      $reload_haproxy = ['systemctl reload haproxy']
+      Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>
+      if defined(Class['::haproxy']) {
+        Class['::tripleo::certmonger::ca::crl'] ~> Class['::haproxy']
+      }
+    } else {
+      $reload_haproxy = []
+    }
+    class { '::tripleo::certmonger::ca::crl' :
+      reload_cmds => $reload_haproxy,
+    }
+    Certmonger_certificate<||> -> Class['::tripleo::certmonger::ca::crl']
+    include ::tripleo::certmonger::ca::libvirt
+    include ::tripleo::certmonger::ca::libvirt_vnc
 
-  # Remove apache_certificates_specs where hostname is empty.
-  # Workaround bug: https://bugs.launchpad.net/tripleo/+bug/1811207
-  $apache_certificates_specs_filtered = $apache_certificates_specs.filter | $specs, $keys | { ! empty($keys[hostname]) }
-  unless empty($apache_certificates_specs_filtered) {
-    include ::tripleo::certmonger::apache_dirs
-    ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs_filtered)
-  }
-  unless empty($libvirt_certificates_specs) {
-    include ::tripleo::certmonger::libvirt_dirs
-    ensure_resources('tripleo::certmonger::libvirt', $libvirt_certificates_specs,
-                      {'postsave_cmd' => $libvirt_postsave_cmd})
-  }
-  unless empty($libvirt_vnc_certificates_specs) {
-    include ::tripleo::certmonger::libvirt_vnc_dirs
-    ensure_resources('tripleo::certmonger::libvirt_vnc', $libvirt_vnc_certificates_specs,
-                      {'postsave_cmd' => $libvirt_vnc_postsave_cmd})
-  }
-  unless empty($haproxy_certificates_specs) {
-    include ::tripleo::certmonger::haproxy_dirs
-    ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs)
-    # The haproxy fronends (or listen resources) depend on the certificate
-    # existing and need to be refreshed if it changed.
-    Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
-  }
-  unless empty($mongodb_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::mongodb', $mongodb_certificate_specs)
-  }
-  unless empty($mysql_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::mysql', $mysql_certificate_specs)
-  }
-  unless empty($rabbitmq_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::rabbitmq', $rabbitmq_certificate_specs)
-  }
-  unless empty($redis_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::redis', $redis_certificate_specs)
-  }
-  unless empty($etcd_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::etcd', $etcd_certificate_specs)
-  }
-  unless empty($odl_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::opendaylight', $odl_certificate_specs)
-  }
-  unless empty($ovs_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::openvswitch', $ovs_certificate_specs)
-  }
-  unless empty($neutron_certificate_specs) {
-    ensure_resource('class', 'tripleo::certmonger::neutron', $neutron_certificate_specs)
-  }
-  unless empty($novnc_proxy_certificates_specs) {
-    ensure_resource('class', 'tripleo::certmonger::novnc_proxy', $novnc_proxy_certificates_specs,
-                      {'postsave_cmd' => $novnc_proxy_postsave_cmd})
+    # Remove apache_certificates_specs where hostname is empty.
+    # Workaround bug: https://bugs.launchpad.net/tripleo/+bug/1811207
+    $apache_certificates_specs_filtered = $apache_certificates_specs.filter | $specs, $keys | { ! empty($keys[hostname]) }
+    unless empty($apache_certificates_specs_filtered) {
+      include ::tripleo::certmonger::apache_dirs
+      ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs_filtered)
+    }
+    unless empty($libvirt_certificates_specs) {
+      include ::tripleo::certmonger::libvirt_dirs
+      ensure_resources('tripleo::certmonger::libvirt', $libvirt_certificates_specs,
+                        {'postsave_cmd' => $libvirt_postsave_cmd})
+    }
+    unless empty($libvirt_vnc_certificates_specs) {
+      include ::tripleo::certmonger::libvirt_vnc_dirs
+      ensure_resources('tripleo::certmonger::libvirt_vnc', $libvirt_vnc_certificates_specs,
+                        {'postsave_cmd' => $libvirt_vnc_postsave_cmd})
+    }
+    unless empty($haproxy_certificates_specs) {
+      include ::tripleo::certmonger::haproxy_dirs
+      ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs)
+      # The haproxy fronends (or listen resources) depend on the certificate
+      # existing and need to be refreshed if it changed.
+      Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
+    }
+    unless empty($mongodb_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::mongodb', $mongodb_certificate_specs)
+    }
+    unless empty($mysql_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::mysql', $mysql_certificate_specs)
+    }
+    unless empty($rabbitmq_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::rabbitmq', $rabbitmq_certificate_specs)
+    }
+    unless empty($redis_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::redis', $redis_certificate_specs)
+    }
+    unless empty($etcd_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::etcd', $etcd_certificate_specs)
+    }
+    unless empty($odl_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::opendaylight', $odl_certificate_specs)
+    }
+    unless empty($ovs_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::openvswitch', $ovs_certificate_specs)
+    }
+    unless empty($neutron_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::neutron', $neutron_certificate_specs)
+    }
+    unless empty($novnc_proxy_certificates_specs) {
+      ensure_resource('class', 'tripleo::certmonger::novnc_proxy', $novnc_proxy_certificates_specs,
+                        {'postsave_cmd' => $novnc_proxy_postsave_cmd})
+    }
   }
 }
