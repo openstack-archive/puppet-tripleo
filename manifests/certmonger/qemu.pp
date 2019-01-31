@@ -37,7 +37,6 @@
 #
 # [*postsave_cmd*]
 #   (Optional) Specifies the command to execute after requesting a certificate.
-#   If nothing is given, it will default to: "systemctl reload ${service name}"
 #   Defaults to undef.
 #
 # [*principal*]
@@ -60,7 +59,6 @@ define tripleo::certmonger::qemu (
   include ::certmonger
   include ::nova::params
 
-  $postsave_cmd_real = pick($postsave_cmd, "systemctl reload ${::nova::params::libvirt_service_name}")
   certmonger_certificate { $name :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -68,7 +66,7 @@ define tripleo::certmonger::qemu (
     hostname     => $hostname,
     dnsname      => $hostname,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd_real,
+    postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
     cacertfile   => $cacertfile,
     wait         => true,
@@ -85,7 +83,4 @@ define tripleo::certmonger::qemu (
     group   => 'qemu',
     mode    => '0640'
   }
-
-  File[$service_certificate] ~> Service<| title == $::nova::params::libvirt_service_name |>
-  File[$service_key] ~> Service<| title == $::nova::params::libvirt_service_name |>
 }
