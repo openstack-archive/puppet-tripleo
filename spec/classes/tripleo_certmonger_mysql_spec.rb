@@ -33,10 +33,6 @@ describe 'tripleo::certmonger::mysql' do
       is_expected.to contain_class('certmonger')
     end
 
-    it 'should include the mysql parameters' do
-      is_expected.to contain_class('mysql::params')
-    end
-
     it 'should request a certificate' do
       is_expected.to contain_certmonger_certificate('mysql').with(
         :ensure       => 'present',
@@ -47,8 +43,6 @@ describe 'tripleo::certmonger::mysql' do
         :ca           => 'local',
         :wait         => true,
       )
-      is_expected.to contain_file('/etc/pki/cert.crt')
-      is_expected.to contain_file('/etc/pki/key.pem')
     end
   end
 
