@@ -33,7 +33,6 @@
 #
 # [*postsave_cmd*]
 #   (Optional) Specifies the command to execute after requesting a certificate.
-#   Defaults to 'if systemctl -q is-active opendaylight; then systemctl restart opendaylight; else true; fi'
 #
 # [*principal*]
 #   (Optional) The haproxy service principal that is set for neutron in kerberos.
@@ -48,6 +47,13 @@ class tripleo::certmonger::neutron (
   $principal     = undef,
 ) {
   include ::certmonger
+
+  ensure_resource('file', '/usr/bin/certmonger-neutron-dhcpd-refresh.sh', {
+    source  => 'puppet:///modules/tripleo/certmonger-neutron-dhcpd-refresh.sh',
+    mode    => '0700',
+    seltype => 'bin_t',
+    notify  => Service['certmonger']
+  })
 
   certmonger_certificate { 'neutron' :
     ensure       => 'present',
