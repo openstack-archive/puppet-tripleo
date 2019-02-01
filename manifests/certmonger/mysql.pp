@@ -56,9 +56,7 @@ class tripleo::certmonger::mysql (
   $principal     = undef,
 ) {
   include ::certmonger
-  include ::mysql::params
 
-  $postsave_cmd_real = pick($postsave_cmd, "systemctl reload ${::mysql::params::server_service_name}")
   certmonger_certificate { 'mysql' :
     ensure       => 'present',
     certfile     => $service_certificate,
@@ -66,22 +64,9 @@ class tripleo::certmonger::mysql (
     hostname     => $hostname,
     dnsname      => $dnsnames,
     principal    => $principal,
-    postsave_cmd => $postsave_cmd_real,
+    postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
     wait         => true,
     require      => Class['::certmonger'],
   }
-  file { $service_certificate :
-    owner   => 'mysql',
-    group   => 'mysql',
-    require => Certmonger_certificate['mysql'],
-  }
-  file { $service_key :
-    owner   => 'mysql',
-    group   => 'mysql',
-    require => Certmonger_certificate['mysql'],
-  }
-
-  File[$service_certificate] ~> Service<| title == $::mysql::params::server_service_name |>
-  File[$service_key] ~> Service<| title == $::mysql::params::server_service_name |>
 }
