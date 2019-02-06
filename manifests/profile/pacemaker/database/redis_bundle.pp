@@ -176,7 +176,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
 
       # redis slave advertise itself as running on a specific
       # <localhost:port> that uniquely identifies it. This value is
-      # used by the master as is, and points the the outgoing stunnel
+      # used by the master as is, and points the outgoing stunnel
       # endpoint to target this slave.
 
       $local_tuple = $replication_tuples.filter |$tuple| {

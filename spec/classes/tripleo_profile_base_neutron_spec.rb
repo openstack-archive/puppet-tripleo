@@ -46,7 +46,7 @@ describe 'tripleo::profile::base::neutron' do
           :dhcp_agents_per_network => 2
         })
       end
-      it 'should set the the value' do
+      it 'should set the value' do
         is_expected.to contain_class('neutron').with(:dhcp_agents_per_network => 2)
       end
     end
