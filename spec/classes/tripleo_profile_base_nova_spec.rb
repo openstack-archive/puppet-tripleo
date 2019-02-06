@@ -49,7 +49,6 @@ describe 'tripleo::profile::base::nova' do
           :default_transport_url => 'rabbit://nova:foo@localhost:5672/?ssl=0'
         )
         is_expected.to contain_class('nova::config')
-        is_expected.to contain_class('nova::placement')
         is_expected.to contain_class('nova::cache').with(
           :enabled => true,
           :backend => 'oslo_cache.memcache_pool',
@@ -71,7 +70,6 @@ describe 'tripleo::profile::base::nova' do
         is_expected.to_not contain_class('nova')
         is_expected.to_not contain_class('nova::config')
         is_expected.to_not contain_class('nova::cache')
-        is_expected.to_not contain_class('nova::placement')
       }
     end
 
@@ -93,7 +91,6 @@ describe 'tripleo::profile::base::nova' do
         )
         is_expected.to contain_class('nova::config')
         is_expected.to contain_class('nova::cache')
-        is_expected.to contain_class('nova::placement')
         is_expected.to_not contain_class('nova::migration::libvirt')
         is_expected.to_not contain_file('/etc/nova/migration/authorized_keys')
         is_expected.to_not contain_file('/etc/nova/migration/identity')
