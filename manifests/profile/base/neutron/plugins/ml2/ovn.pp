@@ -41,8 +41,8 @@ class tripleo::profile::base::neutron::plugins::ml2::ovn (
 ) {
   if $step >= 4 {
     class { '::neutron::plugins::ml2::ovn':
-      ovn_nb_connection => "tcp:${ovn_db_host}:${ovn_nb_port}",
-      ovn_sb_connection => "tcp:${ovn_db_host}:${ovn_sb_port}",
+      ovn_nb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
+      ovn_sb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
     }
   }
 }
