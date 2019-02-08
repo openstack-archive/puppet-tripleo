@@ -93,7 +93,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
           before   => Pacemaker::Resource::Bundle['ovn-dbs-bundle'],
         }
       }
-
+      $ovn_dbs_vip_norm = normalize_ip_for_uri($ovn_dbs_vip)
       $ovn_dbs_location_rule = {
         resource_discovery => 'exclusive',
         score              => 0,
@@ -144,7 +144,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         ocf_agent_name  => "${ovndb_servers_ocf_name}",
         master_params   => '',
         op_params       => 'start timeout=200s stop timeout=200s',
-        resource_params => "master_ip=${ovn_dbs_vip} nb_master_port=${nb_db_port} \
+        resource_params => "master_ip=${ovn_dbs_vip_norm} nb_master_port=${nb_db_port} \
 sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000",
         tries           => $pcs_tries,
         location_rule   => $ovn_dbs_location_rule,

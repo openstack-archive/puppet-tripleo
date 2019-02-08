@@ -73,7 +73,7 @@ class tripleo::profile::pacemaker::ovn_northd (
     $ovndb_servers_resource_name = 'ovndb_servers'
     $ovndb_servers_ocf_name      = 'ovn:ovndb-servers'
     $ovndb_vip_resource_name     = "ip-${ovn_dbs_vip}"
-
+    $ovn_dbs_vip_norm = normalize_ip_for_uri($ovn_dbs_vip)
     # By step 3, all the VIPs would have been created.
     # After creating ovn ocf resource, colocate it with the
     # VIP - ip-${ovn_dbs_vip}.
@@ -81,7 +81,7 @@ class tripleo::profile::pacemaker::ovn_northd (
       ocf_agent_name  => "${ovndb_servers_ocf_name}",
       master_params   => '',
       op_params       => 'start timeout=200s stop timeout=200s',
-      resource_params => "master_ip=${ovn_dbs_vip} nb_master_port=${nb_db_port} \
+      resource_params => "master_ip=${ovn_dbs_vip_norm} nb_master_port=${nb_db_port} \
 sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000",
       tries           => $pcs_tries,
       location_rule   => {
