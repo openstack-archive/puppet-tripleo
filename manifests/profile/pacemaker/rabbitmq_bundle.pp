@@ -95,9 +95,16 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $step                         = Integer(hiera('step')),
   $container_backend            = 'docker',
 ) {
+  # is this an additional nova cell?
+  if hiera('nova_is_additional_cell', undef) {
+    $rpc_nodes_real = hiera('oslo_messaging_rpc_cell_node_names', [])
+  } else {
+    $rpc_nodes_real = $rpc_nodes
+  }
+
   if $rpc_scheme == 'rabbit' {
     $bootstrap_node = $rpc_bootstrap_node
-    $rabbit_nodes = $rpc_nodes
+    $rabbit_nodes = $rpc_nodes_real
   } elsif $notify_scheme == 'rabbit' {
     $bootstrap_node = $notify_bootstrap_node
     $rabbit_nodes = $notify_nodes

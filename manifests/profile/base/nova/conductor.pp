@@ -18,15 +18,31 @@
 #
 # === Parameters
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('nova_api_short_bootstrap_node_name')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::nova::conductor (
+  $bootstrap_node                = hiera('bootstrap_nodeid', undef),
   $step = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::nova
+  include ::nova::db
+
+  if $::hostname == downcase($bootstrap_node) {
+    $sync_db = true
+  } else {
+    $sync_db = false
+  }
+
+  if $step >= 3 and $sync_db {
+    include ::nova::db::sync
+  }
   if $step >= 4 {
     include ::nova::conductor
   }
