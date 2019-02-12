@@ -48,21 +48,6 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*tls_proxy_bind_ip*]
-#   IP on which the TLS proxy will listen on. Required only if
-#   enable_internal_tls is set.
-#   Defaults to undef
-#
-# [*tls_proxy_fqdn*]
-#   fqdn on which the tls proxy will listen on. required only used if
-#   enable_internal_tls is set.
-#   defaults to undef
-#
-# [*tls_proxy_port*]
-#   port on which the tls proxy will listen on. Only used if
-#   enable_internal_tls is set.
-#   defaults to 9876
-#
 # [*neutron_driver*]
 #   (Optional) The neutron driver for ml2 currently default tripleo value is ovn.
 #   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
@@ -73,9 +58,6 @@ class tripleo::profile::base::octavia::api (
   $enable_internal_tls = hiera('enable_internal_tls', false),
   $octavia_network     = hiera('octavia_api_network', undef),
   $step                = Integer(hiera('step')),
-  $tls_proxy_bind_ip   = undef,
-  $tls_proxy_fqdn      = undef,
-  $tls_proxy_port      = 9876,
   $neutron_driver      = hiera('neutron::plugins::ml2::mechanism_drivers', []),
 ) {
   if $::hostname == downcase($bootstrap_node) {
@@ -91,23 +73,11 @@ class tripleo::profile::base::octavia::api (
       if !$octavia_network {
         fail('octavia_api_network is not set in the hieradata.')
       }
-      if !$tls_proxy_bind_ip {
-        fail('tls_proxy_bind_ip is not set in the hieradata.')
-      }
-      if !$tls_proxy_fqdn {
-        fail('tls_proxy_fqdn is required if internal TLS is enabled.')
-      }
       $tls_certfile = $certificates_specs["httpd-${octavia_network}"]['service_certificate']
       $tls_keyfile = $certificates_specs["httpd-${octavia_network}"]['service_key']
-
-      ::tripleo::tls_proxy { 'octavia-api':
-        servername => $tls_proxy_fqdn,
-        ip         => $tls_proxy_bind_ip,
-        port       => $tls_proxy_port,
-        tls_cert   => $tls_certfile,
-        tls_key    => $tls_keyfile,
-        notify     => Class['::octavia::api'],
-      }
+    } else {
+      $tls_certfile = undef
+      $tls_keyfile = undef
     }
   }
 
@@ -125,6 +95,11 @@ class tripleo::profile::base::octavia::api (
       class { '::octavia::api':
         sync_db => $sync_db,
       }
+    }
+    include ::tripleo::profile::base::apache
+    class { '::octavia::wsgi::apache':
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile
     }
   }
 }

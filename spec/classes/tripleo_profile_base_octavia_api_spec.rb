@@ -153,20 +153,10 @@ eos
               'service_key'         => '/foo.key',
             },
           },
-          :tls_proxy_bind_ip    => '172.16.10.25',
-          :tls_proxy_fqdn       => 'octavia-host.example.com',
-          :tls_proxy_port       => 9876
         })
       end
       it {
         is_expected.to contain_class('octavia::api')
-        is_expected.to contain_apache__vhost('octavia-api-proxy').with(
-          :ssl_cert     => '/foo.pem',
-          :ssl_key      => '/foo.key',
-          :ip           => '172.16.10.25',
-          :port         => 9876,
-          :servername   => 'octavia-host.example.com',
-        )
       }
     end
   end
