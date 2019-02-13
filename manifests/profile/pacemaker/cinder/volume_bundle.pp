@@ -67,7 +67,13 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
 
   if $step >= 2 and $pacemaker_master {
     $cinder_volume_short_node_names = hiera('cinder_volume_short_node_names')
-    $pacemaker_short_node_names = hiera('pacemaker_short_node_names')
+
+    if (hiera('pacemaker_short_node_names_override', undef)) {
+      $pacemaker_short_node_names = hiera('pacemaker_short_node_names_override')
+    } else {
+      $pacemaker_short_node_names = hiera('pacemaker_short_node_names')
+    }
+
     $pcmk_cinder_volume_nodes = intersection($cinder_volume_short_node_names, $pacemaker_short_node_names)
     $pcmk_cinder_volume_nodes.each |String $node_name| {
       pacemaker::property { "cinder-volume-role-${node_name}":

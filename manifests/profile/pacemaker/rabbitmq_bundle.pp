@@ -149,11 +149,14 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
 
   if $step >= 2 {
     if $pacemaker_master {
-      if $rpc_scheme == 'rabbit' {
+      if (hiera('rabbitmq_short_node_names_override', undef)) {
+        $rabbitmq_short_node_names = hiera('rabbitmq_short_node_names_override')
+      } elsif ($rpc_scheme == 'rabbit') {
         $rabbitmq_short_node_names = hiera('oslo_messaging_rpc_short_node_names')
       } elsif $notify_scheme == 'rabbit' {
         $rabbitmq_short_node_names = hiera('oslo_messaging_notify_short_node_names')
       }
+
       $rabbitmq_nodes_count = count($rabbitmq_short_node_names)
       $rabbitmq_short_node_names.each |String $node_name| {
         pacemaker::property { "rabbitmq-role-${node_name}":

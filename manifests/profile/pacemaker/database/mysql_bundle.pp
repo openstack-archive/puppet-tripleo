@@ -149,11 +149,15 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
 
   # FQDN are lowercase in /etc/hosts, so are pacemaker node names
   $galera_node_names_lookup = downcase(hiera('mysql_short_node_names', $::hostname))
-  # is this an additional nova cell?
-  if hiera('nova_is_additional_cell', undef) {
-    $galera_fqdns_names_lookup = downcase(hiera('mysql_cell_node_names', $::hostname))
+  if (hiera('mysql_node_names_override', undef)) {
+    $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names_override'))
   } else {
-    $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names', $::hostname))
+    # is this an additional nova cell?
+    if hiera('nova_is_additional_cell', undef) {
+      $galera_fqdns_names_lookup = downcase(hiera('mysql_cell_node_names', $::hostname))
+    } else {
+      $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names', $::hostname))
+    }
   }
 
   if is_array($galera_node_names_lookup) {
@@ -306,7 +310,12 @@ MYSQL_HOST=localhost\n",
     }
 
     if $pacemaker_master {
-      $mysql_short_node_names = hiera('mysql_short_node_names')
+      if (hiera('mysql_short_node_names_override', undef)) {
+        $mysql_short_node_names = hiera('mysql_short_node_names_override')
+      } else {
+        $mysql_short_node_names = hiera('mysql_short_node_names')
+      }
+
       $mysql_short_node_names.each |String $node_name| {
         # lint:ignore:puppet-lint-2.0.1 does not work with multiline strings
         # and blocks (remove this when we move to 2.2.0 where this works)
