@@ -82,6 +82,10 @@
 #   enable_internal_tls is set.
 #   defaults to 9696
 #
+# [*designate_api_enabled*]
+#   (Optional) Indicate whether Designate is available in the deployment.
+#   Defaults to hiera('designate_api_enabled') or false
+#
 class tripleo::profile::base::neutron::server (
   $bootstrap_node                = hiera('neutron_api_short_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -94,6 +98,7 @@ class tripleo::profile::base::neutron::server (
   $tls_proxy_bind_ip             = undef,
   $tls_proxy_fqdn                = undef,
   $tls_proxy_port                = 9696,
+  $designate_api_enabled   = hiera('designate_api_enabled', false),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -129,6 +134,9 @@ class tripleo::profile::base::neutron::server (
         tls_key    => $tls_keyfile,
       }
       Tripleo::Tls_proxy['neutron-api'] ~> Anchor<| title == 'neutron::service::begin' |>
+    }
+    if $designate_api_enabled {
+      include ::neutron::designate
     }
   }
   # We start neutron-server on the bootstrap node first, because
