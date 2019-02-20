@@ -105,6 +105,20 @@ eos
       end
     end
 
+    context 'with step 4 with ovn' do
+      before do
+        params.merge!({
+          :step           => 4,
+          :bootstrap_node => 'node.example.com',
+          :neutron_driver => ['ovn']
+        })
+      end
+
+      it 'should should set provider drivers' do
+        is_expected.to contain_class('octavia::api').with(:provider_drivers => { 'amphora' => 'Octavia Amphora Driver', 'ovn' => 'Octavia OVN driver' })
+      end
+    end
+
     context 'with step 4 on non-bootstrap node' do
       before do
         params.merge!({ :step => 4 })

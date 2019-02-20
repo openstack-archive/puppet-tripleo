@@ -63,6 +63,10 @@
 #   enable_internal_tls is set.
 #   defaults to 9876
 #
+# [*neutron_driver*]
+#   (Optional) The neutron driver for ml2 currently default tripleo value is ovn.
+#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
+#
 class tripleo::profile::base::octavia::api (
   $bootstrap_node      = hiera('octavia_api_short_bootstrap_node_name', undef),
   $certificates_specs  = hiera('apache_certificates_specs', {}),
@@ -72,6 +76,7 @@ class tripleo::profile::base::octavia::api (
   $tls_proxy_bind_ip   = undef,
   $tls_proxy_fqdn      = undef,
   $tls_proxy_port      = 9876,
+  $neutron_driver      = hiera('neutron::plugins::ml2::mechanism_drivers', []),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -111,8 +116,15 @@ class tripleo::profile::base::octavia::api (
   # before it starts on other nodes
   if ($step >= 4 and $sync_db) or ($step >= 5 and !$sync_db) {
     include ::octavia::controller
-    class { '::octavia::api':
-      sync_db => $sync_db,
+    if 'ovn' in $neutron_driver {
+      class { '::octavia::api':
+        sync_db          => $sync_db,
+        provider_drivers => { 'amphora' => 'Octavia Amphora Driver', 'ovn' => 'Octavia OVN driver' },
+      }
+    } else {
+      class { '::octavia::api':
+        sync_db => $sync_db,
+      }
     }
   }
 }
