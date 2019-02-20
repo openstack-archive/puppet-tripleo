@@ -91,6 +91,7 @@ then
   fi
   interface_pci=$(grep PCI_SLOT_NAME /sys/class/net/eth0/device/uevent | cut -d'=' -f2)
   /usr/sbin/devlink dev eswitch set pci/\"$interface_pci\" mode switchdev
+  /usr/sbin/ifup eth0
   if [[ \"$(/usr/sbin/devlink dev eswitch show pci/\"$interface_pci\")\" =~ \"mode switchdev\" ]]
   then
     echo \"PCI device $interface_pci set to mode switchdev.\"
