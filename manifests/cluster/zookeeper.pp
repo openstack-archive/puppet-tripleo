@@ -44,7 +44,7 @@ class tripleo::cluster::zookeeper(
   # https://tickets.puppetlabs.com/browse/PUP-1299
 
   # validate_array($zookeeper_server_ips)
-  validate_ipv4_address($zookeeper_client_ip)
+  validate_legacy(Stdlib::IP::Address::V4, 'validate_ipv4_address', $zookeeper_client_ip)
   # validate_array($zookeeper_hostnames)
 
   # TODO(devvesa) Zookeeper package should provide these paths,

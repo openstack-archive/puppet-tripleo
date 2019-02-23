@@ -110,7 +110,7 @@ class tripleo::profile::base::swift::ringbuilder (
   }
 
   if $step >= 3 {
-    validate_bool($build_ring)
+    validate_legacy(Boolean, 'validate_bool', $build_ring)
 
     if $build_ring {
       if $devices {

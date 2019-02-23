@@ -58,7 +58,7 @@ class tripleo::cluster::cassandra(
   # https://tickets.puppetlabs.com/browse/PUP-1299
   #
   # validate_array($cassandra_servers)
-  validate_ipv4_address($cassandra_ip)
+  validate_legacy(Stdlib::IP::Address::V4, 'validate_ipv4_address', $cassandra_ip)
 
   class {'::cassandra':
     cluster_name          => 'TripleO',

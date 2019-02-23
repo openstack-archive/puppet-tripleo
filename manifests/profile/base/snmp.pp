@@ -57,7 +57,7 @@ class tripleo::profile::base::snmp (
       authpass => $snmpd_password,
     }
     if $snmpd_config {
-      validate_array($snmpd_config)
+      validate_legacy(Array, 'validate_array', $snmpd_config)
       class { '::snmp':
         snmpd_config => $snmpd_config,
       }

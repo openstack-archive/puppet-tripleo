@@ -261,7 +261,7 @@ class tripleo::profile::base::keystone (
     include ::keystone::security_compliance
 
     if $ldap_backend_enable {
-      validate_hash($ldap_backends_config)
+      validate_legacy(Hash, 'validate_hash', $ldap_backends_config)
       if !str2bool($::selinux) {
         selboolean { 'authlogin_nsswitch_use_ldap':
             value      => on,

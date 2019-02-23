@@ -51,7 +51,7 @@ define tripleo::profile::base::aide::rules (
   {
     fail('$order must be a string or an integer')
   }
-  validate_string($body)
+  validate_legacy(String, 'validate_string', $body)
 
   concat::fragment{ "aide_fragment_${name}":
     target  => 'aide.conf',

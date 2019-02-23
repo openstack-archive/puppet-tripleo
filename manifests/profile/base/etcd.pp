@@ -65,7 +65,7 @@ class tripleo::profile::base::etcd (
   $step                = Integer(hiera('step')),
 ) {
 
-  validate_hash($certificate_specs)
+  validate_legacy(Hash, 'validate_hash', $certificate_specs)
 
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']

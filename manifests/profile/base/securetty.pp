@@ -32,7 +32,8 @@ class tripleo::profile::base::securetty (
   $step = Integer(hiera('step')),
   $tty_list = hiera('tty_list', []),
 ) {
-  validate_array($tty_list)
+
+  validate_legacy(Array, 'validate_array', $tty_list)
 
   if $step >=1 {
     $ttys = join($tty_list, "\n")

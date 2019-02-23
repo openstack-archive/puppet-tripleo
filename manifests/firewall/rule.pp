@@ -145,8 +145,8 @@ define tripleo::firewall::rule (
 
   $ipv4_rule = merge($basic, $state_rule, $extras)
   $ipv6_rule = merge($basic, $state_rule, $ipv6, $extras)
-  validate_hash($ipv4_rule)
-  validate_hash($ipv6_rule)
+  validate_legacy(Hash, 'validate_hash', $ipv4_rule)
+  validate_legacy(Hash, 'validate_hash', $ipv6_rule)
 
   # This conditional will ensure that TCP and UDP firewall rules have
   # a port specified in the configuration when using INPUT or OUTPUT chains.
