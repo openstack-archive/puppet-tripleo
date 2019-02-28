@@ -29,7 +29,6 @@
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/agents/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/ovn.*$
-              - ^manifests/profile/(base|pacemaker)/congress.*$
               - ^manifests/profile/(base|pacemaker)/tacker.*$
         - tripleo-ci-centos-7-scenario008-multinode-oooq-container:
             files:

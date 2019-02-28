@@ -347,9 +347,6 @@ class tripleo::profile::base::keystone (
     if hiera('cinder_api_enabled', false) {
       include ::cinder::keystone::auth
     }
-    if hiera('congress_enabled', false) {
-      include ::congress::keystone::auth
-    }
     if hiera('designate_api_enabled', false) {
       include ::designate::keystone::auth
     }

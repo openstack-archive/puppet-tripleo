@@ -184,10 +184,6 @@
 #  (optional) Enable or not Cinder API binding
 #  Defaults to hiera('cinder_api_enabled', false)
 #
-# [*congress*]
-#  (optional) Enable or not Congress API binding
-#  Defaults to hiera('congress_enabled', false)
-#
 # [*manila*]
 #  (optional) Enable or not Manila API binding
 #  Defaults to hiera('manila_api_enabled', false)
@@ -381,10 +377,6 @@
 # [*cinder_network*]
 #  (optional) Specify the network cinder is running on.
 #  Defaults to hiera('cinder_api_network', undef)
-#
-# [*congress_network*]
-#  (optional) Specify the network congress is running on.
-#  Defaults to hiera('congress_api_network', undef)
 #
 # [*designate_network*]
 #  (optional) Specify the network designate is running on.
@@ -626,7 +618,6 @@ class tripleo::haproxy (
   $keystone_public             = hiera('keystone_enabled', false),
   $neutron                     = hiera('neutron_api_enabled', false),
   $cinder                      = hiera('cinder_api_enabled', false),
-  $congress                    = hiera('congress_enabled', false),
   $manila                      = hiera('manila_api_enabled', false),
   $sahara                      = hiera('sahara_api_enabled', false),
   $tacker                      = hiera('tacker_enabled', false),
@@ -675,7 +666,6 @@ class tripleo::haproxy (
   $barbican_network            = hiera('barbican_api_network', false),
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
   $cinder_network              = hiera('cinder_api_network', undef),
-  $congress_network            = hiera('congress_api_network', undef),
   $designate_network           = hiera('designate_api_network', undef),
   $docker_registry_network     = hiera('docker_registry_network', undef),
   $glance_api_network          = hiera('glance_api_network', undef),
@@ -719,8 +709,6 @@ class tripleo::haproxy (
     barbican_api_ssl_port => 13311,
     cinder_api_port => 8776,
     cinder_api_ssl_port => 13776,
-    congress_api_port => 1789,
-    congress_api_ssl_port => 13789,
     designate_api_port => 9001,
     designate_api_ssl_port => 13001,
     docker_registry_port => 8787,
@@ -969,19 +957,6 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[cinder_api_ssl_port],
       service_network   => $cinder_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
-    }
-  }
-
-  if $congress {
-    ::tripleo::haproxy::endpoint { 'congress':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('congress_api_vip', $controller_virtual_ip),
-      service_port      => $ports[congress_api_port],
-      ip_addresses      => hiera('congress_node_ips', $controller_hosts_real),
-      server_names      => hiera('congress_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      public_ssl_port   => $ports[congress_api_ssl_port],
-      service_network   => $congress_network,
     }
   }
 

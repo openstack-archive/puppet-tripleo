@@ -208,9 +208,6 @@ class tripleo::profile::base::database::mysql (
     if hiera('barbican_api_enabled', false) {
       include ::barbican::db::mysql
     }
-    if hiera('congress_enabled', false) {
-      include ::congress::db::mysql
-    }
     if hiera('designate_api_enabled', false) {
       include ::designate::db::mysql
     }
