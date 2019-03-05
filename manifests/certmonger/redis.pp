@@ -31,6 +31,12 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
+# [*dnsnames*]
+#   (Optional) The DNS names that will be added for the SubjectAltNames entry
+#   in the certificate. If left unset, the value will be set to the $hostname.
+#   This parameter can take both a string or an array of strings.
+#   Defaults to $hostname
+#
 # [*postsave_cmd*]
 #   (Optional) Specifies the command to execute after requesting a certificate.
 #   Defaults to undef.
@@ -44,6 +50,7 @@ class tripleo::certmonger::redis (
   $service_certificate,
   $service_key,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
+  $dnsnames      = $hostname,
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
@@ -61,7 +68,7 @@ class tripleo::certmonger::redis (
     certfile     => $service_certificate,
     keyfile      => $service_key,
     hostname     => $hostname,
-    dnsname      => $hostname,
+    dnsname      => $dnsnames,
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
