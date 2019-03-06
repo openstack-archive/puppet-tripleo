@@ -86,6 +86,26 @@
 #   (Optional) Name of RBD client
 #   Defaults to hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name')
 #
+# [*cinder_volume_cluster*]
+#   (Optional) Name of the cluster when running in active-active mode
+#   Defaults to hiera('tripleo::profile::base::cinder::volume::cinder_volume_cluster')
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*etcd_enabled*]
+#   (optional) Whether the etcd service is enabled or not
+#   Defaults to hiera('etcd_enabled', false)
+#
+# [*etcd_host*]
+#   (optional) IP address (VIP) of the etcd service
+#   Defaults to hiera('etcd_vip', undef)
+#
+# [*etcd_port*]
+#   (optional) Port used by the etcd service
+#   Defaults to hiera('tripleo::profile::base::etcd::client_port', '2379')
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -109,12 +129,43 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_nvmeof_backend                = false,
   $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
   $cinder_rbd_client_name                      = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name','openstack'),
+  $cinder_volume_cluster                       = hiera('tripleo::profile::base::cinder::volume::cinder_volume_cluster', ''),
+  $enable_internal_tls                         = hiera('enable_internal_tls', false),
+  $etcd_enabled                                = hiera('etcd_enabled', false),
+  $etcd_host                                   = hiera('etcd_vip', undef),
+  $etcd_port                                   = hiera('tripleo::profile::base::etcd::client_port', '2379'),
   $step                                        = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder
 
   if $step >= 4 {
-    include ::cinder::volume
+    if $cinder_volume_cluster == '' {
+      $cinder_volume_cluster_real = undef
+    } else {
+      $cinder_volume_cluster_real = $cinder_volume_cluster
+    }
+
+    if $cinder_volume_cluster_real {
+      unless $etcd_enabled {
+        fail('Running cinder-volume in active-active mode with a cluster name requires the etcd service.')
+      }
+      if empty($etcd_host) {
+        fail('etcd_vip not set in hieradata')
+      }
+      if $enable_internal_tls {
+        $protocol = 'https'
+      } else {
+        $protocol = 'http'
+      }
+      $backend_url = sprintf('etcd3+%s://%s:%s', $protocol, $etcd_host, $etcd_port)
+      class { '::cinder::coordination' :
+        backend_url => $backend_url,
+      }
+    }
+
+    class { '::cinder::volume' :
+      cluster => $cinder_volume_cluster_real,
+    }
 
     if $cinder_enable_pure_backend {
       include ::tripleo::profile::base::cinder::volume::pure
