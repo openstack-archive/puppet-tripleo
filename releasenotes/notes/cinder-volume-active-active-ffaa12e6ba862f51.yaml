@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Add the ability to configure the cinder-volume service to run in
+    active-active mode using the specified cluster name. Note that
+    active-active mode requires the etcd service be enabled, as it's used by
+    the cinder-volume service for its Distributed Lock Manager (DLM).

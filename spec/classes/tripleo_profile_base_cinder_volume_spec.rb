@@ -51,10 +51,15 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::iscsi')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume')
           is_expected.to contain_class('tripleo::profile::base::cinder')
-          is_expected.to contain_class('cinder::volume')
           is_expected.to contain_class('cinder::backends').with(
             :enabled_backends => ['tripleo_iscsi']
           )
+        end
+        it 'should not configure cinder-volume for A/A mode' do
+          is_expected.to contain_class('cinder::volume').with(
+            :cluster => '<SERVICE DEFAULT>',
+          )
+          is_expected.to_not contain_class('cinder::coordination')
         end
       end
 
@@ -262,9 +267,52 @@ describe 'tripleo::profile::base::cinder::volume' do
           )
         end
       end
+
+      context 'with a cluster name' do
+        before :each do
+          params.merge!({
+            :cinder_volume_cluster => 'tripleo-cluster',
+            :etcd_enabled          => true,
+            :etcd_host             => '127.0.0.1',
+          })
+        end
+        it 'should configure cinder-volume for A/A mode' do
+          is_expected.to contain_class('cinder::volume').with(
+            :cluster => 'tripleo-cluster',
+          )
+          is_expected.to contain_class('cinder::coordination').with(
+            :backend_url => 'etcd3+http://127.0.0.1:2379',
+          )
+        end
+
+        context 'with internal tls enabled' do
+          before :each do
+            params.merge!({
+              :enable_internal_tls => true,
+            })
+          end
+          it 'should configure coordination backend_url with https' do
+            is_expected.to contain_class('cinder::coordination').with(
+              :backend_url => 'etcd3+https://127.0.0.1:2379',
+            )
+          end
+        end
+
+        context 'with etcd service not enabled' do
+          before :each do
+            params.merge!({
+              :etcd_enabled => false,
+            })
+          end
+          it 'should fail to deploy' do
+            is_expected.to compile.and_raise_error(
+              /Running cinder-volume in active-active mode with a cluster name requires the etcd service./
+            )
+          end
+        end
+      end
     end
   end
-
 
   on_supported_os.each do |os, facts|
     context 'on #{os}' do
