@@ -36,7 +36,6 @@ describe 'tripleo::profile::base::snmp' do
             'proc  cron',
             'includeAllDisks  10%',
             'master agentx',
-            'trapsink localhost public',
             'iquerySecName internalUser',
             'rouser internalUser',
             'defaultMonitors yes',

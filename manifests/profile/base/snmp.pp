@@ -68,7 +68,6 @@ class tripleo::profile::base::snmp (
                           'proc  cron',
                           'includeAllDisks  10%',
                           'master agentx',
-                          'trapsink localhost public',
                           'iquerySecName internalUser',
                           'rouser internalUser',
                           'defaultMonitors yes',
