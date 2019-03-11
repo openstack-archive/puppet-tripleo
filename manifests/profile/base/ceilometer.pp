@@ -88,6 +88,8 @@ class tripleo::profile::base::ceilometer (
 ) {
 
   if $step >= 3 {
+    warning('Ceilometer is deprecated and is going to be removed in future.')
+
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
     class { '::ceilometer' :
