@@ -62,12 +62,30 @@ Puppet::Type.type(:sriov_vf_config).provide(:numvfs) do
         File.write("/sys/bus/pci/drivers/mlx5_core/unbind",vfs_pci)
       end
     end
+
+    # Saving the name of sriov interface to udev rules
+    udev_file_path = "/etc/udev/rules.d/70-persistent-net.rules"
+    sriov_interface_mac = File.read(sriov_interface_mac_path).strip
+    udev_data_line = get_udev_data_line(sriov_interface_mac)
+    File.write(udev_file_path, udev_data_line, mode: 'a')
+    %x{/usr/sbin/udevadm control --reload-rules}
+    %x{/usr/sbin/udevadm trigger}
+
     # Changing the mode of sriov interface to switchdev mode
     %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} mode switchdev}
+    %x{/usr/sbin/ifup #{sriov_get_interface}}
     if get_interface_device == "0x1013" || get_interface_device == "0x1015"
       %x{/usr/sbin/devlink dev eswitch set pci/#{get_interface_pci} inline-mode transport}
     end
     %x{/usr/sbin/ethtool -K #{sriov_get_interface} hw-tc-offload on}
+  end
+
+  def get_udev_data_line(mac)
+    'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="' + "#{mac}" + '", NAME="' + "#{sriov_get_interface}" + "\"\n"
+  end
+
+  def sriov_interface_mac_path
+    "/sys/class/net/#{sriov_get_interface}/address"
   end
 
   def sriov_numvfs_path
