@@ -153,6 +153,11 @@
 # [*keystone_openidc_enabled*]
 #   (Optional) Enable OpenIDC federation
 #   Defaults to hiera('keystone_openidc_enabled', false)
+#
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_ips')
+#
 class tripleo::profile::base::keystone (
   $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
   $bootstrap_node                 = hiera('keystone_short_bootstrap_node_name', undef),
@@ -185,6 +190,7 @@ class tripleo::profile::base::keystone (
   $keystone_enable_member         = hiera('keystone_enable_member', false),
   $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
+  $memcached_ips                  = hiera('memcached_node_ips')
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -278,7 +284,11 @@ class tripleo::profile::base::keystone (
     }
 
     if $keystone_openidc_enabled {
-      include ::keystone::federation::openidc
+      $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+
+      class { '::keystone::federation::openidc':
+        memcached_servers => $memcached_servers,
+      }
     }
   }
 
