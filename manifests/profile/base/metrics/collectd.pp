@@ -188,6 +188,11 @@
 #  The 'address' value concatenated with the 'name' given will be used
 #  as the send-to address for communications over the messaging link.
 #  Defaults to {}.
+#
+# [*python_read_plugins*]
+#  (Optional) List of strings. List of third party python packages to install.
+#  Defaults to [].
+#
 class tripleo::profile::base::metrics::collectd (
   $step = Integer(hiera('step')),
 
@@ -227,12 +232,20 @@ class tripleo::profile::base::metrics::collectd (
   $amqp_retry_delay = undef,
   $amqp_interval = undef,
   $service_names = hiera('service_names', []),
-  $collectd_manage_repo = false
+  $collectd_manage_repo = false,
+  $python_read_plugins = []
 ) {
   if $step >= 3 {
     class {'::collectd':
       manage_repo => $collectd_manage_repo
     }
+
+    include ::collectd::plugin::python
+    $python_packages = concat(['collectd-python'], $python_read_plugins)
+    package { $python_packages:
+      ensure => 'present'
+    }
+
     if $enable_file_logging {
       include ::collectd::plugin::logfile
     }
