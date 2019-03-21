@@ -43,7 +43,7 @@ if [ "$ACTION" == "reload" ]; then
     $container_cli exec "$haproxy_container_name" chown haproxy:haproxy "$service_pem"
 
     # Trigger a reload for HAProxy to read the new certificates
-    pkill -f -HUP haproxy-systemd-wrapper
+    $container_cli kill --signal HUP "$haproxy_container_name"
 elif [ "$ACTION" == "restart" ]; then
     # Copying the certificate and permissions will be handled by kolla's start
     # script.
