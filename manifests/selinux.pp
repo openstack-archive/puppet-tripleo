@@ -41,11 +41,16 @@
 #   Note: Those module should be in the $directory path
 #
 class tripleo::selinux (
-  $mode      = 'enforcing',
   $directory = '/usr/share/selinux/',
   $booleans  = [],
   $modules   = [],
+  # Deprecated
+  $mode      = undef,
 ) {
+
+  if $mode {
+    warning('The "mode" parameter is deprecated.')
+  }
 
   if $::osfamily != 'RedHat'  {
     fail("OS family unsuppored yet (${::osfamily}), SELinux support is only limited to RedHat family OS")
@@ -59,33 +64,6 @@ class tripleo::selinux (
   Selmodule {
     ensure       => present,
     selmoduledir => $directory,
-  }
-
-  file { '/etc/selinux/config':
-    ensure  => present,
-    mode    => '0444',
-    content => template('tripleo/selinux/sysconfig_selinux.erb')
-  }
-
-  $current_mode = $::selinux? {
-    false   => 'disabled',
-    default => $::selinux_current_mode,
-  }
-
-  if $current_mode != $mode {
-    case $mode {
-      /^(disabled|permissive)$/: {
-        if $current_mode == 'enforcing' {
-          exec { '/sbin/setenforce 0': }
-        }
-      }
-      'enforcing': {
-        exec { '/sbin/setenforce 1': }
-      }
-      default: {
-        fail('You must specify a mode (enforcing, permissive, or disabled)')
-      }
-    }
   }
 
   selboolean { $booleans :

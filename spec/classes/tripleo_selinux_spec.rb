@@ -21,7 +21,7 @@ describe 'tripleo::selinux' do
 
   shared_examples_for 'tripleo::selinux' do
 
-    context 'with selinux enforcing' do
+    context 'sebool and semodule management' do
       before :each do
         facts.merge!({
           :selinux              => true,
@@ -30,46 +30,9 @@ describe 'tripleo::selinux' do
       end
 
       let :params do
-        { :mode       => 'disabled',
-          :booleans   => ['foo', 'bar'],
+        { :booleans   => ['foo', 'bar'],
           :modules    => ['module1', 'module2'],
           :directory  => '/path/to/modules'}
-      end
-
-      it 'runs setenforce 0' do
-        is_expected.to contain_exec('/sbin/setenforce 0')
-      end
-
-      it 'enables the SELinux boolean' do
-        is_expected.to contain_selboolean('foo').with(
-          :persistent => true,
-          :value      => 'on',
-        )
-      end
-
-      it 'enables the SELinux modules' do
-        is_expected.to contain_selmodule('module1').with(
-          :ensure       => 'present',
-          :selmoduledir => '/path/to/modules',
-        )
-      end
-
-    end
-
-    context 'with selinux disabled' do
-      before :each do
-        facts.merge!({ :selinux => false })
-      end
-
-      let :params do
-        { :mode       => 'enforcing',
-          :booleans   => ['foo', 'bar'],
-          :modules    => ['module1', 'module2'],
-          :directory  => '/path/to/modules'}
-      end
-
-      it 'runs setenforce 1' do
-        is_expected.to contain_exec('/sbin/setenforce 1')
       end
 
       it 'enables the SELinux boolean' do
