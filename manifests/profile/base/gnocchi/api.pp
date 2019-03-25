@@ -157,6 +157,7 @@ class tripleo::profile::base::gnocchi::api (
           unless  => "getfacl /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q mask::r",
         }
       }
+      's3': { include ::gnocchi::storage::s3 }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
   }
