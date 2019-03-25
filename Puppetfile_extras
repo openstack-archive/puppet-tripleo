@@ -70,7 +70,7 @@ mod 'snmp',
 
 mod 'sensu',
   :git => 'https://github.com/sensu/sensu-puppet',
-  :ref => 'master'
+  :ref => 'aa0f9256ade05153c99f5eac8931da9eb1aaec1a'
 
 mod 'pacemaker',
   :git => 'https://github.com/openstack/puppet-pacemaker',
