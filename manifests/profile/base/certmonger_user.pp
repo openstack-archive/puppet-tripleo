@@ -184,7 +184,6 @@ class tripleo::profile::base::certmonger_user (
       reload_cmds => $reload_haproxy,
     }
     Certmonger_certificate<||> -> Class['::tripleo::certmonger::ca::crl']
-    include ::tripleo::certmonger::ca::libvirt
     include ::tripleo::certmonger::ca::libvirt_vnc
     include ::tripleo::certmonger::ca::qemu
 
