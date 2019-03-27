@@ -50,6 +50,7 @@ $CLI run --detach \
     -v /sbin/modprobe:/sbin/modprobe:ro \
     -v /run/netns:/run/netns:shared \
     -v /var/lib/neutron:/var/lib/neutron:z,shared \
+    -v /dev/log:/dev/log \
     --net host \
     --pid host \
     --privileged \
