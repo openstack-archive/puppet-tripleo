@@ -41,6 +41,11 @@
 #   (optional) Only affects the PureISCSIDriver.
 #   Defaults to False
 #
+# [*image_volume_cache_enabled*]
+#   (Optional) Enable Cinder's image cache function for the PureStorage
+#   backend.
+#   Defaults to True
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -59,6 +64,7 @@ class tripleo::profile::base::cinder::volume::pure (
       pure_storage_protocol        => hiera('cinder::backend::pure::pure_storage_protocol', undef),
       use_chap_auth                => hiera('cinder::backend::pure::use_chap_auth', undef),
       use_multipath_for_image_xfer => hiera('cinder::backend::pure::use_multipath_for_image_xfer', undef),
+      image_volume_cache_enabled   => hiera('cinder::backend::pure::image_volume_cache_enabled', undef),
     }
   }
 
