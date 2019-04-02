@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    In case of a multicell deployment the mysql and nova novncproxy backend
+    servers need to use the SERVICE_cell_node_names. 
+    Also the novncproxy did use the nova_api_vip and nova_api_node_[ips|names]
+    information insteand of nova_vnc_proxy_vip and nova_vnc_proxy_node_[ips|names]

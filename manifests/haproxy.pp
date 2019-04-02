@@ -1070,6 +1070,7 @@ class tripleo::haproxy (
     }
   }
 
+  $nova_vnc_proxy_vip = hiera('nova_vnc_proxy_vip', $controller_virtual_ip)
   if $nova_novncproxy {
     if $enable_internal_tls {
       # we need to make sure we use ssl for checks.
@@ -1079,12 +1080,17 @@ class tripleo::haproxy (
       $haproxy_member_options_real   = $haproxy_member_options
       $novncproxy_ssl_member_options = []
     }
+    if hiera('nova_is_additional_cell', undef) {
+      $novncproxy_server_names_real = hiera('nova_vnc_proxy_cell_node_names', $controller_hosts_names_real)
+    } else {
+      $novncproxy_server_names_real = hiera('nova_vnc_proxy_node_names', $controller_hosts_names_real)
+    }
     ::tripleo::haproxy::endpoint { 'nova_novncproxy':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $nova_api_vip,
+      internal_ip       => $nova_vnc_proxy_vip,
       service_port      => $ports[nova_novnc_port],
-      ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('nova_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => hiera('nova_vnc_proxy_node_ips', $controller_hosts_real),
+      server_names      => $novncproxy_server_names_real,
       listen_options    => merge($default_listen_options, {
         'option'  => [ 'tcpka', 'tcplog' ],
         'balance' => 'source',
@@ -1343,6 +1349,11 @@ class tripleo::haproxy (
   }
 
   if $mysql {
+    if hiera('nova_is_additional_cell', undef) {
+      $mysql_server_names_real = hiera('mysql_cell_node_names', $controller_hosts_names_real)
+    } else {
+      $mysql_server_names_real = hiera('mysql_node_names', $controller_hosts_names_real)
+    }
     haproxy::listen { 'mysql':
       bind             => $mysql_bind_opts,
       options          => $mysql_listen_options,
@@ -1352,7 +1363,7 @@ class tripleo::haproxy (
       listening_service => 'mysql',
       ports             => '3306',
       ipaddresses       => hiera('mysql_node_ips', $controller_hosts_real),
-      server_names      => hiera('mysql_node_names', $controller_hosts_names_real),
+      server_names      => $mysql_server_names_real,
       options           => $mysql_member_options_real,
     }
     if $manage_firewall {
