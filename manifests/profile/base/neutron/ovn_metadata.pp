@@ -39,7 +39,7 @@ class tripleo::profile::base::neutron::ovn_metadata (
   if $step >= 4 {
     include ::tripleo::profile::base::neutron
     class { '::neutron::agents::ovn_metadata':
-      ovn_sb_connection => "tcp:${ovn_db_host}:${ovn_sb_port}",
+        ovn_sb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
     }
     Service<| title == 'controller' |> -> Service<| title == 'ovn-metadata' |>
   }

@@ -36,7 +36,7 @@ class tripleo::profile::base::neutron::agents::ovn (
 ) {
   if $step >= 4 {
     class { '::ovn::controller':
-      ovn_remote     => "tcp:${ovn_db_host}:${ovn_sbdb_port}",
+      ovn_remote     => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_sbdb_port}"], ':'),
     }
   }
 }
