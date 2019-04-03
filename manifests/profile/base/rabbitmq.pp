@@ -155,8 +155,8 @@ class tripleo::profile::base::rabbitmq (
     $environment_real = merge($environment, {
       'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS' => $rabbitmq_additional_erl_args,
       'RABBITMQ_CTL_ERL_ARGS' => $rabbitmq_additional_erl_args,
-      'LANG' => 'C.UTF-8',
-      'LC_ALL' => 'C.UTF-8'
+      'LANG' => 'en_US.UTF-8',
+      'LC_ALL' => 'en_US.UTF-8'
     })
     # Configure a list of secure transport protocols, unless the
     # user explicitly sets one

@@ -252,7 +252,9 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           expression         => ['rabbitmq-role eq true'],
         },
         container_options => 'network=host',
-        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=C.UTF-8 -e LC_ALL=C.UTF-8',
+        # lint:ignore:140chars
+        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8',
+        # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${rabbitmq_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
