@@ -158,6 +158,7 @@ class tripleo::profile::base::gnocchi::api (
         }
         Ceph::Key<| title == "client.${gnocchi_rbd_client_name}" |> -> Exec["exec-setfacl-${gnocchi_rbd_client_name}-gnocchi"]
       }
+      's3': { include ::gnocchi::storage::s3 }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
   }
