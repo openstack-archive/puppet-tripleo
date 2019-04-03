@@ -1,0 +1,5 @@
+---
+issues:
+  - |
+    Allow a hiera key to add an additional rabbitmq policy in the resource
+    agend.

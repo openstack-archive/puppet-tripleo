@@ -48,6 +48,10 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
+# [*rabbitmq_extra_policies*]
+#   (Optional) Hash of extra policies for the HA queues
+#   Defaults to hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'})
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -65,6 +69,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
   $rabbit_nodes                 = hiera('rabbitmq_node_names'),
   $enable_internal_tls          = hiera('enable_internal_tls', false),
+  $rabbitmq_extra_policies      = hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'}),
   $pcs_tries                    = hiera('pcs_tries', 20),
   $step                         = Integer(hiera('step')),
 ) {
@@ -216,16 +221,19 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       if $user_ha_queues == 0 {
         $nr_rabbit_nodes = size($rabbit_nodes)
         $nr_ha_queues = $nr_rabbit_nodes / 2 + ($nr_rabbit_nodes % 2)
-        $params = "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'"
+        $ha_queues_policy = { 'ha-mode' => 'exactly', 'ha-params' => $nr_ha_queues }
       } elsif $user_ha_queues == -1 {
-        $params = 'set_policy=\'ha-all ^(?!amq\.).* {"ha-mode":"all"}\''
+        $ha_queues_policy = { 'ha-mode' => 'all' }
       } else {
         $nr_ha_queues = $user_ha_queues
-        $params = "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'"
+        $ha_queues_policy = { 'ha-mode' => 'exactly', 'ha-params' => $nr_ha_queues }
       }
+      $ha_policy = merge($ha_queues_policy, $rabbitmq_extra_policies)
+      $ocf_params = "set_policy='ha-all ^(?!amq\\.).* ${to_json($ha_policy)}'"
+
       pacemaker::resource::ocf { 'rabbitmq':
         ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
-        resource_params => $params,
+        resource_params => $ocf_params,
         meta_params     => 'notify=true container-attribute-target=host',
         op_params       => 'start timeout=200s stop timeout=200s',
         tries           => $pcs_tries,
@@ -258,6 +266,18 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         try_sleep => 10,
         tag       => 'rabbitmq_ready',
       }
+
+      # Set the HA queue policy here, because the rabbitmq resource
+      # agent do so very early in the bootstrap process, and it
+      # doesn't seem to work reliably.
+      # Note: rabbitmq_policy expects all the hash values passed
+      # to 'definition' to be strings
+      rabbitmq_policy { 'ha-all@/':
+        applyto    => 'queues',
+        pattern    => '^(?!amq\.).*',
+        definition => hash($ha_policy.map |$k, $v| {[$k, "${v}"]}),
+      }
+
       # Make sure that if we create rabbitmq users at the same step it happens
       # after the cluster is up
       Exec['rabbitmq-ready'] -> Rabbitmq_user<||>
