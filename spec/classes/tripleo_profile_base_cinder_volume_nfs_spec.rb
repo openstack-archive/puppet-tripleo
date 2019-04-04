@@ -45,9 +45,30 @@ describe 'tripleo::profile::base::cinder::volume::nfs' do
       context 'with defaults' do
         it 'should trigger complete configuration' do
           is_expected.to contain_cinder__backend__nfs('tripleo_nfs').with(
-            :nfs_servers => ['127.0.0.1'],
-            :nfs_mount_options => '',
-            :nfs_shares_config => '/etc/cinder/shares-nfs.conf'
+            :nfs_servers                 => ['127.0.0.1'],
+            :nfs_mount_options           => '',
+            :nfs_shares_config           => '/etc/cinder/shares-nfs.conf',
+            :nfs_snapshot_support        => '<SERVICE DEFAULT>',
+            :nas_secure_file_operations  => '<SERVICE DEFAULT>',
+            :nas_secure_file_permissions => '<SERVICE DEFAULT>',
+          )
+        end
+      end
+
+      context 'with customizations' do
+        before :each do
+          params.merge!(
+            {
+              :cinder_nfs_snapshot_support        => 'true',
+              :cinder_nas_secure_file_operations  => 'false',
+              :cinder_nas_secure_file_permissions => 'auto',
+            })
+        end
+        it 'should trigger complete configuration' do
+          is_expected.to contain_cinder__backend__nfs('tripleo_nfs').with(
+            :nfs_snapshot_support        => 'true',
+            :nas_secure_file_operations  => 'false',
+            :nas_secure_file_permissions => 'auto',
           )
         end
       end
