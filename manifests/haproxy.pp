@@ -1271,6 +1271,7 @@ class tripleo::haproxy (
       server_names      => hiera('ironic_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_api_ssl_port],
       service_network   => $ironic_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
