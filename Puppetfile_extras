@@ -43,7 +43,7 @@ mod 'certmonger',
 
 mod 'ntp',
   :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
-  :ref => '4.2.x'
+  :ref => '4.2.0'
 
 mod 'ptp',
   :git => 'https://github.com/redhat-nfvpe/ptp',
