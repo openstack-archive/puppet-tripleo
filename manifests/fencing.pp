@@ -101,4 +101,7 @@ class tripleo::fencing(
 
   $ironic_devices = local_fence_devices('fence_ironic', $all_devices)
   create_resources('pacemaker::stonith::fence_ironic', $ironic_devices, $common_params)
+
+  $rhev_devices = local_fence_devices('fence_rhevm', $all_devices)
+  create_resources('pacemaker::stonith::fence_rhevm', $rhev_devices, $common_params)
 }
