@@ -22,9 +22,11 @@ NAME=neutron-haproxy-${NETNS}
 HAPROXY_CMD='$(if [ -f /usr/sbin/haproxy-systemd-wrapper ]; then echo "/usr/sbin/haproxy -Ds"; else echo "/usr/sbin/haproxy -Ws"; fi)'
 <%- if $container_cli == 'docker' { -%>
 CLI='docker'
+LOGGING=''
 CMD="ip netns exec ${NETNS} "'$HAPROXY'
 <%- } elsif $container_cli == 'podman' { -%>
 CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
+LOGGING="--log-driver json-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
 CMD='$HAPROXY'
 <%- } else { -%>
 CLI='echo noop'
@@ -45,7 +47,7 @@ fi
 # If the NAME is already taken by a container, give it an unique name
 printf "%s\n" "${LIST}" | grep -q "${NAME}$" && NAME="${NAME}-$(date +%Y-%m-%d-%H%M%S-%N)"
 echo "Starting a new child container ${NAME}"
-$CLI run --detach \
+$CLI run --detach ${LOGGING} \
      -v /var/lib/config-data/puppet-generated/neutron/etc/neutron:/etc/neutron:ro \
      -v /run/netns:/run/netns:shared \
      -v /var/lib/neutron:/var/lib/neutron:z,shared \

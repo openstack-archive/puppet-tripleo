@@ -21,9 +21,11 @@ NETWORK_ID=$(echo $ARGS| awk '{if (match($0, /(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})/,
 NAME=neutron-radvd-${NETWORK_ID}
 <%- if $container_cli == 'docker' { -%>
 CLI='docker'
+LOGGING=''
 CMD="ip netns exec qrouter-${NETWORK_ID} /usr/sbin/radvd -n"
 <%- } elsif $container_cli == 'podman' { -%>
 CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
+LOGGING="--log-driver json-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
 CMD='/usr/sbin/radvd -n'
 <%- } else { -%>
 CLI='echo noop'
@@ -44,7 +46,7 @@ fi
 # If the NAME is already taken by a container, give it an unique name
 printf "%s\n" "${LIST}" | grep -q "${NAME}$" && NAME="${NAME}-$(date +%Y-%m-%d-%H%M%S-%N)"
 echo "Starting a new child container ${NAME}"
-$CLI run --detach \
+$CLI run --detach ${LOGGING} \
      -v /var/lib/config-data/puppet-generated/neutron/etc/neutron:/etc/neutron:ro \
      -v /run/netns:/run/netns:shared \
      -v /var/lib/neutron:/var/lib/neutron:z,shared \
