@@ -89,7 +89,7 @@ class tripleo::profile::base::octavia::api (
     if 'ovn' in $neutron_driver {
       class { '::octavia::api':
         sync_db          => $sync_db,
-        provider_drivers => { 'amphora' => 'Octavia Amphora Driver', 'ovn' => 'Octavia OVN driver' },
+        provider_drivers => 'amphora: Octavia Amphora Driver, ovn: Octavia OVN driver',
       }
     } else {
       class { '::octavia::api':
