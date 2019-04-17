@@ -88,6 +88,10 @@
 #   (optional) List of hashes containing configuration for autoLinks
 #   Defaults to []
 #
+# [*router_mode*]
+#   (optional) Mode in which the qdrouterd service should run.
+#   Defaults to 'edge'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -111,6 +115,7 @@ class tripleo::profile::base::metrics::qdr (
   $ssl_profiles             = [],
   $addresses                = [],
   $autolink_addresses       = [],
+  $router_mode              = 'edge',
   $step                     = Integer(hiera('step')),
 ) {
   if $step >= 1 {
@@ -125,11 +130,7 @@ class tripleo::profile::base::metrics::qdr (
       listener_ssl_pw_file     => $listener_ssl_pw_file,
       listener_ssl_password    => $listener_ssl_password,
       listener_trusted_certs   => $listener_trusted_certs,
-      # TO-DO(mmagr): Metrics QDRs gonna run in edge mode as soon as we will
-      # have a newest version of qpid-dispatch-router. Until then we have to run
-      # in interior mode
-      #router_mode              => 'edge',
-      router_mode              => 'interior',
+      router_mode              => $router_mode,
       connectors               => $connectors,
       ssl_profiles             => $ssl_profiles,
       extra_addresses          => $addresses,
