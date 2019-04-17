@@ -21,9 +21,11 @@ NETNS=$(ip netns identify)
 NAME=neutron-keepalived-${NETNS}
 <%- if $container_cli == 'docker' { -%>
 CLI='docker'
+LOGGING=''
 CMD="ip netns exec ${NETNS} /usr/sbin/keepalived -n -l -D"
 <%- } elsif $container_cli == 'podman' { -%>
 CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
+LOGGING="--log-driver json-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
 CMD='/usr/sbin/keepalived -n -l -D'
 <%- } else { -%>
 CLI='echo noop'
@@ -44,7 +46,7 @@ fi
 # If the NAME is already taken by a container, give it an unique name
 printf "%s\n" "${LIST}" | grep -q "${NAME}$" && NAME="${NAME}-$(date +%Y-%m-%d-%H%M%S-%N)"
 echo "Starting a new child container ${NAME}"
-$CLI run --detach \
+$CLI run --detach ${LOGGING} \
     -v /var/lib/config-data/puppet-generated/neutron/etc/neutron:/etc/neutron:ro \
     -v /lib/modules:/lib/modules:ro \
     -v /sbin/modprobe:/sbin/modprobe:ro \
