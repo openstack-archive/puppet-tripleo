@@ -55,6 +55,9 @@ manila_share_short_node_names:
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
 nova::network::neutron::neutron_password: 'password'
+# placement related items
+placement::rabbit_password: 'password'
+placement::keystone::authtoken::password: 'password'
 # memcache related items
 memcached_node_ips_v6:
  - '::1'

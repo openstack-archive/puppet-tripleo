@@ -393,6 +393,9 @@ class tripleo::profile::base::keystone (
     if hiera('nova_placement_enabled', false) {
       include ::nova::keystone::auth_placement
     }
+    if hiera('placement_enabled', false) {
+      include ::placement::keystone::auth
+    }
     if hiera('octavia_api_enabled', false) {
       include ::octavia::keystone::auth
     }
