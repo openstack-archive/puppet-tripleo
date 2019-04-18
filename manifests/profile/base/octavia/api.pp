@@ -52,6 +52,14 @@
 #   (Optional) The neutron driver for ml2 currently default tripleo value is ovn.
 #   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
 #
+# [*ovn_db_host*]
+#   (Optional) The IP-Address where OVN DBs are listening.
+#   Defaults to hiera('ovn_dbs_vip')
+#
+# [*ovn_nb_port*]
+#   (Optional) Port number on which northbound database is listening
+#   Defaults to hiera('ovn::northbound::port')
+#
 class tripleo::profile::base::octavia::api (
   $bootstrap_node      = hiera('octavia_api_short_bootstrap_node_name', undef),
   $certificates_specs  = hiera('apache_certificates_specs', {}),
@@ -59,6 +67,8 @@ class tripleo::profile::base::octavia::api (
   $octavia_network     = hiera('octavia_api_network', undef),
   $step                = Integer(hiera('step')),
   $neutron_driver      = hiera('neutron::plugins::ml2::mechanism_drivers', []),
+  $ovn_db_host         = hiera('ovn_dbs_vip', undef),
+  $ovn_nb_port         = hiera('ovn::northbound::port', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -88,8 +98,9 @@ class tripleo::profile::base::octavia::api (
     include ::octavia::controller
     if 'ovn' in $neutron_driver {
       class { '::octavia::api':
-        sync_db          => $sync_db,
-        provider_drivers => 'amphora: Octavia Amphora Driver, ovn: Octavia OVN driver',
+        sync_db           => $sync_db,
+        provider_drivers  => 'amphora: Octavia Amphora Driver, ovn: Octavia OVN driver',
+        ovn_nb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
       }
     } else {
       class { '::octavia::api':

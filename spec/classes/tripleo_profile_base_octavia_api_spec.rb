@@ -21,7 +21,7 @@ describe 'tripleo::profile::base::octavia::api' do
   let :params do
     { :step            => 5,
       :bootstrap_node  => 'notbootstrap.example.com'
-    }
+   }
   end
 
   shared_examples_for 'tripleo::profile::base::octavia::api' do
@@ -110,12 +110,15 @@ eos
         params.merge!({
           :step           => 4,
           :bootstrap_node => 'node.example.com',
-          :neutron_driver => ['ovn']
+          :neutron_driver => ['ovn'],
+          :ovn_db_host    => '127.0.0.1',
+          :ovn_nb_port    => '6641'
         })
       end
 
-      it 'should should set provider drivers' do
+      it 'should should set provider drivers and ovn nb connection' do
         is_expected.to contain_class('octavia::api').with(:provider_drivers => 'amphora: Octavia Amphora Driver, ovn: Octavia OVN driver')
+        is_expected.to contain_class('octavia::api').with(:ovn_nb_connection => 'tcp:127.0.0.1:6641')
       end
     end
 
