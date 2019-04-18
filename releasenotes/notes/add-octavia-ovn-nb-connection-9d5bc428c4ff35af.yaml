@@ -1,0 +1,5 @@
+---
+features:
+  - Adds ovn_db_host and ovn_nb_port to configure ovn nb connection string
+    for OVN Provider driver.
+
