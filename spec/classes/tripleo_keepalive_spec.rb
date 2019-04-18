@@ -196,7 +196,7 @@ describe 'tripleo::keepalived' do
         case facts[:osfamily]
         when 'RedHat'
           { :name_is_process => 'false',
-            :vrrp_script     => 'test -S /var/lib/haproxy/stats && echo "show info" | socat /var/lib/haproxy/stats stdio' }
+            :vrrp_script     => "/bin/sh -c 'test -S /var/lib/haproxy/stats && echo show info | socat /var/lib/haproxy/stats stdio'" }
         when 'Debian'
           { :name_is_process => 'true',
             :vrrp_script     => nil }
