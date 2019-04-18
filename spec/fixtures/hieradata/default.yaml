@@ -2,15 +2,16 @@
 my_hash:
   network: '127.0.0.1'
 not_hash: string
+bootstrap_nodeid: node
 # aodh profile required hieradata
+aodh_api_bootstrap_node_name: node
 aodh::rabbit_password: 'password'
 aodh_redis_password: 'password'
-redis_vip: '127.0.0.1'
-redis::bind: '10.0.0.1'
 aodh::auth::auth_password: 'password'
 aodh::db::mysql::password: 'password'
 aodh::keystone::authtoken::password: 'password'
 # barbican profile required hieradata
+barbican_api_bootstrap_node_name: node
 barbican::api::rabbit_password: 'password'
 barbican::db::mysql::password: 'password'
 barbican::keystone::authtoken::password: 'password'
@@ -26,6 +27,7 @@ ceph::profile::params::rgw_keystone_admin_project: 'keystone_project'
 ceph::profile::params::rgw_keystone_admin_user: 'keystone_admin_user'
 ceph::profile::params::rgw_keystone_admin_password: 'keystone_admin_password'
 # cinder related items
+cinder_api_short_bootstrap_node_name: node
 cinder_backup_short_bootstrap_node_name: 'node.example.com'
 cinder_backup_short_node_names:
  - 'node.example.com'
@@ -38,12 +40,15 @@ cinder::backup::nfs::backup_share: '/mnt/backup'
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
 # gnocchi related items
+gnocchi_api_short_bootstrap_node_name: node
 gnocchi::keystone::authtoken::password: 'password'
 gnocchi::storage::ceph::ceph_username: 'gnocchi'
 gnocchi::storage::ceph::ceph_secret: 'password'
 # haproxy related items
 mysql_enabled: true
 controller_node_ips: '10.1.0.1,10.1.0.2'
+# mysql related
+mysql_short_bootstrap_node_name: node
 # manila related items
 manila::rabbit_password: 'password'
 manila::backend::cephfs::cephfs_protocol_helper_type: 'NFS'
@@ -51,11 +56,18 @@ manila_share_short_bootstrap_node_name: 'node.example.com'
 manila_share_short_node_names:
  - 'manila-1'
  - 'manila-2'
+manila_api_short_bootstrap_node_name: node
 # nova related items
+ec2_api_short_bootstrap_node_name: node
+nova_api_short_bootstrap_node_name: node
+nova_metadata_short_bootstrap_node_name: node
+nova_placement_short_bootstrap_node_name: node
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
 nova::network::neutron::neutron_password: 'password'
 # placement related items
+placement_api_short_bootstrap_node_name: node
+placement_short_bootstrap_node_name: node
 placement::rabbit_password: 'password'
 placement::keystone::authtoken::password: 'password'
 # memcache related items
@@ -65,6 +77,8 @@ memcached_node_ips:
  - '127.0.0.1'
 # octavia related items
 octavia::rabbit_password: 'password'
+# horizon related
+horizon_short_bootstrap_node_name: node
 horizon::secret_key: 'secrete'
 horizon_node_ips:
  - '127.0.0.1'
@@ -128,8 +142,13 @@ tripleo::haproxy_basic_auth::haproxy_userlists:
       - 'luke insecure-password jedi'
       - 'anakin insecure-password darthvador'
       - 'sith password $5$h9LsKUOeCr$UlD62CNEpuZQkGYdBoiFJLsM6TlXluRLBlhEnpjDdaC'
+# redis related
+redis_short_bootstrap_node_name: node
+redis_vip: '127.0.0.1'
+redis::bind: '10.0.0.1'
 # OpenDaylight
 neutron::plugins::ovs::opendaylight::odl_port: '8081'
 neutron::plugins::ovs::opendaylight::odl_username: 'admin'
 neutron::plugins::ovs::opendaylight::odl_password: 'admin'
-
+# swift related
+swift_proxy_short_bootstrap_node_name: node

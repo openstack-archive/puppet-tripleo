@@ -4,8 +4,7 @@
       jobs:
         - puppet-openstack-unit-4.8-centos-7
         - puppet-openstack-unit-5.5-centos-7
-        - puppet-openstack-unit-6.0-ubuntu-bionic:
-            voting: false
+        - puppet-openstack-unit-6.0-ubuntu-bionic
         - puppet-openstack-unit-latest-ubuntu-bionic:
             voting: false
     gate:

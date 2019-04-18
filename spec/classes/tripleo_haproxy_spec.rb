@@ -21,7 +21,8 @@ describe 'tripleo::haproxy' do
   shared_examples_for 'tripleo::haproxy' do
     let :params do {
       :controller_virtual_ip     => '10.1.0.1',
-      :public_virtual_ip         => '192.168.0.1'
+      :public_virtual_ip         => '192.168.0.1',
+      :mysql_max_conn            => 100
     }
     end
 
@@ -31,7 +32,7 @@ describe 'tripleo::haproxy' do
           :options => {
             'timeout client' => "90m",
             'timeout server' => "90m",
-            'maxconn'        => :undef
+            'maxconn'        => 100
           }
         )
       end
@@ -52,7 +53,7 @@ describe 'tripleo::haproxy' do
             'timeout server' => "90m",
             'stick-table'    => "type ip size 1000",
             'stick'          => "on dst",
-            'maxconn'        => :undef
+            'maxconn'        => 100
           }
         )
       end
