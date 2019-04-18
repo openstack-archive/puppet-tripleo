@@ -24,7 +24,7 @@
   "dependencies": [
     { "name": "puppetlabs/stdlib", "version_requirement": ">= 5.0.0 < 6.0.0" },
     { "name": "openstack/openstacklib", "version_requirement": ">=14.0.0 <15.0.0" },
-    { "name": "sensu/sensu" },
-    { "name": "yelp/uchiwa" }
+    { "name": "sensu/sensu", "version_requirement": ">=3.0.0 <4.0.0" },
+    { "name": "yelp/uchiwa", "version_requirement": ">=2.0.0 <3.0.0" }
   ]
 }
