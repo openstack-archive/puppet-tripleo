@@ -115,7 +115,7 @@ eos
       end
 
       it 'should should set provider drivers' do
-        is_expected.to contain_class('octavia::api').with(:provider_drivers => { 'amphora' => 'Octavia Amphora Driver', 'ovn' => 'Octavia OVN driver' })
+        is_expected.to contain_class('octavia::api').with(:provider_drivers => 'amphora: Octavia Amphora Driver, ovn: Octavia OVN driver')
       end
     end
 
