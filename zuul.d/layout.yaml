@@ -2,7 +2,6 @@
     name: puppet-tripleo-module-unit-jobs
     check:
       jobs:
-        - puppet-openstack-unit-4.8-centos-7
         - puppet-openstack-unit-5.5-centos-7
         - puppet-openstack-unit-6.0-ubuntu-bionic:
             voting: false
@@ -10,8 +9,8 @@
             voting: false
     gate:
       jobs:
-        - puppet-openstack-unit-4.8-centos-7
         - puppet-openstack-unit-5.5-centos-7
+        - puppet-openstack-unit-6.0-ubuntu-bionic
 
 - project:
     templates:
