@@ -25,10 +25,8 @@ describe 'tripleo::haproxy::endpoint' do
       it 'should configure haproxy' do
         is_expected.to contain_haproxy__listen('neutron').with(
           :collect_exported => false,
-          :bind             => [
-            ['10.0.0.1:9696', ['transparent']],
-            ['192.168.0.1:9696', ['transparent']]
-          ],
+          :bind             => { "10.0.0.1:9696"    => ["transparent"],
+                                 "192.168.0.1:9696" => ["transparent"] },
           :options          => {'option' => [],
                                 'timeout client' => '90m',
                                 'timeout server' => '90m',
@@ -46,11 +44,9 @@ describe 'tripleo::haproxy::endpoint' do
       it 'should configure haproxy' do
         is_expected.to contain_haproxy__listen('neutron').with(
           :collect_exported => false,
-          :bind             => [
-            ['10.0.0.1:9696', ['transparent']],
-            ['fd00:fd00:fd00:2000::14:9696', ['transparent']],
-            ['192.168.0.1:9696', ['transparent']]
-          ]
+          :bind             => { "10.0.0.1:9696"                => ["transparent"],
+                                 "fd00:fd00:fd00:2000::14:9696" => ["transparent"],
+                                 "192.168.0.1:9696"             => ["transparent"] },
         )
       end
    end

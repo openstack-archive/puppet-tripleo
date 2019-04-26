@@ -89,3 +89,8 @@ mod 'keepalived',
 mod 'redis',
   :git => 'https://github.com/arioch/puppet-redis',
   :ref => 'v3.3.0'
+
+# NOTE(aschultz): in puppet 6 this was extracted out
+mod 'selinux_core',
+  :git => 'https://github.com/puppetlabs/puppetlabs-selinux_core',
+  :ref => 'master'
