@@ -48,7 +48,7 @@ define tripleo::profile::base::database::mysql::user (
   $allowed_hosts = undef
 ) {
 
-  validate_string($password)
+  validate_legacy(String, 'validate_string', $password)
 
   ::openstacklib::db::mysql { $title :
     user          => $user,

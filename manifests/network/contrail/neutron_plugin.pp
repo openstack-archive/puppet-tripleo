@@ -123,7 +123,7 @@ class tripleo::network::contrail::neutron_plugin (
   include ::neutron::deps
   include ::neutron::params
 
-  validate_array($contrail_extensions)
+  validate_legacy(Array, 'validate_array', $contrail_extensions)
 
   package { 'neutron-plugin-contrail':
     ensure => $package_ensure,

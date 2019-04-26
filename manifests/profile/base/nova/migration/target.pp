@@ -52,10 +52,14 @@ class tripleo::profile::base::nova::migration::target (
 
   include ::tripleo::profile::base::nova::migration
 
-  validate_array($ssh_localaddrs)
-  $ssh_localaddrs.each |$x| { validate_ip_address($x) }
+  validate_legacy(Array, 'validate_array', $ssh_localaddrs)
+
+  $ssh_localaddrs.each |$x| {
+    validate_legacy(Stdlib::IP::Address, 'validate_ip_address', $x)
+  }
+
   $ssh_localaddrs_real = unique($ssh_localaddrs)
-  validate_array($ssh_authorized_keys)
+  validate_legacy(Array, 'validate_array', $ssh_authorized_keys)
   $ssh_authorized_keys_real = join($ssh_authorized_keys, '\n')
 
   if $step >= 4 {

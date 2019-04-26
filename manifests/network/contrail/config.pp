@@ -251,9 +251,10 @@ class tripleo::network::contrail::config(
   $zk_server_ip           = hiera('contrail_database_node_ips'),
 )
 {
-  validate_ip_address($listen_ip_address)
-  validate_ip_address($disc_server_ip)
-  validate_ip_address($ifmap_server_ip)
+
+  validate_legacy(Stdlib::IP::Address, 'validate_ip_address', $listen_ip_address)
+  validate_legacy(Stdlib::IP::Address, 'validate_ip_address', $disc_server_ip)
+  validate_legacy(Stdlib::IP::Address, 'validate_ip_address', $ifmap_server_ip)
   $basicauthusers_property_control = map($control_server_list) |$item| { "${item}.control:${item}.control" }
   $basicauthusers_property_dns = $control_server_list.map |$item| { "${item}.dns:${item}.dns" }
   $basicauthusers_property = concat($basicauthusers_property_control, $basicauthusers_property_dns)

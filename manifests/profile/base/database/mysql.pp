@@ -116,8 +116,8 @@ class tripleo::profile::base::database::mysql (
     $sync_db = false
   }
 
-  validate_hash($mysql_server_options)
-  validate_hash($certificate_specs)
+  validate_legacy(Hash, 'validate_hash', $mysql_server_options)
+  validate_legacy(Hash, 'validate_hash', $certificate_specs)
 
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']

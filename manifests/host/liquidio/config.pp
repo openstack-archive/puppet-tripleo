@@ -28,7 +28,7 @@ class tripleo::host::liquidio::config (
   $liquidio_config = {}
 ) {
 
-    validate_hash($liquidio_config)
+  validate_legacy(Hash, 'validate_hash', $liquidio_config)
 
-    create_resources('liquidio_config', $liquidio_config)
+  create_resources('liquidio_config', $liquidio_config)
 }

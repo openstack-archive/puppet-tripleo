@@ -49,7 +49,7 @@ class tripleo::profile::base::neutron::opendaylight (
   $enable_internal_tls = hiera('enable_internal_tls', false),
 ) {
 
-  validate_hash($certificate_specs)
+  validate_legacy(Hash, 'validate_hash', $certificate_specs)
 
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
@@ -60,7 +60,7 @@ class tripleo::profile::base::neutron::opendaylight (
   }
 
   if $step >= 1 {
-    validate_array($odl_api_ips)
+    validate_legacy(Array, 'validate_array', $odl_api_ips)
     if empty($odl_api_ips) {
       fail('No IPs assigned to OpenDaylight Api Service')
     } elsif size($odl_api_ips) == 2 {
