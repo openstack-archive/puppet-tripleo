@@ -57,51 +57,77 @@ class tripleo::fencing(
     'tries' => $tries,
     'try_sleep' => $try_sleep,
   }
-  # We will create stonith levels *only* if the node is a compute instanceha one
+
+  # check if instanceha is enabled
   if member(hiera('compute_instanceha_short_node_names', []), downcase($::hostname)) {
     $is_compute_instanceha_node = true
   } else {
     $is_compute_instanceha_node = false
   }
 
+  $content = $config['devices']
 
-  $all_devices = $config['devices']
-
-  if $::uuid != 'docker' and $::deployment_type != 'containers' {
-    $xvm_devices = local_fence_devices('fence_xvm', $all_devices)
-    create_resources('pacemaker::stonith::fence_xvm', $xvm_devices, $common_params)
+  # check if the devices: section in fence.yaml contains levels.
+  # if it doesn't, assume level=1 an build a hash with the content.
+  if is_array($content) {
+    $all_levels = {'level1' => $content}
+  }
+  else {
+    $all_levels = $content
   }
 
-  $redfish_devices = local_fence_devices('fence_redfish', $all_devices)
-  create_resources('pacemaker::stonith::fence_redfish', $redfish_devices, $common_params)
+  $all_levels.each |$index, $levelx_devices |{
 
-  $ipmilan_devices = local_fence_devices('fence_ipmilan', $all_devices)
-  create_resources('pacemaker::stonith::fence_ipmilan', $ipmilan_devices, $common_params)
-  if ($enable_instanceha and $is_compute_instanceha_node) {
-    if length($ipmilan_devices) < 1 {
-      fail('You must specify an IPmilan device for a host when configuring instance HA')
+    $level = regsubst($index, 'level', '', 'G')
+    $all_devices = $levelx_devices
+
+    if $::uuid != 'docker' and $::deployment_type != 'containers' {
+      $xvm_devices = local_fence_devices('fence_xvm', $all_devices)
+      create_resources('pacemaker::stonith::fence_xvm', $xvm_devices, $common_params)
     }
-    if length($ipmilan_devices) > 1 {
-      fail('Multiple IPmilan devices for a single host are not supported with instance HA')
+
+    $ironic_devices = local_fence_devices('fence_ironic', $all_devices)
+    create_resources('pacemaker::stonith::fence_ironic', $ironic_devices, $common_params)
+
+    $redfish_devices = local_fence_devices('fence_redfish', $all_devices)
+    create_resources('pacemaker::stonith::fence_redfish', $redfish_devices, $common_params)
+
+    $ipmilan_devices = local_fence_devices('fence_ipmilan', $all_devices)
+    create_resources('pacemaker::stonith::fence_ipmilan', $ipmilan_devices, $common_params)
+
+    $kdump_devices = local_fence_devices('fence_kdump', $all_devices)
+    create_resources('pacemaker::stonith::fence_kdump', $kdump_devices, $common_params)
+
+    $rhev_devices = local_fence_devices('fence_rhevm', $all_devices)
+    create_resources('pacemaker::stonith::fence_rhevm', $rhev_devices, $common_params)
+
+    $data = {
+      'xvm' => $xvm_devices, 'ironic' => $ironic_devices, 'redfish' => $redfish_devices,
+      'ipmilan' => $ipmilan_devices, 'kdump' => $kdump_devices, 'rhevm' => $rhev_devices
     }
-    # Get the first (and only) key which is the mac-address
-    $mac = keys($ipmilan_devices)[0]
-    $safe_mac = regsubst($mac, ':', '', 'G')
-    $stonith_resources = [ "stonith-fence_ipmilan-${safe_mac}", 'stonith-fence_compute-fence-nova' ]
-    Pcmk_stonith <||> -> Pcmk_stonith_level <||>
-    pacemaker::stonith::level{ "stonith-level-${safe_mac}":
-      level             => 1,
-      target            => '$(/usr/sbin/crm_node -n)',
-      stonith_resources => $stonith_resources,
-      tries             => $tries,
-      try_sleep         => $try_sleep,
+
+    $data.each |$items| {
+      $driver = $items[0]
+      $driver_devices = $items[1]
+
+      if length($driver_devices) == 1 {
+        $mac = keys($driver_devices)[0]
+        $safe_mac = regsubst($mac, ':', '', 'G')
+        if ($enable_instanceha and $is_compute_instanceha_node) {
+          $stonith_resources = [ "stonith-fence_${driver}-${safe_mac}", 'stonith-fence_compute-fence-nova' ]
+        }
+        else {
+          $stonith_resources = [ "stonith-fence_${driver}-${safe_mac}" ]
+        }
+        pacemaker::stonith::level{ "stonith-${level}-${safe_mac}":
+          level             => $level,
+          target            => '$(/usr/sbin/crm_node -n)',
+          stonith_resources => $stonith_resources,
+          tries             => $tries,
+          try_sleep         => $try_sleep,
+        }
+      }
     }
   }
-
-
-  $ironic_devices = local_fence_devices('fence_ironic', $all_devices)
-  create_resources('pacemaker::stonith::fence_ironic', $ironic_devices, $common_params)
-
-  $rhev_devices = local_fence_devices('fence_rhevm', $all_devices)
-  create_resources('pacemaker::stonith::fence_rhevm', $rhev_devices, $common_params)
 }
+
