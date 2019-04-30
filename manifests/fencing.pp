@@ -110,7 +110,7 @@ class tripleo::fencing(
       $driver = $items[0]
       $driver_devices = $items[1]
 
-      if length($driver_devices) == 1 {
+      if $driver_devices and length($driver_devices) == 1 {
         $mac = keys($driver_devices)[0]
         $safe_mac = regsubst($mac, ':', '', 'G')
         if ($enable_instanceha and $is_compute_instanceha_node) {
