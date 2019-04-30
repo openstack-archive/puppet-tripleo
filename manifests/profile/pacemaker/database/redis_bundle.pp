@@ -266,7 +266,7 @@ slave-announce-port ${local_tuple[0][2]}
         'redis-run'                     => {
           'source-dir' => '/var/run/redis',
           'target-dir' => '/var/run/redis',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         # TODO check whether those tls mappings are necessary
         'redis-pki-extracted'           => {
