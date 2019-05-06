@@ -55,9 +55,7 @@ describe 'tripleo::profile::base::logging::fluentd' do
       ) }
 
       it { is_expected.to contain_fluentd__config('110-system-sources.conf') }
-      it { is_expected.to contain_file('/etc/rsyslog.d/fluentd.conf').with_content(
-"*.* @127.0.0.1:42185"
-      ) }
+      it { is_expected.to_not contain_file('/etc/rsyslog.d/fluentd.conf') }
       it { is_expected.to contain_file('/etc/fluentd/config.d/110-system-sources.conf').with_content(
 "# This file is managed by Puppet, do not edit manually.
 <source>
@@ -72,6 +70,7 @@ describe 'tripleo::profile::base::logging::fluentd' do
     context 'step greater than 3 and a fluentd source' do
       let(:params) { {
         :step => 4,
+        :fluentd_managed_rsyslog => true,
         :fluentd_sources => [ {
           'format' => '/(?<time>\\d{4}-\\d{2}-\\d{2} \\d{2} =>\\d{2}:\\d{2}.\\d+) (?<pid>\\d+) (?<priority>\\S+) (?<message>.*)$/',
           'path' => '/var/log/keystone/keystone.log',
@@ -90,6 +89,10 @@ describe 'tripleo::profile::base::logging::fluentd' do
         :config => {
           'source' => params[:fluentd_sources]
         }
+      ) }
+      it { is_expected.to contain_fluentd__config('110-system-sources.conf') }
+      it { is_expected.to contain_file('/etc/rsyslog.d/fluentd.conf').with_content(
+"*.* @127.0.0.1:42185"
       ) }
       it { is_expected.to contain_file('/etc/fluentd/config.d/100-openstack-sources.conf').with_content(
       /^\s*path \/var\/log\/keystone\/keystone\.log$/
