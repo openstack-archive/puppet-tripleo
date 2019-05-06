@@ -1,0 +1,4 @@
+---
+deprecations:
+  - |
+    Keepalived is deprecated in Ussuri and will be removed in the next cycle.
