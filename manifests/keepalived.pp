@@ -96,6 +96,8 @@ class tripleo::keepalived (
   $storage_mgmt_virtual_ip = false,
 ) {
 
+  warning('Keepalived is deprecated in Ussuri and will be removed in the next cycle.')
+
   case $::osfamily {
     'RedHat': {
       $keepalived_name_is_process = false
