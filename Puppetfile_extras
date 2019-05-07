@@ -41,10 +41,6 @@ mod 'certmonger',
   :git => 'https://github.com/saltedsignal/puppet-certmonger',
   :ref => 'v1.1.1'
 
-mod 'ntp',
-  :git => 'https://github.com/puppetlabs/puppetlabs-ntp',
-  :ref => '4.2.0'
-
 mod 'ptp',
   :git => 'https://github.com/redhat-nfvpe/ptp',
   :ref => 'master'
