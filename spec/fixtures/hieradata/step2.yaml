@@ -1,2 +1,12 @@
 ---
 step: 2
+# rsyslog tests
+service_names:
+ - 'horizon'
+tripleo_fluentd_sources_horizon:
+ - path: '/var/log/horizon/test.log'
+   tag: 'openstack.horizon.test'
+ - path: '/var/log/horizon/access.log'
+   tag: 'openstack.horizon.access'
+rsyslog::confdir: /etc/rsyslog.d
+rsyslog::target_file: 50_openstack_logs.conf

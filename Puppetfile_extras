@@ -54,6 +54,10 @@ mod 'opendaylight',
   :git => 'https://git.opendaylight.org/gerrit/integration/packaging/puppet-opendaylight',
   :ref => 'master'
 
+mod 'rsyslog',
+  :git => 'https://github.com/voxpupuli/puppet-rsyslog',
+  :ref => 'master'
+
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
   :ref => 'v3.0.1'
