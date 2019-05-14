@@ -93,6 +93,10 @@
 # [*service_names*]
 #   (Optional) List of services enabled on the current role. This is used
 #   to obtain per-service configuration information.
+#
+# [*fluentd_managed_rsyslog*]
+#   (Optional, default false) Let fluentd configure and restart rsyslog
+#   service
 class tripleo::profile::base::logging::fluentd (
   $step = Integer(hiera('step')),
   $fluentd_sources = undef,
@@ -112,7 +116,8 @@ class tripleo::profile::base::logging::fluentd (
   $fluentd_monitoring = true,
   $fluentd_monitoring_bind = '127.0.0.1',
   $fluentd_monitoring_port = 24220,
-  $service_names = hiera('service_names', [])
+  $service_names = hiera('service_names', []),
+  $fluentd_managed_rsyslog = false
 ) {
   if $step >= 4 {
     warning('Service fluentd is deprecated. Please take in mind, that it going to be removed in T release.')
@@ -234,14 +239,16 @@ class tripleo::profile::base::logging::fluentd (
         }
       }
 
-      file { '/etc/rsyslog.d/fluentd.conf':
-        content => "*.* @127.0.0.1:${fluentd_syslog_port}",
-        owner   => 'root',
-        group   => 'root',
-        mode    => '0644',
-      } ~> exec { 'reload rsyslog':
-        command     => '/bin/systemctl restart rsyslog',
-        refreshonly => true,
+      if $fluentd_managed_rsyslog {
+        file { '/etc/rsyslog.d/fluentd.conf':
+          content => "*.* @127.0.0.1:${fluentd_syslog_port}",
+          owner   => 'root',
+          group   => 'root',
+          mode    => '0644',
+        } ~> exec { 'reload rsyslog':
+          command     => '/bin/systemctl restart rsyslog',
+          refreshonly => true,
+        }
       }
     }
 
