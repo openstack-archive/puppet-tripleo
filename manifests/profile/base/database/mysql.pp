@@ -64,6 +64,11 @@
 #   (Optional) Defines the method used to flush data to InnoDB data files and log files.
 #   Defaults to undef.
 #
+# [*innodb_lock_wait_timeout*]
+#   (Option) Time in seconds that an InnoDB transaction waits for an InnoDB row lock (not table lock).
+#   When this occurs, the statement (not transaction) is rolled back.
+#   Defaults to undef.
+#
 # [*table_open_cache*]
 #   (Optional) Configure the number of open tables for all threads.
 #   Increasing this value increases the number of file descriptors that mysqld requires.
@@ -101,6 +106,7 @@ class tripleo::profile::base::database::mysql (
   $generate_dropin_file_limit    = false,
   $innodb_buffer_pool_size       = hiera('innodb_buffer_pool_size', undef),
   $innodb_log_file_size          = undef,
+  $innodb_lock_wait_timeout      = hiera('innodb_lock_wait_timeout', undef),
   $table_open_cache              = undef,
   $innodb_flush_method           = undef,
   $manage_resources              = true,
@@ -158,6 +164,7 @@ class tripleo::profile::base::database::mysql (
         'innodb_buffer_pool_size' => $innodb_buffer_pool_size,
         'innodb_file_per_table'   => 'ON',
         'innodb_log_file_size'    => $innodb_log_file_size,
+        'innodb_lock_wait_timeout'    => $innodb_lock_wait_timeout,
         'table_open_cache'        => $table_open_cache,
         'innodb_flush_method'     => $innodb_flush_method,
         'ssl'                     => $enable_internal_tls,
