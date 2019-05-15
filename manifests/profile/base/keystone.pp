@@ -214,13 +214,9 @@ class tripleo::profile::base::keystone (
     if !$admin_endpoint_network {
       fail('keystone_admin_api_network is not set in the hieradata.')
     }
-    $tls_certfile_admin = $certificates_specs["httpd-${admin_endpoint_network}"]['service_certificate']
-    $tls_keyfile_admin = $certificates_specs["httpd-${admin_endpoint_network}"]['service_key']
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
-    $tls_certfile_admin = undef
-    $tls_keyfile_admin = undef
   }
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
@@ -258,10 +254,8 @@ class tripleo::profile::base::keystone (
     include ::keystone::logging
     include ::tripleo::profile::base::apache
     class { '::keystone::wsgi::apache':
-      ssl_cert       => $tls_certfile,
-      ssl_key        => $tls_keyfile,
-      ssl_cert_admin => $tls_certfile_admin,
-      ssl_key_admin  => $tls_keyfile_admin,
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
     }
     include ::keystone::cors
     include ::keystone::security_compliance
