@@ -57,6 +57,7 @@ class tripleo::profile::base::nova::compute (
   if $step >= 4 {
     # deploy basic bits for nova
     include ::tripleo::profile::base::nova
+    include ::nova::cinder
 
     if $keymgr_api_class {
       warning('The keymgr_api_class parameter is deprecated, use keymgr_backend')
