@@ -66,6 +66,11 @@
 #  fetching the certificate for that specific network.
 #  Defaults to undef
 #
+# [*manage_firewall*]
+#  (optional) Enable or disable firewall settings for ports exposed by HAProxy
+#  (false means disabled, and true means enabled)
+#  Defaults to hiera('tripleo::firewall::manage_firewall', true)
+#
 class tripleo::haproxy::horizon_endpoint (
   $internal_ip,
   $ip_addresses,
@@ -77,6 +82,7 @@ class tripleo::haproxy::horizon_endpoint (
   $use_internal_certificates   = false,
   $internal_certificates_specs = {},
   $service_network             = undef,
+  $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
 ) {
   # Let users override the options on a per-service basis
   $custom_options = hiera('tripleo::haproxy::horizon::options', undef)
@@ -156,6 +162,27 @@ class tripleo::haproxy::horizon_endpoint (
       ipaddresses       => $ip,
       server_names      => $server,
       options           => union($member_options, ["cookie ${server}"]),
+    }
+  }
+  if $manage_firewall {
+    include ::tripleo::firewall
+    $haproxy_horizon_firewall_rules = {
+      '100 horizon_haproxy'     => {
+        'dport' => 80,
+      },
+    }
+    if $public_certificate {
+      $haproxy_horizon_ssl_firewall_rules = {
+        '100 horizon_haproxy_ssl' => {
+          'dport' => 443,
+        },
+      }
+    } else {
+      $haproxy_horizon_ssl_firewall_rules = {}
+    }
+    $horizon_firewall_rules = merge($haproxy_horizon_firewall_rules, $haproxy_horizon_ssl_firewall_rules)
+    if !empty($horizon_firewall_rules) {
+      create_resources('tripleo::firewall::rule', $horizon_firewall_rules)
     }
   }
 }
