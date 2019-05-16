@@ -1292,6 +1292,7 @@ class tripleo::haproxy (
       use_internal_certificates   => $use_internal_certificates,
       internal_certificates_specs => $internal_certificates_specs,
       service_network             => $horizon_network,
+      manage_firewall             => $manage_firewall,
     }
   }
 
