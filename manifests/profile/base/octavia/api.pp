@@ -97,9 +97,10 @@ class tripleo::profile::base::octavia::api (
   if ($step >= 4 and $sync_db) or ($step >= 5 and !$sync_db) {
     include ::octavia::controller
     if 'ovn' in $neutron_driver {
+      $providers = 'amphora: Octavia Amphora Driver.,octavia: Deprecated alias of the Octavia Amphora driver.,ovn: Octavia OVN driver.'
       class { '::octavia::api':
         sync_db           => $sync_db,
-        provider_drivers  => 'amphora: Octavia Amphora Driver, ovn: Octavia OVN driver',
+        provider_drivers  => $providers,
         ovn_nb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
       }
     } else {
