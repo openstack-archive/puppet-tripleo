@@ -80,6 +80,8 @@ class tripleo::haproxy::horizon_endpoint (
 ) {
   # Let users override the options on a per-service basis
   $custom_options = hiera('tripleo::haproxy::horizon::options', undef)
+  $custom_bind_options_public = delete(any2array(hiera('tripleo::haproxy::horizon::public_bind_options', undef)), undef).flatten()
+  $custom_bind_options_internal = delete(any2array(hiera('tripleo::haproxy::horizon::internal_bind_options', undef)), undef).flatten()
   # service exposed to the public network
   if $public_certificate {
     if $use_internal_certificates {
@@ -107,10 +109,10 @@ class tripleo::haproxy::horizon_endpoint (
     # Even though for the public_virtual_ip the port 80 is listening, we
     # redirect to https in the horizon_options below.
     $horizon_bind_opts = {
-      "${internal_ip}:80"        => $haproxy_listen_bind_param,
-      "${internal_ip}:443"       => $internal_bind_opts,
-      "${public_virtual_ip}:80"  => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]),
+      "${internal_ip}:80"        => union($haproxy_listen_bind_param, $custom_bind_options_internal),
+      "${internal_ip}:443"       => union($internal_bind_opts, $custom_bind_options_internal),
+      "${public_virtual_ip}:80"  => union($haproxy_listen_bind_param, $custom_bind_options_public),
+      "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate], $custom_bind_options_public),
     }
     $horizon_options = merge({
       'cookie'       => 'SERVERID insert indirect nocache',
@@ -124,8 +126,8 @@ class tripleo::haproxy::horizon_endpoint (
     }, $custom_options)
   } else {
     $horizon_bind_opts = {
-      "${internal_ip}:80" => $haproxy_listen_bind_param,
-      "${public_virtual_ip}:80" => $haproxy_listen_bind_param,
+      "${internal_ip}:80" => union($haproxy_listen_bind_param, $custom_bind_options_internal),
+      "${public_virtual_ip}:80" => union($haproxy_listen_bind_param, $custom_bind_options_public),
     }
     $horizon_options = merge({
       'cookie' => 'SERVERID insert indirect nocache',
