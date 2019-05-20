@@ -66,12 +66,16 @@ class tripleo::profile::base::database::mysql::client (
     if $enable_ssl {
       $changes_ssl = [
         "set ${mysql_read_default_group}/ssl '1'",
-        "set ${mysql_read_default_group}/ssl-ca '${ssl_ca}'"
+        "set ${mysql_read_default_group}/ssl-ca '${ssl_ca}'",
+        'set client/ssl \'1\'',
+        "set client/ssl-ca '${ssl_ca}'"
       ]
     } else {
       $changes_ssl = [
         "rm ${mysql_read_default_group}/ssl",
-        "rm ${mysql_read_default_group}/ssl-ca"
+        "rm ${mysql_read_default_group}/ssl-ca",
+        'rm client/ssl',
+        'rm client/ssl-ca'
       ]
     }
 
