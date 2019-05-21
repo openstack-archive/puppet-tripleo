@@ -27,6 +27,16 @@
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
 #
+# [*pcs_user*]
+#   (Optional) The user to set up pcsd with
+#   Defaults to 'hacluster'
+#
+# [*pcs_password*]
+#   (Optional) The password to be used for the pcs_user. While it is
+#   optional as a parameter, the hiera key 'hacluster_pwd' *must* not
+#   be undefined or an error will be generated.
+#   Defaults to hiera('hacluster_pwd', undef)
+#
 # [*remote_short_node_names*]
 #   (Optional) List of short node names for pacemaker remote nodes
 #   Defaults to hiera('pacemaker_remote_short_node_names', [])
@@ -74,6 +84,8 @@
 class tripleo::profile::base::pacemaker (
   $step                      = Integer(hiera('step')),
   $pcs_tries                 = hiera('pcs_tries', 20),
+  $pcs_user                  = 'hacluster',
+  $pcs_password              = hiera('hacluster_pwd', undef),
   $remote_short_node_names   = hiera('pacemaker_remote_short_node_names', []),
   $remote_node_ips           = hiera('pacemaker_remote_node_ips', []),
   $remote_authkey            = undef,
@@ -90,8 +102,8 @@ class tripleo::profile::base::pacemaker (
     fail("Count of ${remote_short_node_names} is not equal to count of ${remote_node_ips}")
   }
 
-  if hiera('hacluster_pwd', undef) == undef {
-    fail("The 'hacluster_pwd' hiera key is undefined, did you forget to include ::tripleo::profile::base::pacemaker in your role?")
+  if $pcs_password == undef {
+    fail('The $pcs_password param is undefined, did you forget to include ::tripleo::profile::base::pacemaker in your role?')
   }
 
   Pcmk_resource <| |> {
@@ -141,7 +153,7 @@ class tripleo::profile::base::pacemaker (
       $cluster_setup_extras = $cluster_setup_extras_pre
     }
     class { '::pacemaker':
-      hacluster_pwd => hiera('hacluster_pwd'),
+      hacluster_pwd => $pcs_password,
     }
     -> class { '::pacemaker::corosync':
       cluster_members      => $pacemaker_cluster_members,
@@ -201,6 +213,8 @@ class tripleo::profile::base::pacemaker (
           op_params          => "monitor interval=${remote_monitor_interval}",
           tries              => $remote_tries,
           try_sleep          => $remote_try_sleep,
+          pcs_user           => $pcs_user,
+          pcs_password       => $pcs_password,
           before             => Exec["exec-wait-for-${remote_short_node}"],
           notify             => Exec["exec-wait-for-${remote_short_node}"],
         }
