@@ -26,6 +26,16 @@
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
 #
+# [*pcs_user*]
+#   (Optional) The user to set up pcsd with
+#   Defaults to 'hacluster'
+#
+# [*pcs_password*]
+#   (Optional) The password to be used for the pcs_user. While it is
+#   optional as a parameter, the hiera key 'hacluster_pwd' *must* not
+#   be undefined or an error will be generated.
+#   Defaults to hiera('hacluster_pwd', undef)
+#
 # [*enable_fencing*]
 #   (Optional) Whether or not to manage stonith devices for nodes
 #   Defaults to hiera('enable_fencing', false)
@@ -38,11 +48,19 @@
 class tripleo::profile::base::pacemaker_remote (
   $remote_authkey,
   $pcs_tries      = hiera('pcs_tries', 20),
+  $pcs_user       = 'hacluster',
+  $pcs_password   = hiera('hacluster_pwd', undef),
   $enable_fencing = hiera('enable_fencing', false),
   $step           = Integer(hiera('step')),
 ) {
+  if $pcs_password == undef {
+    fail('The $pcs_password param is and the hiera key "hacluster_pwd" hiera key are both undefined, this is not allowed')
+  }
   class { '::pacemaker::remote':
+    pcs_user       => $pcs_user,
+    pcs_password   => $pcs_password,
     remote_authkey => $remote_authkey,
+    use_pcsd       => true,
   }
   if str2bool(hiera('docker_enabled', false)) {
     include ::systemd::systemctl::daemon_reload
