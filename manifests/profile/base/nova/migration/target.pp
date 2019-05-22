@@ -125,5 +125,12 @@ class tripleo::profile::base::nova::migration::target (
       shell   => $migration_user_shell,
       require => Package['openstack-nova-migration']
     }
+
+    file_line { 'nova_migration_logindefs':
+      ensure => present,
+      path   => '/etc/login.defs',
+      line   => 'UMASK           022',
+      match  => '^UMASK',
+    }
   }
 }
