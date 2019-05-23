@@ -139,14 +139,39 @@ define tripleo::profile::base::metrics::collectd::gnocchi (
 ) {
   include ::collectd
 
-  package { ['python-collectd-gnocchi', 'collectd-python']:
+  package { 'python-collectd-gnocchi':
     ensure => $ensure,
   }
 
-  collectd::plugin { 'python':
-    ensure  => $ensure,
-    order   => $order,
-    content => template('tripleo/collectd/collectd-gnocchi.conf.erb'),
-    require => Package['python-collectd-gnocchi']
+  $_conf = {'Auth_Mode' => $auth_mode, 'ResourceType' => $resource_type, 'BatchSize' => $batch_size}
+  if $auth_mode == 'basic' {
+    $conf = merge($_conf, {
+      'Endpoint' => "${protocol}://${server}:${port}",
+      'User' => $user
+    })
+  } elsif $auth_mode == 'keystone' {
+    $conf = merge($_conf, {
+      'Auth_Url' => $keystone_auth_url,
+      'Username' => $keystone_user_name,
+      'User_Id' => $keystone_user_id,
+      'Project_Id' => $keystone_project_id,
+      'Project_Name' => $keystone_project_name,
+      'Password' => $keystone_password,
+      'User_Domain_Id' => $keystone_user_domain_id,
+      'User_Domain_Name' => $keystone_user_domain_name,
+      'Project_Domain_Id' => $keystone_project_domain_id,
+      'Project_Domain_Name' => $keystone_project_domain_name,
+      'Region_Name' => $keystone_region_name,
+      'Interface' => $keystone_interface,
+      'Endpoint' => $keystone_endpoint
+    })
+  } else {
+    fail('Invalid auth mode for collect_gnocchi plugin.')
   }
+
+  $config = $conf.filter |$key, $value| { $value != undef }
+  ::collectd::plugin::python::module { 'collectd_gnocchi':
+    config => [$config]
+  }
+
 }
