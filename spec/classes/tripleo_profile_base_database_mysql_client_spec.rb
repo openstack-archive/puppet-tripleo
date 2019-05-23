@@ -38,7 +38,9 @@ describe 'tripleo::profile::base::database::mysql::client' do
           :changes => [
             'rm tripleo/bind-address',
             'rm tripleo/ssl',
-            'rm tripleo/ssl-ca'
+            'rm tripleo/ssl-ca',
+            'rm client/ssl',
+            'rm client/ssl-ca'
           ]
         )
       }
@@ -60,7 +62,9 @@ describe 'tripleo::profile::base::database::mysql::client' do
           :changes => [
             'rm tripleo/bind-address',
             'rm tripleo/ssl',
-            'rm tripleo/ssl-ca'
+            'rm tripleo/ssl-ca',
+            'rm client/ssl',
+            'rm client/ssl-ca'
           ]
         )
       }
@@ -82,7 +86,9 @@ describe 'tripleo::profile::base::database::mysql::client' do
           :changes => [
             'rm tripleo/bind-address',
             'rm tripleo/ssl',
-            'rm tripleo/ssl-ca'
+            'rm tripleo/ssl-ca',
+            'rm client/ssl',
+            'rm client/ssl-ca'
           ]
         )
       }
@@ -106,7 +112,9 @@ describe 'tripleo::profile::base::database::mysql::client' do
           :changes => [
             'rm tripleo/bind-address',
             'rm tripleo/ssl',
-            'rm tripleo/ssl-ca'
+            'rm tripleo/ssl-ca',
+            'rm client/ssl',
+            'rm client/ssl-ca'
           ]
         )
       }
@@ -131,7 +139,9 @@ describe 'tripleo::profile::base::database::mysql::client' do
           :changes => [
             "set tripleo/bind-address '#{params[:mysql_client_bind_address]}'",
             "set tripleo/ssl '1'",
-            "set tripleo/ssl-ca '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'"
+            "set tripleo/ssl-ca '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'",
+            "set client/ssl '1'",
+            "set client/ssl-ca '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt'"
           ]
         )
       }
