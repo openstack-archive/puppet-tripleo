@@ -98,18 +98,29 @@ class tripleo::profile::base::manila::share (
     if $backend_cephfs_enabled {
       $manila_cephfs_backend = hiera('manila::backend::cephfs::title')
       $cephfs_auth_id = hiera('manila::backend::cephfs::cephfs_auth_id')
+      $cephfs_ganesha_server_ip = hiera('manila::backend::cephfs::cephfs_ganesha_server_ip', undef)
       $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', false)
 
+      if $cephfs_ganesha_server_ip == undef {
+        $cephfs_ganesha_server_ip_real = hiera('ganesha_vip', undef)
+      } else {
+        $cephfs_ganesha_server_ip_real = $cephfs_ganesha_server_ip
+      }
+
       manila::backend::cephfs { $manila_cephfs_backend :
-        driver_handles_share_servers => hiera('manila::backend::cephfs::driver_handles_share_servers', false),
-        share_backend_name           => hiera('manila::backend::cephfs::share_backend_name'),
-        cephfs_conf_path             => hiera('manila::backend::cephfs::cephfs_conf_path'),
-        cephfs_auth_id               => $cephfs_auth_id,
-        cephfs_cluster_name          => hiera('manila::backend::cephfs::cephfs_cluster_name'),
-        cephfs_enable_snapshots      => hiera('manila::backend::cephfs::cephfs_enable_snapshots'),
-        cephfs_volume_mode           => hiera('manila::backend::cephfs::cephfs_volume_mode', '0755'),
-        cephfs_protocol_helper_type  => $manila_cephfs_protocol_helper_type,
-        cephfs_ganesha_server_ip     => hiera('ganesha_vip', undef),
+        driver_handles_share_servers       => hiera('manila::backend::cephfs::driver_handles_share_servers', false),
+        share_backend_name                 => hiera('manila::backend::cephfs::share_backend_name'),
+        cephfs_conf_path                   => hiera('manila::backend::cephfs::cephfs_conf_path'),
+        cephfs_auth_id                     => $cephfs_auth_id,
+        cephfs_cluster_name                => hiera('manila::backend::cephfs::cephfs_cluster_name'),
+        cephfs_enable_snapshots            => hiera('manila::backend::cephfs::cephfs_enable_snapshots'),
+        cephfs_volume_mode                 => hiera('manila::backend::cephfs::cephfs_volume_mode', '0755'),
+        cephfs_protocol_helper_type        => $manila_cephfs_protocol_helper_type,
+        cephfs_ganesha_server_ip           => $cephfs_ganesha_server_ip_real,
+        cephfs_ganesha_server_is_remote    => hiera('manila::backend::cephfs::cephfs_ganesha_server_is_remote', false),
+        cephfs_ganesha_server_username     => hiera('manila::backend::cephfs::cephfs_ganesha_server_username', undef),
+        cephfs_ganesha_server_password     => hiera('manila::backend::cephfs::cephfs_ganesha_server_password', undef),
+        cephfs_ganesha_path_to_private_key => hiera('manila::backend::cephfs::cephfs_ganesha_path_to_private_key', undef),
       }
 
       # cephfs supports both direct cephfs access or access through
