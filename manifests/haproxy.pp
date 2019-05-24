@@ -113,6 +113,12 @@
 #  A string.
 #  Defaults to undef
 #
+# [*haproxy_stats_bind_address*]
+#  Bind address for where the haproxy stats web interface should listen on in addition
+#  to the controller_virtual_ip
+#  A string.or an array
+#  Defaults to undef
+#
 # [*service_certificate*]
 #  Filename of an HAProxy-compatible certificate and key file
 #  When set, enables SSL on the public API endpoints using the specified file.
@@ -593,6 +599,7 @@ class tripleo::haproxy (
   $haproxy_socket_access_level = 'user',
   $haproxy_stats_user          = 'admin',
   $haproxy_stats_password      = undef,
+  $haproxy_stats_bind_address  = undef,
   $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
   $controller_hosts            = hiera('controller_node_ips'),
   $controller_hosts_names      = hiera('controller_node_names', undef),
@@ -874,9 +881,12 @@ class tripleo::haproxy (
     } else {
       $haproxy_stats_certificate_real = undef
     }
+    $haproxy_stats_ips_raw = union(any2array($controller_virtual_ip), any2array($haproxy_stats_bind_address))
+    $haproxy_stats_ips = delete_undef_values($haproxy_stats_ips_raw)
+
     class { '::tripleo::haproxy::stats':
       haproxy_listen_bind_param => $haproxy_listen_bind_param,
-      ip                        => $controller_virtual_ip,
+      ip                        => $haproxy_stats_ips,
       password                  => $haproxy_stats_password,
       certificate               => $haproxy_stats_certificate_real,
       user                      => $haproxy_stats_user,
