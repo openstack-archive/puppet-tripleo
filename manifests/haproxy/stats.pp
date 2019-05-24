@@ -21,8 +21,12 @@
 #  A list of params to be added to the HAProxy listener bind directive.
 #
 # [*ip*]
-#  IP Address on which the stats interface is listening on. This right now
-#  assumes that it's in the ctlplane network.
+#  IP Address(es) on which the stats interface is listening on.
+#  Can be a string or a list of ip addresses
+#
+# [*port*]
+#  Port on which to listen to for haproxy stats web interface
+#  Defaults to '1993'
 #
 # [*password*]
 #  Password for haproxy stats authentication.  When set, authentication is
@@ -43,19 +47,18 @@
 class tripleo::haproxy::stats (
   $haproxy_listen_bind_param,
   $ip,
+  $port        = '1993',
   $password    = undef,
   $certificate = undef,
   $user        = 'admin'
 ) {
   if $certificate {
-    $haproxy_stats_bind_opts = {
-      "${ip}:1993" => union($haproxy_listen_bind_param, ['ssl', 'crt', $certificate]),
-    }
+    $opts = union($haproxy_listen_bind_param, ['ssl', 'crt', $certificate])
   } else {
-    $haproxy_stats_bind_opts = {
-      "${ip}:1993" => $haproxy_listen_bind_param,
-    }
+    $opts = $haproxy_listen_bind_param
   }
+
+  $haproxy_stats_bind_opts = list_to_hash(suffix(any2array($ip), ":${port}"), $opts)
 
   $stats_base = ['enable', 'uri /']
   if $password {
