@@ -45,4 +45,12 @@ class tripleo::profile::base::kernel (
   # That way, we can support both 7.3 and 7.4 RHEL versions.
   # https://bugzilla.redhat.com/show_bug.cgi?id=1387537
   Exec <| title == 'modprobe nf_conntrack_proto_sctp' |> { returns => [0,1] }
+
+  # Rebuild initramfs to include kernel parameter changes in initramfs
+  exec { 'rebuild initramfs':
+    command     => 'dracut -f -v',
+    path        => '/bin:/sbin:/usr/bin:/usr/sbin',
+    refreshonly => true,
+  }
+  Sysctl <| |> ~> Exec <| title == 'rebuild initramfs' |>
 }
