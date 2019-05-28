@@ -1,0 +1,4 @@
+---
+deprecations:
+  - The aide puppet manifest for `aide` was removed. The heat template
+    invoking this manifest has been converted to Ansible.
