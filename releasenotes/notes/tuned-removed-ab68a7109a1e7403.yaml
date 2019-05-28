@@ -1,0 +1,4 @@
+---
+deprecations:
+  - The tuned puppet manifest for `tuned` was removed. The heat template
+    invoking this manifest has been converted to Ansible.
