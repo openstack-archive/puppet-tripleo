@@ -72,20 +72,20 @@ describe 'tripleo::profile::pacemaker::manila::share_bundle' do
           storage_maps = catalogue.resource(
             'Pacemaker::Resource::Bundle', 'openstack-manila-share').send(:parameters)[:storage_maps]
           expect(storage_maps).to include('manila-share-cfg-files', 'manila-share-cfg-data')
-          # CephFS is disabled by default, so ensure no resources are created.
+          # ceph-nfs is disabled by default, so ensure no resources are created.
           is_expected.to_not contain_pacemaker__constraint__order('ceph-nfs-then-manila-share')
           is_expected.to_not contain_pacemaker__constraint__colocation('openstack-manila-share-with-ceph-nfs')
           expect(storage_maps).to_not include('manila-share-dbus-docker', 'manila-share-etc-ganesha')
         end
       end
 
-      context 'with cephfs backend enabled' do
+      context 'with ceph-nfs enabled' do
         before :each do
           params.merge!({
-            :backend_cephfs_enabled => true,
+            :ceph_nfs_enabled => true,
           })
         end
-        it 'should include cephfs docker volumes and pacemaker constraints' do
+        it 'should include ceph-nfs docker volumes and pacemaker constraints' do
           is_expected.to contain_pacemaker__constraint__order('ceph-nfs-then-manila-share')
           is_expected.to contain_pacemaker__constraint__colocation('openstack-manila-share-with-ceph-nfs')
           storage_maps = catalogue.resource(
