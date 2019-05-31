@@ -107,6 +107,9 @@ class tripleo::profile::base::pacemaker::instance_ha (
   }
   # We need the guarantee that keystone is configured before creating the next resources
   if $step >= 4 {
+    # This passes the explicit host list of compute nodes that the fence_compute stonith device
+    # is in charge of
+    $compute_list = downcase(join(any2array(hiera('compute_instanceha_short_node_names', '')), ','))
     pacemaker::stonith::fence_compute { 'fence-nova':
       auth_url       => $keystone_endpoint_url,
       login          => $keystone_admin,
@@ -118,7 +121,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
       region_name    => $region_name,
       record_only    => 1,
       meta_attr      => 'provides=unfencing',
-      pcmk_host_list => '',
+      pcmk_host_list => $compute_list,
       tries          => $pcs_tries,
       deep_compare   => $deep_compare_fencing,
     }
