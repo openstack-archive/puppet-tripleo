@@ -190,7 +190,7 @@ class tripleo::profile::base::keystone (
   $keystone_enable_member         = hiera('keystone_enable_member', false),
   $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
-  $memcached_ips                  = hiera('memcached_node_ips')
+  $memcached_ips                  = hiera('memcached_node_ips', [])
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
