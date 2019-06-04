@@ -18,9 +18,9 @@
 #
 # === Parameters
 #
-# [*backend_cephfs_enabled*]
-#   (Optional) Whether or not the cephfs backend is enabled
-#   Defaults to hiera('manila_backend_cephfs_enabled', false)
+# [*ceph_nfs_enabled*]
+#   (Optional) Whether or not the ceph_nfs service is enabled
+#   Defaults to hiera('ceph_nfs_enabled', false)
 #
 # [*manila_share_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
@@ -33,10 +33,6 @@
 # [*docker_environment*]
 #   (Optional) The list of environment variables set in the docker container
 #   Defaults to ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS']
-#
-# [*backend_cephfs_enabled*]
-#   (Optional) Whether the CephFS Manila backend is enabled
-#   Defaults to hiera('manila_backend_cephfs_enabled', false)
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
@@ -61,7 +57,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
   $manila_share_docker_image  = hiera('tripleo::profile::pacemaker::manila::share_bundle::manila_share_docker_image', undef),
   $docker_volumes             = [],
   $docker_environment         = ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS'],
-  $backend_cephfs_enabled     = hiera('manila_backend_cephfs_enabled', false),
+  $ceph_nfs_enabled           = hiera('ceph_nfs_enabled', false),
   $container_backend          = 'docker',
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
@@ -92,7 +88,6 @@ class tripleo::profile::pacemaker::manila::share_bundle (
       $manila_share_nodes_count = count(hiera('manila_share_short_node_names', []))
 
       $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', '')
-      $nfs_ganesha = ($backend_cephfs_enabled and $manila_cephfs_protocol_helper_type == 'NFS')
       $docker_vol_arr = delete(any2array($docker_volumes), '').flatten()
 
       unless empty($docker_vol_arr) {
@@ -182,7 +177,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
         # creation of NFS exports and DBus socket has to be mounted
         # both to manila-share and ganesha containers so they can talk
         # to each other
-        if $nfs_ganesha {
+        if $ceph_nfs_enabled {
           $extra_storage_maps = {
             'manila-share-dbus-docker' => {
               'source-dir' => '/var/run/dbus/system_bus_socket',
@@ -220,7 +215,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
         container_backend => $container_backend,
       }
 
-      if $nfs_ganesha {
+      if $ceph_nfs_enabled {
         pacemaker::constraint::order { 'ceph-nfs-then-manila-share':
           first_resource    => 'ceph-nfs',
           second_resource   => 'openstack-manila-share',
