@@ -167,6 +167,8 @@ class tripleo::profile::base::database::mysql (
         'innodb_lock_wait_timeout'    => $innodb_lock_wait_timeout,
         'table_open_cache'        => $table_open_cache,
         'innodb_flush_method'     => $innodb_flush_method,
+        'query_cache_size'        => '0',
+        'query_cache_type'        => '0',
         'ssl'                     => $enable_internal_tls,
         'ssl-key'                 => $tls_keyfile,
         'ssl-cert'                => $tls_certfile,
