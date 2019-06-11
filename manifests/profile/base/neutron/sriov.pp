@@ -32,6 +32,5 @@ class tripleo::profile::base::neutron::sriov(
 
   if $step >= 4 {
     include ::neutron::agents::ml2::sriov
-    include ::tripleo::host::sriov
   }
 }
