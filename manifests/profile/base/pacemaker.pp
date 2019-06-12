@@ -138,9 +138,9 @@ class tripleo::profile::base::pacemaker (
         '--token' => hiera('corosync_token_timeout', 1000)
       }
     }
-    # If hiera('pacemaker_node_ips', []) is not empty we want to create the array
+    # If pacemaker_node_ips is not empty we want to create the array
     # for puppet pacemaker to use as addresses list which is an array of arrays.
-    $pacemaker_node_ips = hiera('pacemaker_node_ips', [])
+    $pacemaker_node_ips = hiera('pacemaker_node_ips_override', hiera('pacemaker_node_ips', []))
     if count($pacemaker_node_ips) > 0 {
       $pacemaker_node_ips_real = $pacemaker_node_ips.map |$x| { Array([$x]) }
     } else {
