@@ -1,0 +1,5 @@
+---
+features:
+  - Adds profile for rsyslogd composable service which aims to replace fluentd
+    with the same behaviour. This means that rsyslog will be tailing OpenStack
+    log files and forwarding it to central log collector (ELK)
