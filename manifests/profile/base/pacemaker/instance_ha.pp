@@ -52,6 +52,10 @@
 #   The keystone project domain for nova
 #   Defaults to hiera('nova::keystone::authtoken::project_domain_name', 'Default')
 #
+# [*region_name*]
+#   (Optional) String. Region name for authenticating to Keystone.
+#   Defaults to hiera('nova::keystone::authtoken::region_name', 'regionOne')
+#
 # [*no_shared_storage*]
 #   Variable that defines the no_shared_storage for the nova evacuate resource
 #   Defaults to hiera('tripleo::instanceha::no_shared_storage', true)
@@ -65,6 +69,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
   $keystone_domain       = hiera('tripleo::clouddomain', 'localdomain'),
   $user_domain           = hiera('nova::keystone::authtoken::user_domain_name', 'Default'),
   $project_domain        = hiera('nova::keystone::authtoken::project_domain_name', 'Default'),
+  $region_name           = hiera('nova::keystone::authtoken::region_name', 'regionOne'),
   $no_shared_storage     = hiera('tripleo::instanceha::no_shared_storage', true),
 ) {
   if $step >= 2 {
@@ -88,6 +93,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
       project_domain => $project_domain,
       user_domain    => $user_domain,
       domain         => $keystone_domain,
+      region_name    => $region_name,
       record_only    => 1,
       meta_attr      => 'provides=unfencing',
       pcmk_host_list => '',
@@ -114,7 +120,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
     pacemaker::resource::ocf { 'nova-evacuate':
       ocf_agent_name  => 'openstack:NovaEvacuate',
       # lint:ignore:140chars
-      resource_params => "auth_url=${keystone_endpoint_url} username=${keystone_admin} password=${keystone_password} user_domain=${user_domain} project_domain=${project_domain} tenant_name=${keystone_admin} ${iha_no_shared_storage}",
+      resource_params => "auth_url=${keystone_endpoint_url} username=${keystone_admin} password=${keystone_password} user_domain=${user_domain} project_domain=${project_domain} tenant_name=${keystone_admin} region_name=${region_name} ${iha_no_shared_storage}",
       # lint:endignore
       tries           => $pcs_tries,
       location_rule   => {

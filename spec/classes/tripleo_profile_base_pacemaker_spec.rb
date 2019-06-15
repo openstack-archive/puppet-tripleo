@@ -53,7 +53,7 @@ describe 'tripleo::profile::base::pacemaker' do
         })
         is_expected.to contain_pcmk_resource('nova-evacuate').with({
           :resource_type   => "ocf:openstack:NovaEvacuate",
-          :resource_params => "auth_url=localhost:5000 username=admin password=password user_domain=Default project_domain=Default tenant_name=admin no_shared_storage=true",
+          :resource_params => "auth_url=localhost:5000 username=admin password=password user_domain=Default project_domain=Default tenant_name=admin region_name=regionOne no_shared_storage=true",
         })
       }
     end
