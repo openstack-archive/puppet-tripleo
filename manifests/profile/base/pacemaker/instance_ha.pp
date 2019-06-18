@@ -98,6 +98,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
       ocf_agent_name => 'pacemaker:Dummy',
       meta_params    => 'requires=unfencing',
       clone_params   => true,
+      op_params      => 'stop timeout=20 on-fail=block',
       tries          => $pcs_tries,
       location_rule  => {
         resource_discovery => 'never',
