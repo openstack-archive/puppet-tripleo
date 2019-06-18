@@ -46,19 +46,24 @@
 #   (Optional) Whether or not the vnx backend is enabled
 #   Defaults to hiera('manila_backend_vnx_enabled', false)
 #
+# [*manila_user_enabled_backends*]
+#   (Optional) List of additional backend stanzas to activate
+#   Defaults to hiera('manila_user_enabled_backends', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::manila::share (
-  $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
-  $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
-  $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
-  $backend_isilon_enabled  = hiera('manila_backend_isilon_enabled', false),
-  $backend_unity_enabled   = hiera('manila_backend_unity_enabled', false),
-  $backend_vnx_enabled     = hiera('manila_backend_vnx_enabled', false),
-  $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
+  $backend_generic_enabled      = hiera('manila_backend_generic_enabled', false),
+  $backend_netapp_enabled       = hiera('manila_backend_netapp_enabled', false),
+  $backend_vmax_enabled         = hiera('manila_backend_vmax_enabled', false),
+  $backend_isilon_enabled       = hiera('manila_backend_isilon_enabled', false),
+  $backend_unity_enabled        = hiera('manila_backend_unity_enabled', false),
+  $backend_vnx_enabled          = hiera('manila_backend_vnx_enabled', false),
+  $backend_cephfs_enabled       = hiera('manila_backend_cephfs_enabled', false),
+  $manila_user_enabled_backends = hiera('manila_user_enabled_backends', undef),
   $step = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::manila
@@ -257,18 +262,16 @@ class tripleo::profile::base::manila::share (
       }
     }
 
-    $manila_enabled_backends = delete_undef_values(
-      [
-        $manila_generic_backend,
-        $manila_cephfsnative_backend,
-        $manila_cephfs_backend,
-        $manila_netapp_backend,
-        $manila_vmax_backend,
-        $manila_isilon_backend,
-        $manila_unity_backend,
-        $manila_vnx_backend
-      ]
-    )
+    $backends = delete_undef_values(concat([], $manila_generic_backend,
+                                      $manila_cephfsnative_backend,
+                                      $manila_cephfs_backend,
+                                      $manila_netapp_backend,
+                                      $manila_vmax_backend,
+                                      $manila_isilon_backend,
+                                      $manila_unity_backend,
+                                      $manila_vnx_backend,
+                                      $manila_user_enabled_backends))
+    $manila_enabled_backends = delete($backends, '')
     class { '::manila::backends' :
       enabled_share_backends => $manila_enabled_backends,
     }
