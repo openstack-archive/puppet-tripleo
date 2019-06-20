@@ -48,7 +48,7 @@ class tripleo::profile::base::kernel (
 
   # Rebuild initramfs to include kernel parameter changes in initramfs
   exec { 'rebuild initramfs':
-    command     => 'dracut -f -v',
+    command     => 'dracut -f -v --hostonly',
     path        => '/bin:/sbin:/usr/bin:/usr/sbin',
     refreshonly => true,
   }
