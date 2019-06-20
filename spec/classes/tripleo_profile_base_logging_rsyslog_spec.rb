@@ -36,7 +36,10 @@ elastic_conf = <<-EOS
 # elasticsearch
 action(type="omelasticsearch"
     name="elasticsearch"
-)
+    tls.cacert="/etc/rsyslog.d/es-ca-cert.crt"
+    tls.mycert="/etc/rsyslog.d/es-client-cert.pem"
+    tls.myprivkey="/etc/rsyslog.d/es-client-key.pem"
+  )
 EOS
 
 describe 'tripleo::profile::base::logging::rsyslog' do
@@ -46,14 +49,20 @@ describe 'tripleo::profile::base::logging::rsyslog' do
     end
 
     context 'on step 2' do
-      let(:params) { { :step => 2 } }
+      let(:params) do
+        { :step => 2,
+          :elasticsearch_tls_ca_cert => 'cacert',
+          :elasticsearch_tls_client_cert => 'clientcert',
+          :elasticsearch_tls_client_key => 'clientkey',
+        }
+      end
 
-      it 'should generate a rsyslog config file for horizon from hieradata' do
-        should contain_concat__fragment("rsyslog::component::module::imfile").with({
+      it 'should generate a rsyslog config file for horizon from hieradata and TLS certificates for Elasticsearch' do
+        should contain_concat__fragment('rsyslog::component::module::imfile').with({
           :target => '/etc/rsyslog.d/50_openstack_logs.conf',
           :content => "module(load=\"imfile\")\n",
         })
-        should contain_concat__fragment("rsyslog::component::module::omelasticsearch").with({
+        should contain_concat__fragment('rsyslog::component::module::omelasticsearch').with({
           :target => '/etc/rsyslog.d/50_openstack_logs.conf',
           :content => "module(load=\"omelasticsearch\")\n",
         })
@@ -65,9 +74,21 @@ describe 'tripleo::profile::base::logging::rsyslog' do
           :target => '/etc/rsyslog.d/50_openstack_logs.conf',
           :content => horizon_test_log_conf,
         })
-        should contain_concat__fragment("rsyslog::component::action::elasticsearch").with({
+        should contain_concat__fragment('rsyslog::component::action::elasticsearch').with({
           :target => '/etc/rsyslog.d/50_openstack_logs.conf',
           :content => elastic_conf,
+        })
+        should contain_file('elasticsearch_ca_cert').with({
+          :path => '/etc/rsyslog.d/es-ca-cert.crt',
+          :content => 'cacert',
+        })
+        should contain_file('elasticsearch_client_cert').with({
+          :path => '/etc/rsyslog.d/es-client-cert.pem',
+          :content => 'clientcert',
+        })
+        should contain_file('elasticsearch_client_key').with({
+          :path => '/etc/rsyslog.d/es-client-key.pem',
+          :content => 'clientkey',
         })
       end
     end
