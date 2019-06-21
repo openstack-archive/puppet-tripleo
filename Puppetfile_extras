@@ -33,9 +33,11 @@ mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
   :ref => 'master'
 
+# NOTE(aschultz): Include a fixed version for alternate source until
+# https://github.com/soylent/konstantin-fluentd/pull/40 is merged
 mod 'fluentd',
-  :git => 'https://github.com/soylent/konstantin-fluentd',
-  :ref => 'master'
+  :git => 'https://github.com/mwhahaha/konstantin-fluentd',
+  :ref => 'fix-tdagent-provider'
 
 mod 'certmonger',
   :git => 'https://github.com/saltedsignal/puppet-certmonger',
