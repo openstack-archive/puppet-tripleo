@@ -129,6 +129,29 @@ eos
         is_expected.to contain_class('tripleo::profile::base::manila::api')
       }
     end
+
+    context 'with custom protocols' do
+      let(:params) { {
+        :step                    => 4,
+        :bootstrap_node          => 'node.example.com',
+        :backend_generic_enabled => true,
+        :backend_cephfs_enabled  => true,
+        :enabled_share_protocols => ['CIFS', 'CEPHFS'],
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to contain_class('tripleo::profile::base::manila')
+        is_expected.to contain_class('tripleo::profile::base::manila::authtoken')
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to contain_class('tripleo::profile::base::apache')
+        is_expected.to contain_class('manila::api').with(
+          :enabled_share_protocols => 'CIFS,CEPHFS'
+        )
+        is_expected.to contain_class('manila::wsgi::apache')
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+      }
+    end
   end
 
 
