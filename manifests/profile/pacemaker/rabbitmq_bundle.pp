@@ -90,10 +90,12 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
   $rpc_scheme                   = hiera('oslo_messaging_rpc_scheme'),
   $rpc_bootstrap_node           = hiera('oslo_messaging_rpc_short_bootstrap_node_name'),
-  $rpc_nodes                    = hiera('oslo_messaging_rpc_node_names', []),
+  $rpc_nodes                    = hiera('oslo_messaging_rpc_node_names_override',
+                                        hiera('oslo_messaging_rpc_node_names', [])),
   $notify_scheme                = hiera('oslo_messaging_notify_scheme'),
   $notify_bootstrap_node        = hiera('oslo_messaging_notify_short_bootstrap_node_name'),
-  $notify_nodes                 = hiera('oslo_messaging_notify_node_names', []),
+  $notify_nodes                 = hiera('oslo_messaging_notify_node_names_override',
+                                        hiera('oslo_messaging_notify_node_names', [])),
   $enable_internal_tls          = hiera('enable_internal_tls', false),
   $rabbitmq_extra_policies      = hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'}),
   $pcs_tries                    = hiera('pcs_tries', 20),
@@ -154,14 +156,13 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
 
   if $step >= 2 {
     if $pacemaker_master {
-      if (hiera('rabbitmq_short_node_names_override', undef)) {
-        $rabbitmq_short_node_names = hiera('rabbitmq_short_node_names_override')
-      } elsif ($rpc_scheme == 'rabbit') {
-        $rabbitmq_short_node_names = hiera('oslo_messaging_rpc_short_node_names')
+      if $rpc_scheme == 'rabbit' {
+        $rabbitmq_short_node_names = hiera('oslo_messaging_rpc_short_node_names_override',
+          hiera('oslo_messaging_rpc_short_node_names'))
       } elsif $notify_scheme == 'rabbit' {
-        $rabbitmq_short_node_names = hiera('oslo_messaging_notify_short_node_names')
+        $rabbitmq_short_node_names = hiera('oslo_messaging_notify_short_node_names_override',
+          hiera('oslo_messaging_notify_short_node_names'))
       }
-
       $rabbitmq_nodes_count = count($rabbitmq_short_node_names)
       $rabbitmq_short_node_names.each |String $node_name| {
         pacemaker::property { "rabbitmq-role-${node_name}":
