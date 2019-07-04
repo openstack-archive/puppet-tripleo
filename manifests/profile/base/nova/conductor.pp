@@ -24,6 +24,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::nova::conductor (
+  $bootstrap_node = hiera('nova_api_short_bootstrap_node_name', undef),
   $step = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::nova
