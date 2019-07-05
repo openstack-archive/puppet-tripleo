@@ -11,7 +11,7 @@ cinder::backend::dellsc_iscsi::iscsi_ip_address: '127.0.0.1'
 cinder::backend::eqlx::eqlx_chap_login: 'user'
 cinder::backend::eqlx::eqlx_chap_password: 'user'
 cinder::backend::emc_vnx::storage_vnx_pool_names: 'emc-storage-pool'
-service_names:
+enabled_services:
  - 'ceilometer_agent_central'
  - 'horizon'
 tripleo_fluentd_groups_ceilometer_agent_central:

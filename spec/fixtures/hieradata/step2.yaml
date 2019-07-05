@@ -1,7 +1,7 @@
 ---
 step: 2
 # rsyslog tests
-service_names:
+enabled_services:
  - 'horizon'
 tripleo_fluentd_sources_horizon:
  - path: '/var/log/horizon/test.log'
