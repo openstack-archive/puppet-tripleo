@@ -19,4 +19,13 @@
 <%- if @compress %>
   compress
 <%- end %>
+<%- if @dateext %>
+  dateext
+<%- if @dateformat %>
+  dateformat <%= @dateformat %>
+<%- end %>
+<%- if @dateyesterday %>
+  dateyesterday
+<%- end %>
+<%- end %>
 }
