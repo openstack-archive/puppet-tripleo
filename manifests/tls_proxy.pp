@@ -37,6 +37,10 @@
 #   (Optional) Whether the Host header is perserved in proxied requests.
 #   See the Apache ProxyPreserveHost directive docs.
 #   Defaults to false
+#
+# [*proxy_pass_host*]
+#   The host to connect to.
+#   Defaults to hiera('localhost_address', 'localhost')
 
 define tripleo::tls_proxy(
   $ip,
@@ -44,7 +48,8 @@ define tripleo::tls_proxy(
   $servername,
   $tls_cert,
   $tls_key,
-  $preserve_host = false
+  $preserve_host = false,
+  $proxy_pass_host = hiera('localhost_address', 'localhost')
 ) {
   include ::apache
   ::apache::vhost { "${title}-proxy":
@@ -61,7 +66,7 @@ define tripleo::tls_proxy(
     proxy_preserve_host => $preserve_host,
     proxy_pass          => {
       path   => '/',
-      url    => "http://localhost:${port}/",
+      url    => "http://${proxy_pass_host}:${port}/",
       params => {retry => '10'},
     }
   }
