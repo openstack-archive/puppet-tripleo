@@ -1,0 +1,5 @@
+---
+other:
+  - |
+    Add dateext and related paramters for containerized logrotate service to
+    find easily when logfiles were rotated.
