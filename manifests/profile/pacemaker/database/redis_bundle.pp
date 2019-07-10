@@ -95,6 +95,9 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
 class tripleo::profile::pacemaker::database::redis_bundle (
   $certificate_specs         = hiera('redis_certificate_specs', {}),
@@ -112,6 +115,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $tls_proxy_bind_ip         = undef,
   $tls_proxy_fqdn            = undef,
   $tls_proxy_port            = 6379,
+  $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -313,6 +317,11 @@ slave-announce-port ${local_tuple[0][2]}
       } else {
         $storage_maps_tls = {}
       }
+      if $tls_priorities != undef {
+        $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
+      } else {
+        $tls_priorities_real = ''
+      }
 
       pacemaker::resource::bundle { 'redis-bundle':
         image             => $redis_docker_image,
@@ -324,7 +333,7 @@ slave-announce-port ${local_tuple[0][2]}
           expression         => ['redis-role eq true'],
         },
         container_options => 'network=host',
-        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
+        options           => "--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${redis_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),

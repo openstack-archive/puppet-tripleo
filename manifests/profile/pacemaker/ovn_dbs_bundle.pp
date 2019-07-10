@@ -56,6 +56,10 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
@@ -67,6 +71,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $nb_db_port           = 6641,
   $sb_db_port           = 6642,
   $container_backend    = 'docker',
+  $tls_priorities       = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -99,6 +104,11 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         score              => 0,
         expression         => ['ovn-dbs-role eq true'],
       }
+      if $tls_priorities != undef {
+        $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
+      } else {
+        $tls_priorities_real = ''
+      }
 
       pacemaker::resource::bundle { 'ovn-dbs-bundle':
         image             => $ovn_dbs_docker_image,
@@ -106,7 +116,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         masters           => 1,
         location_rule     => $ovn_dbs_location_rule,
         container_options => 'network=host',
-        options           => '--log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
+        options           => "--log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${ovn_dbs_control_port}",
         storage_maps      => {
