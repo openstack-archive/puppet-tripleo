@@ -79,6 +79,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef),
   $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122'),
@@ -94,6 +98,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_extra_policies      = hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'}),
   $pcs_tries                    = hiera('pcs_tries', 20),
   $step                         = Integer(hiera('step')),
+  $tls_priorities               = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
   if $rpc_scheme == 'rabbit' {
     $bootstrap_node = $rpc_bootstrap_node
@@ -237,6 +242,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       } else {
         $storage_maps_tls = {}
       }
+      if $tls_priorities != undef {
+        $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
+      } else {
+        $tls_priorities_real = ''
+      }
 
       pacemaker::resource::bundle { 'rabbitmq-bundle':
         image             => $rabbitmq_docker_image,
@@ -247,7 +257,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           expression         => ['rabbitmq-role eq true'],
         },
         container_options => 'network=host',
-        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
+        options           => "--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${rabbitmq_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
