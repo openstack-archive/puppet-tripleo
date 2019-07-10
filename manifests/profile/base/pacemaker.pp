@@ -71,6 +71,11 @@
 #  (Optional) Boolean driving the Instance HA controlplane configuration
 #  Defaults to false
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#
+
 class tripleo::profile::base::pacemaker (
   $step                      = Integer(hiera('step')),
   $pcs_tries                 = hiera('pcs_tries', 20),
@@ -84,6 +89,7 @@ class tripleo::profile::base::pacemaker (
   $cluster_recheck_interval  = hiera('pacemaker_cluster_recheck_interval', undef),
   $encryption                = true,
   $enable_instanceha         = hiera('tripleo::instanceha', false),
+  $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
 
   if count($remote_short_node_names) != count($remote_node_ips) {
@@ -131,6 +137,7 @@ class tripleo::profile::base::pacemaker (
       setup_cluster        => $pacemaker_master,
       cluster_setup_extras => $cluster_setup_extras,
       remote_authkey       => $remote_authkey,
+      tls_priorities       => $tls_priorities,
     }
     if str2bool(hiera('docker_enabled', false)) {
       include ::systemd::systemctl::daemon_reload

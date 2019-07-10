@@ -30,6 +30,10 @@
 #   (Optional) Whether or not to manage stonith devices for nodes
 #   Defaults to hiera('enable_fencing', false)
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -39,10 +43,12 @@ class tripleo::profile::base::pacemaker_remote (
   $remote_authkey,
   $pcs_tries      = hiera('pcs_tries', 20),
   $enable_fencing = hiera('enable_fencing', false),
+  $tls_priorities = hiera('tripleo::pacemaker::tls_priorities', undef),
   $step           = Integer(hiera('step')),
 ) {
   class { '::pacemaker::remote':
     remote_authkey => $remote_authkey,
+    tls_priorities => $tls_priorities,
   }
   if str2bool(hiera('docker_enabled', false)) {
     include ::systemd::systemctl::daemon_reload

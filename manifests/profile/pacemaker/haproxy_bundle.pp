@@ -67,6 +67,10 @@
 #   (optional) Additional op parameters to pass to "pcs resource create" for the VIP
 #   Defaults to ''
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -88,6 +92,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   $deployed_ssl_cert_path   = hiera('tripleo::haproxy::service_certificate', undef),
   $meta_params              = '',
   $op_params                = '',
+  $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
   $step                     = Integer(hiera('step')),
   $pcs_tries                = hiera('pcs_tries', 20),
 ) {
@@ -235,12 +240,18 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         $storage_maps_internal_tls = {}
       }
 
+      if $tls_priorities != undef {
+        $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
+      } else {
+        $tls_priorities_real = ''
+      }
+
       pacemaker::resource::bundle { 'haproxy-bundle':
         image             => $haproxy_docker_image,
         replicas          => $haproxy_nodes_count,
         location_rule     => $haproxy_location_rule,
         container_options => 'network=host',
-        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS',
+        options           => "--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => merge($storage_maps, $cert_storage_maps, $storage_maps_internal_tls),
       }
