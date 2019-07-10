@@ -83,6 +83,10 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef),
   $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122'),
@@ -101,6 +105,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $pcs_tries                    = hiera('pcs_tries', 20),
   $step                         = Integer(hiera('step')),
   $container_backend            = 'docker',
+  $tls_priorities               = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
   # is this an additional nova cell?
   if hiera('nova_is_additional_cell', undef) {
@@ -248,6 +253,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       } else {
         $storage_maps_tls = {}
       }
+      if $tls_priorities != undef {
+        $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
+      } else {
+        $tls_priorities_real = ''
+      }
 
       pacemaker::resource::bundle { 'rabbitmq-bundle':
         image             => $rabbitmq_docker_image,
@@ -259,7 +269,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => '--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8',
+        options           => "--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${rabbitmq_docker_control_port}",
