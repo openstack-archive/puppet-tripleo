@@ -160,6 +160,8 @@ define tripleo::haproxy::endpoint (
   }
   # Let users override the options on a per-service basis
   $custom_options = hiera("tripleo::haproxy::${name}::options", undef)
+  $custom_bind_options_public = delete(any2array(hiera("tripleo::haproxy::${name}::public_bind_options", undef)), undef).flatten()
+  $custom_bind_options_internal = delete(any2array(hiera("tripleo::haproxy::${name}::internal_bind_options", undef)), undef).flatten()
   if $public_virtual_ip {
     # service exposed to the public network
 
@@ -175,10 +177,11 @@ define tripleo::haproxy::endpoint (
         $listen_options_precookie = merge($listen_options, $custom_options)
       }
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${public_ssl_port}"),
-                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate], $custom_bind_options_public))
     } else {
       $listen_options_precookie = merge($listen_options, $custom_options)
-      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${haproxy_port_real}"), $haproxy_listen_bind_param)
+      $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${haproxy_port_real}"),
+                                        union($haproxy_listen_bind_param, $custom_bind_options_public))
     }
   } else {
     # internal service only
@@ -211,13 +214,16 @@ define tripleo::haproxy::endpoint (
       $internal_cert_path = $internal_certificates_specs["haproxy-${service_network}"]['service_pem']
     }
     $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${haproxy_port_real}"),
-                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $internal_cert_path]))
+                                        union($haproxy_listen_bind_param, ['ssl', 'crt', $internal_cert_path],
+                                        $custom_bind_options_internal))
   } else {
     if $service_network == 'external' and $public_certificate {
       $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${haproxy_port_real}"),
-                                          union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate]))
+                                          union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate],
+                                          $custom_bind_options_internal))
     } else {
-      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${haproxy_port_real}"), $haproxy_listen_bind_param)
+      $internal_bind_opts = list_to_hash(suffix(any2array($internal_ip), ":${haproxy_port_real}"),
+                                          union($haproxy_listen_bind_param, $custom_bind_options_internal))
     }
   }
   if $authorized_userlist {

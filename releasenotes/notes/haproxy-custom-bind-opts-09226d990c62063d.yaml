@@ -1,0 +1,10 @@
+---
+features:
+  - |
+     Two custom per-service hiera keys are added
+     tripleo::haproxy::<service>::internal_bind_options and
+     tripleo::haproxy::<service>::public_bind_options. They control additional
+     custom options that can be added to the bind line of a specific service configuration
+     in haproxy. One use case is to force older TLS versions for internal APIs that
+     end up pointing to devices that do not support the latest TLS standard.
+     They accept a single string or an array of strings.
