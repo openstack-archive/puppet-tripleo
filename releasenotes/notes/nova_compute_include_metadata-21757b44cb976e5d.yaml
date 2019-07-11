@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    The old DEFAULT/dhcp_domain setting was moved to api/dhcp_domain.
+    nova::network::neutron::dhcp_domain will be removed later in the cycle.
+    We need include nova::metadata which sets the new [api]/dhcp_domain
+    as this is used by the virt driver to generate the config drive.
