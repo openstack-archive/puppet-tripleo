@@ -148,5 +148,6 @@ class tripleo::profile::base::nova (
       }),
     }
     include ::nova::placement
+    include ::nova::keystone::service_user
   }
 }
