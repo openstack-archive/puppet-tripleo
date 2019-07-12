@@ -231,7 +231,7 @@ class tripleo::profile::base::metrics::collectd (
   $amqp_instances = {},
   $amqp_retry_delay = undef,
   $amqp_interval = undef,
-  $service_names = hiera('service_names', []),
+  $service_names = hiera('enabled_services', []),
   $collectd_manage_repo = false,
   $python_read_plugins = []
 ) {
