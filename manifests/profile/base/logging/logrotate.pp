@@ -79,6 +79,18 @@
 #    Configures forced purge period for rotated logs.
 #    Overrides the rotation and rotate settings.
 #
+#  [*dateext*]
+#    (optional) Defaults to undef.
+#    Configures the dateext parameter.
+#
+#  [*dateformat*]
+#    (optional) Defaults to undef.
+#    Configures the dateformat parameter used with dateext parameter.
+#
+#  [*dateyesterday*]
+#    (optional) Defaults to undef.
+#    Configures the dateyesterday parameter used with dateext parameter.
+#
 # DEPRECATED PARAMETERS
 #
 #  [*size*]
@@ -102,6 +114,9 @@ class tripleo::profile::base::logging::logrotate (
   $maxsize          = '10M',
   $rotate           = 14,
   $purge_after_days = 14,
+  $dateext          = undef,
+  $dateformat       = undef,
+  $dateyesterday    = undef,
   # DEPRECATED PARAMETERS
   $size             = undef,
 ) {
