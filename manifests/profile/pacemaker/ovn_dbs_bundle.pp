@@ -153,9 +153,19 @@ sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000",
         tries        => $pcs_tries,
       }
 
+      pacemaker::constraint::order { "${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}":
+        first_resource    => 'ovn-dbs-bundle',
+        second_resource   => "${ovndb_vip_resource_name}",
+        first_action      => 'promote',
+        second_action     => 'start',
+        constraint_params => 'kind=Optional',
+        tries             => $pcs_tries,
+      }
+
       Pacemaker::Resource::Bundle['ovn-dbs-bundle']
         -> Pacemaker::Resource::Ocf["${ovndb_servers_resource_name}"]
-          -> Pacemaker::Constraint::Colocation["${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}"]
+          -> Pacemaker::Constraint::Order["${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}"]
+            -> Pacemaker::Constraint::Colocation["${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}"]
     }
   }
 }
