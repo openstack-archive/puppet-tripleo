@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added new parameter 'mpm_module' for the base Apache profile to configure
+    the used MPM module. Defaults to 'prefork', which is also the default
+    value for the config files installed with the package.

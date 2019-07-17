@@ -26,11 +26,15 @@
 # [*status_listener*]
 #   Where should apache listen for status page
 #   Default to 127.0.0.1:80
-
+#
+# [*mpm_module*]
+#   The MPM module to use.
+#   Default to prefork.
 
 class tripleo::profile::base::apache(
   Boolean $enable_status_listener = false,
   String  $status_listener        = '127.0.0.1:80',
+  String  $mpm_module             = 'prefork',
 ) {
   include ::apache::params
   # rhel8/fedora will be python3. See LP#1813053
@@ -38,6 +42,11 @@ class tripleo::profile::base::apache(
     class { '::apache':
       mod_packages => merge($::apache::params::mod_packages, { 'wsgi' =>  'python3-mod_wsgi' }),
       mod_libs     => merge($::apache::params::mod_libs, { 'wsgi' => 'mod_wsgi_python3.so' }),
+      mpm_module   => $mpm_module,
+    }
+  } else {
+    class { '::apache':
+      mpm_module => $mpm_module,
     }
   }
 

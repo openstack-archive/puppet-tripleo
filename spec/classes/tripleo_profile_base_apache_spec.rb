@@ -21,6 +21,7 @@ describe 'tripleo::profile::base::apache' do
 
     context 'with default params' do
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('apache::mod::prefork')
         is_expected.to contain_class('apache::mod::status')
         is_expected.to contain_class('apache::mod::ssl')
         is_expected.to_not contain_apache__listen('127.0.0.1:80')
@@ -51,6 +52,14 @@ describe 'tripleo::profile::base::apache' do
       end
     end
 
+    context 'Change MPM module' do
+      let(:params) {{
+        :mpm_module => 'event',
+      }}
+      it 'should trigger complete configuration' do
+        is_expected.to contain_class('apache::mod::event')
+      end
+    end
 
     context 'Provide wrong value for ensure_status_listener' do
       let(:params) {{
