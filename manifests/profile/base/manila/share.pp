@@ -105,6 +105,7 @@ class tripleo::profile::base::manila::share (
       $cephfs_auth_id = hiera('manila::backend::cephfs::cephfs_auth_id')
       $cephfs_ganesha_server_ip = hiera('manila::backend::cephfs::cephfs_ganesha_server_ip', undef)
       $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', false)
+      $manila_cephfs_pool_name = hiera('manila::backend::cephfs::pool_name', 'manila_data')
 
       if $cephfs_ganesha_server_ip == undef {
         $cephfs_ganesha_server_ip_real = hiera('ganesha_vip', undef)
@@ -134,7 +135,7 @@ class tripleo::profile::base::manila::share (
       if $manila_cephfs_protocol_helper_type == 'NFS' {
         manila_config {
           "${manila_cephfs_backend}/ganesha_rados_store_enable":    value => true;
-          "${manila_cephfs_backend}/ganesha_rados_store_pool_name": value => 'manila_data';
+          "${manila_cephfs_backend}/ganesha_rados_store_pool_name": value => $manila_cephfs_pool_name;
         }
       }
 
