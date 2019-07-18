@@ -1397,10 +1397,10 @@ class tripleo::haproxy (
 
   if $redis {
     if $enable_internal_tls {
-      $redis_tcp_check_ssl_options = ['connect ssl']
+      $redis_tcp_check_ssl_options = ['connect port 6379 ssl']
       $redis_ssl_member_options = ['check-ssl', "ca-file ${ca_bundle}"]
     } else {
-      $redis_tcp_check_ssl_options = []
+      $redis_tcp_check_ssl_options = ['connect port 6379']
       $redis_ssl_member_options = []
     }
     if $redis_password {
