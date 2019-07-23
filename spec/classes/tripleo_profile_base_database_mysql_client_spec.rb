@@ -25,7 +25,7 @@ describe 'tripleo::profile::base::database::mysql::client' do
       end
 
       before (:each) do
-        facts.merge!({ :uuid => 'notdocker' })
+        facts.merge!({ :deployment_type => 'notcontainers' })
       end
 
       it {
@@ -46,13 +46,13 @@ describe 'tripleo::profile::base::database::mysql::client' do
       }
     end
 
-    context 'with defaults on docker' do
+    context 'with defaults in containers' do
       let (:params) do
         { :step => 1 }
       end
 
       before (:each) do
-        facts.merge!({ :uuid => 'docker' })
+        facts.merge!({ :deployment_type => 'containers' })
       end
 
       it {
@@ -76,7 +76,7 @@ describe 'tripleo::profile::base::database::mysql::client' do
       end
 
       before (:each) do
-        facts.merge!({ :uuid => 'notdocker', :deployment_type => 'containers' })
+        facts.merge!({ :deployment_type => 'notcontainers', :deployment_type => 'containers' })
       end
 
       it {
@@ -102,7 +102,7 @@ describe 'tripleo::profile::base::database::mysql::client' do
       end
 
       before (:each) do
-        facts.merge!({ :uuid => 'notdocker' })
+        facts.merge!({ :deployment_type => 'notcontainers' })
       end
 
       it {
@@ -129,7 +129,7 @@ describe 'tripleo::profile::base::database::mysql::client' do
       end
 
       before (:each) do
-        facts.merge!({ :uuid => 'notdocker' })
+        facts.merge!({ :deployment_type => 'notcontainers' })
       end
 
       it {

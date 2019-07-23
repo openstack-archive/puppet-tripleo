@@ -57,7 +57,7 @@ class tripleo::profile::base::nova::libvirt (
 
     # This removal of files in /etc/libvirt/qemu should not happen inside containers
     # Avoids LP#1819482
-    if ! ($::uuid == 'docker' or $::deployment_type == 'containers') {
+    if $::deployment_type != 'containers' {
       file { ['/etc/libvirt/qemu/networks/autostart/default.xml',
               '/etc/libvirt/qemu/networks/default.xml']:
         ensure  => absent,
