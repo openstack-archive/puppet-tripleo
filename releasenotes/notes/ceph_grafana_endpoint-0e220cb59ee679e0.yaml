@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds ceph_grafana endpoint and ceph_grafana_port to configure
+    the ceph-dashboard service

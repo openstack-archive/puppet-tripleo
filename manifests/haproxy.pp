@@ -343,6 +343,10 @@
 #  (optional) Enable or not Ceph RadosGW binding
 #  Defaults to hiera('ceph_rgw_enabled', false)
 #
+# [*ceph_grafana*]
+#  (optional) Enable or not Ceph Grafana dashboard binding
+#  Defaults to hiera('ceph_grafana-server_enabled', false)
+#
 # [*opendaylight*]
 #  (optional) Enable or not OpenDaylight binding
 #  Defaults to hiera('opendaylight_api_enabled', false)
@@ -379,6 +383,10 @@
 # [*ceph_rgw_network*]
 #  (optional) Specify the network ceph_rgw is running on.
 #  Defaults to hiera('ceph_rgw_network', undef)
+#
+# [*ceph_grafana_network*]
+#  (optional) Specify the network ceph_grafana is running on.
+#  Defaults to hiera('ceph_grafana_network', undef)
 #
 # [*cinder_network*]
 #  (optional) Specify the network cinder is running on.
@@ -583,6 +591,8 @@
 #    'zaqar_api_ssl_port' (Defaults to 13888)
 #    'ceph_rgw_port' (Defaults to 8080)
 #    'ceph_rgw_ssl_port' (Defaults to 13808)
+#    'ceph_grafana_port' (Defaults to 3100)
+#    'ceph_grafana_ssl_port' (Defaults to 3100)
 #    'zaqar_ws_port' (Defaults to 9000)
 #    'zaqar_ws_ssl_port' (Defaults to 9000)
 #  * Note that for zaqar's websockets we don't support having a different
@@ -639,6 +649,7 @@ class tripleo::haproxy (
   $aodh                        = hiera('aodh_api_enabled', false),
   $panko                       = hiera('panko_api_enabled', false),
   $barbican                    = hiera('barbican_api_enabled', false),
+  $ceph_grafana                = hiera('ceph_grafana-server_enabled', false),
   $gnocchi                     = hiera('gnocchi_api_enabled', false),
   $mistral                     = hiera('mistral_api_enabled', false),
   $swift_proxy_server          = hiera('swift_proxy_enabled', false),
@@ -678,6 +689,7 @@ class tripleo::haproxy (
   $glance_api_network          = hiera('glance_api_network', undef),
   $gnocchi_network             = hiera('gnocchi_api_network', undef),
   $heat_api_network            = hiera('heat_api_network', undef),
+  $ceph_grafana_network        = hiera('ceph_grafana-server_network', undef),
   $heat_cfn_network            = hiera('heat_api_cfn_network', undef),
   $horizon_network             = hiera('horizon_network', undef),
   $ironic_inspector_network    = hiera('ironic_inspector_network', undef),
@@ -783,6 +795,8 @@ class tripleo::haproxy (
     ceph_rgw_ssl_port => 13808,
     zaqar_ws_port => 9000,
     zaqar_ws_ssl_port => 9000,
+    ceph_grafana_port => 3100,
+    ceph_grafana_ssl_port => 3100,
   }
   $ports = merge($default_service_ports, $service_ports)
 
@@ -1034,6 +1048,21 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /healthcheck', ]}),
       service_network   => $glance_api_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
+    }
+  }
+
+  if $ceph_grafana {
+    ::tripleo::haproxy::endpoint { 'ceph_grafana':
+      public_virtual_ip => $controller_virtual_ip,
+      internal_ip       => hiera('ceph_grafana-server_vip', $controller_virtual_ip),
+      service_port      => $ports[ceph_grafana_port],
+      ip_addresses      => hiera('ceph_grafana-server_node_ips', $controller_hosts_real),
+      server_names      => hiera('ceph_grafana-server_node_names', $controller_hosts_names_real),
+      mode              => 'http',
+      public_ssl_port   => $ports[ceph_grafana_ssl_port],
+      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk HEAD /' ] }),
+      service_network   => $ceph_grafana_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
