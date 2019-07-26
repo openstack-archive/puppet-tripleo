@@ -818,10 +818,6 @@ class tripleo::haproxy (
     "${rabbitmq_vip}:5672" => $haproxy_listen_bind_param,
   }
 
-  $redis_vip = hiera('redis_vip', $controller_virtual_ip)
-  $redis_bind_opts = {
-    "${redis_vip}:6379" => $haproxy_listen_bind_param,
-  }
 
   $haproxy_global_options = {
     'log'                      => "${haproxy_log_address} ${haproxy_log_facility}",
@@ -1433,6 +1429,11 @@ class tripleo::haproxy (
   }
 
   if $redis {
+    $redis_vip = hiera('redis_vip', $controller_virtual_ip)
+    $redis_bind_opts = {
+      "${redis_vip}:6379" => $haproxy_listen_bind_param,
+    }
+
     if $enable_internal_tls {
       $redis_tcp_check_ssl_options = ['connect port 6379 ssl']
       $redis_ssl_member_options = ['check-ssl', "ca-file ${ca_bundle}"]

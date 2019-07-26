@@ -271,15 +271,18 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         pcs_tries     => $pcs_tries,
       }
 
-      $redis_vip = hiera('redis_vip')
-      tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_redis_vip':
-        ensure        => $redis_vip and $redis_vip != $control_vip,
-        vip_name      => 'redis',
-        ip_address    => $redis_vip,
-        location_rule => $haproxy_location_rule,
-        meta_params   => $meta_params,
-        op_params     => $op_params,
-        pcs_tries     => $pcs_tries,
+      $redis = hiera('redis_enabled', false)
+      if $redis {
+        $redis_vip = hiera('redis_vip')
+        tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_redis_vip':
+          ensure        => $redis_vip and $redis_vip != $control_vip,
+          vip_name      => 'redis',
+          ip_address    => $redis_vip,
+          location_rule => $haproxy_location_rule,
+          meta_params   => $meta_params,
+          op_params     => $op_params,
+          pcs_tries     => $pcs_tries,
+        }
       }
 
       # Set up all vips for isolated networks
