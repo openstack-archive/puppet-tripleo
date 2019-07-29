@@ -47,6 +47,9 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*tls_priorities*]
+#   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
+#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
 class tripleo::profile::pacemaker::cinder::volume_bundle (
   $bootstrap_node             = hiera('cinder_volume_short_bootstrap_node_name'),
@@ -56,6 +59,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
   $container_backend          = 'docker',
+  $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -181,6 +185,11 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
 
       $docker_env_arr = delete(any2array($docker_environment), '').flatten()
       $docker_env = join($docker_env_arr.map |$var| { "-e ${var}" }, ' ')
+      if $tls_priorities != undef {
+        $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
+      } else {
+        $tls_priorities_real = ''
+      }
 
       pacemaker::resource::bundle { $::cinder::params::volume_service:
         image             => $cinder_volume_docker_image,
@@ -191,7 +200,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
           expression         => ['cinder-volume-role eq true'],
         },
         container_options => 'network=host',
-        options           => "--ipc=host --privileged=true --user=root --log-driver=journald ${docker_env}",
+        options           => "--ipc=host --privileged=true --user=root --log-driver=journald ${docker_env}${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => $storage_maps,
         container_backend => $container_backend,
