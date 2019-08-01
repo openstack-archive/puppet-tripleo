@@ -138,6 +138,7 @@ class tripleo::profile::base::neutron::server (
     if $designate_api_enabled {
       include ::neutron::designate
     }
+    include ::tripleo::profile::base::apache
   }
   # We start neutron-server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens

@@ -170,6 +170,7 @@ class tripleo::profile::base::glance::api (
         tls_key    => $tls_keyfile,
         notify     => Class['::glance::api'],
       }
+      include ::tripleo::profile::base::apache
     }
     case $glance_backend {
         'swift': { $backend_store = 'swift' }
