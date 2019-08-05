@@ -102,6 +102,11 @@
 #   it will create.
 #   Defaults to hiera('redis_certificate_specs', {}).
 #
+# [*ceph_grafana_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('ceph_grafana_certificate_specs', {}).
+#
 # [*etcd_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -164,6 +169,7 @@ class tripleo::profile::base::certmonger_user (
   $ovs_certificate_specs      = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
   $neutron_certificate_specs  = hiera('tripleo::profile::base::neutron::certificate_specs', {}),
   $novnc_proxy_certificates_specs = hiera('novnc_proxy_certificates_specs',{}),
+  $ceph_grafana_certificate_specs = hiera('ceph_grafana_certificate_specs', {}),
   $novnc_proxy_postsave_cmd   = undef,
   # Deprecated
   $haproxy_postsave_cmd       = undef,
@@ -250,6 +256,9 @@ class tripleo::profile::base::certmonger_user (
     unless empty($novnc_proxy_certificates_specs) {
       ensure_resource('class', 'tripleo::certmonger::novnc_proxy', $novnc_proxy_certificates_specs,
                         {'postsave_cmd' => $novnc_proxy_postsave_cmd})
+    }
+    unless empty($ceph_grafana_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::ceph_grafana', $ceph_grafana_certificate_specs)
     }
   }
 }
