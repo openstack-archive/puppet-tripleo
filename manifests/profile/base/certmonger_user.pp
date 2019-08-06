@@ -137,6 +137,26 @@
 #   certificate is renewed.
 #   Defaults to undef
 #
+# [*ovn_dbs_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('ovn_dbs_certificate_specs', {})
+#
+# [*ovn_controller_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('ovn_controller_certificate_specs', {})
+#
+# [*ovn_metadata_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('ovn_metadata_certificate_specs', {})
+#
+# [*neutron_ovn_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('neutron_ovn_certificate_specs', {})
+#
 # === Deprecated
 #
 # [*haproxy_postsave_cmd*]
@@ -150,30 +170,34 @@
 #   Defaults to undef
 #
 class tripleo::profile::base::certmonger_user (
-  $step                       = Integer(hiera('step')),
-  $certmonger_ca              = hiera('certmonger_ca', 'local'),
-  $apache_certificates_specs  = hiera('apache_certificates_specs', {}),
-  $haproxy_certificates_specs = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
-  $libvirt_certificates_specs = hiera('libvirt_certificates_specs', {}),
-  $libvirt_postsave_cmd       = undef,
-  $libvirt_vnc_certificates_specs = hiera('libvirt_vnc_certificates_specs', {}),
-  $libvirt_vnc_postsave_cmd       = undef,
-  $qemu_certificates_specs    = hiera('qemu_certificates_specs', {}),
-  $qemu_postsave_cmd          = undef,
-  $qdr_certificate_specs      = hiera('tripleo::profile::base::metrics::qdr::certificate_specs', {}),
-  $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
-  $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
-  $redis_certificate_specs    = hiera('redis_certificate_specs', {}),
-  $etcd_certificate_specs     = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
-  $odl_certificate_specs      = hiera('tripleo::profile::base::neutron::opendaylight::certificate_specs', {}),
-  $ovs_certificate_specs      = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
-  $neutron_certificate_specs  = hiera('tripleo::profile::base::neutron::certificate_specs', {}),
-  $novnc_proxy_certificates_specs = hiera('novnc_proxy_certificates_specs',{}),
-  $ceph_grafana_certificate_specs = hiera('ceph_grafana_certificate_specs', {}),
-  $novnc_proxy_postsave_cmd   = undef,
+  $step                               = Integer(hiera('step')),
+  $certmonger_ca                      = hiera('certmonger_ca', 'local'),
+  $apache_certificates_specs          = hiera('apache_certificates_specs', {}),
+  $haproxy_certificates_specs         = hiera('tripleo::profile::base::haproxy::certificates_specs', {}),
+  $libvirt_certificates_specs         = hiera('libvirt_certificates_specs', {}),
+  $libvirt_postsave_cmd               = undef,
+  $libvirt_vnc_certificates_specs     = hiera('libvirt_vnc_certificates_specs', {}),
+  $libvirt_vnc_postsave_cmd           = undef,
+  $qemu_certificates_specs            = hiera('qemu_certificates_specs', {}),
+  $qemu_postsave_cmd                  = undef,
+  $qdr_certificate_specs              = hiera('tripleo::profile::base::metrics::qdr::certificate_specs', {}),
+  $mysql_certificate_specs            = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
+  $rabbitmq_certificate_specs         = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
+  $redis_certificate_specs            = hiera('redis_certificate_specs', {}),
+  $etcd_certificate_specs             = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
+  $odl_certificate_specs              = hiera('tripleo::profile::base::neutron::opendaylight::certificate_specs', {}),
+  $ovs_certificate_specs              = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
+  $neutron_certificate_specs          = hiera('tripleo::profile::base::neutron::certificate_specs', {}),
+  $novnc_proxy_certificates_specs     = hiera('novnc_proxy_certificates_specs',{}),
+  $ceph_grafana_certificate_specs     = hiera('ceph_grafana_certificate_specs', {}),
+  $ovn_dbs_certificate_specs          = hiera('ovn_dbs_certificate_specs', {}),
+  $ovn_controller_certificate_specs   = hiera('ovn_controlle_rcertificate_specs', {}),
+  $ovn_metadata_certificate_specs     = hiera('ovn_metadata_certificate_specs', {}),
+  $neutron_ovn_certificate_specs      = hiera('neutron_ovn_certificate_specs', {}),
+  $novnc_proxy_postsave_cmd           = undef,
   # Deprecated
-  $haproxy_postsave_cmd       = undef,
-  $apache_postsave_cmd        = undef,
+  $haproxy_postsave_cmd               = undef,
+  $apache_postsave_cmd                = undef,
 ) {
   include ::certmonger
 
@@ -259,6 +283,18 @@ class tripleo::profile::base::certmonger_user (
     }
     unless empty($ceph_grafana_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::ceph_grafana', $ceph_grafana_certificate_specs)
+    }
+    unless empty($ovn_dbs_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::ovn_dbs', $ovn_dbs_certificate_specs)
+    }
+    unless empty($ovn_controller_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::ovn_controller', $ovn_controller_certificate_specs)
+    }
+    unless empty($ovn_metadata_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::ovn_metadata', $ovn_metadata_certificate_specs)
+    }
+    unless empty($neutron_ovn_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::neutron_ovn', $neutron_ovn_certificate_specs)
     }
   }
 }
