@@ -113,7 +113,7 @@
 class tripleo::profile::base::rabbitmq (
   $certificate_specs             = {},
   $config_variables              = hiera('rabbitmq_config_variables'),
-  $enable_internal_tls           = undef,  # TODO(jaosorior): pass this via t-h-t
+  $enable_internal_tls           = undef,
   $environment                   = hiera('rabbitmq_environment'),
   $ssl_versions                  = undef,
   # lint:ignore:140chars
