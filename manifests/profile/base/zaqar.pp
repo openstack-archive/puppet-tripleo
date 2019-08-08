@@ -119,9 +119,7 @@ class tripleo::profile::base::zaqar (
 
     # TODO (bcrochet): At some point, the transports should be split out to
     # separate services.
-    class { '::zaqar::server':
-      service_name => 'httpd', # TODO cleanup when passed by t-h-t.
-    }
+    include ::zaqar::server
     class { '::zaqar::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

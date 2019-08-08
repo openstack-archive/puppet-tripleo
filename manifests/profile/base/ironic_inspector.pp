@@ -73,17 +73,9 @@ class tripleo::profile::base::ironic_inspector (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include ::ironic::inspector::cors
-    # TODO(hjensas): Once https://review.openstack.org/557465 is merged remove
-    # the condition.
-    if $inspection_subnets != [] {
-      class { '::ironic::inspector':
-        sync_db            => $sync_db,
-        dnsmasq_ip_subnets => $inspection_subnets_real,
-      }
-    } else {
-      class { '::ironic::inspector':
-        sync_db => $sync_db,
-      }
+    class { '::ironic::inspector':
+      sync_db            => $sync_db,
+      dnsmasq_ip_subnets => $inspection_subnets_real,
     }
 
     include ::ironic::inspector::pxe_filter

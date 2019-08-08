@@ -193,11 +193,9 @@ class tripleo::profile::base::glance::api (
     $http_store = ['http']
     $glance_store = concat($http_store, $backend_store)
 
-    # TODO: notifications, scrubber, etc.
     include ::glance
     include ::glance::config
     include ::glance::api::logging
-    # TODO(jaosorior): Remove bind_host when we set it up conditionally in t-h-t
     class { '::glance::api':
       stores  => $glance_store,
       sync_db => $sync_db,
