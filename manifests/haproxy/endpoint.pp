@@ -290,6 +290,8 @@ define tripleo::haproxy::endpoint (
           'dport' => $haproxy_port_real,
         },
       }
+    } else {
+      $haproxy_firewall_rules = {}
     }
     if $public_ssl_port {
       $haproxy_ssl_firewall_rules = {
