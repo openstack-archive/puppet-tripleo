@@ -331,10 +331,6 @@
 #  specific monitoring we do from HAProxy for Redis
 #  Defaults to undef
 #
-# [*midonet_api*]
-#  (optional) Enable or not MidoNet API binding
-#  Defaults to false
-#
 # [*zaqar_api*]
 #  (optional) Enable or not Zaqar Api binding
 #  Defaults to hiera('zaqar_api_enabled', false)
@@ -671,7 +667,6 @@ class tripleo::haproxy (
   $docker_registry             = hiera('enable_docker_registry', false),
   $redis                       = hiera('redis_enabled', false),
   $redis_password              = undef,
-  $midonet_api                 = false,
   $zaqar_api                   = hiera('zaqar_api_enabled', false),
   $ceph_rgw                    = hiera('ceph_rgw_enabled', false),
   $opendaylight                = hiera('opendaylight_api_enabled', false),
@@ -754,7 +749,6 @@ class tripleo::haproxy (
     keystone_public_api_ssl_port => 13000,
     manila_api_port => 8786,
     manila_api_ssl_port => 13786,
-    midonet_cluster_port => 8181,
     neutron_api_port => 9696,
     neutron_api_ssl_port => 13696,
     nova_api_port => 8774,
@@ -1509,25 +1503,6 @@ class tripleo::haproxy (
     }
   }
 
-  $midonet_cluster_vip = hiera('midonet_cluster_vip', $controller_virtual_ip)
-  $midonet_bind_opts = {
-    "${midonet_cluster_vip}:${ports[midonet_cluster_port]}" => [],
-    "${public_virtual_ip}:${ports[midonet_cluster_port]}"   => [],
-  }
-
-  if $midonet_api {
-    haproxy::listen { 'midonet_api':
-      bind             => $midonet_bind_opts,
-      collect_exported => false,
-    }
-    haproxy::balancermember { 'midonet_api':
-      listening_service => 'midonet_api',
-      ports             => $ports[midonet_cluster_port],
-      ipaddresses       => hiera('midonet_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('midonet_api_node_names', $controller_hosts_names_real),
-      options           => $haproxy_member_options,
-    }
-  }
   if $zaqar_api {
     ::tripleo::haproxy::endpoint { 'zaqar_api':
       public_virtual_ip => $public_virtual_ip,
