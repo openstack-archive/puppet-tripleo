@@ -48,10 +48,6 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*neutron_driver*]
-#   (Optional) The neutron driver for ml2 currently default tripleo value is ovn.
-#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
-#
 # [*ovn_db_host*]
 #   (Optional) The IP-Address where OVN DBs are listening.
 #   Defaults to hiera('ovn_dbs_vip')
@@ -59,6 +55,13 @@
 # [*ovn_nb_port*]
 #   (Optional) Port number on which northbound database is listening
 #   Defaults to hiera('ovn::northbound::port')
+#
+# DEPRECATED PARAMETERS
+#
+# [*neutron_driver*]
+#   (Optional) The neutron driver for ml2 currently default tripleo value is ovn.
+#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers'). Not used
+#   any more.
 #
 class tripleo::profile::base::octavia::api (
   $bootstrap_node      = hiera('octavia_api_short_bootstrap_node_name', undef),
@@ -90,23 +93,17 @@ class tripleo::profile::base::octavia::api (
       $tls_keyfile = undef
     }
   }
-
   # We start the Octavia API server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes
   if ($step >= 4 and $sync_db) or ($step >= 5 and !$sync_db) {
     include ::octavia::controller
-    if 'ovn' in $neutron_driver {
-      $providers = 'amphora: The Octavia Amphora driver.,octavia: Deprecated alias of the Octavia Amphora driver.,ovn: Octavia OVN driver.'
-      class { '::octavia::api':
-        sync_db           => $sync_db,
-        provider_drivers  => $providers,
-        ovn_nb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
-      }
-    } else {
-      class { '::octavia::api':
-        sync_db => $sync_db,
-      }
+    if $ovn_db_host and $ovn_nb_port {
+      $ovn_nb_connection = join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':')
+    }
+    class { '::octavia::api':
+      sync_db           => $sync_db,
+      ovn_nb_connection => $ovn_nb_connection,
     }
     include ::tripleo::profile::base::apache
     class { '::octavia::wsgi::apache':

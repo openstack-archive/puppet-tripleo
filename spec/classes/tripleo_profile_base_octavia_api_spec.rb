@@ -117,9 +117,6 @@ eos
       end
 
       it 'should should set provider drivers and ovn nb connection' do
-        is_expected.to contain_class('octavia::api').with(
-          :provider_drivers =>
-            'amphora: The Octavia Amphora driver.,octavia: Deprecated alias of the Octavia Amphora driver.,ovn: Octavia OVN driver.')
         is_expected.to contain_class('octavia::api').with(:ovn_nb_connection => 'tcp:127.0.0.1:6641')
       end
     end
