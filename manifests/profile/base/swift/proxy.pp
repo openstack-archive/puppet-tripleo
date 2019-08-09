@@ -139,6 +139,7 @@ class tripleo::profile::base::swift::proxy (
         tls_key    => $tls_keyfile,
       }
       Tripleo::Tls_proxy['swift-proxy-api'] ~> Anchor<| title == 'swift::service::begin' |>
+      include ::tripleo::profile::base::apache
     }
   }
   if $step >= 4 {
