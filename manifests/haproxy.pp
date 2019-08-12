@@ -220,7 +220,7 @@
 #
 # [*nova_metadata*]
 #  (optional) Enable or not Nova metadata binding
-#  Defaults to hiera('nova_api_enabled', false)
+#  Defaults to hiera('nova_metadata_enabled', false)
 #
 # [*nova_novncproxy*]
 #  (optional) Enable or not Nova novncproxy binding
@@ -459,7 +459,7 @@
 #
 # [*nova_metadata_network*]
 #  (optional) Specify the network nova_metadata is running on.
-#  Defaults to hiera('nova_api_network', undef)
+#  Defaults to hiera('nova_metadata_network', undef)
 #
 # [*nova_novncproxy_network*]
 #  (optional) Specify the network nova_novncproxy is running on.
@@ -638,7 +638,7 @@ class tripleo::haproxy (
   $glance_api                  = hiera('glance_api_enabled', false),
   $nova_osapi                  = hiera('nova_api_enabled', false),
   $placement                   = hiera('placement_enabled', false),
-  $nova_metadata               = hiera('nova_api_enabled', false),
+  $nova_metadata               = hiera('nova_metadata_enabled', false),
   $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
   $ec2_api                     = hiera('ec2_api_enabled', false),
   $ec2_api_metadata            = hiera('ec2_api_enabled', false),
@@ -697,7 +697,7 @@ class tripleo::haproxy (
   $manila_network              = hiera('manila_api_network', undef),
   $mistral_network             = hiera('mistral_api_network', undef),
   $neutron_network             = hiera('neutron_api_network', undef),
-  $nova_metadata_network       = hiera('nova_api_network', undef),
+  $nova_metadata_network       = hiera('nova_metadata_network', undef),
   $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', undef),
   $nova_osapi_network          = hiera('nova_api_network', undef),
   $placement_network           = hiera('placement_network', undef),
@@ -1088,11 +1088,16 @@ class tripleo::haproxy (
   }
 
   if $nova_metadata {
+    if hiera('nova_is_additional_cell', undef) {
+      $nova_metadata_server_names_real = hiera('nova_metadata_cell_node_names', $controller_hosts_names_real)
+    } else {
+      $nova_metadata_server_names_real = hiera('nova_metadata_node_names', $controller_hosts_names_real)
+    }
     ::tripleo::haproxy::endpoint { 'nova_metadata':
       internal_ip     => hiera('nova_metadata_vip', $controller_virtual_ip),
       service_port    => $ports[nova_metadata_port],
       ip_addresses    => hiera('nova_metadata_node_ips', $controller_hosts_real),
-      server_names    => hiera('nova_metadata_node_names', $controller_hosts_names_real),
+      server_names    => $nova_metadata_server_names_real,
       mode            => 'http',
       service_network => $nova_metadata_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
