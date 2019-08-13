@@ -49,6 +49,7 @@ class tripleo::profile::base::apache(
       mpm_module => $mpm_module,
     }
   }
+  Service <| title == 'httpd' |> { provider => 'noop' }
 
   include ::apache::mod::status
   include ::apache::mod::ssl
