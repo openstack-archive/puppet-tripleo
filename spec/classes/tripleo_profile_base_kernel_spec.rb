@@ -32,6 +32,19 @@ describe 'tripleo::profile::base::kernel' do
                 is_expected.to contain_kmod__load('nf_conntrack')
             end
         end
+        context 'with packages' do
+           let :params do
+               {
+                   :package_list => {
+                     'kmod_special' => {},
+                   }
+               }
+           end
+
+            it 'should install package' do
+              is_expected.to contain_package('kmod_special').with('tag' => 'kernel-package')
+            end
+        end
         context 'with sysctl settings' do
            let :params do
                {
