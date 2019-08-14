@@ -315,7 +315,9 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         # This grep makes sure the rabbit app in erlang is up and running
         # which is enough to guarantee that the user will eventually get
         # replicated around the cluster
-        $check_command = 'rabbitmqctl eval "rabbit_mnesia:is_clustered()." | grep -q true'
+        $cmd1 = 'rabbitmqctl eval "rabbit_nodes:is_running(node(), rabbit)." | grep -q true'
+        $cmd2 = 'rabbitmqctl eval "rabbit_mnesia:is_clustered()." | grep -q true'
+        $check_command = "${cmd1} && ${cmd2}"
       }
 
       exec { 'rabbitmq-ready':
