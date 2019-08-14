@@ -23,18 +23,34 @@
 #   (Optional) List of kernel modules to load.
 #   Defaults to hiera('kernel_modules')
 #
+# [*package_list*]
+#   (Optional) List of additional kernel related packages to load
+#   Defaults to hiera('kernel_packages')
+#
 # [*sysctl_settings*]
 #   (Optional) List of sysctl settings to load.
 #   Defaults to hiera('sysctl_settings')
 #
 class tripleo::profile::base::kernel (
   $module_list     = hiera('kernel_modules', undef),
+  $package_list    = hiera('kernel_packages', undef),
   $sysctl_settings = hiera('sysctl_settings', undef),
 ) {
 
   if $module_list {
     create_resources(kmod::load, $module_list, { })
   }
+
+  if $package_list {
+    $pkg_defaults = {
+      'tag' => 'kernel-package'
+    }
+    create_resources(package, $package_list, $pkg_defaults)
+    # ensure we install the package prior to trying to load kmods to make sure
+    # if the package list includes a kmod that it will be available.
+    Package<| tag == 'kernel-package' |> -> Exec<| tag == 'kmod::load' |>
+  }
+
   if $sysctl_settings {
     create_resources(sysctl::value, $sysctl_settings, { })
   }
