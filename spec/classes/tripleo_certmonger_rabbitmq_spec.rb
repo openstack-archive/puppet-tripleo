@@ -33,10 +33,6 @@ describe 'tripleo::certmonger::rabbitmq' do
       is_expected.to contain_class('certmonger')
     end
 
-    it 'should include the rabbitmq parameters' do
-      is_expected.to contain_class('rabbitmq::params')
-    end
-
     it 'should request a certificate' do
       is_expected.to contain_certmonger_certificate('rabbitmq').with(
         :ensure       => 'present',
