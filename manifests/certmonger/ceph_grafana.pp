@@ -1,4 +1,4 @@
-# Copyright 2017 Red Hat, Inc.
+# Copyright 2019 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::certmonger::ceph_grafana-server
+# == Class: tripleo::certmonger::ceph_grafana
 #
 # Request a certificate for RabbitMQ and do the necessary setup.
 #
@@ -31,6 +31,10 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
+# [*postsave_cmd*]
+#   (Optional) Specifies the command to execute after requesting a certificate.
+#   Defaults to undef.
+#
 # [*principal*]
 #   (Optional) The service principal that is set for the service in kerberos.
 #   Defaults to undef
@@ -39,20 +43,29 @@ class tripleo::certmonger::ceph_grafana (
   $hostname,
   $service_certificate,
   $service_key,
+  $postsave_cmd = undef,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $principal     = undef,
 ) {
 
+  ensure_resource('file', '/usr/bin/certmonger-grafana-refresh.sh', {
+    source  => 'puppet:///modules/tripleo/certmonger-grafana-refresh.sh',
+    mode    => '0700',
+    seltype => 'bin_t',
+    notify  => Service['certmonger']
+  })
+
   certmonger_certificate { 'ceph_grafana' :
-    ensure    => 'present',
-    certfile  => $service_certificate,
-    keyfile   => $service_key,
-    hostname  => $hostname,
-    dnsname   => $hostname,
-    principal => $principal,
-    ca        => $certmonger_ca,
-    wait      => true,
-    require   => Class['::certmonger'],
+    ensure       => 'present',
+    certfile     => $service_certificate,
+    keyfile      => $service_key,
+    hostname     => $hostname,
+    dnsname      => $hostname,
+    principal    => $principal,
+    postsave_cmd => $postsave_cmd,
+    ca           => $certmonger_ca,
+    wait         => true,
+    require      => Class['::certmonger'],
   }
 
   file { $service_certificate :
