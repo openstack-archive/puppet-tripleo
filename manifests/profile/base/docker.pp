@@ -62,6 +62,11 @@
 #   String. Value to configure the deployment user.
 #   Defaults to hiera('deployment_user', undef)
 #
+# [*registry_credentials*]
+#   Hash. A hash of registry credentials used with docker login. This should
+#   be in { 'registry_host' => { 'username' => 'password' } } format.
+#   Defaults to {}
+#
 # DEPRECATED PARAMETERS
 #
 # [*insecure_registry_address*]
@@ -79,17 +84,18 @@
 #   is enabled (defaults to false)
 #
 class tripleo::profile::base::docker (
-  $insecure_registries = undef,
-  $registry_mirror     = false,
-  $docker_options      = '--log-driver=journald --signature-verification=false --iptables=false --live-restore',
-  $additional_sockets  = undef,
-  $configure_network   = false,
-  $network_options     = '',
-  $configure_storage   = true,
-  $storage_options     = '-s overlay2',
-  $step                = Integer(hiera('step')),
-  $debug               = false,
-  $deployment_user     = hiera('deployment_user', undef),
+  $insecure_registries  = undef,
+  $registry_mirror      = false,
+  $docker_options       = '--log-driver=journald --signature-verification=false --iptables=false --live-restore',
+  $additional_sockets   = undef,
+  $configure_network    = false,
+  $network_options      = '',
+  $configure_storage    = true,
+  $storage_options      = '-s overlay2',
+  $step                 = Integer(hiera('step')),
+  $debug                = false,
+  $deployment_user      = hiera('deployment_user', undef),
+  $registry_credentials = {},
   # DEPRECATED PARAMETERS
   $insecure_registry_address = undef,
   $docker_namespace = undef,
@@ -283,6 +289,22 @@ class tripleo::profile::base::docker (
         'notify'  => Service['docker'],
       })
     }
+  }
 
+  if $step == 1 {
+    $registry_credentials.each |$host, $cred| {
+      $cred.each |$user, $pass| {
+        exec { "Login to ${host} as ${user}":
+          path        => ['/bin', '/usr/bin'],
+          command     => 'docker login -u $USER -p $PASS $HOST',
+          environment => [
+            "USER=${user}",
+            "PASS=${pass}",
+            "HOST=${host}",
+          ],
+          require     => Service['docker'],
+        }
+      }
+    }
   }
 }
