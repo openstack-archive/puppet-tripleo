@@ -341,7 +341,7 @@
 #
 # [*ceph_grafana*]
 #  (optional) Enable or not Ceph Grafana dashboard binding
-#  Defaults to hiera('ceph_grafana-server_enabled', false)
+#  Defaults to hiera('ceph_grafana_enabled', false)
 #
 # [*opendaylight*]
 #  (optional) Enable or not OpenDaylight binding
@@ -645,7 +645,7 @@ class tripleo::haproxy (
   $aodh                        = hiera('aodh_api_enabled', false),
   $panko                       = hiera('panko_api_enabled', false),
   $barbican                    = hiera('barbican_api_enabled', false),
-  $ceph_grafana                = hiera('ceph_grafana-server_enabled', false),
+  $ceph_grafana                = hiera('ceph_grafana_enabled', false),
   $gnocchi                     = hiera('gnocchi_api_enabled', false),
   $mistral                     = hiera('mistral_api_enabled', false),
   $swift_proxy_server          = hiera('swift_proxy_enabled', false),
@@ -684,7 +684,7 @@ class tripleo::haproxy (
   $glance_api_network          = hiera('glance_api_network', undef),
   $gnocchi_network             = hiera('gnocchi_api_network', undef),
   $heat_api_network            = hiera('heat_api_network', undef),
-  $ceph_grafana_network        = hiera('ceph_grafana-server_network', undef),
+  $ceph_grafana_network        = hiera('ceph_grafana_network', undef),
   $heat_cfn_network            = hiera('heat_api_cfn_network', undef),
   $horizon_network             = hiera('horizon_network', undef),
   $ironic_inspector_network    = hiera('ironic_inspector_network', undef),
@@ -1045,10 +1045,10 @@ class tripleo::haproxy (
   if $ceph_grafana {
     ::tripleo::haproxy::endpoint { 'ceph_grafana':
       public_virtual_ip => $controller_virtual_ip,
-      internal_ip       => hiera('ceph_grafana-server_vip', $controller_virtual_ip),
+      internal_ip       => hiera('ceph_grafana_vip', $controller_virtual_ip),
       service_port      => $ports[ceph_grafana_port],
-      ip_addresses      => hiera('ceph_grafana-server_node_ips', $controller_hosts_real),
-      server_names      => hiera('ceph_grafana-server_node_names', $controller_hosts_names_real),
+      ip_addresses      => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names      => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[ceph_grafana_ssl_port],
       listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk HEAD /' ] }),
