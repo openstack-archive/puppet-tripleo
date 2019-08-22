@@ -133,6 +133,18 @@
 #   (Optional) String. Minimum number of values Gnocchi should batch.
 #   Defaults to 10
 #
+# [*enable_sqlalchemy_collectd*]
+#   (Optional) boolean.  enable SQLAlchemy-collectd plugin
+#   defaults to false
+#
+# [*sqlalchemy_collectd_bind_host*]
+#   (Optional) String. Hostname to listen on.  Defaults to 0.0.0.0
+#
+# [*sqlalchemy_collectd_log_messages*]
+#   (Optional) String. Log level for the plugin, set to "debug" to show
+#   messages received.
+#   Defaults to 'info'
+#
 # [*service_names*]
 #   (Optional) List of strings.  A list of active services in this tripleo
 #   deployment. This is used to look up service-specific plugins that
@@ -222,6 +234,9 @@ class tripleo::profile::base::metrics::collectd (
   $gnocchi_keystone_endpoint = undef,
   $gnocchi_resource_type = 'collectd',
   $gnocchi_batch_size = 10,
+  $enable_sqlalchemy_collectd = false,
+  $sqlalchemy_collectd_bind_host = undef,
+  $sqlalchemy_collectd_log_messages = undef,
   $amqp_transport_name = 'metrics',
   $amqp_host = undef,
   $amqp_port = undef,
@@ -240,7 +255,10 @@ class tripleo::profile::base::metrics::collectd (
       manage_repo => $collectd_manage_repo
     }
 
-    include ::collectd::plugin::python
+    class { '::collectd::plugin::python':
+      logtraces   => true,
+    }
+
     $python_packages = concat(['collectd-python'], $python_read_plugins)
     package { $python_packages:
       ensure => 'present'
@@ -280,6 +298,13 @@ class tripleo::profile::base::metrics::collectd (
     $_collectd_securitylevel = empty($collectd_securitylevel) ? {
       true    => undef,
       default => $collectd_securitylevel
+    }
+
+    if $enable_sqlalchemy_collectd {
+      ::tripleo::profile::base::metrics::collectd::sqlalchemy_collectd { 'sqlalchemy_collectd':
+          bind_host    => $sqlalchemy_collectd_bind_host,
+          log_messages => $sqlalchemy_collectd_log_messages,
+      }
     }
 
     if ! empty($collectd_server) {
