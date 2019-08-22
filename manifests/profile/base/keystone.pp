@@ -331,7 +331,16 @@ class tripleo::profile::base::keystone (
     }
 
     if hiera('barbican_api_enabled', false) {
+      keystone_role { 'key-manager:service-admin':
+        ensure => present
+      }
       keystone_role { 'creator':
+        ensure => present
+      }
+      keystone_role { 'observer':
+        ensure => present
+      }
+      keystone_role { 'audit':
         ensure => present
       }
     }
