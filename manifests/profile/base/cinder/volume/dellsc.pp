@@ -33,15 +33,12 @@ class tripleo::profile::base::cinder::volume::dellsc (
 ) {
   include ::tripleo::profile::base::cinder::volume
 
-
   if $step >= 4 {
 
+    # Include support for 'excluded_domain_ip' until it's deprecated in THT
     $excluded_domain_ip = hiera('cinder::backend::dellsc_iscsi::excluded_domain_ip', undef)
-    if $excluded_domain_ip == '' {
-      $excluded_domain_ip_real = undef
-    } else {
-      $excluded_domain_ip_real = $excluded_domain_ip
-    }
+    $excluded_domain_ips = hiera('cinder::backend::dellsc_iscsi::excluded_domain_ips', undef)
+    $excluded_domain_ips_real = pick_default($excluded_domain_ips, $excluded_domain_ip, undef)
 
     cinder::backend::dellsc_iscsi { $backend_name :
       backend_availability_zone    => hiera('cinder::backend::dellsc_iscsi::backend_availability_zone', undef),
@@ -54,8 +51,7 @@ class tripleo::profile::base::cinder::volume::dellsc (
       dell_sc_api_port             => hiera('cinder::backend::dellsc_iscsi::dell_sc_api_port', undef),
       dell_sc_server_folder        => hiera('cinder::backend::dellsc_iscsi::dell_sc_server_folder', undef),
       dell_sc_volume_folder        => hiera('cinder::backend::dellsc_iscsi::dell_sc_volume_folder', undef),
-      excluded_domain_ip           => $excluded_domain_ip_real,
-      excluded_domain_ips          => hiera('cinder::backend::dellsc_iscsi::excluded_domain_ips', undef),
+      excluded_domain_ips          => $excluded_domain_ips_real,
       secondary_san_ip             => hiera('cinder::backend::dellsc_iscsi::secondary_san_ip', undef),
       secondary_san_login          => hiera('cinder::backend::dellsc_iscsi::secondary_san_login', undef),
       secondary_san_password       => hiera('cinder::backend::dellsc_iscsi::secondary_san_password', undef),

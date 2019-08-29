@@ -58,14 +58,6 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# DEPRECATED PARAMETERS
-#
-# [*keymgr_api_class*]
-#   (Optional) Deprecated. The encryption key manager API class. The default value
-#   ensures Cinder's legacy key manager is enabled when no hiera value is
-#   specified.
-#   Defaults to undef.
-#
 class tripleo::profile::base::cinder::api (
   $bootstrap_node                = hiera('cinder_api_short_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -74,8 +66,6 @@ class tripleo::profile::base::cinder::api (
   $keymgr_backend                = hiera('cinder::api::keymgr_backend', 'cinder.keymgr.conf_key_mgr.ConfKeyManager'),
   $default_volume_type           = hiera('cinder::api::default_volume_type', ''),
   $step                          = Integer(hiera('step')),
-  # DEPRECATED PARAMETERS
-  $keymgr_api_class              = undef,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -99,16 +89,9 @@ class tripleo::profile::base::cinder::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    if $keymgr_api_class {
-      warning('The keymgr_api_class parameter is deprecated, use keymgr_backend')
-      $keymgr_backend_real = $keymgr_api_class
-    } else {
-      $keymgr_backend_real = $keymgr_backend
-    }
-
     class { '::cinder::api':
       sync_db        => $sync_db,
-      keymgr_backend => $keymgr_backend_real,
+      keymgr_backend => $keymgr_backend,
     }
     include ::tripleo::profile::base::apache
     class { '::cinder::wsgi::apache':

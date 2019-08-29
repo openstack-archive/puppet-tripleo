@@ -45,7 +45,7 @@ class tripleo::profile::base::cinder::volume::dellemc_vnx (
       san_login                     => hiera('cinder::backend::emc_vnx::san_login', undef),
       san_password                  => hiera('cinder::backend::emc_vnx::san_password', undef),
       storage_protocol              => hiera('cinder::backend::emc_vnx::storage_protocol', undef),
-      storage_vnx_pool_names        => $storage_vnx_pool_names_real,
+      storage_vnx_pool_names        => hiera('cinder::backend::emc_vnx::storage_vnx_pool_names', undef),
       default_timeout               => hiera('cinder::backend::emc_vnx::default_timeout', undef),
       max_luns_per_storage_group    => hiera('cinder::backend::emc_vnx::max_luns_per_storage_group', undef),
       initiator_auto_registration   => hiera('cinder::backend::emc_vnx::initiator_auto_registration', undef),
