@@ -41,10 +41,11 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
       context 'with defaults' do
         it 'should trigger complete configuration' do
           is_expected.to contain_cinder__backend__rbd('tripleo_ceph').with(
-            :backend_host    => 'node.example.com',
-            :rbd_ceph_conf   => '/etc/ceph/ceph.conf',
-            :rbd_pool        => 'volumes',
-            :rbd_user        => 'openstack',
+            :backend_host                     => 'node.example.com',
+            :rbd_ceph_conf                    => '/etc/ceph/ceph.conf',
+            :rbd_pool                         => 'volumes',
+            :rbd_user                         => 'openstack',
+            :rbd_flatten_volume_from_snapshot => '<SERVICE DEFAULT>',
           )
         end
       end
@@ -52,40 +53,44 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
       context 'with customizations' do
         before :each do
           params.merge!({
-            :backend_name              => 'poodles',
-            :backend_availability_zone => 'my_zone',
-            :cinder_rbd_backend_host   => 'fe80::fc54:ff:fe9e:7846',
-            :cinder_rbd_ceph_conf      => '/etc/ceph/mycluster.conf',
-            :cinder_rbd_pool_name      => 'poolname',
-            :cinder_rbd_extra_pools    => ['aplenty', 'galore'],
-            :cinder_rbd_secret_uuid    => 'secretuuid',
-            :cinder_rbd_user_name      => 'kcatsnepo'
+            :backend_name                            => 'poodles',
+            :backend_availability_zone               => 'my_zone',
+            :cinder_rbd_backend_host                 => 'fe80::fc54:ff:fe9e:7846',
+            :cinder_rbd_ceph_conf                    => '/etc/ceph/mycluster.conf',
+            :cinder_rbd_pool_name                    => 'poolname',
+            :cinder_rbd_extra_pools                  => ['aplenty', 'galore'],
+            :cinder_rbd_secret_uuid                  => 'secretuuid',
+            :cinder_rbd_user_name                    => 'kcatsnepo',
+            :cinder_rbd_flatten_volume_from_snapshot => true,
           })
         end
         it 'should trigger complete configuration' do
           is_expected.to contain_cinder__backend__rbd('poodles').with(
-            :backend_host              => 'fe80::fc54:ff:fe9e:7846',
-            :backend_availability_zone => 'my_zone',
-            :rbd_ceph_conf             => '/etc/ceph/mycluster.conf',
-            :rbd_pool                  => 'poolname',
-            :rbd_user                  => 'kcatsnepo',
-            :rbd_secret_uuid           => 'secretuuid'
+            :backend_host                     => 'fe80::fc54:ff:fe9e:7846',
+            :backend_availability_zone        => 'my_zone',
+            :rbd_ceph_conf                    => '/etc/ceph/mycluster.conf',
+            :rbd_pool                         => 'poolname',
+            :rbd_user                         => 'kcatsnepo',
+            :rbd_secret_uuid                  => 'secretuuid',
+            :rbd_flatten_volume_from_snapshot => true,
           )
           is_expected.to contain_cinder__backend__rbd('poodles_aplenty').with(
-            :backend_host              => 'fe80::fc54:ff:fe9e:7846',
-            :backend_availability_zone => 'my_zone',
-            :rbd_ceph_conf             => '/etc/ceph/mycluster.conf',
-            :rbd_pool                  => 'aplenty',
-            :rbd_user                  => 'kcatsnepo',
-            :rbd_secret_uuid           => 'secretuuid'
+            :backend_host                     => 'fe80::fc54:ff:fe9e:7846',
+            :backend_availability_zone        => 'my_zone',
+            :rbd_ceph_conf                    => '/etc/ceph/mycluster.conf',
+            :rbd_pool                         => 'aplenty',
+            :rbd_user                         => 'kcatsnepo',
+            :rbd_secret_uuid                  => 'secretuuid',
+            :rbd_flatten_volume_from_snapshot => true,
           )
           is_expected.to contain_cinder__backend__rbd('poodles_galore').with(
-            :backend_host              => 'fe80::fc54:ff:fe9e:7846',
-            :backend_availability_zone => 'my_zone',
-            :rbd_ceph_conf             => '/etc/ceph/mycluster.conf',
-            :rbd_pool                  => 'galore',
-            :rbd_user                  => 'kcatsnepo',
-            :rbd_secret_uuid           => 'secretuuid'
+            :backend_host                     => 'fe80::fc54:ff:fe9e:7846',
+            :backend_availability_zone        => 'my_zone',
+            :rbd_ceph_conf                    => '/etc/ceph/mycluster.conf',
+            :rbd_pool                         => 'galore',
+            :rbd_user                         => 'kcatsnepo',
+            :rbd_secret_uuid                  => 'secretuuid',
+            :rbd_flatten_volume_from_snapshot => true,
           )
         end
       end
