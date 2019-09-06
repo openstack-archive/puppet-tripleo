@@ -29,7 +29,7 @@ describe 'tripleo::profile::base::monitoring::sensu' do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let (:facts) {
-        facts
+        facts.merge({ :ipaddress => '127.0.0.1' })
       }
       it_behaves_like 'tripleo::profile::base::monitoring::sensu'
     end
