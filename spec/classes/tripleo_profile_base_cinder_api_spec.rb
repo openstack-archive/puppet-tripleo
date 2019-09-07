@@ -96,19 +96,6 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to_not contain_cinder__type('tripleo')
       end
     end
-
-    context 'with deprecated keymgr parameters' do
-      let(:params) { {
-        :step             => 4,
-        :keymgr_api_class => 'some.other.key_manager',
-      } }
-
-      it 'should use deprecated keymgr parameters' do
-        is_expected.to contain_class('cinder::api').with(
-          :keymgr_backend => 'some.other.key_manager',
-        )
-      end
-    end
   end
 
   on_supported_os.each do |os, facts|
