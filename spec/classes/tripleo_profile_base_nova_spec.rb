@@ -30,7 +30,10 @@ describe 'tripleo::profile::base::nova' do
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova')
         is_expected.to_not contain_class('nova::config')
+        is_expected.to_not contain_class('nova::logging')
         is_expected.to_not contain_class('nova::cache')
+        is_expected.to_not contain_class('nova::placement')
+        is_expected.to_not contain_class('nova::keystone::service_user')
       }
     end
 
@@ -49,11 +52,14 @@ describe 'tripleo::profile::base::nova' do
           :default_transport_url => 'rabbit://nova:foo@localhost:5672/?ssl=0'
         )
         is_expected.to contain_class('nova::config')
+        is_expected.to contain_class('nova::logging')
         is_expected.to contain_class('nova::cache').with(
           :enabled => true,
           :backend => 'oslo_cache.memcache_pool',
           :memcache_servers => ['127.0.0.1:11211']
         )
+        is_expected.to contain_class('nova::placement')
+        is_expected.to contain_class('nova::keystone::service_user')
       }
     end
 
@@ -69,7 +75,10 @@ describe 'tripleo::profile::base::nova' do
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova')
         is_expected.to_not contain_class('nova::config')
+        is_expected.to_not contain_class('nova::logging')
         is_expected.to_not contain_class('nova::cache')
+        is_expected.to_not contain_class('nova::placement')
+        is_expected.to_not contain_class('nova::keystone::service_user')
       }
     end
 
@@ -90,7 +99,10 @@ describe 'tripleo::profile::base::nova' do
           :nova_private_key => nil,
         )
         is_expected.to contain_class('nova::config')
+        is_expected.to contain_class('nova::logging')
         is_expected.to contain_class('nova::cache')
+        is_expected.to contain_class('nova::placement')
+        is_expected.to contain_class('nova::keystone::service_user')
         is_expected.to_not contain_class('nova::migration::libvirt')
         is_expected.to_not contain_file('/etc/nova/migration/authorized_keys')
         is_expected.to_not contain_file('/etc/nova/migration/identity')
