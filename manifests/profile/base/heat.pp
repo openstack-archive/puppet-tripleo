@@ -96,6 +96,9 @@ class tripleo::profile::base::heat (
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
 ) {
+
+  include ::tripleo::profile::base::heat::authtoken
+
   # Domain resources will be created at step5 on the node running keystone.pp
   # configure heat.conf at step3 and 4 but actually create the domain later.
   if $step >= 3 {
@@ -136,4 +139,3 @@ class tripleo::profile::base::heat (
     }
   }
 }
-
