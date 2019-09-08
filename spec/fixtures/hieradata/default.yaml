@@ -39,6 +39,8 @@ cinder_volume_short_node_names:
 cinder::backup::nfs::backup_share: '/mnt/backup'
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
+# glance related items
+glance::api::authtoken::password: 'password'
 # gnocchi related items
 gnocchi_api_short_bootstrap_node_name: node
 gnocchi::keystone::authtoken::password: 'password'

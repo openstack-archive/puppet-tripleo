@@ -148,6 +148,8 @@ class tripleo::profile::base::glance::api (
     $sync_db = false
   }
 
+  include ::tripleo::profile::base::glance::authtoken
+
   if $step >= 4 or ($step >= 3 and $sync_db) {
     if $enable_internal_tls {
       if !$glance_network {
