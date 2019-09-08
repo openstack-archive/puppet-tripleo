@@ -107,6 +107,7 @@ class tripleo::profile::base::neutron::server (
   }
 
   include ::tripleo::profile::base::neutron
+  include ::tripleo::profile::base::neutron::authtoken
 
   # Calculate neutron::server::l3_ha based on the number of API nodes
   # combined with if DVR is enabled.

@@ -86,6 +86,7 @@ horizon_node_names:
  - 'controller-1'
 #Neutron related
 neutron::rabbit_password: 'password'
+neutron::keystone::authtoken::password: 'password'
 # oslo.messaging related
 oslo_messaging_rpc_password: 'password'
 oslo_messaging_notify_password: 'password'
