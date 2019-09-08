@@ -59,6 +59,8 @@ class tripleo::profile::base::ironic_inspector (
   $step               = Integer(hiera('step')),
 ) {
 
+  include ::tripleo::profile::base::ironic_inspector::authtoken
+
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
