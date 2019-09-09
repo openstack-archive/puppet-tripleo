@@ -80,6 +80,7 @@ class tripleo::profile::base::octavia::api (
   }
 
   include ::tripleo::profile::base::octavia
+  include ::tripleo::profile::base::octavia::authtoken
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     if $enable_internal_tls {
