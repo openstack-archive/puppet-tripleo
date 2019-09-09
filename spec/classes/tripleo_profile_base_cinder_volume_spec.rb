@@ -80,6 +80,15 @@ describe 'tripleo::profile::base::cinder::volume' do
             :enabled_backends => ['tripleo_pure']
           )
         end
+        context 'with multiple pure backends' do
+          # Step 5's hiera specifies two pure backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_pure_1', 'tripleo_pure_2']
+            )
+          end
+        end
       end
 
       context 'with only dellsc' do

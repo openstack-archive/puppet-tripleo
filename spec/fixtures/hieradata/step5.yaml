@@ -3,3 +3,6 @@ step: 5
 tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools:
   - 'foo'
   - 'bar'
+cinder::backend::pure::volume_backend_name:
+  - 'tripleo_pure_1'
+  - 'tripleo_pure_2'

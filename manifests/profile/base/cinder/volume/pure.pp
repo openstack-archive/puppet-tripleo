@@ -18,33 +18,13 @@
 #
 # === Parameters
 #
-# [*san_ip*]
-#   (required) IP address of PureStorage management VIP.
-#
-# [*pure_api_token*]
-#   (required) API token for management of PureStorage array.
-#
 # [*backend_name*]
-#   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_pure'
+#   (Optional) List of names given to the Cinder backend stanza.
+#   Defaults to hiera('cinder::backend::pure::volume_backend_name', ['tripleo_pure'])
 #
-# [*pure_storage_protocol*]
-#   (optional) Must be either 'iSCSI' or 'FC'. This will determine
-#   which Volume Driver will be configured; PureISCSIDriver or PureFCDriver.
-#   Defaults to 'iSCSI'
-#
-# [*use_multipath_for_image_xfer*]
-#   (optional) .
-#   Defaults to True
-#
-# [*use_chap_auth*]
-#   (optional) Only affects the PureISCSIDriver.
-#   Defaults to False
-#
-# [*image_volume_cache_enabled*]
-#   (Optional) Enable Cinder's image cache function for the PureStorage
-#   backend.
-#   Defaults to True
+# [*multi_config*]
+#   (Optional) A config hash when multiple backends are used.
+#   Defaults to hiera('cinder::backend::pure::volume_multi_config', {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -52,21 +32,35 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::volume::pure (
-  $backend_name = hiera('cinder::backend::pure::volume_backend_name', 'tripleo_pure'),
+  $backend_name = hiera('cinder::backend::pure::volume_backend_name', ['tripleo_pure']),
+  $multi_config = hiera('cinder::backend::pure::volume_multi_config', {}),
   $step         = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    cinder::backend::pure { $backend_name :
-      backend_availability_zone    => hiera('cinder::backend::pure::backend_availability_zone', undef),
-      san_ip                       => hiera('cinder::backend::pure::san_ip', undef),
-      pure_api_token               => hiera('cinder::backend::pure::pure_api_token', undef),
-      pure_storage_protocol        => hiera('cinder::backend::pure::pure_storage_protocol', undef),
-      use_chap_auth                => hiera('cinder::backend::pure::use_chap_auth', undef),
-      use_multipath_for_image_xfer => hiera('cinder::backend::pure::use_multipath_for_image_xfer', undef),
-      image_volume_cache_enabled   => hiera('cinder::backend::pure::image_volume_cache_enabled', undef),
+    $backend_defaults = {
+      'CinderPureAvailabilityZone' => hiera('cinder::backend::pure::backend_availability_zone', undef),
+      'CinderPureSanIp'            => hiera('cinder::backend::pure::san_ip', undef),
+      'CinderPureAPIToken'         => hiera('cinder::backend::pure::pure_api_token', undef),
+      'CinderPureStorageProtocol'  => hiera('cinder::backend::pure::pure_storage_protocol', undef),
+      'CinderPureUseChap'          => hiera('cinder::backend::pure::use_chap_auth', undef),
+      'CinderPureMultipathXfer'    => hiera('cinder::backend::pure::use_multipath_for_image_xfer', undef),
+      'CinderPureImageCache'       => hiera('cinder::backend::pure::image_volume_cache_enabled', undef),
+    }
+
+    $backend_name.each |String $backend| {
+      $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
+
+      cinder::backend::pure { $backend :
+        backend_availability_zone    => $backend_config['CinderPureAvailabilityZone'],
+        san_ip                       => $backend_config['CinderPureSanIp'],
+        pure_api_token               => $backend_config['CinderPureAPIToken'],
+        pure_storage_protocol        => $backend_config['CinderPureStorageProtocol'],
+        use_chap_auth                => $backend_config['CinderPureUseChap'],
+        use_multipath_for_image_xfer => $backend_config['CinderPureMultipathXfer'],
+        image_volume_cache_enabled   => $backend_config['CinderPureImageCache'],
+      }
     }
   }
-
 }

@@ -41,6 +41,22 @@ describe 'tripleo::profile::base::cinder::volume::pure' do
       it 'should trigger complete configuration' do
         # TODO(aschultz): check hiera parameters
         is_expected.to contain_cinder__backend__pure('tripleo_pure')
+        is_expected.to contain_cinder_config('tripleo_pure/use_chap_auth').with_value(false)
+      end
+
+      context 'with multiple backends' do
+        let(:params) { {
+          :backend_name => ['tripleo_pure_1', 'tripleo_pure_2'],
+          :multi_config => { 'tripleo_pure_2' => { 'CinderPureUseChap' => true }},
+          :step         => 4,
+        } }
+
+        it 'should configure each backend' do
+          is_expected.to contain_cinder__backend__pure('tripleo_pure_1')
+          is_expected.to contain_cinder_config('tripleo_pure_1/use_chap_auth').with_value(false)
+          is_expected.to contain_cinder__backend__pure('tripleo_pure_2')
+          is_expected.to contain_cinder_config('tripleo_pure_2/use_chap_auth').with_value(true)
+        end
       end
     end
   end
