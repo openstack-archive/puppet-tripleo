@@ -76,6 +76,7 @@ class tripleo::profile::base::cinder::api (
   }
 
   include ::tripleo::profile::base::cinder
+  include ::tripleo::profile::base::cinder::authtoken
 
   if $enable_internal_tls {
     if !$cinder_api_network {
