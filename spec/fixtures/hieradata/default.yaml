@@ -47,7 +47,9 @@ gnocchi::storage::ceph::ceph_secret: 'password'
 # haproxy related items
 mysql_enabled: true
 controller_node_ips: '10.1.0.1,10.1.0.2'
-# mysql related
+# heat related items
+heat::keystone::authtoken::password: 'password'
+# mysql related items
 mysql_short_bootstrap_node_name: node
 # manila related items
 manila::rabbit_password: 'password'
