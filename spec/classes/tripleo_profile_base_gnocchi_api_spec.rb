@@ -17,6 +17,11 @@
 require 'spec_helper'
 
 describe 'tripleo::profile::base::gnocchi::api' do
+
+  before :each do
+    facts.merge!({ :step => params[:step] })
+  end
+
   shared_examples_for 'tripleo::profile::base::gnocchi::api' do
     let(:pre_condition) do
       "

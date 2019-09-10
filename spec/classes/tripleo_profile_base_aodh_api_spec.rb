@@ -17,6 +17,11 @@
 require 'spec_helper'
 
 describe 'tripleo::profile::base::aodh::api' do
+
+  before :each do
+    facts.merge!({ :step => params[:step] })
+  end
+
   shared_examples_for 'tripleo::profile::base::aodh::api' do
     let(:pre_condition) do
       "class { '::tripleo::profile::base::aodh': step => #{params[:step]}, oslomsg_rpc_hosts => ['localhost.localdomain'] }"

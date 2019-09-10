@@ -87,6 +87,7 @@ class tripleo::profile::base::gnocchi::api (
   }
 
   include ::tripleo::profile::base::gnocchi
+  include ::tripleo::profile::base::gnocchi::authtoken
 
   if $enable_internal_tls {
     if !$gnocchi_network {
