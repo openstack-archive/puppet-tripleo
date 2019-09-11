@@ -133,6 +133,7 @@ class tripleo::profile::base::barbican::api (
   }
 
   include ::tripleo::profile::base::barbican
+  include ::tripleo::profile::base::barbican::authtoken
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include ::tripleo::profile::base::barbican::backends
