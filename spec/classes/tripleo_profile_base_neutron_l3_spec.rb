@@ -24,11 +24,20 @@ describe 'tripleo::profile::base::neutron::l3' do
       facts.merge!({ :step => params[:step] })
     end
 
-    context 'with defaults for all parameters' do
-      let(:params) { { :step => 4 } }
-
+    context 'with step less than 4' do
+      let(:params) { { :step => 3 } }
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::neutron::l3')
+        is_expected.to_not contain_class('tripleo::profile::base::neutron')
+        is_expected.to_not contain_class('neutron::agents::l3')
+      end
+    end
+
+    context 'with step 4 and later' do
+      let(:params) { { :step => 4 } }
+      it 'should trigger complete configuration' do
+        is_expected.to contain_class('tripleo::profile::base::neutron::l3')
+        is_expected.to contain_class('tripleo::profile::base::neutron')
         is_expected.to contain_class('neutron::agents::l3')
       end
     end
