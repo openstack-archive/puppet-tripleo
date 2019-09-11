@@ -23,30 +23,42 @@ describe 'tripleo::profile::base::cinder' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to_not contain_class('cinder')
+        is_expected.to_not contain_class('cinder::ceilometer')
         is_expected.to_not contain_class('cinder::config')
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
+        is_expected.to_not contain_class('cinder::logging')
+        is_expected.to_not contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
 
     context 'with step 3 on bootstrap node' do
       let(:params) { {
-        :step                 => 3,
-        :bootstrap_node       => 'node.example.com',
-        :oslomsg_rpc_hosts    => [ '127.0.0.1' ],
-        :oslomsg_rpc_username => 'cinder',
-        :oslomsg_rpc_password => 'foo',
-        :oslomsg_rpc_port     => '1234'
+        :step                    => 3,
+        :bootstrap_node          => 'node.example.com',
+        :oslomsg_rpc_hosts       => [ '192.168.0.1' ],
+        :oslomsg_rpc_username    => 'cinder1',
+        :oslomsg_rpc_password    => 'foo',
+        :oslomsg_rpc_port        => '1234',
+        :oslomsg_notify_hosts    => [ '192.168.0.2' ],
+        :oslomsg_notify_username => 'cinder2',
+        :oslomsg_notify_password => 'baa',
+        :oslomsg_notify_port     => '5678'
       } }
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder').with(
-          :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:1234/?ssl=0'
+          :default_transport_url => 'rabbit://cinder1:foo@192.168.0.1:1234/?ssl=0'
+        )
+        is_expected.to contain_class('cinder::ceilometer').with(
+          :notification_transport_url => 'rabbit://cinder2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
+        is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end
@@ -59,30 +71,42 @@ describe 'tripleo::profile::base::cinder' do
 
       it 'should not trigger any configuration' do
         is_expected.to_not contain_class('cinder')
+        is_expected.to_not contain_class('cinder::ceilometer')
         is_expected.to_not contain_class('cinder::config')
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
+        is_expected.to_not contain_class('cinder::logging')
+        is_expected.to_not contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
 
     context 'with step 4 on other node' do
       let(:params) { {
-        :step                 => 4,
-        :bootstrap_node       => 'somethingelse.example.com',
-        :oslomsg_rpc_hosts    => [ '127.0.0.1' ],
-        :oslomsg_rpc_username => 'cinder',
-        :oslomsg_rpc_password => 'foo',
-        :oslomsg_rpc_port     => '5672',
+        :step                    => 4,
+        :bootstrap_node          => 'somethingelse.example.com',
+        :oslomsg_rpc_hosts       => [ '192.168.0.1' ],
+        :oslomsg_rpc_username    => 'cinder1',
+        :oslomsg_rpc_password    => 'foo',
+        :oslomsg_rpc_port        => '1234',
+        :oslomsg_notify_hosts    => [ '192.168.0.2' ],
+        :oslomsg_notify_username => 'cinder2',
+        :oslomsg_notify_password => 'baa',
+        :oslomsg_notify_port     => '5678'
       } }
 
       it 'should trigger cinder configuration without mysql grant' do
         is_expected.to contain_class('cinder').with(
-          :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
+          :default_transport_url => 'rabbit://cinder1:foo@192.168.0.1:1234/?ssl=0'
+        )
+        is_expected.to contain_class('cinder::ceilometer').with(
+          :notification_transport_url => 'rabbit://cinder2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
+        is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -100,9 +124,12 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder').with(
           :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
+        is_expected.to contain_class('cinder::ceilometer')
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
+        is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to contain_class('cinder::cron::db_purge')
       end
     end
@@ -121,9 +148,12 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder').with(
           :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
+        is_expected.to contain_class('cinder::ceilometer')
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
+        is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end
