@@ -43,19 +43,35 @@
 #  and constraints.
 #  Defaults to 3
 #
+# [*deep_compare*]
+#   Enable deep comparing of resources and bundles
+#   When set to true a resource will be compared in full (options, meta parameters,..)
+#   to the existing one and in case of difference it will be repushed to the CIB
+#   Defaults to false
+#
+# [*update_settle_secs*]
+#   When deep_compare is enabled and puppet updates a resource, this
+#   parameter represents the number (in seconds) to wait for the cluster to settle
+#   after the resource update.
+#   Defaults to 600 (seconds)
+#
 # [*enable_instanceha*]
 #  (Optional) Boolean driving the Instance HA controlplane configuration
 #  Defaults to false
 #
 class tripleo::fencing(
-  $config            = {},
-  $tries             = 10,
-  $try_sleep         = 3,
-  $enable_instanceha = hiera('tripleo::instanceha', false),
+  $config             = {},
+  $tries              = 10,
+  $try_sleep          = 3,
+  $deep_compare       = false,
+  $update_settle_secs = 600,
+  $enable_instanceha  = hiera('tripleo::instanceha', false),
 ) {
   $common_params = {
     'tries' => $tries,
     'try_sleep' => $try_sleep,
+    'deep_compare' => $deep_compare,
+    'update_settle_secs' => $update_settle_secs
   }
 
   # check if instanceha is enabled
