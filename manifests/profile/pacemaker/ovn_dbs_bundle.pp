@@ -60,6 +60,15 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
+# [*ca_file*]
+#   (Optional) The path to the CA file that will be used for the TLS
+#   configuration. It's only used if internal TLS is enabled.
+#   Defaults to undef
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
@@ -72,6 +81,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $sb_db_port           = 6642,
   $container_backend    = 'docker',
   $tls_priorities       = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $enable_internal_tls  = hiera('enable_internal_tls', false),
+  $ca_file              = undef,
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -86,7 +97,33 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
       $ovndb_servers_resource_name = 'ovndb_servers'
       $ovndb_servers_ocf_name      = 'ovn:ovndb-servers'
       $ovndb_vip_resource_name     = "ip-${ovn_dbs_vip}"
-
+      $storage_maps = {
+        'ovn-dbs-cfg-files' => {
+          'source-dir' => '/var/lib/kolla/config_files/ovn_dbs.json',
+          'target-dir' => '/var/lib/kolla/config_files/config.json',
+          'options'    => 'ro',
+        },
+        'ovn-dbs-mod-files' => {
+          'source-dir' => '/lib/modules',
+          'target-dir' => '/lib/modules',
+          'options'    => 'ro',
+        },
+        'ovn-dbs-run-files' => {
+          'source-dir' => '/var/lib/openvswitch/ovn',
+          'target-dir' => '/run/openvswitch',
+          'options'    => 'rw',
+        },
+        'ovn-dbs-log-files' => {
+          'source-dir' => '/var/log/containers/openvswitch',
+          'target-dir' => '/var/log/openvswitch',
+          'options'    => 'rw',
+        },
+        'ovn-dbs-db-path'   => {
+          'source-dir' => '/var/lib/openvswitch/ovn',
+          'target-dir' => '/etc/openvswitch',
+          'options'    => 'rw',
+        },
+      }
       $ovn_dbs_short_node_names = hiera('ovn_dbs_short_node_names')
       $ovn_dbs_nodes_count = count($ovn_dbs_short_node_names)
       $ovn_dbs_short_node_names.each |String $node_name| {
@@ -99,6 +136,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         }
       }
       $ovn_dbs_vip_norm = normalize_ip_for_uri($ovn_dbs_vip)
+      $resource_params = "master_ip=${ovn_dbs_vip_norm} nb_master_port=${nb_db_port} \
+sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000"
       $ovn_dbs_location_rule = {
         resource_discovery => 'exclusive',
         score              => 0,
@@ -110,6 +149,33 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         $tls_priorities_real = ''
       }
 
+      if $enable_internal_tls {
+        $ovn_storage_maps_tls = {
+          'ovn-dbs-pki-'  => {
+            'source-dir' => '/etc/pki/tls/private/ovn_dbs.key',
+            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/private/ovn_dbs.key',
+            'options'    => 'ro',
+          },
+          'ovn-dbs-cert' => {
+            'source-dir' => '/etc/pki/tls/certs/ovn_dbs.crt',
+            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/certs/ovn_dbs.crt',
+            'options'    => 'ro',
+          },
+          'ovn-dbs-cacert' => {
+            'source-dir' => '/etc/pki/tls/certs/ovn_dbs.crt',
+            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/certs/cacert.pem',
+            'options'    => 'ro',
+          },
+        }
+        $tls_params = " ovn_nb_db_privkey=/etc/pki/tls/private/ovn_dbs.key  ovn_nb_db_cert=/etc/pki/tls/certs/ovn_dbs.crt \
+ovn_nb_db_cacert=${ca_file} ovn_sb_db_privkey=/etc/pki/tls/private/ovn_dbs.key  \
+ovn_sb_db_cert=/etc/pki/tls/certs/ovn_dbs.crt ovn_sb_db_cacert=${ca_file} \
+nb_master_protocol=ssl sb_master_protocol=ssl"
+      } else {
+        $tls_params = ''
+        $ovn_storage_maps_tls = {}
+      }
+      $resource_map = "${resource_params}${tls_params}"
       pacemaker::resource::bundle { 'ovn-dbs-bundle':
         image             => $ovn_dbs_docker_image,
         replicas          => $ovn_dbs_nodes_count,
@@ -119,33 +185,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         options           => "--log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${ovn_dbs_control_port}",
-        storage_maps      => {
-          'ovn-dbs-cfg-files' => {
-            'source-dir' => '/var/lib/kolla/config_files/ovn_dbs.json',
-            'target-dir' => '/var/lib/kolla/config_files/config.json',
-            'options'    => 'ro',
-          },
-          'ovn-dbs-mod-files' => {
-            'source-dir' => '/lib/modules',
-            'target-dir' => '/lib/modules',
-            'options'    => 'ro',
-          },
-          'ovn-dbs-run-files' => {
-            'source-dir' => '/var/lib/openvswitch/ovn',
-            'target-dir' => '/run/openvswitch',
-            'options'    => 'rw',
-          },
-          'ovn-dbs-log-files' => {
-            'source-dir' => '/var/log/containers/openvswitch',
-            'target-dir' => '/var/log/openvswitch',
-            'options'    => 'rw',
-          },
-          'ovn-dbs-db-path'   => {
-            'source-dir' => '/var/lib/openvswitch/ovn',
-            'target-dir' => '/etc/openvswitch',
-            'options'    => 'rw',
-          },
-        },
+        storage_maps      => merge($storage_maps, $ovn_storage_maps_tls),
         container_backend => $container_backend,
         tries             => $pcs_tries,
       }
@@ -154,8 +194,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
         ocf_agent_name  => "${ovndb_servers_ocf_name}",
         master_params   => '',
         op_params       => 'start timeout=200s stop timeout=200s',
-        resource_params => "master_ip=${ovn_dbs_vip_norm} nb_master_port=${nb_db_port} \
-sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000",
+        resource_params => $resource_map,
         tries           => $pcs_tries,
         location_rule   => $ovn_dbs_location_rule,
         meta_params     => 'notify=true container-attribute-target=host',

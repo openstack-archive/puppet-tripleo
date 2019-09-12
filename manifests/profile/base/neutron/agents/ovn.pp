@@ -24,6 +24,10 @@
 #   (Optional) Port number on which southbound database is listening
 #   Defaults to hiera('ovn::southbound::port')
 #
+# [*protocol*]
+#   (optional) Protocol use in communication with dbs
+#   Defaults to tcp
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -32,11 +36,12 @@
 class tripleo::profile::base::neutron::agents::ovn (
   $ovn_db_host    = hiera('ovn_dbs_vip'),
   $ovn_sbdb_port  = hiera('ovn::southbound::port'),
+  $protocol       = 'tcp',
   $step           = Integer(hiera('step'))
 ) {
   if $step >= 4 {
     class { '::ovn::controller':
-      ovn_remote     => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_sbdb_port}"], ':'),
+      ovn_remote     => join([$protocol, normalize_ip_for_uri($ovn_db_host), "${ovn_sbdb_port}"], ':'),
     }
   }
 }

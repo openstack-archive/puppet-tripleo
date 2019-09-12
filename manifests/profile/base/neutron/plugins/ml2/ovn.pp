@@ -28,21 +28,66 @@
 #   (Optional) Port number on which southbound database is listening
 #   Defaults to hiera('ovn::southbound::port')
 #
+# [*ovn_nb_private_key*]
+#   (optional) The PEM file with private key for SSL connection to OVN-NB-DB
+#   Defaults to $::os_service_default
+#
+# [*ovn_nb_certificate*]
+#   (optional) The PEM file with certificate that certifies the private
+#   key specified in ovn_nb_private_key
+#   Defaults to $::os_service_default
+#
+# [*ovn_nb_ca_cert*]
+#   (optional) The PEM file with CA certificate that OVN should use to
+#   verify certificates presented to it by SSL peers
+#   Defaults to $::os_service_default
+#
+# [*ovn_sb_private_key*]
+#   (optional) The PEM file with private key for SSL connection to OVN-SB-DB
+#   Defaults to $::os_service_default
+#
+# [*ovn_sb_certificate*]
+#   (optional) The PEM file with certificate that certifies the
+#   private key specified in ovn_sb_private_key
+#   Defaults to $::os_service_default
+#
+# [*ovn_sb_ca_cert*]
+#   (optional) The PEM file with CA certificate that OVN should use to
+#   verify certificates presented to it by SSL peers
+#   Defaults to $::os_service_default
+#
+# [*protocol*]
+#   (optional) Protocol use in communication with dbs
+#   Defaults to tcp
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::neutron::plugins::ml2::ovn (
-  $ovn_db_host = hiera('ovn_dbs_vip'),
-  $ovn_nb_port = hiera('ovn::northbound::port'),
-  $ovn_sb_port = hiera('ovn::southbound::port'),
-  $step        = Integer(hiera('step'))
+  $ovn_db_host              = hiera('ovn_dbs_vip'),
+  $ovn_nb_port              = hiera('ovn::northbound::port'),
+  $ovn_sb_port              = hiera('ovn::southbound::port'),
+  $ovn_nb_private_key       = $::os_service_default,
+  $ovn_nb_certificate       = $::os_service_default,
+  $ovn_nb_ca_cert           = $::os_service_default,
+  $ovn_sb_private_key       = $::os_service_default,
+  $ovn_sb_certificate       = $::os_service_default,
+  $ovn_sb_ca_cert           = $::os_service_default,
+  $protocol                 = 'tcp',
+  $step                     = Integer(hiera('step'))
 ) {
   if $step >= 4 {
     class { '::neutron::plugins::ml2::ovn':
-      ovn_nb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
-      ovn_sb_connection => join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
+      ovn_nb_connection  => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
+      ovn_sb_connection  => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
+      ovn_nb_private_key => $ovn_nb_private_key,
+      ovn_nb_certificate => $ovn_nb_certificate,
+      ovn_nb_ca_cert     => $ovn_nb_ca_cert,
+      ovn_sb_private_key => $ovn_sb_private_key,
+      ovn_sb_certificate => $ovn_sb_certificate,
+      ovn_sb_ca_cert     => $ovn_sb_ca_cert,
     }
   }
 }
