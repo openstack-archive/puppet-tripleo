@@ -205,6 +205,10 @@
 #  (Optional) List of strings. List of third party python packages to install.
 #  Defaults to [].
 #
+# [*enable_sensubility*]
+#  (Optional) Boolean. Set to true if sensubility should be executed by exec plugin.
+#  Defaults to false.
+#
 class tripleo::profile::base::metrics::collectd (
   $step = Integer(hiera('step')),
 
@@ -248,7 +252,8 @@ class tripleo::profile::base::metrics::collectd (
   $amqp_interval = undef,
   $service_names = hiera('enabled_services', []),
   $collectd_manage_repo = false,
-  $python_read_plugins = []
+  $python_read_plugins = [],
+  $enable_sensubility = false,
 ) {
   if $step >= 3 {
     class {'::collectd':
@@ -356,6 +361,10 @@ class tripleo::profile::base::metrics::collectd (
         resource_type                => $gnocchi_resource_type,
         batch_size                   => $gnocchi_batch_size,
       }
+    }
+
+    if $enable_sensubility {
+      include ::tripleo::profile::base::metrics::collectd::sensubility
     }
   }
 }

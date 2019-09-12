@@ -1,0 +1,67 @@
+<%- | Optional[String]  $log_file,
+      Optional[String]  $log_level,
+      Optional[String]  $connection,
+      Optional[Array]   $subscriptions,
+      Optional[String]  $client_name,
+      Optional[String]  $client_address,
+      Optional[Integer] $keepalive_interval,
+      Optional[String]  $tmp_base_dir,
+      Optional[String]  $shell_path,
+      Optional[Integer] $worker_count,
+      Optional[String]  $checks,
+      Optional[String]  $amqp_host,
+      Optional[String]  $amqp_port,
+      Optional[String]  $amqp_user,
+      Optional[String]  $amqp_password
+| -%>
+
+[default]
+<% unless $log_file =~ Undef { -%>
+log_file=<%=$log_file%>
+<%- } -%>
+<% unless $log_level =~ Undef { -%>
+log_level=<%=$log_level%>
+<%- } -%>
+
+[sensu]
+<% unless $connection =~ Undef { -%>
+connection=<%=$connection%>
+<%- } -%>
+<% unless $subscriptions =~ Undef { -%>
+subscriptions=<%=$subscriptions.join(',')%>
+<%- } -%>
+<% unless $client_name =~ Undef { -%>
+client_name=<%=$client_name%>
+<%- } -%>
+<% unless $client_address =~ Undef { -%>
+client_address=<%=$client_address%>
+<%- } -%>
+<% unless $keepalive_interval =~ Undef { -%>
+keepalive_interval=<%=$keepalive_interval%>
+<%- } -%>
+<% unless $tmp_base_dir =~ Undef { -%>
+tmp_base_dir=<%=$tmp_base_dir%>
+<%- } -%>
+<% unless $shell_path =~ Undef { -%>
+shell_path=<%=$shell_path%>
+<%- } -%>
+<% unless $worker_count =~ Undef { -%>
+worker_count=<%=$worker_count%>
+<%- } -%>
+<% unless $checks =~ Undef { -%>
+checks=<%=$checks%>
+<%- } -%>
+
+[amqp1]
+<% unless $amqp_host =~ Undef { -%>
+host=<%=$amqp_host%>
+<%- } -%>
+<% unless $amqp_port =~ Undef { -%>
+port=<%=$amqp_port%>
+<%- } -%>
+<% unless $amqp_user =~ Undef { -%>
+user=<%=$amqp_user%>
+<%- } -%>
+<% unless $amqp_password =~ Undef { -%>
+password=<%=$amqp_password%>
+<%- } -%>
