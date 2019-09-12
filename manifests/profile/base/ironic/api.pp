@@ -55,6 +55,7 @@ class tripleo::profile::base::ironic::api (
   $step                = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::ironic
+  include ::tripleo::profile::base::ironic::authtoken
 
   if $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true

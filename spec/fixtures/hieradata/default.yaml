@@ -46,6 +46,11 @@ gnocchi_api_short_bootstrap_node_name: node
 gnocchi::keystone::authtoken::password: 'password'
 gnocchi::storage::ceph::ceph_username: 'gnocchi'
 gnocchi::storage::ceph::ceph_secret: 'password'
+# ironic related items
+ironic::api::authtoken::password: 'password'
+ironic_api_short_bootstrap_node_name: node
+ironic::inspector::authtoken::password: 'password'
+ironic_inspector_short_bootstrap_node_name: node
 # haproxy related items
 mysql_enabled: true
 controller_node_ips: '10.1.0.1,10.1.0.2'
