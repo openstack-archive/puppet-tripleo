@@ -1470,7 +1470,8 @@ class tripleo::haproxy (
       $redis_ssl_member_options = []
     }
     if $redis_password {
-      $redis_tcp_check_password_options = ["send AUTH\\ ${redis_password}\\r\\n"]
+      $redis_tcp_check_password_options = ["send AUTH\\ ${redis_password}\\r\\n",
+                                            'expect string +OK']
     } else {
       $redis_tcp_check_password_options = []
     }
