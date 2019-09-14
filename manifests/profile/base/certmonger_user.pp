@@ -191,7 +191,7 @@ class tripleo::profile::base::certmonger_user (
   $novnc_proxy_certificates_specs     = hiera('novnc_proxy_certificates_specs',{}),
   $ceph_grafana_certificate_specs     = hiera('ceph_grafana_certificate_specs', {}),
   $ovn_dbs_certificate_specs          = hiera('ovn_dbs_certificate_specs', {}),
-  $ovn_controller_certificate_specs   = hiera('ovn_controlle_rcertificate_specs', {}),
+  $ovn_controller_certificate_specs   = hiera('ovn_controller_certificate_specs', {}),
   $ovn_metadata_certificate_specs     = hiera('ovn_metadata_certificate_specs', {}),
   $neutron_ovn_certificate_specs      = hiera('neutron_ovn_certificate_specs', {}),
   $novnc_proxy_postsave_cmd           = undef,
