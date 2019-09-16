@@ -24,12 +24,20 @@ describe 'tripleo::profile::base::neutron::ovs' do
       facts.merge!({ :step => params[:step] })
     end
 
-    context 'with defaults for all parameters' do
-      let(:params) { { :step => 3 } }
-
-      it 'should do nothing in step 3' do
+    context 'with step less than 5 and defaults for all parameters' do
+      let(:params) { { :step => 4 } }
+      it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::neutron')
         is_expected.to_not contain_class('neutron::agents::ml2::ovs')
+        is_expected.not_to contain_file('/var/lib/vhostuser_sockets')
+      end
+    end
+
+    context 'with step 5 and defaults for all parameters' do
+      let(:params) { { :step => 5 } }
+      it 'should trigger complete configuration except for vhostuser sockets' do
+        is_expected.to contain_class('tripleo::profile::base::neutron')
+        is_expected.to contain_class('neutron::agents::ml2::ovs')
         is_expected.not_to contain_file('/var/lib/vhostuser_sockets')
       end
     end
