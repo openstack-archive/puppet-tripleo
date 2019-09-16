@@ -32,7 +32,9 @@ describe 'tripleo::profile::base::cinder::api' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::cinder::api')
         is_expected.to contain_class('tripleo::profile::base::cinder')
+        is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to_not contain_class('cinder::api')
+        is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('cinder::ceilometer')
       end
     end
@@ -44,11 +46,15 @@ describe 'tripleo::profile::base::cinder::api' do
       } }
 
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('tripleo::profile::base::cinder::api')
+        is_expected.to contain_class('tripleo::profile::base::cinder')
+        is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to contain_class('cinder::api').with(
           :sync_db        => true,
           # Verify legacy key manager is enabled when none is set in hiera.
           :keymgr_backend => 'cinder.keymgr.conf_key_mgr.ConfKeyManager',
         )
+        is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('cinder::ceilometer')
       end
     end
@@ -60,7 +66,11 @@ describe 'tripleo::profile::base::cinder::api' do
       } }
 
       it 'should not trigger any configuration' do
+        is_expected.to contain_class('tripleo::profile::base::cinder::api')
+        is_expected.to contain_class('tripleo::profile::base::cinder')
+        is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to_not contain_class('cinder::api')
+        is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('cinder::ceilometer')
       end
     end
@@ -72,10 +82,14 @@ describe 'tripleo::profile::base::cinder::api' do
       } }
 
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('tripleo::profile::base::cinder::api')
+        is_expected.to contain_class('tripleo::profile::base::cinder')
+        is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to contain_class('cinder::api').with(
           :sync_db        => true,
           :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
         )
+        is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('cinder::ceilometer')
         is_expected.to contain_cinder__type('tripleo')
       end
@@ -88,10 +102,14 @@ describe 'tripleo::profile::base::cinder::api' do
       } }
 
       it 'should trigger complete configuration but with no db sync or default volume type' do
+        is_expected.to contain_class('tripleo::profile::base::cinder::api')
+        is_expected.to contain_class('tripleo::profile::base::cinder')
+        is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to contain_class('cinder::api').with(
           :sync_db        => false,
           :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
         )
+        is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('cinder::ceilometer')
         is_expected.to_not contain_cinder__type('tripleo')
       end
