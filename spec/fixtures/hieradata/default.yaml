@@ -40,7 +40,10 @@ cinder::backup::nfs::backup_share: '/mnt/backup'
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
 # glance related items
+glance_api_short_bootstrap_node_name : node
 glance::api::authtoken::password: 'password'
+glance::backend::swift::swift_store_user: 'service:glance'
+glance::backend::swift::swift_store_key: 'foo'
 # gnocchi related items
 gnocchi_api_short_bootstrap_node_name: node
 gnocchi::keystone::authtoken::password: 'password'
