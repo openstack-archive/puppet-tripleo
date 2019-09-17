@@ -70,7 +70,7 @@
 #
 # [*manage_db_purge*]
 #   (Optional) Whether keystone token flushing should be enabled
-#   Defaults to hiera('keystone_enable_db_purge', true)
+#   Defaults to hiera('keystone_enable_db_purge', false)
 #
 # [*public_endpoint_network*]
 #   (Optional) The network name where the admin endpoint is listening on.
@@ -169,7 +169,7 @@ class tripleo::profile::base::keystone (
   $heat_admin_user                = undef,
   $ldap_backends_config           = undef,
   $ldap_backend_enable            = false,
-  $manage_db_purge                = hiera('keystone_enable_db_purge', true),
+  $manage_db_purge                = hiera('keystone_enable_db_purge', false),
   $public_endpoint_network        = hiera('keystone_public_api_network', undef),
   $oslomsg_rpc_proto              = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
   $oslomsg_rpc_hosts              = any2array(hiera('oslo_messaging_rpc_node_names', undef)),

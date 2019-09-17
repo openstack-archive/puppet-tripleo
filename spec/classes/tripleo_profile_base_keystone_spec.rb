@@ -118,7 +118,7 @@ describe 'tripleo::profile::base::keystone' do
         is_expected.to contain_class('keystone::security_compliance')
         is_expected.to_not contain_class('keystone::ldap_backend')
         is_expected.to_not contain_class('keystone::federation::openidc')
-        is_expected.to contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::token_flush')
       end
     end
 
@@ -144,22 +144,37 @@ describe 'tripleo::profile::base::keystone' do
         is_expected.to contain_class('keystone::security_compliance')
         is_expected.to_not contain_class('keystone::ldap_backend')
         is_expected.to_not contain_class('keystone::federation::openidc')
-        is_expected.to contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::token_flush')
       end
     end
 
-    context 'with step 4 and db_purge disabled' do
+    context 'with step less than 4 and db_purge enabled' do
       before do
         params.merge!(
-          { :step            => 4,
+          { :step            => 3,
             :bootstrap_node  => 'other.example.com',
-            :manage_db_purge => false
+            :manage_db_purge => true
           }
         )
       end
 
       it 'should not trigger token_flush configuration' do
         is_expected.to_not contain_class('keystone::cron::token_flush')
+      end
+    end
+
+    context 'with step 4 and db_purge enabled' do
+      before do
+        params.merge!(
+          { :step            => 4,
+            :bootstrap_node  => 'other.example.com',
+            :manage_db_purge => true
+          }
+        )
+      end
+
+      it 'should trigger token_flush configuration' do
+        is_expected.to contain_class('keystone::cron::token_flush')
       end
     end
   end
