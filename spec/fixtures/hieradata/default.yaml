@@ -115,6 +115,8 @@ pacemaker::resource_defaults::defaults:
 # pcmk instance ha
 keystone::endpoint::public_url: 'localhost:5000'
 keystone::admin_password: 'password'
+keystone::admin_token: 'admintoken'
+keystone::roles::admin::password: 'password'
 # tripleo firewall service_rules
 tripleo::dynamic_rules::firewall_rules:
   '11-neutron':
