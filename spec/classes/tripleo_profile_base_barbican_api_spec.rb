@@ -18,6 +18,10 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::barbican::api' do
   shared_examples_for 'tripleo::profile::base::barbican::api' do
+    before :each do
+      facts.merge!({ :step => params[:step] })
+    end
+
     let(:pre_condition) do
       "class { '::tripleo::profile::base::barbican': step => #{params[:step]} }"
     end
