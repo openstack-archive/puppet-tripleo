@@ -48,7 +48,7 @@ class tripleo::certmonger::ovn_controller (
 ) {
   include ::certmonger
 
-  certmonger_certificate { 'ovn_clients' :
+  certmonger_certificate { 'ovn_controller' :
     ensure       => 'present',
     certfile     => $service_certificate,
     keyfile      => $service_key,
