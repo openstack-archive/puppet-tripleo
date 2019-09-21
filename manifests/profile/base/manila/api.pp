@@ -97,6 +97,7 @@ class tripleo::profile::base::manila::api (
   }
 
   include ::tripleo::profile::base::manila
+  include ::tripleo::profile::base::manila::authtoken
 
   if $enable_internal_tls {
     if !$manila_api_network {
