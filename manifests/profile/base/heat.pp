@@ -23,8 +23,8 @@
 #   Defaults to downcase(hiera('heat_engine_short_bootstrap_node_name'))
 #
 # [*manage_db_purge*]
-#   (Optional) Whether keystone token flushing should be enabled
-#   Defaults to hiera('keystone_enable_db_purge', true)
+#   (Optional) Whether to enable db purging
+#   Defaults to hiera('heat_enable_db_purge', true)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
