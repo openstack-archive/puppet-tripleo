@@ -26,7 +26,7 @@ LOGGING=''
 CMD="ip netns exec ${NETNS} "'$HAPROXY'
 <%- } elsif $container_cli == 'podman' { -%>
 CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
-LOGGING="--log-driver json-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
+LOGGING="--log-driver k8s-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
 CMD='$HAPROXY'
 <%- } else { -%>
 CLI='echo noop'
