@@ -77,6 +77,8 @@ nova_placement_short_bootstrap_node_name: node
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
 nova::network::neutron::neutron_password: 'password'
+# panko related items
+panko::keystone::authtoken::password: 'password'
 # placement related items
 placement_api_short_bootstrap_node_name: node
 placement_short_bootstrap_node_name: node

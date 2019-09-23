@@ -67,6 +67,7 @@ class tripleo::profile::base::panko::api (
   }
 
   include ::tripleo::profile::base::panko
+  include ::tripleo::profile::base::panko::authtoken
 
   if $enable_internal_tls {
     if !$panko_network {

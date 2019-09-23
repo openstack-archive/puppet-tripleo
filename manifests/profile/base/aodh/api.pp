@@ -63,6 +63,7 @@ class tripleo::profile::base::aodh::api (
   }
 
   include ::tripleo::profile::base::aodh
+  include ::tripleo::profile::base::aodh::authtoken
 
   if $enable_internal_tls {
     if !$aodh_network {
