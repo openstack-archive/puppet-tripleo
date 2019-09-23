@@ -1,6 +1,10 @@
 
 ## TripleO Puppet modules
 
+mod 'stdlib',
+  :git => 'https://github.com/puppetlabs/puppetlabs-stdlib',
+  :ref => '127b2f9b36b6f41a62db0d68f3908e7c227871a0'
+
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
   :ref => 'master'
@@ -79,5 +83,4 @@ mod 'pacemaker',
 # Note(bandini): Pinned due to LP#1756890
 mod 'collectd',
   :git => 'https://github.com/voxpupuli/puppet-collectd',
-  :ref => '93c8d0bd32bb5610652f30e785ba6644fc82a8b6'
-
+  :ref => '0f9f525f967930620437afb050d58570d129ee85'
