@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    The ``ipversion`` parameter was added to tripleo::firewall:rule. Allowing
+    the user to provide the IP version (``ipv4`` or ``ipv6``) for firewall
+    rules. With the default (``undef``) the rule will be created in both
+    *iptables* and *ip6tables*.
+    Bug: `1845153 <https://bugs.launchpad.net/tripleo/+bug/1845153>`_.
+

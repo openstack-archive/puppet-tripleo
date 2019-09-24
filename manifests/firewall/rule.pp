@@ -19,6 +19,11 @@
 #
 # === Parameters:
 #
+# [*ipversion*]
+#  (optional) The IP-version associated to the rule.
+#  If not set the rule will be created for both IPv4 and IPv6.
+#  Defaults to undef
+#
 # [*port*]
 #  (optional) The port associated to the rule.
 #  Defaults to undef
@@ -78,6 +83,7 @@
 #  Defaults to {}
 #
 define tripleo::firewall::rule (
+  $ipversion   = undef,
   $port        = undef,
   $dport       = undef,
   $sport       = undef,
@@ -93,6 +99,12 @@ define tripleo::firewall::rule (
   $table       = undef,
   $tag         = 'tripleo-firewall-rule',
 ) {
+
+  if $ipversion == 'all' {
+    $ipversion_real = undef
+  } else {
+    $ipversion_real = $ipversion
+  }
 
   if $port == 'all' {
     warning("All ${proto} traffic will be open on this host.")
@@ -124,16 +136,28 @@ define tripleo::firewall::rule (
     'table'       => $table,
     'tag'         => $tag,
   }
-  if $proto == 'icmp' {
-    $ipv6 = {
-      'provider' => 'ip6tables',
-      'proto'    => 'ipv6-icmp',
+
+  if $ipversion_real != undef {
+    if $ipversion_real == 'ipv6' {
+      $ipv4 = undef
+      $ipv6 = {'provider' => 'ip6tables'}
+    }
+    if $ipversion_real == 'ipv4' {
+      $ipv4 = {'provider' => 'iptables'}
+      $ipv6 = undef
     }
   } else {
-    $ipv6 = {
-      'provider' => 'ip6tables',
+    $ipv4 = {'provider' => 'iptables'}
+    if $proto == 'icmp' {
+      $ipv6 = {
+        'provider' => 'ip6tables',
+        'proto'    => 'ipv6-icmp',
+      }
+    } else {
+      $ipv6 = {'provider' => 'ip6tables'}
     }
   }
+
   if $proto != 'gre' {
     $state_rule = {
       'state' => $state
@@ -142,11 +166,14 @@ define tripleo::firewall::rule (
     $state_rule = {}
   }
 
-
-  $ipv4_rule = merge($basic, $state_rule, $extras)
-  $ipv6_rule = merge($basic, $state_rule, $ipv6, $extras)
-  validate_legacy(Hash, 'validate_hash', $ipv4_rule)
-  validate_legacy(Hash, 'validate_hash', $ipv6_rule)
+  if $ipv4 != undef {
+    $ipv4_rule = merge($basic, $state_rule, $ipv4, $extras)
+    validate_legacy(Hash, 'validate_hash', $ipv4_rule)
+  }
+  if $ipv6 != undef {
+    $ipv6_rule = merge($basic, $state_rule, $ipv6, $extras)
+    validate_legacy(Hash, 'validate_hash', $ipv6_rule)
+  }
 
   # This conditional will ensure that TCP and UDP firewall rules have
   # a port specified in the configuration when using INPUT or OUTPUT chains.
@@ -165,8 +192,12 @@ define tripleo::firewall::rule (
       create_resources('firewall', { "${title} ipv6" => $ipv6_rule })
     }
   } else {
-    create_resources('firewall', { "${title} ipv4" => $ipv4_rule })
-    create_resources('firewall', { "${title} ipv6" => $ipv6_rule })
+    if $ipv4 != undef {
+      create_resources('firewall', { "${title} ipv4" => $ipv4_rule })
+    }
+    if $ipv6 != undef {
+      create_resources('firewall', { "${title} ipv6" => $ipv6_rule })
+    }
   }
 
 }
