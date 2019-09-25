@@ -56,6 +56,10 @@
 #   Variable that defines the no_shared_storage for the nova evacuate resource
 #   Defaults to hiera('tripleo::instanceha::no_shared_storage', true)
 #
+# [*evacuate_delay*]
+#   (Optional) Integer, seconds to wait before starting the nova evacuate
+#   Defaults to hiera('tripleo::instanceha::evacuate_delay', 0)
+#
 class tripleo::profile::base::pacemaker::instance_ha (
   $step                  = Integer(hiera('step')),
   $pcs_tries             = hiera('pcs_tries', 20),
@@ -66,6 +70,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
   $user_domain           = hiera('nova::keystone::authtoken::user_domain_name', 'Default'),
   $project_domain        = hiera('nova::keystone::authtoken::project_domain_name', 'Default'),
   $no_shared_storage     = hiera('tripleo::instanceha::no_shared_storage', true),
+  $evacuate_delay        = hiera('tripleo::instanceha::evacuate_delay', 0),
 ) {
   if $step >= 2 {
     class { '::pacemaker::resource_defaults':
@@ -111,10 +116,15 @@ class tripleo::profile::base::pacemaker::instance_ha (
     } else {
       $iha_no_shared_storage = 'no_shared_storage=false'
     }
+    if $evacuate_delay > 0 {
+      $evacuate_param = " evacuate_delay=${evacuate_delay}"
+    } else {
+      $evacuate_param = ''
+    }
     pacemaker::resource::ocf { 'nova-evacuate':
       ocf_agent_name  => 'openstack:NovaEvacuate',
       # lint:ignore:140chars
-      resource_params => "auth_url=${keystone_endpoint_url} username=${keystone_admin} password=${keystone_password} user_domain=${user_domain} project_domain=${project_domain} tenant_name=${keystone_admin} ${iha_no_shared_storage}",
+      resource_params => "auth_url=${keystone_endpoint_url} username=${keystone_admin} password=${keystone_password} user_domain=${user_domain} project_domain=${project_domain} tenant_name=${keystone_admin} ${iha_no_shared_storage}${evacuate_param}",
       # lint:endignore
       tries           => $pcs_tries,
       location_rule   => {
