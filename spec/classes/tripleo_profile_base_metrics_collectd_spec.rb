@@ -16,8 +16,27 @@
 
 require 'spec_helper'
 
+sensubility_conf = "
+[default]
+
+[sensu]
+connection=ampq://sensu:sensu@localhost:5672//sensu
+subscriptions=default,test
+checks={\"standalone_check\":{\"command\":\"echo 'foobar'\",\"interval\":5}}
+
+[amqp1]
+"
+exec_cmd = <<-EOS
+  Exec \"collectd:collectd\" \"collectd-sensubility\"
+EOS
+
+
 describe 'tripleo::profile::base::metrics::collectd' do
   shared_examples_for 'tripleo::profile::base::metrics::collectd' do
+    before :each do
+      facts.merge!({ :step => params[:step] })
+    end
+
     context 'with step less than 3' do
       let(:params) { { :step => 2, :gnocchi_server => 'localhost' } }
       it 'should do nothing' do
@@ -78,6 +97,26 @@ describe 'tripleo::profile::base::metrics::collectd' do
          :ensure => 'running',
          :enable => true,
        )
+      end
+    end
+
+    context 'with defaults and enabled sensubility' do
+      let(:params) do
+        { :step => 3,
+          :amqp_host => 'localhost',
+          :enable_sensubility => true }
+      end
+      it 'has collectd class with exec plugin and enabled sensubility' do
+        is_expected.to compile.with_all_deps
+        is_expected.to contain_package('collectd-sensubility').with(:ensure => 'present')
+        is_expected.to contain_class('collectd')
+        is_expected.to contain_class('collectd::plugin::exec')
+        is_expected.to contain_concat__fragment('collectd_plugin_exec_conf_sensubility').with({
+          :order => 50,
+          :target => '/etc/collectd.d/exec-config.conf',
+          :content => exec_cmd,
+        })
+        is_expected.to contain_file('/etc/collectd-sensubility.conf').with_content(sensubility_conf)
       end
     end
   end

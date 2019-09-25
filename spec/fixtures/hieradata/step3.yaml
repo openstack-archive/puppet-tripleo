@@ -1,2 +1,10 @@
 ---
 step: 3
+tripleo::profile::base::metrics::collectd::sensubility::connection: 'ampq://sensu:sensu@localhost:5672//sensu'
+tripleo::profile::base::metrics::collectd::sensubility::subscriptions:
+  - default
+  - test
+tripleo::profile::base::metrics::collectd::sensubility::checks:
+  standalone_check:
+    command: "echo 'foobar'"
+    interval: 5
