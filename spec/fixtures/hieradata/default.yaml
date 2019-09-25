@@ -64,6 +64,7 @@ mysql_short_bootstrap_node_name: node
 # manila related items
 manila::rabbit_password: 'password'
 manila::backend::cephfs::cephfs_protocol_helper_type: 'NFS'
+manila::keystone::authtoken::password: 'password'
 manila_share_short_bootstrap_node_name: 'node.example.com'
 manila_share_short_node_names:
  - 'manila-1'
