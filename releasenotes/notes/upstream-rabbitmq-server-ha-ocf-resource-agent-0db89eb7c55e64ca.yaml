@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Introduces the tripleo::profile::pacemaker::rabbitmq_bundle::use_masterslave_rabbitmqra class
+    parameter to be able to use the resource agent from the rabbitmq upstream repository (as opposed
+    to the resource-agent maintained under the clusterlabs umbrella).
