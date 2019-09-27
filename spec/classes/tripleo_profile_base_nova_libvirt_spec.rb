@@ -32,10 +32,12 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
         is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
         is_expected.to_not contain_class('tripleo::profile::base::nova')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtlogd')
         is_expected.to_not contain_class('nova::compute::libvirt::services')
         is_expected.to_not contain_file('/etclibvirt/qemu/networks/autostart/default.xml')
         is_expected.to_not contain_file('/etclibvirt/qemu/networks/default.xml')
         is_expected.to_not contain_exec('libvirt-default-net-destroy')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtlogd::config')
         is_expected.to_not contain_exec('set libvirt sasl credentials')
       }
     end
@@ -65,6 +67,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
         is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
         is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::compute::libvirt::virtlogd')
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_class('nova::compute::libvirt::qemu')
         is_expected.to contain_class('nova::migration::qemu')
@@ -78,6 +81,7 @@ eos
           "unix_sock_ro_perms" => {"value" => '"0777"'},
           "unix_sock_rw_perms" => {"value" => '"0770"'}
         })
+        is_expected.to contain_class('nova::compute::libvirt::virtlogd::config')
         is_expected.to contain_package('cyrus-sasl-scram')
         is_expected.to contain_file('/etc/sasl2/libvirt.conf')
         is_expected.to contain_file('/etc/libvirt/auth.conf').with_ensure('absent')
@@ -111,6 +115,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
         is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::compute::libvirt::virtlogd')
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
@@ -122,6 +127,7 @@ eos
           "unix_sock_ro_perms" => {"value" => '"0777"'},
           "unix_sock_rw_perms" => {"value" => '"0770"'}
         })
+        is_expected.to contain_class('nova::compute::libvirt::virtlogd::config')
         is_expected.to contain_package('cyrus-sasl-scram')
         is_expected.to contain_file('/etc/sasl2/libvirt.conf')
         is_expected.to contain_file('/etc/libvirt/auth.conf').with_ensure('absent')
@@ -156,6 +162,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
         is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
         is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::compute::libvirt::virtlogd')
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_class('nova::compute::libvirt::qemu')
         is_expected.to contain_class('nova::migration::qemu')
@@ -169,6 +176,7 @@ eos
           "unix_sock_ro_perms" => {"value" => '"0777"'},
           "unix_sock_rw_perms" => {"value" => '"0770"'}
         })
+        is_expected.to contain_class('nova::compute::libvirt::virtlogd::config')
         is_expected.to contain_package('cyrus-sasl-scram')
         is_expected.to contain_file('/etc/sasl2/libvirt.conf')
         is_expected.to contain_file('/etc/libvirt/auth.conf').with_ensure('present')

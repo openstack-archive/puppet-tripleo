@@ -27,6 +27,10 @@
 #   (Optional) Overrides for libvirtd config options
 #   Defaults to {}
 #
+# [*virtlogd_config*]
+#   (Optional) Overrides for virtlogd config options
+#   Defaults to {}
+#
 # [*tls_password*]
 #   (Optional) SASL Password for libvirtd TLS connections
 #   Defaults to '' (disabled)
@@ -34,6 +38,7 @@
 class tripleo::profile::base::nova::libvirt (
   $step = Integer(hiera('step')),
   $libvirtd_config = {},
+  $virtlogd_config = {},
   $tls_password    = '',
 ) {
   include tripleo::profile::base::nova::compute_libvirt_shared
@@ -41,6 +46,7 @@ class tripleo::profile::base::nova::libvirt (
   if $step >= 4 {
     include tripleo::profile::base::nova
     include tripleo::profile::base::nova::migration::client
+    include nova::compute::libvirt::virtlogd
     include nova::compute::libvirt::services
 
     $libvirtd_config_default = {
@@ -53,6 +59,10 @@ class tripleo::profile::base::nova::libvirt (
 
     class { 'nova::compute::libvirt::config':
       libvirtd_config => merge($libvirtd_config_default, $libvirtd_config)
+    }
+
+    class { 'nova::compute::libvirt::virtlogd::config':
+      virtlogd_config => $virtlogd_config
     }
 
     # This removal of files in /etc/libvirt/qemu should not happen inside containers
