@@ -77,6 +77,10 @@
 #   (Optional) Whether or not to enable encryption of the pacemaker traffic
 #   Defaults to true
 #
+# [*resource_op_defaults*]
+#   (Optional) A hash allowing to override pacemaker resource op defaults
+#   Defaults to undef
+#
 # [*enable_instanceha*]
 #  (Optional) Boolean driving the Instance HA controlplane configuration
 #  Defaults to false
@@ -100,6 +104,7 @@ class tripleo::profile::base::pacemaker (
   $remote_try_sleep          = hiera('pacemaker_remote_try_sleep', 60),
   $cluster_recheck_interval  = hiera('pacemaker_cluster_recheck_interval', undef),
   $encryption                = true,
+  $resource_op_defaults      = undef,
   $enable_instanceha         = hiera('tripleo::instanceha', false),
   $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
@@ -246,6 +251,13 @@ class tripleo::profile::base::pacemaker (
   if ($step >= 2 and $pacemaker_master) {
     if ! $enable_instanceha {
       include ::pacemaker::resource_defaults
+    }
+    # Set pacemaker resource op defaults only when specified
+    if $resource_op_defaults != undef {
+      class { '::pacemaker::resource_op_defaults':
+        tries    => $pcs_tries,
+        defaults => $resource_op_defaults,
+      }
     }
     # When we have a non-zero number of pacemaker remote nodes we
     # want to set the cluster-recheck-interval property to something
