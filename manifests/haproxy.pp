@@ -246,6 +246,10 @@
 #  (optional) Enable or not Designate API binding
 #  Defaults to hiera('designate_api_enabled', false)
 #
+# [*metrics_qdr*]
+#  (optional) Enable or not Metrics QDR binding
+#  Defaults to hiera('metrics_qdr_enabled', false)
+#
 # [*gnocchi*]
 #  (optional) Enable or not Gnocchi API binding
 #  Defaults to hiera('gnocchi_api_enabled', false)
@@ -387,6 +391,10 @@
 # [*designate_network*]
 #  (optional) Specify the network designate is running on.
 #  Defaults to hiera('designate_api_network', undef)
+#
+# [*metrics_qdr_network*]
+#  (optional) Specify the network metrics_qdr is running on.
+#  Defaults to hiera('metrics_qdr_network', undef)
 #
 # [*docker_registry_network*]
 #  (optional) Specify the network docker-registry is running on.
@@ -549,6 +557,7 @@
 #    'keystone_public_api_ssl_port' (Defaults to 13000)
 #    'manila_api_port' (Defaults to 8786)
 #    'manila_api_ssl_port' (Defaults to 13786)
+#    'metrics_qdr_port' (Defaults to 5666)
 #    'neutron_api_port' (Defaults to 9696)
 #    'neutron_api_ssl_port' (Defaults to 13696)
 #    'nova_api_port' (Defaults to 8774)
@@ -647,6 +656,7 @@ class tripleo::haproxy (
   $ironic_inspector            = hiera('ironic_inspector_enabled', false),
   $octavia                     = hiera('octavia_api_enabled', false),
   $designate                   = hiera('designate_api_enabled', false),
+  $metrics_qdr                 = hiera('metrics_qdr_enabled', false),
   $mysql                       = hiera('mysql_enabled', false),
   $kubernetes_master           = hiera('kubernetes_master_enabled', false),
   $mysql_clustercheck          = false,
@@ -671,6 +681,7 @@ class tripleo::haproxy (
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
   $cinder_network              = hiera('cinder_api_network', undef),
   $designate_network           = hiera('designate_api_network', undef),
+  $metrics_qdr_network         = hiera('metrics_qdr_network', undef),
   $docker_registry_network     = hiera('docker_registry_network', undef),
   $glance_api_network          = hiera('glance_api_network', undef),
   $gnocchi_network             = hiera('gnocchi_api_network', undef),
@@ -739,6 +750,7 @@ class tripleo::haproxy (
     keystone_public_api_ssl_port => 13000,
     manila_api_port => 8786,
     manila_api_ssl_port => 13786,
+    metrics_qdr_port => 5666,
     neutron_api_port => 9696,
     neutron_api_ssl_port => 13696,
     nova_api_port => 8774,
@@ -1329,6 +1341,18 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[designate_api_ssl_port],
       service_network   => $designate_network,
+    }
+  }
+
+  if $metrics_qdr {
+    ::tripleo::haproxy::endpoint { 'metrics_qdr':
+      public_virtual_ip => $public_virtual_ip,
+      internal_ip       => $controller_virtual_ip,
+      service_port      => $ports[metrics_qdr_port],
+      ip_addresses      => $controller_hosts_real,
+      server_names      => $controller_hosts_names_real,
+      public_ssl_port   => $ports[metrics_qdr_port],
+      service_network   => $metrics_qdr_network,
     }
   }
 
