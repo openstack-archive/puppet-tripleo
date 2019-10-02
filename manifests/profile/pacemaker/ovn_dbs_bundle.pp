@@ -163,17 +163,17 @@ sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000"
         $ovn_storage_maps_tls = {
           'ovn-dbs-pki-'  => {
             'source-dir' => '/etc/pki/tls/private/ovn_dbs.key',
-            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/private/ovn_dbs.key',
+            'target-dir' => '/etc/pki/tls/private/ovn_dbs.key',
             'options'    => 'ro',
           },
           'ovn-dbs-cert' => {
             'source-dir' => '/etc/pki/tls/certs/ovn_dbs.crt',
-            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/certs/ovn_dbs.crt',
+            'target-dir' => '/etc/pki/tls/certs/ovn_dbs.crt',
             'options'    => 'ro',
           },
           'ovn-dbs-cacert' => {
-            'source-dir' => '/etc/pki/tls/certs/ovn_dbs.crt',
-            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/certs/cacert.pem',
+            'source-dir' => "${ca_file}",
+            'target-dir' => "${ca_file}",
             'options'    => 'ro',
           },
         }
