@@ -26,34 +26,26 @@
 #   Password for the qdrouter daemon
 #   Defaults to undef
 #
+# [*external_listener_addr*]
+#   (optional) Bind address for external connections (CloudForms for example)
+#   Defaults to 'localhost'
+#
 # [*listener_addr*]
 #   (optional) Service host name
-#   Defaults to '127.0.0.1'
+#   Defaults to 'localhost'
 #
 # [*listener_port*]
 #   Service name or port number on which the qdrouterd will accept connections.
 #   This argument must be string, even if the numeric form is used.
 #   Defaults to '5666'
 #
-# [*certificate_specs*]
-#   (optional) The specification to give to certmonger for the certificate
-#   it will create. Note that the certificate nickname must be 'qdr' in
-#   the case of this service.
-#   Example with hiera:
-#     tripleo::profile::base::metrics::qdr::certificate_specs:
-#       hostname: <overcloud controller fqdn>
-#       service_certificate: <service certificate path>
-#       service_key: <service key path>
-#       principal: "qdr/<overcloud controller fqdn>"
-#   Defaults to {}.
-#
 # [*listener_require_encrypt*]
 #   (optional) Require the connection to the peer to be encrypted
 #   Defaults to  'no'
 #
 # [*listener_require_ssl*]
-#   (optional) Require the use of SSL or TLS on the connection
-#   Defaults to 'no'
+#   (optional) Require the use of SSL on the connection
+#   Defaults to false
 #
 # [*listener_sasl_mech*]
 #   (optional) List of accepted SASL auth mechanisms
@@ -83,6 +75,10 @@
 #   (optional) Path to file containing trusted certificates
 #   Defaults to 'UNSET'
 #
+# [*interior_mesh_nodes*]
+#   (optional) Comma separated list of controller nodes' fqdns
+#   Defaults to hiera('controller_node_names', '')
+#
 # [*connectors*]
 #   (optional) List of hashes containing configuration for outgoing connections
 #   from the router. Each hash should contain 'host', 'role' and 'port' key.
@@ -91,6 +87,10 @@
 # [*ssl_profiles*]
 #   (optional) List of hashes containing configuration for ssl profiles
 #   Defaults to []
+#
+# [*ssl_internal_profile_name*]
+#   (optional) SSL Profile name for internal connections.
+#   Defaults to undef.
 #
 # [*addresses*]
 #   (optional) List of hashes containing configuration for addresses.
@@ -110,30 +110,96 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::metrics::qdr (
-  $username                 = undef,
-  $password                 = undef,
-  $listener_addr            = 'localhost',
-  $listener_port            = '5666',
-  $certificate_specs        = {},
-  $listener_require_ssl     = false,
-  $listener_require_encrypt = false,
-  $listener_sasl_mech       = undef,
-  $listener_ssl_cert_db     = undef,
-  $listener_ssl_cert_file   = undef,
-  $listener_ssl_key_file    = undef,
-  $listener_ssl_pw_file     = undef,
-  $listener_ssl_password    = undef,
-  $listener_trusted_certs   = undef,
-  $connectors               = [],
-  $ssl_profiles             = [],
-  $addresses                = [],
-  $autolink_addresses       = [],
-  $router_mode              = 'edge',
-  $step                     = Integer(hiera('step')),
+  $username                  = undef,
+  $password                  = undef,
+  $external_listener_addr    = 'localhost',
+  $listener_addr             = 'localhost',
+  $listener_port             = '5666',
+  $listener_require_ssl      = false,
+  $listener_require_encrypt  = false,
+  $listener_sasl_mech        = undef,
+  $listener_ssl_cert_db      = undef,
+  $listener_ssl_cert_file    = undef,
+  $listener_ssl_key_file     = undef,
+  $listener_ssl_pw_file      = undef,
+  $listener_ssl_password     = undef,
+  $listener_trusted_certs    = undef,
+  $interior_mesh_nodes       = hiera('controller_node_names', ''),
+  $connectors                = [],
+  $ssl_profiles              = [],
+  $ssl_internal_profile_name = undef,
+  $addresses                 = [],
+  $autolink_addresses        = [],
+  $router_mode               = 'edge',
+  $step                      = Integer(hiera('step')),
 ) {
   if $step >= 1 {
+    $interior_nodes = any2array(split($interior_mesh_nodes, ','))
+
+    if $router_mode == 'edge' {
+      if length($interior_nodes) > 0 {
+        # ignore explicitly set connectors and connect just to one of the interior nodes (choose randomly)
+        $all_connectors = [
+          {'host' => $interior_nodes[fqdn_rand(length($interior_nodes))],
+          'port' => '5668',
+          'role' => 'edge',
+          'verifyHostname' => false,
+          'saslMechanisms' => 'ANONYMOUS',
+          'sslProfile' => $ssl_internal_profile_name}
+        ]
+      } else {
+        # in case we don't have interior_nodes, eg. we run in all-edge mode
+        $all_connectors = $connectors
+      }
+      # and don't provide any internal listener
+      $internal_listeners = []
+    } else {
+      # provide listener for edge node and listener for other interior nodes (if required)
+      $edge_listener = {'host' => $listener_addr,
+                        'port' => '5668',
+                        'role' => 'edge',
+                        'authenticatePeer' => 'no',
+                        'saslMechanisms' => 'ANONYMOUS',
+                        'sslProfile' => $ssl_internal_profile_name}
+      if length($interior_nodes) > 1 {
+        $internal_listeners = [
+          $edge_listener,
+          {'host' => $listener_addr,
+          'port' => '5667',
+          'role' => 'inter-router',
+          'authenticatePeer' => 'no',
+          'saslMechanisms' => 'ANONYMOUS',
+          'sslProfile' => $ssl_internal_profile_name}
+        ]
+        # build mesh with other interior nodes
+        $internal_connectors = $interior_nodes.reduce([]) |$memo, $node| {
+          if $::hostname in $node {
+            $memo << true
+          } elsif true in $memo {
+            $memo
+          } else {
+            $memo << {'host' => $node,
+                      'port' => '5667',
+                      'role' => 'inter-router',
+                      'verifyHostname' => false,
+                      'sslProfile' => $ssl_internal_profile_name}
+          }
+        } - true
+      } else {
+        # single controller does not need to listen on / connect to other inter-router connections
+        $internal_listeners = [$edge_listener]
+        $internal_connectors = []
+      }
+      $all_connectors = $connectors + $internal_connectors
+    }
+
+    $listen_on = $router_mode ? {
+      'edge'     => $listener_addr,
+      'interior' => $external_listener_addr
+    }
+
     class { '::qdr':
-      listener_addr            => $listener_addr,
+      listener_addr            => $listen_on,
       listener_port            => $listener_port,
       listener_require_encrypt => $listener_require_encrypt,
       listener_require_ssl     => $listener_require_ssl,
@@ -144,10 +210,11 @@ class tripleo::profile::base::metrics::qdr (
       listener_ssl_password    => $listener_ssl_password,
       listener_trusted_certs   => $listener_trusted_certs,
       router_mode              => $router_mode,
-      connectors               => $connectors,
+      connectors               => $all_connectors,
       ssl_profiles             => $ssl_profiles,
       extra_addresses          => $addresses,
       autolink_addresses       => $autolink_addresses,
+      extra_listeners          => $internal_listeners,
     }
 
     qdr_user { $username:
