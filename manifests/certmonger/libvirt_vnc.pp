@@ -81,8 +81,21 @@ define tripleo::certmonger::libvirt_vnc (
   }
 
   if $cacertfile {
+    # Sometimes certmonger returns before creating the cacert file. This has
+    # been reported in: https://bugzilla.redhat.com/show_bug.cgi?id=1759281
+    # Until this is fixed, add this workaround.
+    exec { $cacertfile :
+      require   => Certmonger_certificate[$name],
+      command   => "test -f ${cacertfile}",
+      unless    => "test -f ${cacertfile}",
+      tries     => 60,
+      try_sleep => 1,
+      timeout   => 60,
+      path      => '/usr/bin:/bin',
+    }
+
     file { $cacertfile :
-      require => Certmonger_certificate[$name],
+      require => Exec[$cacertfile],
       mode    => '0644'
     }
     ~> Service<| title == $notify_service_real |>
