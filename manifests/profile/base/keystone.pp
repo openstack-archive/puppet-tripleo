@@ -158,6 +158,14 @@
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
 #   Defaults to hiera('memcached_node_ips')
 #
+# [*enable_token_caching*]
+#   (Optional) Enable token caching using memcached
+#   Defaults to false
+#
+# [*cache_backend*]
+#   (Optional) Backend implementation to store cache
+#   Defaults to 'oslo_cache.memcache_pool'
+#
 class tripleo::profile::base::keystone (
   $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
   $bootstrap_node                 = hiera('keystone_short_bootstrap_node_name', undef),
@@ -190,7 +198,9 @@ class tripleo::profile::base::keystone (
   $keystone_enable_member         = hiera('keystone_enable_member', false),
   $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
-  $memcached_ips                  = hiera('memcached_node_ips', [])
+  $memcached_ips                  = hiera('memcached_node_ips', []),
+  $enable_token_caching           = false,
+  $cache_backend                  = 'oslo_cache.memcache_pool',
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -222,6 +232,8 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
+    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+
     class { '::keystone':
       sync_db                    => $sync_db,
       enable_bootstrap           => $sync_db,
@@ -243,7 +255,11 @@ class tripleo::profile::base::keystone (
       }),
       notification_topics        => union($ceilometer_notification_topics,
                                           $barbican_notification_topics,
-                                          $extra_notification_topics)
+                                          $extra_notification_topics),
+      cache_enabled              => $enable_token_caching,
+      cache_memcache_servers     => $memcached_servers,
+      cache_backend              => $cache_backend,
+      token_caching              => $enable_token_caching
     }
 
     if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{
@@ -278,8 +294,6 @@ class tripleo::profile::base::keystone (
     }
 
     if $keystone_openidc_enabled {
-      $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
-
       class { '::keystone::federation::openidc':
         memcached_servers => $memcached_servers,
       }
