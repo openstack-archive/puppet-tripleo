@@ -422,9 +422,6 @@ class tripleo::profile::base::keystone (
     if hiera('swift_proxy_enabled', false) or hiera('external_swift_proxy_enabled',false) {
       include ::swift::keystone::auth
     }
-    if hiera('tacker_enabled', false) {
-      include ::tacker::keystone::auth
-    }
     if hiera('trove_api_enabled', false) {
       include ::trove::keystone::auth
     }
