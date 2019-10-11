@@ -31,8 +31,8 @@
 #   Defaults to []
 #
 # [*docker_environment*]
-#   (Optional) The list of environment variables set in the docker container
-#   Defaults to ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS']
+#   (Optional) List or Hash of environment variables set in the docker container
+#   Defaults to {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'}
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
@@ -59,7 +59,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
   $bootstrap_node             = hiera('manila_share_short_bootstrap_node_name'),
   $manila_share_docker_image  = hiera('tripleo::profile::pacemaker::manila::share_bundle::manila_share_docker_image', undef),
   $docker_volumes             = [],
-  $docker_environment         = ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS'],
+  $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
   $ceph_nfs_enabled           = hiera('ceph_nfs_enabled', false),
   $container_backend          = 'docker',
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
@@ -201,8 +201,12 @@ class tripleo::profile::pacemaker::manila::share_bundle (
         $storage_maps = merge($default_storage_maps, $extra_storage_maps)
       }
 
-      $docker_env_arr = delete(any2array($docker_environment), '').flatten()
-      $docker_env = join($docker_env_arr.map |$var| { "-e ${var}" }, ' ')
+      if is_hash($docker_environment) {
+        $docker_env = join($docker_environment.map |$index, $value| { "-e ${index}=${value}" }, ' ')
+      } else {
+        $docker_env_arr = delete(any2array($docker_environment), '').flatten()
+        $docker_env = join($docker_env_arr.map |$var| { "-e ${var}" }, ' ')
+      }
 
       if $tls_priorities != undef {
         $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"

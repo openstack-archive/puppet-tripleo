@@ -27,8 +27,8 @@
 #   Defaults to []
 #
 # [*docker_environment*]
-#   (Optional) The list of environment variables set in the docker container
-#   Defaults to ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS']
+#   (Optional) List or Hash of environment variables set in the docker container
+#   Defaults to {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'}
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
@@ -55,7 +55,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
   $bootstrap_node             = hiera('cinder_volume_short_bootstrap_node_name'),
   $cinder_volume_docker_image = hiera('tripleo::profile::pacemaker::cinder::volume_bundle::cinder_volume_docker_image', undef),
   $docker_volumes             = [],
-  $docker_environment         = ['KOLLA_CONFIG_STRATEGY=COPY_ALWAYS'],
+  $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
   $container_backend          = 'docker',
@@ -183,8 +183,13 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
         }
       }
 
-      $docker_env_arr = delete(any2array($docker_environment), '').flatten()
-      $docker_env = join($docker_env_arr.map |$var| { "-e ${var}" }, ' ')
+      if is_hash($docker_environment) {
+        $docker_env = join($docker_environment.map |$index, $value| { "-e ${index}=${value}" }, ' ')
+      } else {
+        $docker_env_arr = delete(any2array($docker_environment), '').flatten()
+        $docker_env = join($docker_env_arr.map |$var| { "-e ${var}" }, ' ')
+      }
+
       if $tls_priorities != undef {
         $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
       } else {
