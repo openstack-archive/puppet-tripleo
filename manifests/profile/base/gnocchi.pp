@@ -29,6 +29,7 @@ class tripleo::profile::base::gnocchi (
   if $step >= 3 {
     include ::gnocchi
     include ::gnocchi::config
+    include ::gnocchi::cors
     include ::gnocchi::client
   }
 }
