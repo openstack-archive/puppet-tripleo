@@ -40,6 +40,10 @@
 #   The keystone admin username
 #   Defaults to hiera('keystone::roles::admin::admin_tenant', 'admin')
 #
+# [*keystone_tenant*]
+#   The keystone tenant
+#   Defaults to hiera('keystone::roles::admin::admin_tenant', 'admin')
+#
 # [*keystone_domain*]
 #   The keystone domain
 #   Defaults to hiera('tripleo::clouddomain', 'localdomain')
@@ -60,17 +64,30 @@
 #   (Optional) Integer, seconds to wait before starting the nova evacuate
 #   Defaults to hiera('tripleo::instanceha::evacuate_delay', 0)
 #
+# [*deep_compare_fencing*]
+#   (Optional) Boolean, should fence_compute be deep compared in order to
+#   update the existing fencing resource when puppet is being rerun
+#   Defaults to hiera('tripleo::fencing', true)
+#
+# [*deep_compare_ocf*]
+#   (Optional) Boolean, should the IHA ocf resource nova evacuate be deep
+#   compared in order to update the resource when puppet is being rerun
+#   Defaults to hiera('pacemaker::resource::ocf::deep_compare', true)
+#
 class tripleo::profile::base::pacemaker::instance_ha (
   $step                  = Integer(hiera('step')),
   $pcs_tries             = hiera('pcs_tries', 20),
   $keystone_endpoint_url = hiera('keystone::endpoint::public_url'),
   $keystone_password     = hiera('keystone::admin_password'),
   $keystone_admin        = hiera('keystone::roles::admin::admin_tenant', 'admin'),
+  $keystone_tenant       = hiera('keystone::roles::admin::admin_tenant', 'admin'),
   $keystone_domain       = hiera('tripleo::clouddomain', 'localdomain'),
   $user_domain           = hiera('nova::keystone::authtoken::user_domain_name', 'Default'),
   $project_domain        = hiera('nova::keystone::authtoken::project_domain_name', 'Default'),
   $no_shared_storage     = hiera('tripleo::instanceha::no_shared_storage', true),
   $evacuate_delay        = hiera('tripleo::instanceha::evacuate_delay', 0),
+  $deep_compare_fencing  = hiera('tripleo::fencing', true),
+  $deep_compare_ocf      = hiera('pacemaker::resource::ocf::deep_compare', true),
 ) {
   if $step >= 2 {
     class { '::pacemaker::resource_defaults':
@@ -97,6 +114,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
       meta_attr      => 'provides=unfencing',
       pcmk_host_list => '',
       tries          => $pcs_tries,
+      deep_compare   => $deep_compare_fencing,
     }
 
     pacemaker::resource::ocf { 'compute-unfence-trigger':
@@ -105,6 +123,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
       clone_params   => true,
       op_params      => 'stop timeout=20 on-fail=block',
       tries          => $pcs_tries,
+      deep_compare   => $deep_compare_ocf,
       location_rule  => {
         resource_discovery => 'never',
         score              => '-INFINITY',
@@ -124,9 +143,10 @@ class tripleo::profile::base::pacemaker::instance_ha (
     pacemaker::resource::ocf { 'nova-evacuate':
       ocf_agent_name  => 'openstack:NovaEvacuate',
       # lint:ignore:140chars
-      resource_params => "auth_url=${keystone_endpoint_url} username=${keystone_admin} password=${keystone_password} user_domain=${user_domain} project_domain=${project_domain} tenant_name=${keystone_admin} ${iha_no_shared_storage}${evacuate_param}",
+      resource_params => "auth_url=${keystone_endpoint_url} username=${keystone_admin} password=${keystone_password} user_domain=${user_domain} project_domain=${project_domain} tenant_name=${keystone_tenant} ${iha_no_shared_storage}${evacuate_param}",
       # lint:endignore
       tries           => $pcs_tries,
+      deep_compare    => $deep_compare_ocf,
       location_rule   => {
         resource_discovery => 'never',
         score              => '-INFINITY',
