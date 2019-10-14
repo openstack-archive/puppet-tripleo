@@ -258,7 +258,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     }
   }
 
-  $mysqld_options = merge($mysqld_options_mysqld, $mysqld_options_sst, $mysql_server_options)
+  $mysqld_options = deep_merge($mysqld_options_mysqld, $mysqld_options_sst, $mysql_server_options)
 
   # remove_default_accounts parameter will execute some mysql commands
   # to remove the default accounts created by MySQL package.
