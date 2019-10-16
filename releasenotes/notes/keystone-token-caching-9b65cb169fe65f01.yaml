@@ -1,4 +1,0 @@
----
-features:
-  - |
-    Adds support to configure keystone token caching using memcached
