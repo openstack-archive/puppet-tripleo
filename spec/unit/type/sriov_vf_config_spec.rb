@@ -8,6 +8,12 @@ describe 'Puppet::Type.type(:sriov_vf_config)' do
       :ensure => 'present'
     )}.not_to raise_error
   end
+  it 'should allow name to be passed' do
+    expect{Puppet::Type.type(:sriov_vf_config).new(
+      :name   => 'eTH0:10',
+      :ensure => 'present'
+    )}.not_to raise_error
+  end
   it 'should allow name to be passed with -' do
     expect{Puppet::Type.type(:sriov_vf_config).new(
       :name   => 'eth-0:10',
