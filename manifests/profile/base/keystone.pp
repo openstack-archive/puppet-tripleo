@@ -235,6 +235,7 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
+    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
 
     class { '::keystone':
       sync_db                    => $sync_db,
@@ -257,7 +258,8 @@ class tripleo::profile::base::keystone (
       }),
       notification_topics        => union($ceilometer_notification_topics,
                                           $barbican_notification_topics,
-                                          $extra_notification_topics)
+                                          $extra_notification_topics),
+      cache_memcache_servers     => $memcached_servers
     }
 
     if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{
@@ -292,7 +294,6 @@ class tripleo::profile::base::keystone (
     }
 
     if $keystone_openidc_enabled {
-      $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
 
       class { '::keystone::federation::openidc':
         openidc_cache_type => 'memcache',
