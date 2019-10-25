@@ -128,14 +128,29 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
           'target-dir' => '/run/openvswitch',
           'options'    => 'rw',
         },
+        'ovn-dbs-new-run-files' => {
+          'source-dir' => '/var/lib/openvswitch/ovn',
+          'target-dir' => '/run/ovn',
+          'options'    => 'rw',
+        },
         'ovn-dbs-log-files' => {
           'source-dir' => '/var/log/containers/openvswitch',
           'target-dir' => '/var/log/openvswitch',
           'options'    => 'rw',
         },
+        'ovn-dbs-new-log-files' => {
+          'source-dir' => '/var/log/containers/openvswitch',
+          'target-dir' => '/var/log/ovn',
+          'options'    => 'rw',
+        },
         'ovn-dbs-db-path'   => {
           'source-dir' => '/var/lib/openvswitch/ovn',
           'target-dir' => '/etc/openvswitch',
+          'options'    => 'rw',
+        },
+        'ovn-dbs-new-db-path'   => {
+          'source-dir' => '/var/lib/openvswitch/ovn',
+          'target-dir' => '/etc/ovn',
           'options'    => 'rw',
         },
       }
