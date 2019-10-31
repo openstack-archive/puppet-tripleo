@@ -56,6 +56,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*dbs_timeout*]
+#   (Optional) timeout for monitor of ovn dbs resource
+#   Defaults to 60
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
@@ -67,6 +71,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $nb_db_port           = 6641,
   $sb_db_port           = 6642,
   $tls_priorities       = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $dbs_timeout          = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::dbs_timeout', 60),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -152,7 +157,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
       pacemaker::resource::ocf { "${ovndb_servers_resource_name}":
         ocf_agent_name  => "${ovndb_servers_ocf_name}",
         master_params   => '',
-        op_params       => 'start timeout=200s stop timeout=200s',
+        op_params       => "start timeout=200s stop timeout=200s monitor interval=10s role=Master timeout=${dbs_timeout}s \
+monitor interval=30s role=Slave timeout=${dbs_timeout}s",
         resource_params => "master_ip=${ovn_dbs_vip_norm} nb_master_port=${nb_db_port} \
 sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000",
         tries           => $pcs_tries,
