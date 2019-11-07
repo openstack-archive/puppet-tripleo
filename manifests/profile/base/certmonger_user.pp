@@ -73,6 +73,11 @@
 #   it will create.
 #   Defaults to hiera('mongodb_certificate_specs',{})
 #
+# [*qdr_certificate_specs*]
+#   (Optional) The specifications to give to certmonger fot the certificate(s)
+#   it will create.
+#   Defaults to hiera('tripleo::profile::base::metrics::qdr::certificate_specs', {}).
+#
 # [*mysql_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -139,6 +144,7 @@ class tripleo::profile::base::certmonger_user (
   $libvirt_vnc_certificates_specs = hiera('libvirt_vnc_certificates_specs', {}),
   $libvirt_vnc_postsave_cmd       = undef,
   $mongodb_certificate_specs  = hiera('mongodb_certificate_specs',{}),
+  $qdr_certificate_specs      = hiera('tripleo::profile::base::metrics::qdr::certificate_specs', {}),
   $mysql_certificate_specs    = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
   $rabbitmq_certificate_specs = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
   $redis_certificate_specs    = hiera('redis_certificate_specs', {}),
@@ -195,6 +201,9 @@ class tripleo::profile::base::certmonger_user (
     }
     unless empty($mongodb_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::mongodb', $mongodb_certificate_specs)
+    }
+    unless empty($qdr_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::metrics_qdr', $qdr_certificate_specs)
     }
     unless empty($mysql_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::mysql', $mysql_certificate_specs)
