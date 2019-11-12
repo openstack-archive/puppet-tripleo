@@ -123,10 +123,10 @@ describe 'tripleo::profile::base::metrics::qdr' do
       it 'should set edge listener, interior listener and no connectors' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [
-            {'host' => 'node1.example.com','port' => '5668','role' => 'edge','authenticatePeer' => 'no',
-             'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'},
-            {'host' => 'node1.example.com','port' => '5667','role' => 'inter-router','authenticatePeer' => 'no',
-             'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'}],
+            {'sslProfile' => 'sslProfile', 'host' => 'node1.example.com', 'port' => '5668',
+             'role' => 'edge', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'},
+            {'sslProfile' => 'sslProfile', 'host' => 'node1.example.com', 'port' => '5667',
+             'role' => 'inter-router', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'}],
           :connectors => [],
         )
       end
@@ -148,10 +148,10 @@ describe 'tripleo::profile::base::metrics::qdr' do
       it 'should set up edge listener, interior listener and one interior connector to node1' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [
-            {'host' => 'node2.example.com','port' => '5668','role' => 'edge','authenticatePeer' => 'no',
-             'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'},
-            {'host' => 'node2.example.com','port' => '5667','role' => 'inter-router','authenticatePeer' => 'no',
-             'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'}],
+            {'sslProfile' => 'sslProfile', 'host' => 'node2.example.com', 'port' => '5668',
+             'role' => 'edge', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'},
+            {'sslProfile' => 'sslProfile', 'host' => 'node2.example.com', 'port' => '5667',
+             'role' => 'inter-router', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'}],
           :connectors => [
             {'host' => 'node1.example.com','role' => 'inter-router','port' => '5667',
              'verifyHostname' => 'false','sslProfile' => 'sslProfile'}],
@@ -175,10 +175,10 @@ describe 'tripleo::profile::base::metrics::qdr' do
       it 'should set up edge listener, interior listener and two interior connectors to node1 and node2' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [
-            {'host' => 'node3.example.com','port' => '5668','role' => 'edge','authenticatePeer' => 'no',
-             'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'},
-            {'host' => 'node3.example.com','port' => '5667','role' => 'inter-router','authenticatePeer' => 'no',
-             'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'}],
+            {'sslProfile' => 'sslProfile', 'host' => 'node3.example.com', 'port' => '5668',
+             'role' => 'edge', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'},
+            {'sslProfile' => 'sslProfile', 'host' => 'node3.example.com', 'port' => '5667',
+             'role' => 'inter-router', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'}],
          :connectors => [
             {"host"=>"node1.example.com", "role"=>"inter-router", "port"=>"5667",
              "verifyHostname" => 'false',"sslProfile" => "sslProfile"},
