@@ -26,6 +26,11 @@
 #   Password for the qdrouter daemon
 #   Defaults to undef
 #
+# [*listen_on_external*]
+#   (optional) Whether QDR should listen for connections
+#   on external_listener_addr rather than listener_addr.
+#   Defaults to false
+#
 # [*external_listener_addr*]
 #   (optional) Bind address for external connections (CloudForms for example)
 #   Defaults to 'localhost'
@@ -112,6 +117,7 @@
 class tripleo::profile::base::metrics::qdr (
   $username                  = undef,
   $password                  = undef,
+  $listen_on_external        = false,
   $external_listener_addr    = 'localhost',
   $listener_addr             = 'localhost',
   $listener_port             = '5666',
@@ -124,7 +130,7 @@ class tripleo::profile::base::metrics::qdr (
   $listener_ssl_pw_file      = undef,
   $listener_ssl_password     = undef,
   $listener_trusted_certs    = undef,
-  $interior_mesh_nodes       = hiera('controller_node_names', ''),
+  $interior_mesh_nodes       = hiera('controller_node_ips', ''),
   $connectors                = [],
   $ssl_profiles              = [],
   $ssl_internal_profile_name = undef,
@@ -193,9 +199,10 @@ class tripleo::profile::base::metrics::qdr (
       $all_connectors = $connectors + $internal_connectors
     }
 
-    $listen_on = $router_mode ? {
-      'edge'     => $listener_addr,
-      'interior' => $external_listener_addr
+    if $listen_on_external and $router_mode == 'interior' {
+      $listen_on = $external_listener_addr
+    } else {
+      $listen_on = $listener_addr
     }
 
     class { '::qdr':
