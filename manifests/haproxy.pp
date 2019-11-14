@@ -1019,16 +1019,15 @@ class tripleo::haproxy (
 
   if $ceph_grafana {
     ::tripleo::haproxy::endpoint { 'ceph_grafana':
-      public_virtual_ip => $controller_virtual_ip,
-      internal_ip       => hiera('ceph_grafana_vip', $controller_virtual_ip),
-      service_port      => $ports[ceph_grafana_port],
-      ip_addresses      => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names      => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      public_ssl_port   => $ports[ceph_grafana_ssl_port],
-      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk HEAD /' ] }),
-      service_network   => $ceph_grafana_network,
-      member_options    => union($haproxy_member_options, $internal_tls_member_options),
+      internal_ip     => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      service_port    => $ports[ceph_grafana_port],
+      ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      mode            => 'http',
+      public_ssl_port => $ports[ceph_grafana_ssl_port],
+      listen_options  => merge($default_listen_options, { 'option' => [ 'httpchk HEAD /' ] }),
+      service_network => $ceph_grafana_network,
+      member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
