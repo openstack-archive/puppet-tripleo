@@ -84,12 +84,32 @@ class tripleo::fencing(
   $content = $config['devices']
 
   # check if the devices: section in fence.yaml contains levels.
-  # if it doesn't, assume level=1 an build a hash with the content.
+  # if it doesn't, assume level=1 and build a hash with the content.
   if is_array($content) {
     $all_levels = {'level1' => $content}
   }
   else {
     $all_levels = $content
+  }
+
+  # collect the number of stonith levels currently defined for this system
+  # and convert it to integer.
+  $local_levels = 0 + $facts['stonith_levels']
+
+  # if the number of levels defined on this system is greather than the number in hiera
+  # we need to delete the delta.
+  if $local_levels > $all_levels.length {
+    $begin = $all_levels.length + 1
+    range("${begin}", "${local_levels}").each |$level|{
+        pacemaker::stonith::level{ "stonith-${level}":
+          ensure            => 'absent',
+          level             => $level,
+          target            => '$(/usr/sbin/crm_node -n)',
+          stonith_resources => [''],
+          tries             => $tries,
+          try_sleep         => $try_sleep,
+        }
+    }
   }
 
   $all_levels.each |$index, $levelx_devices |{
