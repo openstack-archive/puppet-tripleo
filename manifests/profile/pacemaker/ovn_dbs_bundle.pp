@@ -64,6 +64,11 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*log_driver*]
+#   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
+#   when container_cli is set to podman and 'journald' when it is set to docker.
+#   Defaults to undef
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -95,6 +100,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $op_params            = '',
   $container_backend    = 'docker',
   $tls_priorities       = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $log_driver           = undef,
   $enable_internal_tls  = hiera('enable_internal_tls', false),
   $ca_file              = undef,
   $dbs_timeout          = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::dbs_timeout', 60),
@@ -106,6 +112,15 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
     $pacemaker_master = false
   }
 
+  if $log_driver == undef {
+    if hiera('container_cli', 'docker') == 'podman' {
+      $log_driver_real = 'k8s-file'
+    } else {
+      $log_driver_real = 'journald'
+    }
+  } else {
+    $log_driver_real = $log_driver
+  }
   if $step >= 3 {
 
     if $pacemaker_master {
@@ -197,7 +212,7 @@ nb_master_protocol=ssl sb_master_protocol=ssl"
         masters           => 1,
         location_rule     => $ovn_dbs_location_rule,
         container_options => 'network=host',
-        options           => "--log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${ovn_dbs_control_port}",
         storage_maps      => merge($storage_maps, $ovn_storage_maps_tls),

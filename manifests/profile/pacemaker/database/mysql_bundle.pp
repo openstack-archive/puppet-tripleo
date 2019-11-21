@@ -118,6 +118,11 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*log_driver*]
+#   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
+#   when container_cli is set to podman and 'journald' when it is set to docker.
+#   Defaults to undef
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -141,6 +146,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
   $mysql_server_options           = hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}),
   $container_backend              = 'docker',
+  $log_driver                     = undef,
   $tls_priorities                 = hiera('tripleo::pacemaker::tls_priorities', undef),
   $pcs_tries                      = hiera('pcs_tries', 20),
   $step                           = Integer(hiera('step')),
@@ -151,6 +157,15 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $pacemaker_master = false
   }
 
+  if $log_driver == undef {
+    if hiera('container_cli', 'docker') == 'podman' {
+      $log_driver_real = 'k8s-file'
+    } else {
+      $log_driver_real = 'journald'
+    }
+  } else {
+    $log_driver_real = $log_driver
+  }
   # FQDN are lowercase in /etc/hosts, so are pacemaker node names
   $galera_node_names_lookup = downcase(hiera('mysql_short_node_names', $::hostname))
   if (hiera('mysql_node_names_override', undef)) {
@@ -422,7 +437,7 @@ MYSQL_HOST=localhost\n",
           expression         => ['galera-role eq true'],
         },
         container_options => 'network=host',
-        options           => "--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=root --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),

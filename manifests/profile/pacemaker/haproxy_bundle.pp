@@ -71,6 +71,11 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*log_driver*]
+#   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
+#   when container_cli is set to podman and 'journald' when it is set to docker.
+#   Defaults to undef
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -98,6 +103,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   $op_params                = '',
   $container_backend        = 'docker',
   $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $log_driver               = undef,
   $step                     = Integer(hiera('step')),
   $pcs_tries                = hiera('pcs_tries', 20),
 ) {
@@ -109,6 +115,15 @@ class tripleo::profile::pacemaker::haproxy_bundle (
     $pacemaker_master = false
   }
 
+  if $log_driver == undef {
+    if hiera('container_cli', 'docker') == 'podman' {
+      $log_driver_real = 'k8s-file'
+    } else {
+      $log_driver_real = 'journald'
+    }
+  } else {
+    $log_driver_real = $log_driver
+  }
   if $step >= 2 and $enable_load_balancer {
     if $pacemaker_master {
       if (hiera('haproxy_short_node_names_override', undef)) {
@@ -255,7 +270,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         replicas          => $haproxy_nodes_count,
         location_rule     => $haproxy_location_rule,
         container_options => 'network=host',
-        options           => "--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=root --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => merge($storage_maps, $cert_storage_maps, $storage_maps_internal_tls),
         container_backend => $container_backend,

@@ -95,6 +95,11 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*log_driver*]
+#   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
+#   when container_cli is set to podman and 'journald' when it is set to docker.
+#   Defaults to undef
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -107,6 +112,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $redis_docker_control_port = hiera('tripleo::profile::pacemaker::database::redis_bundle::control_port', '3124'),
   $container_backend         = 'docker',
   $pcs_tries                 = hiera('pcs_tries', 20),
+  $log_driver                = undef,
   $step                      = Integer(hiera('step')),
   $redis_network             = hiera('redis_network', undef),
   $extra_config_file         = '/etc/redis-tls.conf',
@@ -123,6 +129,15 @@ class tripleo::profile::pacemaker::database::redis_bundle (
     $pacemaker_master = false
   }
 
+  if $log_driver == undef {
+    if hiera('container_cli', 'docker') == 'podman' {
+      $log_driver_real = 'k8s-file'
+    } else {
+      $log_driver_real = 'journald'
+    }
+  } else {
+    $log_driver_real = $log_driver
+  }
   if $enable_internal_tls {
     if !$redis_network {
       fail('redis_network is not set in the hieradata.')
@@ -333,7 +348,7 @@ slave-announce-port ${local_tuple[0][2]}
           expression         => ['redis-role eq true'],
         },
         container_options => 'network=host',
-        options           => "--user=root --log-driver=journald -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=root --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${redis_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
