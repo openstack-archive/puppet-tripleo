@@ -77,6 +77,10 @@
 #   configuration. It's only used if internal TLS is enabled.
 #   Defaults to undef
 #
+# [*dbs_timeout*]
+#   (Optional) timeout for monitor of ovn dbs resource
+#   Defaults to 60
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
@@ -93,6 +97,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $tls_priorities       = hiera('tripleo::pacemaker::tls_priorities', undef),
   $enable_internal_tls  = hiera('enable_internal_tls', false),
   $ca_file              = undef,
+  $dbs_timeout          = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::dbs_timeout', 60),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -203,7 +208,8 @@ nb_master_protocol=ssl sb_master_protocol=ssl"
       pacemaker::resource::ocf { "${ovndb_servers_resource_name}":
         ocf_agent_name  => "${ovndb_servers_ocf_name}",
         master_params   => '',
-        op_params       => 'start timeout=200s stop timeout=200s',
+        op_params       => "start timeout=200s stop timeout=200s monitor interval=10s role=Master timeout=${dbs_timeout}s \
+monitor interval=30s role=Slave timeout=${dbs_timeout}s",
         resource_params => $resource_map,
         tries           => $pcs_tries,
         location_rule   => $ovn_dbs_location_rule,
