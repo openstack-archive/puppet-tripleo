@@ -49,22 +49,28 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*ovn_remote_probe_interval*]
+#  (optional) Set probe interval, based on user configuration, value is in ms
+#  Defaults to 60000
+#
 class tripleo::profile::base::neutron::ovn_metadata (
-  $ovn_db_host             = hiera('ovn_dbs_vip'),
-  $ovn_sb_port             = hiera('ovn::southbound::port'),
-  $ovn_sb_private_key      = $::os_service_default,
-  $ovn_sb_certificate      = $::os_service_default,
-  $ovn_sb_ca_cert          = $::os_service_default,
-  $protocol                = 'tcp',
-  $step                    = Integer(hiera('step')),
+  $ovn_db_host               = hiera('ovn_dbs_vip'),
+  $ovn_sb_port               = hiera('ovn::southbound::port'),
+  $ovn_sb_private_key        = $::os_service_default,
+  $ovn_sb_certificate        = $::os_service_default,
+  $ovn_sb_ca_cert            = $::os_service_default,
+  $protocol                  = 'tcp',
+  $step                      = Integer(hiera('step')),
+  $ovn_remote_probe_interval = 60000,
 ) {
   if $step >= 4 {
     include ::tripleo::profile::base::neutron
     class { '::neutron::agents::ovn_metadata':
-        ovn_sb_connection  => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
-        ovn_sb_private_key => $ovn_sb_private_key,
-        ovn_sb_certificate => $ovn_sb_certificate,
-        ovn_sb_ca_cert     => $ovn_sb_ca_cert,
+        ovn_sb_connection         => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
+        ovn_sb_private_key        => $ovn_sb_private_key,
+        ovn_sb_certificate        => $ovn_sb_certificate,
+        ovn_sb_ca_cert            => $ovn_sb_ca_cert,
+        ovn_remote_probe_interval => $ovn_remote_probe_interval,
     }
     Service<| title == 'controller' |> -> Service<| title == 'ovn-metadata' |>
   }
