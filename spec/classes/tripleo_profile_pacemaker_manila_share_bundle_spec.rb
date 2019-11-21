@@ -57,6 +57,7 @@ describe 'tripleo::profile::pacemaker::manila::share_bundle' do
       let(:params) { {
         :step                      => 5,
         :manila_share_docker_image => 'manila-share-image',
+        :log_driver                => 'journald',
       } }
 
       context 'with default inputs' do
@@ -99,12 +100,13 @@ describe 'tripleo::profile::pacemaker::manila::share_bundle' do
           params.merge!({
             :docker_volumes     => ['/src/1:/tgt/1', '/src/2:/tgt/2:ro', '/src/3:/tgt/3:ro,z'],
             :docker_environment => ['RIGHT=LEFT', 'UP=DOWN'],
+            :log_driver         => 'k8s-file',
           })
         end
         it 'should create custom manila-share resource bundle' do
           is_expected.to contain_pacemaker__resource__bundle('openstack-manila-share').with(
             :image        => 'manila-share-image',
-            :options      => '--ipc=host --privileged=true --user=root --log-driver=journald -e RIGHT=LEFT -e UP=DOWN',
+            :options      => '--ipc=host --privileged=true --user=root --log-driver=k8s-file -e RIGHT=LEFT -e UP=DOWN',
             :storage_maps => {
               'manila-share-src-1' => {
                 'source-dir' => '/src/1',
