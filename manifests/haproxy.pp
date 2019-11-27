@@ -1025,7 +1025,10 @@ class tripleo::haproxy (
       server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
       mode            => 'http',
       public_ssl_port => $ports[ceph_grafana_ssl_port],
-      listen_options  => merge($default_listen_options, { 'option' => [ 'httpchk HEAD /' ] }),
+      listen_options  => merge($default_listen_options, {
+        'option'  => [ 'httpchk HEAD /' ],
+        'balance' => 'source',
+      }),
       service_network => $ceph_grafana_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
