@@ -14,7 +14,7 @@ ACTION=$1
 NETWORK=$2
 
 certmonger_ca=$(hiera -c /etc/puppet/hiera.yaml certmonger_ca)
-container_cli=$(hiera -c /etc/puppet/hiera.yaml container_cli docker)
+container_cli=$(hiera -c /etc/puppet/hiera.yaml container_cli podman)
 service_certificate="$(hiera -c /etc/puppet/hiera.yaml tripleo::certmonger::haproxy_dirs::certificate_dir)/overcloud-haproxy-$NETWORK.crt"
 service_key="$(hiera -c /etc/puppet/hiera.yaml tripleo::certmonger::haproxy_dirs::key_dir)/overcloud-haproxy-$NETWORK.key"
 ca_path=""

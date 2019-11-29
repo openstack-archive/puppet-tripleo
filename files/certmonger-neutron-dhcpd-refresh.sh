@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-container_cli=$(hiera -c /etc/puppet/hiera.yaml container_cli docker)
+container_cli=$(hiera -c /etc/puppet/hiera.yaml container_cli podman)
 
 container_name=$($container_cli ps --format="{{.Names}}" | grep neutron_dhcp)
 
