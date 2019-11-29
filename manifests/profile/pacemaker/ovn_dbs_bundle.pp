@@ -154,7 +154,11 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
           'options'    => 'rw',
         },
       }
-      $ovn_dbs_short_node_names = hiera('ovn_dbs_short_node_names')
+      if (hiera('ovn_dbs_short_node_names_override', undef)) {
+        $ovn_dbs_short_node_names = hiera('ovn_dbs_short_node_names_override')
+      } else {
+        $ovn_dbs_short_node_names = hiera('ovn_dbs_short_node_names')
+      }
       $ovn_dbs_nodes_count = count($ovn_dbs_short_node_names)
       $ovn_dbs_short_node_names.each |String $node_name| {
         pacemaker::property { "ovn-dbs-role-${node_name}":
