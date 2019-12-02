@@ -1313,7 +1313,6 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
       mode              => 'http',
-      listen_options    => { 'http-check' => ['expect rstring .*200.*'], },
     }
   }
 
