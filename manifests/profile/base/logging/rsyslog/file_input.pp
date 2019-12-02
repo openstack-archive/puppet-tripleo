@@ -16,22 +16,24 @@ define tripleo::profile::base::logging::rsyslog::file_input (
   $sources = hiera("tripleo_logging_sources_${title}", undef),
   $default_startmsg = '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}(.[0-9]+ [0-9]+)? (DEBUG|INFO|WARNING|ERROR) '
 ) {
-  $rsyslog_sources = $sources.reduce([]) |$memo, $config| {
-    if ! $config['startmsg.regex'] {
-      $record = $config + {'startmsg.regex' => $default_startmsg}
-    } else {
-      $record = $config
+  if $sources {
+    $rsyslog_sources = $sources.reduce([]) |$memo, $config| {
+      if ! $config['startmsg.regex'] {
+        $record = $config + {'startmsg.regex' => $default_startmsg}
+      } else {
+        $record = $config
+      }
+      $memo + [$record]
     }
-    $memo + [$record]
-  }
 
-  $rsyslog_sources.each |$config| {
-    rsyslog::component::input{ "${title}_${config['tag']}":
-      priority => $::rsyslog::input_priority,
-      target   => $::rsyslog::target_file,
-      confdir  => $::rsyslog::confdir,
-      type     => 'imfile',
-      config   => $config
+    $rsyslog_sources.each |$config| {
+      rsyslog::component::input{ "${title}_${config['tag']}":
+        priority => $::rsyslog::input_priority,
+        target   => $::rsyslog::target_file,
+        confdir  => $::rsyslog::confdir,
+        type     => 'imfile',
+        config   => $config
+      }
     }
   }
 }
