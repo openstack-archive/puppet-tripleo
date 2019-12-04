@@ -31,7 +31,7 @@
 #   We may not want to configure a ml2 plugin for a role,
 #   in spite of the fact that it is in the drivers list.
 #   Check if the required service is enabled from the service list.
-#   Defaults to hiera('enabled_services')
+#   Defaults to hiera('service_names')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -41,7 +41,7 @@
 class tripleo::profile::base::neutron::plugins::ml2 (
   $bootstrap_node    = hiera('neutron_plugin_ml2_short_bootstrap_node_name', undef),
   $mechanism_drivers = hiera('neutron::plugins::ml2::mechanism_drivers'),
-  $service_names     = hiera('enabled_services'),
+  $service_names     = hiera('service_names'),
   $step              = Integer(hiera('step')),
 ) {
   if $::hostname == downcase($bootstrap_node) {

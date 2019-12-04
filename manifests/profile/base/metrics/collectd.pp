@@ -267,7 +267,7 @@ class tripleo::profile::base::metrics::collectd (
   $amqp_interval = undef,
   $qdr_mode = hiera('tripleo::profile::base::metrics::qdr::router_mode', 'edge'),
   $qdr_listens_on_external = hiera('tripleo::profile::base::metrics::qdr::listen_on_external', false),
-  $service_names = hiera('enabled_services', []),
+  $service_names = hiera('service_names', []),
   $collectd_manage_repo = false,
   $python_read_plugins = [],
   $enable_sensubility = false,

@@ -151,7 +151,7 @@ class tripleo::firewall(
     #     dport: 999
     #     proto: udp
     #     action: accept
-    $service_names = hiera('enabled_services', [])
+    $service_names = hiera('service_names', [])
     tripleo::firewall::service_rules { $service_names: }
 
 

@@ -116,7 +116,7 @@ class tripleo::profile::base::logging::fluentd (
   $fluentd_monitoring = true,
   $fluentd_monitoring_bind = '127.0.0.1',
   $fluentd_monitoring_port = 24220,
-  $service_names = hiera('enabled_services', []),
+  $service_names = hiera('service_names', []),
   $fluentd_managed_rsyslog = false
 ) {
   if $step >= 4 {
