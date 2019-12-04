@@ -25,7 +25,7 @@
 # [*service_names*]
 #   (Optional) List of services enabled on the current role. This is used
 #   to obtain per-service configuration information.
-#   Defaults to hiera('enabled_services', [])
+#   Defaults to hiera('service_names', [])
 #
 # [*elasticsearch*]
 #   (Optional) Hash. Configuration for output plugin omelasticsearch.
@@ -47,7 +47,7 @@
 #   Defaults to undef
 class tripleo::profile::base::logging::rsyslog (
   $step                          = Integer(hiera('step')),
-  $service_names                 = hiera('enabled_services', []),
+  $service_names                 = hiera('service_names', []),
   $elasticsearch                 = undef,
   $elasticsearch_tls_ca_cert     = undef,
   $elasticsearch_tls_client_cert = undef,

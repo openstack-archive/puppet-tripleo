@@ -36,7 +36,7 @@
 #   (Optional) List of services enabled on the current role.
 #   If the nova_migration_target service is not enabled then migration over
 #   ssh will be disabled.
-#   Defaults to hiera('enabled_services', [])
+#   Defaults to hiera('service_names', [])
 #
 # [*wrapper_command*]
 #   (Internal) Used to override the wrapper command when proxying
@@ -46,7 +46,7 @@ class tripleo::profile::base::nova::migration::target (
   $step                = Integer(hiera('step')),
   $ssh_authorized_keys = [],
   $ssh_localaddrs      = [],
-  $services_enabled    = hiera('enabled_services', []),
+  $services_enabled    = hiera('service_names', []),
   $wrapper_command     = '/bin/nova-migration-wrapper',
 ) {
 
