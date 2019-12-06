@@ -158,6 +158,13 @@
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
 #   Defaults to hiera('memcached_node_ips')
 #
+# [*keystone_resources_managed*]
+#   (Optional) Enable the management of Keystone resources with Puppet.
+#   Can be disabled if Ansible manages these resources instead of Puppet.
+#   The resources are: endpoints, roles, services, projects, users and their
+#   assignment.
+#   Defaults to hiera('keystone_resources_managed', true)
+#
 class tripleo::profile::base::keystone (
   $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
   $bootstrap_node                 = hiera('keystone_short_bootstrap_node_name', undef),
@@ -190,9 +197,10 @@ class tripleo::profile::base::keystone (
   $keystone_enable_member         = hiera('keystone_enable_member', false),
   $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
-  $memcached_ips                  = hiera('memcached_node_ips', [])
+  $memcached_ips                  = hiera('memcached_node_ips', []),
+  $keystone_resources_managed     = hiera('keystone_resources_managed', true),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $::hostname == downcase($bootstrap_node) and $keystone_resources_managed {
     $sync_db = true
     $manage_roles = true
     $manage_endpoint = true
