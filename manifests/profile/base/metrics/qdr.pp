@@ -136,17 +136,22 @@ class tripleo::profile::base::metrics::qdr (
   if $step >= 1 {
     $interior_nodes = any2array(split($interior_mesh_nodes, ','))
 
+    if ssl_internal_profile_name {
+      $node_base = {'sslProfile' => $ssl_internal_profile_name}
+    } else {
+      $node_base = {}
+    }
+
     if $router_mode == 'edge' {
       if length($interior_nodes) > 0 {
         # ignore explicitly set connectors and connect just to one of the interior nodes (choose randomly)
-        $all_connectors = [
+        $all_connectors = [merge($node_base,
           {'host' => $interior_nodes[fqdn_rand(length($interior_nodes))],
           'port' => '5668',
           'role' => 'edge',
           'verifyHostname' => false,
-          'saslMechanisms' => 'ANONYMOUS',
-          'sslProfile' => $ssl_internal_profile_name}
-        ]
+          'saslMechanisms' => 'ANONYMOUS'}
+        )]
       } else {
         # in case we don't have interior_nodes, eg. we run in all-edge mode
         $all_connectors = $connectors
@@ -155,21 +160,20 @@ class tripleo::profile::base::metrics::qdr (
       $internal_listeners = []
     } else {
       # provide listener for edge node and listener for other interior nodes (if required)
-      $edge_listener = {'host' => $listener_addr,
-                        'port' => '5668',
-                        'role' => 'edge',
-                        'authenticatePeer' => 'no',
-                        'saslMechanisms' => 'ANONYMOUS',
-                        'sslProfile' => $ssl_internal_profile_name}
+      $edge_listener = merge($node_base,
+        {'host' => $listener_addr,
+        'port' => '5668',
+        'role' => 'edge',
+        'authenticatePeer' => 'no',
+        'saslMechanisms' => 'ANONYMOUS'})
       if length($interior_nodes) > 1 {
         $internal_listeners = [
           $edge_listener,
-          {'host' => $listener_addr,
+          merge($node_base, {'host' => $listener_addr,
           'port' => '5667',
           'role' => 'inter-router',
           'authenticatePeer' => 'no',
-          'saslMechanisms' => 'ANONYMOUS',
-          'sslProfile' => $ssl_internal_profile_name}
+          'saslMechanisms' => 'ANONYMOUS'})
         ]
         # build mesh with other interior nodes
         $internal_connectors = $interior_nodes.reduce([]) |$memo, $node| {
@@ -178,11 +182,11 @@ class tripleo::profile::base::metrics::qdr (
           } elsif true in $memo {
             $memo
           } else {
-            $memo << {'host' => $node,
-                      'port' => '5667',
-                      'role' => 'inter-router',
-                      'verifyHostname' => false,
-                      'sslProfile' => $ssl_internal_profile_name}
+            $memo << merge($node_base,
+                            {'host' => $node,
+                            'port' => '5667',
+                            'role' => 'inter-router',
+                            'verifyHostname' => false})
           }
         } - true
       } else {
