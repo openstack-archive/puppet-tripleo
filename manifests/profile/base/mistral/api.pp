@@ -66,7 +66,7 @@ class tripleo::profile::base::mistral::api (
     $is_bootstrap = false
   }
 
-  include ::tripleo::profile::base::mistral
+  include tripleo::profile::base::mistral
 
   if $enable_internal_tls {
     if !$mistral_api_network {
@@ -80,13 +80,13 @@ class tripleo::profile::base::mistral::api (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::mistral::api
-    include ::mistral::cron_trigger
+    include mistral::api
+    include mistral::cron_trigger
     # Temporarily disable Mistral API deployed in WSGI
     # https://bugs.launchpad.net/tripleo/+bug/1724607
     if $mistral_api_wsgi_enabled {
-      include ::tripleo::profile::base::apache
-      class { '::mistral::wsgi::apache':
+      include tripleo::profile::base::apache
+      class { 'mistral::wsgi::apache':
         ssl_cert => $tls_certfile,
         ssl_key  => $tls_keyfile,
       }

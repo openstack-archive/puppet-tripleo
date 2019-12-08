@@ -120,7 +120,7 @@ class tripleo::profile::base::neutron (
       $oslomsg_rpc_hosts_real = $oslomsg_rpc_hosts
     }
 
-    class { '::neutron' :
+    class { 'neutron' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts_real,
@@ -139,7 +139,7 @@ class tripleo::profile::base::neutron (
       }),
       dhcp_agents_per_network    => $dhcp_agents_per_net,
     }
-    include ::neutron::config
-    include ::neutron::logging
+    include neutron::config
+    include neutron::logging
   }
 }

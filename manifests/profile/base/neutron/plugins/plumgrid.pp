@@ -37,9 +37,9 @@ class tripleo::profile::base::neutron::plugins::plumgrid (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
-    include ::neutron::plugins::plumgrid
+    include neutron::plugins::plumgrid
   }
 }

@@ -185,7 +185,7 @@ class tripleo::profile::base::rabbitmq (
   if $step >= 1 {
     # Specific configuration for multi-nodes or when running with Pacemaker.
     if count($nodes) > 1 or ! $manage_service {
-      class { '::rabbitmq':
+      class { 'rabbitmq':
         config_cluster          => $manage_service,
         cluster_nodes           => $nodes,
         config_kernel_variables => $real_kernel_variables,
@@ -209,7 +209,7 @@ class tripleo::profile::base::rabbitmq (
       }
     } else {
       # Standard configuration
-      class { '::rabbitmq':
+      class { 'rabbitmq':
         config_kernel_variables => $kernel_variables,
         config_variables        => $config_variables,
         environment_variables   => $environment,
@@ -245,7 +245,7 @@ class tripleo::profile::base::rabbitmq (
       }
     }
     if hiera('veritas_hyperscale_controller_enabled', false) {
-      include ::veritas_hyperscale::hs_rabbitmq
+      include veritas_hyperscale::hs_rabbitmq
     }
   }
 

@@ -75,8 +75,8 @@ class tripleo::profile::base::cinder::api (
     $manage_type = false
   }
 
-  include ::tripleo::profile::base::cinder
-  include ::tripleo::profile::base::cinder::authtoken
+  include tripleo::profile::base::cinder
+  include tripleo::profile::base::cinder::authtoken
 
   if $enable_internal_tls {
     if !$cinder_api_network {
@@ -90,16 +90,16 @@ class tripleo::profile::base::cinder::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    class { '::cinder::api':
+    class { 'cinder::api':
       sync_db        => $sync_db,
       keymgr_backend => $keymgr_backend,
     }
-    include ::tripleo::profile::base::apache
-    class { '::cinder::wsgi::apache':
+    include tripleo::profile::base::apache
+    class { 'cinder::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }
-    include ::cinder::ceilometer
+    include cinder::ceilometer
   }
 
   if $step == 4 and $manage_type and $default_volume_type != '' {

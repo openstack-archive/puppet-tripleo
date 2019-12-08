@@ -177,7 +177,7 @@ class tripleo::profile::base::database::mysql (
       }
     }
     $mysql_server_options_real = deep_merge($mysql_server_default, $mysql_server_options)
-    class { '::mysql::server':
+    class { 'mysql::server':
       config_file             => $mysql_config_file,
       override_options        => $mysql_server_options_real,
       create_root_user        => $manage_resources,
@@ -206,77 +206,77 @@ class tripleo::profile::base::database::mysql (
   if $step >= 2 and $sync_db {
     Class['::mysql::server'] -> Mysql_database<||>
     if hiera('aodh_api_enabled', false) {
-      include ::aodh::db::mysql
+      include aodh::db::mysql
     }
     if hiera('ceilometer_collector_enabled', false) {
-      include ::ceilometer::db::mysql
+      include ceilometer::db::mysql
     }
     if hiera('cinder_api_enabled', false) {
-      include ::cinder::db::mysql
+      include cinder::db::mysql
     }
     if hiera('barbican_api_enabled', false) {
-      include ::barbican::db::mysql
+      include barbican::db::mysql
     }
     if hiera('designate_api_enabled', false) {
-      include ::designate::db::mysql
+      include designate::db::mysql
     }
     if hiera('glance_api_enabled', false) {
-      include ::glance::db::mysql
+      include glance::db::mysql
     }
     if hiera('gnocchi_api_enabled', false) {
-      include ::gnocchi::db::mysql
+      include gnocchi::db::mysql
     }
     if hiera('heat_engine_enabled', false) {
-      include ::heat::db::mysql
+      include heat::db::mysql
     }
     if hiera('ironic_api_enabled', false) {
-      include ::ironic::db::mysql
+      include ironic::db::mysql
     }
     if hiera('ironic_inspector_enabled', false) {
-      include ::ironic::inspector::db::mysql
+      include ironic::inspector::db::mysql
     }
     if hiera('keystone_enabled', false) {
-      include ::keystone::db::mysql
+      include keystone::db::mysql
     }
     if hiera('manila_api_enabled', false) {
-      include ::manila::db::mysql
+      include manila::db::mysql
     }
     if hiera('mistral_api_enabled', false) {
-      include ::mistral::db::mysql
+      include mistral::db::mysql
     }
     if hiera('neutron_api_enabled', false) {
-      include ::neutron::db::mysql
+      include neutron::db::mysql
     }
     if hiera('nova_conductor_enabled', false) {
-      include ::nova::db::mysql
+      include nova::db::mysql
     }
     if hiera('nova_api_enabled', false) {
-      include ::nova::db::mysql_api
+      include nova::db::mysql_api
     }
     if hiera('placement_enabled', false) {
-      include ::placement::db::mysql
+      include placement::db::mysql
     }
     if hiera('octavia_api_enabled', false) {
-      include ::octavia::db::mysql
+      include octavia::db::mysql
     }
     if hiera('sahara_api_enabled', false) {
-      include ::sahara::db::mysql
+      include sahara::db::mysql
     }
     if hiera('trove_api_enabled', false) {
-      include ::trove::db::mysql
+      include trove::db::mysql
     }
     if hiera('panko_api_enabled', false) {
-      include ::panko::db::mysql
+      include panko::db::mysql
     }
     if hiera('ec2_api_enabled', false) {
-      include ::ec2api::db::mysql
+      include ec2api::db::mysql
     }
     if hiera('zaqar_api_enabled', false) and hiera('zaqar::db::mysql::user', '') == 'zaqar' {
       # NOTE: by default zaqar uses sqlalchemy
-      include ::zaqar::db::mysql
+      include zaqar::db::mysql
     }
     if hiera('veritas_hyperscale_controller_enabled', false) {
-      include ::veritas_hyperscale::db::mysql
+      include veritas_hyperscale::db::mysql
     }
   }
 

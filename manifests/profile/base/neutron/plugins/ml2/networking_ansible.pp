@@ -43,7 +43,7 @@ class tripleo::profile::base::neutron::plugins::ml2::networking_ansible(
   $step                   = Integer(hiera('step'))
 ) {
 
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $enable_internal_tls {
     $tls_query_param = '?ssl=true'
@@ -52,7 +52,7 @@ class tripleo::profile::base::neutron::plugins::ml2::networking_ansible(
   }
 
   if $step >= 4 {
-    class { '::neutron::plugins::ml2::networking_ansible':
+    class { 'neutron::plugins::ml2::networking_ansible':
       coordination_url => join(['redis://:', $neutron_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param])
     }
   }

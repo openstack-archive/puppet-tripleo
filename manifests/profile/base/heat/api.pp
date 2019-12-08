@@ -61,7 +61,7 @@ class tripleo::profile::base::heat::api (
     $is_bootstrap = false
   }
 
-  include ::tripleo::profile::base::heat
+  include tripleo::profile::base::heat
 
   if $enable_internal_tls {
     if !$heat_api_network {
@@ -75,9 +75,9 @@ class tripleo::profile::base::heat::api (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::heat::api
-    include ::tripleo::profile::base::apache
-    class { '::heat::wsgi::apache_api':
+    include heat::api
+    include tripleo::profile::base::apache
+    class { 'heat::wsgi::apache_api':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

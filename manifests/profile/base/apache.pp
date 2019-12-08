@@ -36,23 +36,23 @@ class tripleo::profile::base::apache(
   String  $status_listener        = '127.0.0.1:80',
   String  $mpm_module             = 'prefork',
 ) {
-  include ::apache::params
+  include apache::params
   # rhel8/fedora will be python3. See LP#1813053
   if ($::os['name'] == 'Fedora') or ($::os['family'] == 'RedHat' and Integer.new($::os['release']['major']) > 7) {
-    class { '::apache':
+    class { 'apache':
       mod_packages => merge($::apache::params::mod_packages, { 'wsgi' =>  'python3-mod_wsgi' }),
       mod_libs     => merge($::apache::params::mod_libs, { 'wsgi' => 'mod_wsgi_python3.so' }),
       mpm_module   => $mpm_module,
     }
   } else {
-    class { '::apache':
+    class { 'apache':
       mpm_module => $mpm_module,
     }
   }
   Service <| title == 'httpd' |> { provider => 'noop' }
 
-  include ::apache::mod::status
-  include ::apache::mod::ssl
+  include apache::mod::status
+  include apache::mod::ssl
   if $enable_status_listener {
     if !defined(Apache::Listen[$status_listener]) {
       ::apache::listen {$status_listener: }

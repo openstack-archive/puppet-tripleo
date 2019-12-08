@@ -54,28 +54,28 @@ class tripleo::profile::base::barbican::backends (
   $kmip_backend_enabled          = hiera('barbican_backend_kmip_enabled', false),
 ) {
   if $simple_crypto_backend_enabled {
-    include ::barbican::plugins::simple_crypto
+    include barbican::plugins::simple_crypto
     $backend1 = 'simple_crypto'
   } else {
     $backend1 = undef
   }
 
   if $dogtag_backend_enabled {
-    include ::barbican::plugins::dogtag
+    include barbican::plugins::dogtag
     $backend2 = 'dogtag'
   } else {
     $backend2 = undef
   }
 
   if $p11_crypto_backend_enabled {
-    include ::barbican::plugins::p11_crypto
+    include barbican::plugins::p11_crypto
     $backend3 = 'pkcs11'
   } else {
     $backend3 = undef
   }
 
   if $kmip_backend_enabled {
-    include ::barbican::plugins::kmip
+    include barbican::plugins::kmip
     $backend4 = 'kmip'
   } else {
     $backend4 = undef

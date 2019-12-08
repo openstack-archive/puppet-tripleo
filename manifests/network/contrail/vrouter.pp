@@ -173,7 +173,7 @@ class tripleo::network::contrail::vrouter (
     notify { 'cidr':
       message => $cidr,
     }
-    #include ::contrail::vrouter
+    #include contrail::vrouter
     # NOTE: it's not possible to use this class without a functional
     # contrail controller up and running
     if size($control_server) == 0 {

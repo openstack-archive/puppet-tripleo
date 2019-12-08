@@ -20,13 +20,13 @@ describe 'tripleo::profile::base::nova::api' do
   shared_examples_for 'tripleo::profile::base::nova::api' do
     let(:pre_condition) do
       <<-eos
-      class { '::tripleo::profile::base::nova':
+      class { 'tripleo::profile::base::nova':
         step => #{params[:step]},
         oslomsg_rpc_hosts    => [ 'localhost' ],
         oslomsg_rpc_username => 'nova',
         oslomsg_rpc_password => 'foo'
       }
-      class { '::tripleo::profile::base::nova::authtoken':
+      class { 'tripleo::profile::base::nova::authtoken':
         step => #{params[:step]},
       }
 eos

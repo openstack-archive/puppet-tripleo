@@ -105,7 +105,7 @@ class tripleo::profile::base::qdr (
                         {'prefix'       => 'openstack.org/om/notify/anycast',
                         'distribution' => 'balanced'}]
 
-    class { '::qdr':
+    class { 'qdr':
       listener_addr   => '0.0.0.0',
       listener_port   => "${qdr_listener_port}",
       router_mode     => $router_mode,

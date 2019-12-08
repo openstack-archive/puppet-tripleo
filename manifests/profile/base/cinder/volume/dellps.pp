@@ -31,7 +31,7 @@ class tripleo::profile::base::cinder::volume::dellps (
   $backend_name = hiera('cinder::backend::eqlx::volume_backend_name', 'tripleo_dellps'),
   $step         = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::eqlx { $backend_name :

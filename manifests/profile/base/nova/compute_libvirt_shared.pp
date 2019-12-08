@@ -36,7 +36,7 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
     $rbd_ephemeral_storage = hiera('nova::compute::rbd::ephemeral_storage', false)
     $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
     if $rbd_ephemeral_storage or $rbd_persistent_storage {
-      include ::nova::compute::rbd
+      include nova::compute::rbd
       exec{ "exec-setfacl-${nova_rbd_client_name}-nova":
         path    => ['/bin', '/usr/bin'],
         command => "setfacl -m u:nova:r-- /etc/ceph/ceph.client.${nova_rbd_client_name}.keyring",
@@ -50,12 +50,12 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
     }
 
     if $rbd_ephemeral_storage {
-      class { '::nova::compute::libvirt':
+      class { 'nova::compute::libvirt':
         libvirt_disk_cachemodes => ['network=writeback'],
         libvirt_hw_disk_discard => 'unmap',
       }
     } else {
-      include ::nova::compute::libvirt
+      include nova::compute::libvirt
     }
   }
 }

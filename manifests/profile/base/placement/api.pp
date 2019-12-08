@@ -59,8 +59,8 @@ class tripleo::profile::base::placement::api (
     $is_bootstrap = false
   }
 
-  include ::tripleo::profile::base::placement
-  include ::tripleo::profile::base::placement::authtoken
+  include tripleo::profile::base::placement
+  include tripleo::profile::base::placement::authtoken
 
   if $enable_internal_tls {
     if !$placement_network {
@@ -74,8 +74,8 @@ class tripleo::profile::base::placement::api (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::tripleo::profile::base::apache
-    class { '::placement::wsgi::apache':
+    include tripleo::profile::base::apache
+    class { 'placement::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

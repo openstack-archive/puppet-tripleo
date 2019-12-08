@@ -55,8 +55,8 @@ class tripleo::certmonger::novnc_proxy (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
-  include ::nova::params
+  include certmonger
+  include nova::params
 
   $notify_service_real = pick($notify_service, $::nova::params::vncproxy_service_name)
 

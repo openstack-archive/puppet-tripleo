@@ -138,7 +138,7 @@ class tripleo::profile::base::neutron::plugins::ovs::opendaylight (
       $odl_ovsdb_str = join(regsubst($odl_api_ips_parsed, '.+', 'tcp:\0:6640'), ' ')
     }
 
-    class { '::neutron::plugins::ovs::opendaylight':
+    class { 'neutron::plugins::ovs::opendaylight':
       tunnel_ip       => $tunnel_ip,
       odl_check_url   => $opendaylight_url,
       odl_ovsdb_iface => $odl_ovsdb_str,

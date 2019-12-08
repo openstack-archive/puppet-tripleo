@@ -28,8 +28,8 @@ class tripleo::profile::base::panko (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 3 {
-    include ::panko
-    include ::panko::config
-    include ::panko::logging
+    include panko
+    include panko::config
+    include panko::logging
   }
 }

@@ -20,7 +20,7 @@
 class tripleo::packages::upgrades {
 
   # required for stages
-  include ::stdlib
+  include stdlib
 
   case $::osfamily {
     'RedHat': {

@@ -167,7 +167,7 @@ class tripleo::haproxy::horizon_endpoint (
     }
   }
   if $manage_firewall {
-    include ::tripleo::firewall
+    include tripleo::firewall
     $haproxy_horizon_firewall_rules = {
       '100 horizon_haproxy'     => {
         'dport' => 80,

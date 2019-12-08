@@ -47,7 +47,7 @@ class tripleo::certmonger::opendaylight (
   $postsave_cmd  = 'if systemctl -q is-active opendaylight; then systemctl restart opendaylight; else true; fi',
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   certmonger_certificate { 'opendaylight' :
     ensure       => 'present',

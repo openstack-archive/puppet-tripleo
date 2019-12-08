@@ -43,7 +43,7 @@ class tripleo::profile::base::neutron::plugins::ml2::vts (
     if $vts_url_ip != undef {
       $vts_url_ip_out = normalize_ip_for_uri($vts_url_ip)
 
-      class { '::neutron::plugins::ml2::cisco::vts':
+      class { 'neutron::plugins::ml2::cisco::vts':
         vts_url => "https://${vts_url_ip_out}:${vts_port}/api/running/openstack"
       }
     }

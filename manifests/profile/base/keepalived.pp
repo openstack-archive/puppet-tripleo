@@ -71,7 +71,7 @@ class tripleo::profile::base::keepalived (
         $public_detected_interface = $public_virtual_interface
       }
 
-      class { '::tripleo::keepalived':
+      class { 'tripleo::keepalived':
         control_virtual_interface => $control_detected_interface,
         public_virtual_interface  => $public_detected_interface,
       }

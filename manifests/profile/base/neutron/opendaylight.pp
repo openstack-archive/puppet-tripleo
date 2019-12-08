@@ -66,7 +66,7 @@ class tripleo::profile::base::neutron::opendaylight (
     } elsif size($odl_api_ips) == 2 {
       fail('2 node OpenDaylight deployments are unsupported.  Use 1 or greater than 2')
     } elsif size($odl_api_ips) > 2 {
-      class { '::opendaylight':
+      class { 'opendaylight':
         enable_ha     => true,
         ha_node_ips   => $odl_api_ips,
         enable_tls    => $enable_internal_tls,
@@ -74,7 +74,7 @@ class tripleo::profile::base::neutron::opendaylight (
         tls_cert_file => $tls_certfile
       }
     } else {
-      class { '::opendaylight':
+      class { 'opendaylight':
         enable_tls    => $enable_internal_tls,
         tls_key_file  => $tls_keyfile,
         tls_cert_file => $tls_certfile

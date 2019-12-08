@@ -59,7 +59,7 @@ class tripleo::profile::base::cinder::volume::nvmeof (
   $volume_driver             = 'cinder.volume.drivers.lvm.LVMVolumeDriver',
   $step                      = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::nvmeof { $volume_backend_name :

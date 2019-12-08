@@ -57,7 +57,7 @@ class tripleo::profile::base::octavia (
 ) {
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
-    class { '::octavia' :
+    class { 'octavia' :
       default_transport_url => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
@@ -67,8 +67,8 @@ class tripleo::profile::base::octavia (
         'ssl'       => $oslomsg_rpc_use_ssl_real,
         }),
     }
-    include ::octavia::config
-    include ::octavia::logging
-    include ::octavia::service_auth
+    include octavia::config
+    include octavia::logging
+    include octavia::service_auth
   }
 }

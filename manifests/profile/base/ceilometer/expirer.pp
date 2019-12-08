@@ -26,10 +26,10 @@
 class tripleo::profile::base::ceilometer::expirer (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::ceilometer
+  include tripleo::profile::base::ceilometer
 
   if $step >= 4 {
-    include ::ceilometer::expirer
+    include ceilometer::expirer
     Cron <| title == 'ceilometer-expirer' |>
       { command => "sleep $((\$(od -A n -t d -N 3 /dev/urandom) \\% 86400)) && ${::ceilometer::params::expirer_command}" }
   }

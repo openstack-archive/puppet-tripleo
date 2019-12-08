@@ -27,7 +27,7 @@ class tripleo::profile::base::nova::serialproxy (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::nova
-    include ::nova::serialproxy
+    include tripleo::profile::base::nova
+    include nova::serialproxy
   }
 }

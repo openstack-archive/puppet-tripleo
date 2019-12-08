@@ -31,10 +31,10 @@ class tripleo::profile::base::neutron::plugins::ml2::nuage (
 ) {
 
   if $step >= 4 {
-    include ::neutron::plugins::ml2::nuage
+    include neutron::plugins::ml2::nuage
 
     if $enable_vrs {
-      include ::nuage::vrs
+      include nuage::vrs
     }
   }
 }

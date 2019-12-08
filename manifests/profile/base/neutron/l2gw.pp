@@ -29,9 +29,9 @@
 class tripleo::profile::base::neutron::l2gw (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 4 {
-    include ::neutron::services::l2gw
+    include neutron::services::l2gw
   }
 }

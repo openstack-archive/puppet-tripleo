@@ -62,8 +62,8 @@ class tripleo::profile::base::aodh::api (
     $is_bootstrap = false
   }
 
-  include ::tripleo::profile::base::aodh
-  include ::tripleo::profile::base::aodh::authtoken
+  include tripleo::profile::base::aodh
+  include tripleo::profile::base::aodh::authtoken
 
   if $enable_internal_tls {
     if !$aodh_network {
@@ -79,9 +79,9 @@ class tripleo::profile::base::aodh::api (
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     warning('Service aodh is deprecated. Please take in mind, that it is going to be removed in T release.')
-    include ::aodh::api
-    include ::tripleo::profile::base::apache
-    class { '::aodh::wsgi::apache':
+    include aodh::api
+    include tripleo::profile::base::apache
+    class { 'aodh::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

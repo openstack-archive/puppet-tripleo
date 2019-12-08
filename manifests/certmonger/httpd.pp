@@ -53,8 +53,8 @@ define tripleo::certmonger::httpd (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
-  include ::apache::params
+  include certmonger
+  include apache::params
 
   if $dnsnames {
     $dnsnames_real = $dnsnames

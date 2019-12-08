@@ -25,7 +25,7 @@ describe 'tripleo::profile::base::ironic::api' do
 
     let(:pre_condition) do
       <<-eos
-      class { '::tripleo::profile::base::ironic':
+      class { 'tripleo::profile::base::ironic':
         step => #{params[:step]},
         oslomsg_rpc_hosts    => [ 'localhost' ],
         oslomsg_rpc_username => 'ironic',

@@ -96,8 +96,8 @@ class tripleo::profile::base::manila::api (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::manila
-  include ::tripleo::profile::base::manila::authtoken
+  include tripleo::profile::base::manila
+  include tripleo::profile::base::manila::authtoken
 
   if $enable_internal_tls {
     if !$manila_api_network {
@@ -111,7 +111,7 @@ class tripleo::profile::base::manila::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::tripleo::profile::base::apache
+    include tripleo::profile::base::apache
     if $backend_generic_enabled or $backend_netapp_enabled or $backend_vmax_enabled or
       $backend_isilon_enabled or $backend_unity_enabled or $backend_vnx_enabled {
         $nfs_protocol = 'NFS'
@@ -125,10 +125,10 @@ class tripleo::profile::base::manila::api (
     } else {
       $cephfs_protocol = undef
     }
-    class { '::manila::api' :
+    class { 'manila::api' :
       enabled_share_protocols => join(delete_undef_values([$nfs_protocol,$cifs_protocol,$cephfs_protocol]), ',')
     }
-    class { '::manila::wsgi::apache':
+    class { 'manila::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

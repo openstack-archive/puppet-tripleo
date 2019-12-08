@@ -27,8 +27,8 @@ class tripleo::profile::base::neutron::dhcp (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::neutron
-    include ::neutron::agents::dhcp
+    include tripleo::profile::base::neutron
+    include neutron::agents::dhcp
 
     Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-dhcp' |>
   }

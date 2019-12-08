@@ -29,9 +29,9 @@
 class tripleo::profile::base::neutron::sfc (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 4 {
-    include ::neutron::services::sfc
+    include neutron::services::sfc
   }
 }

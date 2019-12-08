@@ -36,12 +36,12 @@ class tripleo::profile::base::nova::libvirt (
   $libvirtd_config = {},
   $tls_password    = '',
 ) {
-  include ::tripleo::profile::base::nova::compute_libvirt_shared
+  include tripleo::profile::base::nova::compute_libvirt_shared
 
   if $step >= 4 {
-    include ::tripleo::profile::base::nova
-    include ::tripleo::profile::base::nova::migration::client
-    include ::nova::compute::libvirt::services
+    include tripleo::profile::base::nova
+    include tripleo::profile::base::nova::migration::client
+    include nova::compute::libvirt::services
 
     $libvirtd_config_default = {
       unix_sock_group    => {value => '"libvirt"'},
@@ -51,7 +51,7 @@ class tripleo::profile::base::nova::libvirt (
       unix_sock_rw_perms => {value => '"0770"'}
     }
 
-    class { '::nova::compute::libvirt::config':
+    class { 'nova::compute::libvirt::config':
       libvirtd_config => merge($libvirtd_config_default, $libvirtd_config)
     }
 
@@ -75,8 +75,8 @@ class tripleo::profile::base::nova::libvirt (
       before  => Service['libvirt'],
     }
 
-    include ::nova::compute::libvirt::qemu
-    include ::nova::migration::qemu
+    include nova::compute::libvirt::qemu
+    include nova::migration::qemu
 
     $libvirt_sasl_conf = "
 mech_list: scram-sha-1

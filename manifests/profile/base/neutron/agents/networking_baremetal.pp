@@ -28,9 +28,9 @@ class tripleo::profile::base::neutron::agents::networking_baremetal(
   $step               = Integer(hiera('step'))
 ) {
 
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 5 {
-    include ::neutron::agents::ml2::networking_baremetal
+    include neutron::agents::ml2::networking_baremetal
   }
 }

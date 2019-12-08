@@ -277,7 +277,7 @@ class tripleo::profile::base::metrics::collectd (
       manage_repo => $collectd_manage_repo
     }
 
-    class { '::collectd::plugin::python':
+    class { 'collectd::plugin::python':
       logtraces   => true,
     }
 
@@ -287,7 +287,7 @@ class tripleo::profile::base::metrics::collectd (
     }
 
     if $enable_file_logging {
-      include ::collectd::plugin::logfile
+      include collectd::plugin::logfile
     }
 
     if ! ($collectd_securitylevel in [undef, 'None', 'Sign', 'Encrypt']) {
@@ -342,7 +342,7 @@ class tripleo::profile::base::metrics::collectd (
       } else {
         $connect_to = $amqp_host
       }
-      class { '::collectd::plugin::amqp1':
+      class { 'collectd::plugin::amqp1':
         ensure         => 'present',
         manage_package => true,
         transport      => $amqp_transport_name,
@@ -386,7 +386,7 @@ class tripleo::profile::base::metrics::collectd (
     }
 
     if $enable_sensubility {
-      include ::tripleo::profile::base::metrics::collectd::sensubility
+      include tripleo::profile::base::metrics::collectd::sensubility
     }
   }
 }

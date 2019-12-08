@@ -22,10 +22,10 @@ describe 'tripleo::profile::base::nova::migration::target' do
     context 'with step 4 without authorized_keys' do
       let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }
@@ -53,10 +53,10 @@ eos
     context 'with step 4 without nova_migration_target service enabled' do
         let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }
@@ -84,10 +84,10 @@ eos
     context 'with step 4 with invalid ssh_authorized_keys' do
         let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }
@@ -104,10 +104,10 @@ eos
     context 'with step 4 with nova_migration_target services enabled' do
         let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }
@@ -148,10 +148,10 @@ eos
     context 'with step 4 with ssh_localaddrs' do
         let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }
@@ -199,10 +199,10 @@ eos
     context 'with step 4 with duplicate ssh_localaddrs' do
         let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }
@@ -250,10 +250,10 @@ eos
     context 'with step 4 with invalid ssh_localaddrs' do
         let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }
@@ -272,10 +272,10 @@ eos
     context 'with step 4 with wrapper_command' do
         let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::ssh::server':
+        class { 'ssh::server':
           storeconfigs_enabled => false,
           options              => {}
         }

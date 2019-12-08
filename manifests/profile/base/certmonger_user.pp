@@ -199,13 +199,13 @@ class tripleo::profile::base::certmonger_user (
   $haproxy_postsave_cmd               = undef,
   $apache_postsave_cmd                = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   if $step == 1  {
     # This is only needed for certmonger's local CA. For any other CA this
     # operation (trusting the CA) should be done by the deployer.
     if $certmonger_ca == 'local' {
-        include ::tripleo::certmonger::ca::local
+        include tripleo::certmonger::ca::local
     }
     unless empty($haproxy_certificates_specs) {
       $reload_haproxy = ['systemctl reload haproxy']
@@ -216,38 +216,38 @@ class tripleo::profile::base::certmonger_user (
     } else {
       $reload_haproxy = []
     }
-    class { '::tripleo::certmonger::ca::crl' :
+    class { 'tripleo::certmonger::ca::crl' :
       reload_cmds => $reload_haproxy,
     }
     Certmonger_certificate<||> -> Class['::tripleo::certmonger::ca::crl']
-    include ::tripleo::certmonger::ca::libvirt_vnc
-    include ::tripleo::certmonger::ca::qemu
+    include tripleo::certmonger::ca::libvirt_vnc
+    include tripleo::certmonger::ca::qemu
 
     # Remove apache_certificates_specs where hostname is empty.
     # Workaround bug: https://bugs.launchpad.net/tripleo/+bug/1811207
     $apache_certificates_specs_filtered = $apache_certificates_specs.filter | $specs, $keys | { ! empty($keys[hostname]) }
     unless empty($apache_certificates_specs_filtered) {
-      include ::tripleo::certmonger::apache_dirs
+      include tripleo::certmonger::apache_dirs
       ensure_resources('tripleo::certmonger::httpd', $apache_certificates_specs_filtered)
     }
     unless empty($libvirt_certificates_specs) {
-      include ::tripleo::certmonger::libvirt_dirs
+      include tripleo::certmonger::libvirt_dirs
       ensure_resources('tripleo::certmonger::libvirt', $libvirt_certificates_specs,
                         {'postsave_cmd' => $libvirt_postsave_cmd})
     }
     unless empty($libvirt_vnc_certificates_specs) {
-      include ::tripleo::certmonger::libvirt_vnc_dirs
+      include tripleo::certmonger::libvirt_vnc_dirs
       ensure_resources('tripleo::certmonger::libvirt_vnc', $libvirt_vnc_certificates_specs,
                         {'postsave_cmd' => $libvirt_vnc_postsave_cmd})
     }
     unless empty($qemu_certificates_specs) {
-      include ::tripleo::certmonger::qemu_dirs
-      include ::tripleo::certmonger::qemu_nbd_dirs
+      include tripleo::certmonger::qemu_dirs
+      include tripleo::certmonger::qemu_nbd_dirs
       ensure_resources('tripleo::certmonger::qemu', $qemu_certificates_specs,
                         {'postsave_cmd' => $qemu_postsave_cmd})
     }
     unless empty($haproxy_certificates_specs) {
-      include ::tripleo::certmonger::haproxy_dirs
+      include tripleo::certmonger::haproxy_dirs
       ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs)
       # The haproxy fronends (or listen resources) depend on the certificate
       # existing and need to be refreshed if it changed.

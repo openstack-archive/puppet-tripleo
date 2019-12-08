@@ -31,8 +31,8 @@ class tripleo::profile::base::nova::conductor (
   $bootstrap_node                = hiera('nova_api_short_bootstrap_node_name', undef),
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::nova
-  include ::nova::db
+  include tripleo::profile::base::nova
+  include nova::db
 
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -41,9 +41,9 @@ class tripleo::profile::base::nova::conductor (
   }
 
   if $step >= 3 and $sync_db {
-    include ::nova::db::sync
+    include nova::db::sync
   }
   if $step >= 4 {
-    include ::nova::conductor
+    include nova::conductor
   }
 }

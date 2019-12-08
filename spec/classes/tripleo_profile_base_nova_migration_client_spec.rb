@@ -22,8 +22,8 @@ describe 'tripleo::profile::base::nova::migration::client' do
     context 'with step 4' do
       let(:pre_condition) {
         <<-eos
-        include ::nova::compute::libvirt::services
-        class { '::tripleo::profile::base::nova::migration':
+        include nova::compute::libvirt::services
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos
@@ -51,8 +51,8 @@ eos
     context 'with step 4 with libvirt' do
       let(:pre_condition) {
         <<-eos
-        include ::nova::compute::libvirt::services
-        class { '::tripleo::profile::base::nova::migration':
+        include nova::compute::libvirt::services
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos
@@ -82,8 +82,8 @@ eos
     context 'with step 4 with libvirt TLS' do
       let(:pre_condition) {
         <<-eos
-        include ::nova::compute::libvirt::services
-        class { '::tripleo::profile::base::nova::migration':
+        include nova::compute::libvirt::services
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos
@@ -115,8 +115,8 @@ eos
     context 'with step 4 with libvirt and migration ssh key' do
       let(:pre_condition) {
         <<-eos
-        include ::nova::compute::libvirt::services
-        class { '::tripleo::profile::base::nova::migration':
+        include nova::compute::libvirt::services
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos
@@ -146,8 +146,8 @@ eos
     context 'with step 4 with libvirt TLS and migration ssh key' do
       let(:pre_condition) {
         <<-eos
-        include ::nova::compute::libvirt::services
-        class { '::tripleo::profile::base::nova::migration':
+        include nova::compute::libvirt::services
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos

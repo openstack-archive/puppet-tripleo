@@ -60,7 +60,7 @@ class tripleo::profile::base::cinder::volume::hpelefthand (
   $cinder_hpelefthand_debug              = hiera('cinder::backend::hpelefthand_iscsi::hpelefthand_debug', undef),
   $step                                  = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::hpelefthand_iscsi { $backend_name :

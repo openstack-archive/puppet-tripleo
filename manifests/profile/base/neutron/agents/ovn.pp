@@ -40,7 +40,7 @@ class tripleo::profile::base::neutron::agents::ovn (
   $step           = Integer(hiera('step'))
 ) {
   if $step >= 4 {
-    class { '::ovn::controller':
+    class { 'ovn::controller':
       ovn_remote     => join([$protocol, normalize_ip_for_uri($ovn_db_host), "${ovn_sbdb_port}"], ':'),
     }
   }

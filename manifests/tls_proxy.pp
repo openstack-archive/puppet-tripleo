@@ -51,7 +51,7 @@ define tripleo::tls_proxy(
   $preserve_host = false,
   $proxy_pass_host = hiera('localhost_address', 'localhost')
 ) {
-  include ::apache
+  include apache
   ::apache::vhost { "${title}-proxy":
     ensure              => 'present',
     docroot             => false,  # This is required by the manifest

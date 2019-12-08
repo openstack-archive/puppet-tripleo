@@ -99,7 +99,7 @@ class tripleo::profile::base::manila (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::manila' :
+    class { 'manila' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
@@ -117,7 +117,7 @@ class tripleo::profile::base::manila (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include ::manila::config
-    include ::manila::logging
+    include manila::config
+    include manila::logging
   }
 }

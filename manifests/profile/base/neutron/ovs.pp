@@ -42,7 +42,7 @@ class tripleo::profile::base::neutron::ovs(
   $vhostuser_socket_group = hiera('vhostuser_socket_group', 'qemu'),
   $vhostuser_socket_user  = hiera('vhostuser_socket_user', 'qemu'),
 ) {
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 3 {
     if $vhostuser_socket_dir {
@@ -56,7 +56,7 @@ class tripleo::profile::base::neutron::ovs(
   }
 
   if $step >= 5 {
-    include ::neutron::agents::ml2::ovs
+    include neutron::agents::ml2::ovs
 
     # Optional since manage_service may be false and neutron server may not be colocated.
     Service<| title == 'neutron-server' |> -> Service<| title == 'neutron-ovs-agent-service' |>

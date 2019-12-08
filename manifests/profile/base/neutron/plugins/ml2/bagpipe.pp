@@ -29,9 +29,9 @@
 class tripleo::profile::base::neutron::plugins::ml2::bagpipe (
   $step           = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 4 {
-    include ::neutron::plugins::ml2::bagpipe
+    include neutron::plugins::ml2::bagpipe
   }
 }

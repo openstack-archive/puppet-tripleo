@@ -75,7 +75,7 @@ class tripleo::profile::base::cinder::volume::rbd (
   $cinder_rbd_flatten_volume_from_snapshot = hiera('cinder::backend::rbd::flatten_volume_from_snapshot', undef),
   $step                                    = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::rbd { $backend_name :

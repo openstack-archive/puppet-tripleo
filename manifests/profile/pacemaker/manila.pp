@@ -51,7 +51,7 @@ class tripleo::profile::pacemaker::manila (
     stop       => '/bin/true',
   }
 
-  include ::tripleo::profile::base::manila::share
+  include tripleo::profile::base::manila::share
 
   if $step >= 2 {
     pacemaker::property { 'manila-share-role-node-property':

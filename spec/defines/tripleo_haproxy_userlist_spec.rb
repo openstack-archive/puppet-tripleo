@@ -5,7 +5,7 @@ describe 'tripleo::haproxy::userlist' do
   let(:title) { 'starwars' }
 
   let :pre_condition do
-    'include ::haproxy'
+    'include haproxy'
   end
 
   let :params do {

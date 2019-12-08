@@ -28,9 +28,9 @@ class tripleo::profile::base::trove::taskmanager (
 ) {
 
   if $step >= 4 {
-    include ::trove
-    include ::trove::config
-    include ::trove::taskmanager
+    include trove
+    include trove::config
+    include trove::taskmanager
   }
 
 }

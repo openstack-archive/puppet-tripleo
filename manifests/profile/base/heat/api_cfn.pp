@@ -61,7 +61,7 @@ class tripleo::profile::base::heat::api_cfn (
     $is_bootstrap = false
   }
 
-  include ::tripleo::profile::base::heat
+  include tripleo::profile::base::heat
 
   if $enable_internal_tls {
     if !$heat_api_cfn_network {
@@ -75,10 +75,10 @@ class tripleo::profile::base::heat::api_cfn (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::heat::api_cfn
+    include heat::api_cfn
 
-    include ::tripleo::profile::base::apache
-    class { '::heat::wsgi::apache_api_cfn':
+    include tripleo::profile::base::apache
+    class { 'heat::wsgi::apache_api_cfn':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

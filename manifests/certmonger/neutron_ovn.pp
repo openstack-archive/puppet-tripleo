@@ -46,7 +46,7 @@ class tripleo::certmonger::neutron_ovn (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   certmonger_certificate { 'neutron_ovn' :
     ensure       => 'present',

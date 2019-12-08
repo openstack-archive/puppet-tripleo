@@ -56,7 +56,7 @@ class tripleo::stunnel (
   if $manage_service {
     Concat['/etc/stunnel/stunnel.conf'] ~> Service['stunnel']
 
-    include ::tripleo::stunnel::systemd_unit
+    include tripleo::stunnel::systemd_unit
 
     service { 'stunnel':
       ensure => $service_ensure

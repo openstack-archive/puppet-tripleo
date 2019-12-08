@@ -56,8 +56,8 @@ define tripleo::certmonger::qemu (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
-  include ::nova::params
+  include certmonger
+  include nova::params
 
   certmonger_certificate { $name :
     ensure       => 'present',

@@ -4,7 +4,7 @@ describe 'tripleo::firewall::service_rules' do
 
 
   let :pre_condition do
-    'include ::tripleo::firewall'
+    'include tripleo::firewall'
   end
 
   shared_examples_for 'tripleo firewall service rules' do

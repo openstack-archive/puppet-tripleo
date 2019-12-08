@@ -20,10 +20,10 @@ describe 'tripleo::profile::base::placement::api' do
   shared_examples_for 'tripleo::profile::base::placement::api' do
     let(:pre_condition) do
       <<-eos
-      class { '::tripleo::profile::base::placement':
+      class { 'tripleo::profile::base::placement':
         step => #{params[:step]},
       }
-      class { '::tripleo::profile::base::placement::authtoken':
+      class { 'tripleo::profile::base::placement::authtoken':
         step     => #{params[:step]},
       }
 eos

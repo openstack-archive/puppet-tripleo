@@ -26,9 +26,9 @@
 class tripleo::profile::base::sahara::api (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::sahara
+  include tripleo::profile::base::sahara
 
   if $step >= 4 {
-    include ::sahara::service::api
+    include sahara::service::api
   }
 }

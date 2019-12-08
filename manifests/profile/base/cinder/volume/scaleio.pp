@@ -31,7 +31,7 @@ class tripleo::profile::base::cinder::volume::scaleio (
   $backend_name = hiera('cinder::backend::scaleio::volume_backend_name', 'tripleo_scaleio'),
   $step         = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::scaleio { $backend_name :

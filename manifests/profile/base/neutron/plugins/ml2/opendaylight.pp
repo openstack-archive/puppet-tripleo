@@ -79,7 +79,7 @@ class tripleo::profile::base::neutron::plugins::ml2::opendaylight (
       if empty($odl_url_ip) { fail('OpenDaylight API VIP is Empty') }
       $odl_url_addr = $odl_url_ip
     }
-    class { '::neutron::plugins::ml2::opendaylight':
+    class { 'neutron::plugins::ml2::opendaylight':
       odl_username => $odl_username,
       odl_password => $odl_password,
       odl_url      => "${conn_proto}://${odl_url_addr}:${odl_port}/controller/nb/v2/neutron",

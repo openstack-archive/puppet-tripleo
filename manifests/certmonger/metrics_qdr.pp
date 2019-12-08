@@ -54,8 +54,8 @@ class tripleo::certmonger::metrics_qdr (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
-  include ::qdr::params
+  include certmonger
+  include qdr::params
 
   ensure_resource('file', '/usr/bin/certmonger-metrics-qdr-refresh.sh', {
     source  => 'puppet:///modules/tripleo/certmonger-metrics-qdr-refresh.sh',

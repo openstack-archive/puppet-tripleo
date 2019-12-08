@@ -24,7 +24,7 @@ describe 'tripleo::profile::base::aodh::api' do
 
   shared_examples_for 'tripleo::profile::base::aodh::api' do
     let(:pre_condition) do
-      "class { '::tripleo::profile::base::aodh': step => #{params[:step]}, oslomsg_rpc_hosts => ['localhost.localdomain'] }"
+      "class { 'tripleo::profile::base::aodh': step => #{params[:step]}, oslomsg_rpc_hosts => ['localhost.localdomain'] }"
     end
 
     context 'with step less than 3' do

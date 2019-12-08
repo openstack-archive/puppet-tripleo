@@ -148,7 +148,7 @@ class tripleo::profile::base::glance::api (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::glance::authtoken
+  include tripleo::profile::base::glance::authtoken
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     if $enable_internal_tls {
@@ -172,7 +172,7 @@ class tripleo::profile::base::glance::api (
         tls_key    => $tls_keyfile,
         notify     => Class['::glance::api'],
       }
-      include ::tripleo::profile::base::apache
+      include tripleo::profile::base::apache
     }
     case $glance_backend {
         'swift': { $backend_store = 'swift' }
@@ -196,16 +196,16 @@ class tripleo::profile::base::glance::api (
     $http_store = ['http']
     $glance_store = concat($http_store, $backend_store)
 
-    include ::glance
-    include ::glance::config
-    include ::glance::api::logging
-    class { '::glance::api':
+    include glance
+    include glance::config
+    include glance::api::logging
+    class { 'glance::api':
       stores  => $glance_store,
       sync_db => $sync_db,
     }
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::glance::notify::rabbitmq' :
+    class { 'glance::notify::rabbitmq' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,

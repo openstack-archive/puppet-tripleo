@@ -59,7 +59,7 @@ class tripleo::profile::base::ironic_inspector (
   $step               = Integer(hiera('step')),
 ) {
 
-  include ::tripleo::profile::base::ironic_inspector::authtoken
+  include tripleo::profile::base::ironic_inspector::authtoken
 
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -74,15 +74,15 @@ class tripleo::profile::base::ironic_inspector (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::ironic::inspector::cors
-    class { '::ironic::inspector':
+    include ironic::inspector::cors
+    class { 'ironic::inspector':
       sync_db            => $sync_db,
       dnsmasq_ip_subnets => $inspection_subnets_real,
     }
 
-    include ::ironic::inspector::pxe_filter
-    include ::ironic::inspector::pxe_filter::dnsmasq
-    include ::ironic::config
-    include ::ironic::inspector::logging
+    include ironic::inspector::pxe_filter
+    include ironic::inspector::pxe_filter::dnsmasq
+    include ironic::config
+    include ironic::inspector::logging
   }
 }

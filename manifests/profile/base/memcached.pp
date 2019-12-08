@@ -27,6 +27,6 @@ class tripleo::profile::base::memcached (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 1 {
-      include ::memcached
+      include memcached
   }
 }

@@ -47,7 +47,7 @@ class tripleo::certmonger::rabbitmq (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   ensure_resource('file', '/usr/bin/certmonger-rabbitmq-refresh.sh', {
     source  => 'puppet:///modules/tripleo/certmonger-rabbitmq-refresh.sh',

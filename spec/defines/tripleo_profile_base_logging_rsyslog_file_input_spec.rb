@@ -21,7 +21,7 @@ describe 'tripleo::profile::base::logging::rsyslog::file_input' do
   let(:title) { 'foobar' }
 
   let :pre_condition do
-    'include ::rsyslog::server'
+    'include rsyslog::server'
   end
 
   let :params do {

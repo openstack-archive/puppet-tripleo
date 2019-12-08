@@ -27,8 +27,8 @@ class tripleo::profile::base::nova::scheduler (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::nova
-    include ::nova::scheduler
-    include ::nova::scheduler::filter
+    include tripleo::profile::base::nova
+    include nova::scheduler
+    include nova::scheduler::filter
   }
 }

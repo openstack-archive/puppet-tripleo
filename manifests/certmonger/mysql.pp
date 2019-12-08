@@ -55,7 +55,7 @@ class tripleo::certmonger::mysql (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   certmonger_certificate { 'mysql' :
     ensure       => 'present',

@@ -27,8 +27,8 @@ class tripleo::profile::base::nova::compute::ironic (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::nova::compute
-    include ::nova::compute::ironic
-    include ::nova::network::neutron
+    include tripleo::profile::base::nova::compute
+    include nova::compute::ironic
+    include nova::network::neutron
   }
 }

@@ -111,7 +111,7 @@ class tripleo::profile::base::logging::rsyslog (
       }
     }
 
-    class { '::rsyslog::server':
+    class { 'rsyslog::server':
       modules => $modules,
       actions => $actions
     }

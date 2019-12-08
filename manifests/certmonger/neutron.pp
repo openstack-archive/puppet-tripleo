@@ -46,7 +46,7 @@ class tripleo::certmonger::neutron (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   ensure_resource('file', '/usr/bin/certmonger-neutron-dhcpd-refresh.sh', {
     source  => 'puppet:///modules/tripleo/certmonger-neutron-dhcpd-refresh.sh',

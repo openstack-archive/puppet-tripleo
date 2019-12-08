@@ -84,8 +84,8 @@ class tripleo::profile::base::horizon (
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     # Horizon
-    include ::tripleo::profile::base::apache
-    include ::apache::mod::remoteip
+    include tripleo::profile::base::apache
+    include apache::mod::remoteip
 
     if 'cisco_n1kv' in hiera('neutron::plugins::ml2::mechanism_drivers', undef) {
       $_profile_support = 'cisco'
@@ -101,7 +101,7 @@ class tripleo::profile::base::horizon (
         $horizon_memcached_servers = any2array(normalize_ip_for_uri($memcached_ips))
     }
 
-    class { '::horizon':
+    class { 'horizon':
       cache_server_ip => $horizon_memcached_servers,
       neutron_options => $neutron_options_real,
       horizon_cert    => $tls_certfile,

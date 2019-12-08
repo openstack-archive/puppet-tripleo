@@ -320,7 +320,7 @@ MYSQL_HOST=localhost\n",
     # need that class to create all openstack credentials
     # we don't include it in step 1 because the kolla bootstrap
     # happens after step 1 baremetal
-    class { '::tripleo::profile::base::database::mysql':
+    class { 'tripleo::profile::base::database::mysql':
       bootstrap_node          => $bootstrap_node,
       manage_resources        => false,
       remove_default_accounts => $remove_default_accounts,

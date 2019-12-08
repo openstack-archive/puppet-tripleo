@@ -26,6 +26,6 @@ class tripleo::profile::base::neutron::agents::bigswitch(
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::neutron::agents::bigswitch
+    include neutron::agents::bigswitch
   }
 }

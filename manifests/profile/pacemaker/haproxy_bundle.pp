@@ -107,7 +107,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   $step                     = Integer(hiera('step')),
   $pcs_tries                = hiera('pcs_tries', 20),
 ) {
-  include ::tripleo::profile::base::haproxy
+  include tripleo::profile::base::haproxy
 
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true

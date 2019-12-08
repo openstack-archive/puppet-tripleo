@@ -28,9 +28,9 @@ class tripleo::profile::base::neutron::sriov(
   $step               = Integer(hiera('step'))
 ) {
 
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 4 {
-    include ::neutron::agents::ml2::sriov
+    include neutron::agents::ml2::sriov
   }
 }

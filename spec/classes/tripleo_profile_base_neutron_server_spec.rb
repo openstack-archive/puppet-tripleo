@@ -24,7 +24,7 @@ describe 'tripleo::profile::base::neutron::server' do
 
     let(:pre_condition) do
       <<-eos
-      class { '::tripleo::profile::base::neutron':
+      class { 'tripleo::profile::base::neutron':
         oslomsg_rpc_hosts    => [ 'localhost' ],
         oslomsg_rpc_username => 'neutron',
         oslomsg_rpc_password => 'foo'

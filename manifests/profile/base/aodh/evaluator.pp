@@ -32,7 +32,7 @@ class tripleo::profile::base::aodh::evaluator (
   $step                = Integer(hiera('step')),
 ) {
 
-  include ::tripleo::profile::base::aodh
+  include tripleo::profile::base::aodh
   if $enable_internal_tls {
     $tls_query_param = '?ssl=true'
   } else {
@@ -41,7 +41,7 @@ class tripleo::profile::base::aodh::evaluator (
 
   if $step >= 4 {
     warning('Service aodh is deprecated. Please take in mind, that it is going to be removed in T release.')
-    class { '::aodh::evaluator':
+    class { 'aodh::evaluator':
       coordination_url => join(['redis://:', hiera('aodh_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/', $tls_query_param]),
     }
   }

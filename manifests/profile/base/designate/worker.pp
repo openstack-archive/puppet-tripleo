@@ -31,7 +31,7 @@ class tripleo::profile::base::designate::worker (
   $step = Integer(hiera('step')),
   $rndc_key = hiera('designate_rndc_key', false),
 ) {
-  include ::tripleo::profile::base::designate
+  include tripleo::profile::base::designate
 
   if $step >= 4 {
     if $rndc_key {
@@ -40,6 +40,6 @@ class tripleo::profile::base::designate::worker (
         content => template('tripleo/designate/rndc.key.erb')
       }
     }
-    include ::designate::worker
+    include designate::worker
   }
 }

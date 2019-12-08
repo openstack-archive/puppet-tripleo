@@ -37,7 +37,7 @@ class tripleo::profile::base::ironic::authtoken (
       $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
     }
 
-    class { '::ironic::api::authtoken':
+    class { 'ironic::api::authtoken':
       memcached_servers => $memcache_servers
     }
   }

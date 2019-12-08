@@ -135,12 +135,12 @@ class tripleo::profile::base::nova::ec2api (
         tls_key    => $metadata_tls_keyfile,
       }
       Tripleo::Tls_proxy['ec2-api-metadata'] ~> Anchor<| title == 'ec2api::service::begin' |>
-      include ::tripleo::profile::base::apache
+      include tripleo::profile::base::apache
     }
-    include ::ec2api
-    include ::ec2api::api
-    include ::ec2api::db::sync
-    include ::ec2api::metadata
-    include ::ec2api::keystone::authtoken
+    include ec2api
+    include ec2api::api
+    include ec2api::db::sync
+    include ec2api::metadata
+    include ec2api::keystone::authtoken
   }
 }

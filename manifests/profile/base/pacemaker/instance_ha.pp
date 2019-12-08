@@ -95,7 +95,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
   $deep_compare_ocf      = hiera('pacemaker::resource::ocf::deep_compare', true),
 ) {
   if $step >= 2 {
-    class { '::pacemaker::resource_defaults':
+    class { 'pacemaker::resource_defaults':
       tries    => $pcs_tries,
       defaults => {
         'fencing-default' => {

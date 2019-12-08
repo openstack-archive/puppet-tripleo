@@ -35,9 +35,9 @@ class tripleo::profile::base::neutron::plugins::opencontrail (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
-    include ::neutron::plugins::opencontrail
+    include neutron::plugins::opencontrail
   }
 }

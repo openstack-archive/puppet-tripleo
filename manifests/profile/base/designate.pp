@@ -108,7 +108,7 @@ class tripleo::profile::base::designate (
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::designate' :
+    class { 'designate' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
@@ -127,7 +127,7 @@ class tripleo::profile::base::designate (
       }),
     }
     if ($rndc_host and $rndc_allowed_addresses) {
-      class { '::designate::backend::bind9':
+      class { 'designate::backend::bind9':
         rndc_controls => {
           $rndc_host => {
             'port'              => $rndc_port,
@@ -137,9 +137,9 @@ class tripleo::profile::base::designate (
         },
       }
     } else {
-      include ::designate::backend::bind9
+      include designate::backend::bind9
     }
-    include ::designate::config
-    include ::designate::logging
+    include designate::config
+    include designate::logging
   }
 }

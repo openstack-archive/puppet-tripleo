@@ -136,7 +136,7 @@ class tripleo::profile::base::cinder::volume (
   $etcd_port                                   = hiera('tripleo::profile::base::etcd::client_port', '2379'),
   $step                                        = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder
+  include tripleo::profile::base::cinder
 
   if $step >= 4 {
     if $cinder_volume_cluster == '' {
@@ -158,38 +158,38 @@ class tripleo::profile::base::cinder::volume (
         $protocol = 'http'
       }
       $backend_url = sprintf('etcd3+%s://%s:%s', $protocol, $etcd_host, $etcd_port)
-      class { '::cinder::coordination' :
+      class { 'cinder::coordination' :
         backend_url => $backend_url,
       }
     }
 
-    class { '::cinder::volume' :
+    class { 'cinder::volume' :
       cluster => $cinder_volume_cluster_real,
     }
 
     if $cinder_enable_pure_backend {
-      include ::tripleo::profile::base::cinder::volume::pure
+      include tripleo::profile::base::cinder::volume::pure
       $cinder_pure_backend_name = hiera('cinder::backend::pure::volume_backend_name', 'tripleo_pure')
     } else {
       $cinder_pure_backend_name = undef
     }
 
     if $cinder_enable_dellsc_backend {
-      include ::tripleo::profile::base::cinder::volume::dellsc
+      include tripleo::profile::base::cinder::volume::dellsc
       $cinder_dellsc_backend_name = hiera('cinder::backend::dellsc_iscsi::volume_backend_name', 'tripleo_dellsc')
     } else {
       $cinder_dellsc_backend_name = undef
     }
 
     if $cinder_enable_dellemc_unity_backend {
-      include ::tripleo::profile::base::cinder::volume::dellemc_unity
+      include tripleo::profile::base::cinder::volume::dellemc_unity
       $cinder_dellemc_unity_backend_name = hiera('cinder::backend::dellemc_unity::volume_backend_name', 'tripleo_dellemc_unity')
     } else {
       $cinder_dellemc_unity_backend_name = undef
     }
 
     if $cinder_enable_dellemc_vmax_iscsi_backend {
-      include ::tripleo::profile::base::cinder::volume::dellemc_vmax_iscsi
+      include tripleo::profile::base::cinder::volume::dellemc_vmax_iscsi
       $cinder_dellemc_vmax_iscsi_backend_name = hiera('cinder::backend::dellemc_vmax_iscsi::volume_backend_name',
           'tripleo_dellemc_vmax_iscsi')
     } else {
@@ -197,7 +197,7 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_dellemc_vnx_backend {
-      include ::tripleo::profile::base::cinder::volume::dellemc_vnx
+      include tripleo::profile::base::cinder::volume::dellemc_vnx
       $cinder_dellemc_vnx_backend_name = hiera('cinder::backend::emc_vnx::volume_backend_name',
           'tripleo_dellemc_vnx')
     } else {
@@ -205,7 +205,7 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_dellemc_xtremio_iscsi_backend {
-      include ::tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi
+      include tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi
       $cinder_dellemc_xtreamio_iscsi_backend_name = hiera('cinder::backend::dellemc_extremio_iscsi::volume_backend_name',
           'tripleo_dellemc_xtremio_iscsi')
     } else {
@@ -213,42 +213,42 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_hpelefthand_backend {
-      include ::tripleo::profile::base::cinder::volume::hpelefthand
+      include tripleo::profile::base::cinder::volume::hpelefthand
       $cinder_hpelefthand_backend_name = hiera('cinder::backend::hpelefthand_iscsi::volume_backend_name', 'tripleo_hpelefthand')
     } else {
       $cinder_hpelefthand_backend_name = undef
     }
 
     if $cinder_enable_dellps_backend {
-      include ::tripleo::profile::base::cinder::volume::dellps
+      include tripleo::profile::base::cinder::volume::dellps
       $cinder_dellps_backend_name = hiera('cinder::backend::dellps::volume_backend_name', 'tripleo_dellps')
     } else {
       $cinder_dellps_backend_name = undef
     }
 
     if $cinder_enable_iscsi_backend {
-      include ::tripleo::profile::base::cinder::volume::iscsi
+      include tripleo::profile::base::cinder::volume::iscsi
       $cinder_iscsi_backend_name = hiera('cinder::backend::iscsi::volume_backend_name', 'tripleo_iscsi')
     } else {
       $cinder_iscsi_backend_name = undef
     }
 
     if $cinder_enable_netapp_backend {
-      include ::tripleo::profile::base::cinder::volume::netapp
+      include tripleo::profile::base::cinder::volume::netapp
       $cinder_netapp_backend_name = hiera('cinder::backend::netapp::volume_backend_name', 'tripleo_netapp')
     } else {
       $cinder_netapp_backend_name = undef
     }
 
     if $cinder_enable_nfs_backend {
-      include ::tripleo::profile::base::cinder::volume::nfs
+      include tripleo::profile::base::cinder::volume::nfs
       $cinder_nfs_backend_name = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs')
     } else {
       $cinder_nfs_backend_name = undef
     }
 
     if $cinder_enable_rbd_backend {
-      include ::tripleo::profile::base::cinder::volume::rbd
+      include tripleo::profile::base::cinder::volume::rbd
       $cinder_rbd_backend_name = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph')
 
       exec{ "exec-setfacl-${cinder_rbd_client_name}-cinder":
@@ -275,21 +275,21 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_scaleio_backend {
-      include ::tripleo::profile::base::cinder::volume::scaleio
+      include tripleo::profile::base::cinder::volume::scaleio
       $cinder_scaleio_backend_name = hiera('cinder::backend::scaleio::volume_backend_name', 'tripleo_scaleio')
     } else {
       $cinder_scaleio_backend_name = undef
     }
 
     if $cinder_enable_vrts_hs_backend {
-      include ::tripleo::profile::base::cinder::volume::veritas_hyperscale
+      include tripleo::profile::base::cinder::volume::veritas_hyperscale
       $cinder_veritas_hyperscale_backend_name = 'Veritas_HyperScale'
     } else {
       $cinder_veritas_hyperscale_backend_name = undef
     }
 
     if $cinder_enable_nvmeof_backend {
-      include ::tripleo::profile::base::cinder::volume::nvmeof
+      include tripleo::profile::base::cinder::volume::nvmeof
       $cinder_nvmeof_backend_name = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof')
     } else {
       $cinder_nvmeof_backend_name = undef
@@ -318,7 +318,7 @@ class tripleo::profile::base::cinder::volume (
     # "" strings in our array.
     $cinder_enabled_backends = delete($backends, '')
 
-    class { '::cinder::backends' :
+    class { 'cinder::backends' :
       enabled_backends => $cinder_enabled_backends,
     }
   }

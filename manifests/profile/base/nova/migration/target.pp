@@ -50,7 +50,7 @@ class tripleo::profile::base::nova::migration::target (
   $wrapper_command     = '/bin/nova-migration-wrapper',
 ) {
 
-  include ::tripleo::profile::base::nova::migration
+  include tripleo::profile::base::nova::migration
 
   validate_legacy(Array, 'validate_array', $ssh_localaddrs)
 

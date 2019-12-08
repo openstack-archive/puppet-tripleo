@@ -111,7 +111,7 @@ class tripleo::profile::base::sshd (
   if hiera('ssh:server::options', undef) {
     err('ssh:server::options must not be set, use tripleo::profile::base::sshd::options')
   }
-  class { '::ssh::server':
+  class { 'ssh::server':
     storeconfigs_enabled => false,
     options              => $sshd_options
   }

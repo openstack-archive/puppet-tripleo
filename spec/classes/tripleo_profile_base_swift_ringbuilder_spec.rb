@@ -20,7 +20,7 @@ describe 'tripleo::profile::base::swift::ringbuilder' do
   shared_examples_for 'tripleo::profile::base::swift::ringbuilder' do
 
     let :pre_condition do
-      "class { '::swift':
+      "class { 'swift':
          swift_hash_path_prefix => 'foo',
        }"
     end

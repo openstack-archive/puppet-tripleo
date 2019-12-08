@@ -66,8 +66,8 @@ class tripleo::profile::base::panko::api (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::panko
-  include ::tripleo::profile::base::panko::authtoken
+  include tripleo::profile::base::panko
+  include tripleo::profile::base::panko::authtoken
 
   if $enable_internal_tls {
     if !$panko_network {
@@ -81,15 +81,15 @@ class tripleo::profile::base::panko::api (
   }
 
   if $step >= 4  or ( $step >= 3 and $sync_db ) {
-    include ::panko::db
-    class { '::panko::api':
+    include panko::db
+    class { 'panko::api':
       sync_db => $sync_db,
     }
     if $enable_panko_expirer {
-      include ::panko::expirer
+      include panko::expirer
     }
-    include ::tripleo::profile::base::apache
-    class { '::panko::wsgi::apache':
+    include tripleo::profile::base::apache
+    class { 'panko::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

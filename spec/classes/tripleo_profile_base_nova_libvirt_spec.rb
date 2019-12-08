@@ -23,7 +23,7 @@ describe 'tripleo::profile::base::nova::libvirt' do
       let(:params) { { :step => 1, } }
       let(:pre_condition) do
         <<-eos
-        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+        class { 'tripleo::profile::base::nova::compute_libvirt_shared':
           step => #{params[:step]}
         }
 eos
@@ -43,17 +43,17 @@ eos
     context 'with step 4' do
       let(:pre_condition) do
         <<-eos
-        class { '::tripleo::profile::base::nova':
+        class { 'tripleo::profile::base::nova':
           step => #{params[:step]},
           oslomsg_rpc_hosts => [ '127.0.0.1' ],
         }
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::tripleo::profile::base::nova::migration::client':
+        class { 'tripleo::profile::base::nova::migration::client':
           step => #{params[:step]}
         }
-        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+        class { 'tripleo::profile::base::nova::compute_libvirt_shared':
           step => #{params[:step]}
         }
 eos
@@ -90,17 +90,17 @@ eos
     context 'with step 4 and libvirtd_config' do
       let(:pre_condition) do
         <<-eos
-        class { '::tripleo::profile::base::nova':
+        class { 'tripleo::profile::base::nova':
           step => #{params[:step]},
           oslomsg_rpc_hosts => [ '127.0.0.1' ],
         }
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::tripleo::profile::base::nova::migration::client':
+        class { 'tripleo::profile::base::nova::migration::client':
           step => #{params[:step]}
         }
-        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+        class { 'tripleo::profile::base::nova::compute_libvirt_shared':
           step => #{params[:step]}
         }
 eos
@@ -134,17 +134,17 @@ eos
     context 'with step 4 and tls_password' do
       let(:pre_condition) do
         <<-eos
-        class { '::tripleo::profile::base::nova':
+        class { 'tripleo::profile::base::nova':
           step => #{params[:step]},
           oslomsg_rpc_hosts => [ '127.0.0.1' ],
         }
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { '::tripleo::profile::base::nova::migration::client':
+        class { 'tripleo::profile::base::nova::migration::client':
           step => #{params[:step]}
         }
-        class { '::tripleo::profile::base::nova::compute_libvirt_shared':
+        class { 'tripleo::profile::base::nova::compute_libvirt_shared':
           step => #{params[:step]}
         }
 eos

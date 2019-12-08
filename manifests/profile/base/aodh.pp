@@ -101,7 +101,7 @@ class tripleo::profile::base::aodh (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::aodh' :
+    class { 'aodh' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
@@ -119,11 +119,11 @@ class tripleo::profile::base::aodh (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include ::aodh::auth
-    include ::aodh::config
-    include ::aodh::client
-    include ::aodh::db::sync
-    include ::aodh::logging
+    include aodh::auth
+    include aodh::config
+    include aodh::client
+    include aodh::db::sync
+    include aodh::logging
   }
 
 }

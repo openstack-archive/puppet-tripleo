@@ -79,8 +79,8 @@ class tripleo::profile::base::octavia::api (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::octavia
-  include ::tripleo::profile::base::octavia::authtoken
+  include tripleo::profile::base::octavia
+  include tripleo::profile::base::octavia::authtoken
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     if $enable_internal_tls {
@@ -98,16 +98,16 @@ class tripleo::profile::base::octavia::api (
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes
   if ($step >= 4 and $sync_db) or ($step >= 5 and !$sync_db) {
-    include ::octavia::controller
+    include octavia::controller
     if $ovn_db_host and $ovn_nb_port {
       $ovn_nb_connection = join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':')
     }
-    class { '::octavia::api':
+    class { 'octavia::api':
       sync_db           => $sync_db,
       ovn_nb_connection => $ovn_nb_connection,
     }
-    include ::tripleo::profile::base::apache
-    class { '::octavia::wsgi::apache':
+    include tripleo::profile::base::apache
+    class { 'octavia::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile
     }

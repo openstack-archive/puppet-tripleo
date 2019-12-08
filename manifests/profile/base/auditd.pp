@@ -25,6 +25,6 @@ class tripleo::profile::base::auditd (
   $step  = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-      include ::auditd
+      include auditd
   }
 }

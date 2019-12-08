@@ -52,8 +52,8 @@ define tripleo::certmonger::libvirt (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
-  include ::nova::params
+  include certmonger
+  include nova::params
 
   $postsave_cmd_real = pick($postsave_cmd, "systemctl reload ${::nova::params::libvirt_service_name}")
   certmonger_certificate { $name :

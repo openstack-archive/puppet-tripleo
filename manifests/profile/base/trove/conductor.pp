@@ -28,9 +28,9 @@ class tripleo::profile::base::trove::conductor (
 ) {
 
   if $step >= 4 {
-    include ::trove
-    include ::trove::config
-    include ::trove::conductor
+    include trove
+    include trove::config
+    include trove::conductor
   }
 
 }

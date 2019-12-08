@@ -27,9 +27,9 @@ class tripleo::profile::base::nova::compute::libvirt (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::nova::compute
-    include ::tripleo::profile::base::nova::migration::client
+    include tripleo::profile::base::nova::compute
+    include tripleo::profile::base::nova::migration::client
   }
-  include ::tripleo::profile::base::nova::compute_libvirt_shared
+  include tripleo::profile::base::nova::compute_libvirt_shared
 
 }

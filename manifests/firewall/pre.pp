@@ -29,7 +29,7 @@ class tripleo::firewall::pre(
 ){
 
   # ensure the correct packages are installed
-  include ::firewall
+  include firewall
 
   # defaults 'pre' rules
   tripleo::firewall::rule{ '000 accept related established rules':

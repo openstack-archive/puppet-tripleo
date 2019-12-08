@@ -104,7 +104,7 @@ class tripleo::profile::base::cinder (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::cinder' :
+    class { 'cinder' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
@@ -114,7 +114,7 @@ class tripleo::profile::base::cinder (
         'ssl'       => $oslomsg_rpc_use_ssl_real,
       }),
     }
-    class { '::cinder::ceilometer' :
+    class { 'cinder::ceilometer' :
       notification_transport_url => os_transport_url({
         'transport' => $oslomsg_notify_proto,
         'hosts'     => $oslomsg_notify_hosts,
@@ -124,16 +124,16 @@ class tripleo::profile::base::cinder (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include ::cinder::config
-    include ::cinder::glance
-    include ::cinder::nova
-    include ::cinder::logging
-    include ::cinder::keystone::service_user
+    include cinder::config
+    include cinder::glance
+    include cinder::nova
+    include cinder::logging
+    include cinder::keystone::service_user
   }
 
   if $step >= 5 {
     if $cinder_enable_db_purge {
-      include ::cinder::cron::db_purge
+      include cinder::cron::db_purge
     }
   }
 

@@ -118,10 +118,10 @@ class tripleo::profile::base::mistral (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include ::mistral::config
-    include ::mistral::logging
-    include ::mistral::client
-    include ::mistral::db::sync
-    include ::mistral::cors
+    include mistral::config
+    include mistral::logging
+    include mistral::client
+    include mistral::db::sync
+    include mistral::cors
   }
 }

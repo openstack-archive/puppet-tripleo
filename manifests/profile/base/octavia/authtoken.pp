@@ -37,7 +37,7 @@ class tripleo::profile::base::octavia::authtoken (
       $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
     }
 
-    class { '::octavia::keystone::authtoken':
+    class { 'octavia::keystone::authtoken':
       memcached_servers => $memcache_servers
     }
   }

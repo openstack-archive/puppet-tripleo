@@ -23,7 +23,7 @@ describe 'tripleo::certmonger::ca::local' do
   shared_examples_for 'tripleo::certmonger::ca::local' do
 
     let :pre_condition do
-      "include ::certmonger"
+      "include certmonger"
     end
 
     let :params do

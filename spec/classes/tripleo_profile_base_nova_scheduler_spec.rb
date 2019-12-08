@@ -33,7 +33,7 @@ describe 'tripleo::profile::base::nova::scheduler' do
     context 'with step 4' do
       let(:pre_condition) do
         <<-eos
-        class { '::tripleo::profile::base::nova':
+        class { 'tripleo::profile::base::nova':
           step => #{params[:step]},
           oslomsg_rpc_hosts => [ '127.0.0.1' ],
         }

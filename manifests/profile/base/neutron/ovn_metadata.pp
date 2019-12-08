@@ -64,8 +64,8 @@ class tripleo::profile::base::neutron::ovn_metadata (
   $ovn_remote_probe_interval = 60000,
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::neutron
-    class { '::neutron::agents::ovn_metadata':
+    include tripleo::profile::base::neutron
+    class { 'neutron::agents::ovn_metadata':
         ovn_sb_connection         => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
         ovn_sb_private_key        => $ovn_sb_private_key,
         ovn_sb_certificate        => $ovn_sb_certificate,

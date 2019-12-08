@@ -56,8 +56,8 @@ class tripleo::profile::base::nova::compute (
 
   if $step >= 4 {
     # deploy basic bits for nova
-    include ::tripleo::profile::base::nova
-    include ::nova::cinder
+    include tripleo::profile::base::nova
+    include nova::cinder
 
     if $keymgr_api_class {
       warning('The keymgr_api_class parameter is deprecated, use keymgr_backend')
@@ -67,22 +67,22 @@ class tripleo::profile::base::nova::compute (
     }
 
     # deploy basic bits for nova-compute
-    class { '::nova::compute':
+    class { 'nova::compute':
       keymgr_backend => $keymgr_backend_real,
     }
-    include ::nova::compute::pci
+    include nova::compute::pci
     # If Service['nova-conductor'] is in catalog, make sure we start it
     # before nova-compute.
     Service<| title == 'nova-conductor' |> -> Service['nova-compute']
 
 
     # deploy bits to connect nova compute to neutron
-    include ::nova::network::neutron
+    include nova::network::neutron
 
     # we need to set nova::metadata::dhcp_domain which sets
     # [api]/dhcp_domain as this is used by the virt driver
     # to generate the config drive
-    include ::nova::metadata
+    include nova::metadata
   }
 
   # If NFS is used as a Cinder or Nova backend

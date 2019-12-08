@@ -27,6 +27,6 @@ class tripleo::profile::base::vpp (
   $step        = Integer(hiera('step')),
 ) {
   if $step >= 1 {
-    include ::fdio
+    include fdio
   }
 }

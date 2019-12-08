@@ -82,7 +82,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
   } else {
     $log_driver_real = $log_driver
   }
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 2 and $pacemaker_master {
     $cinder_volume_short_node_names = hiera('cinder_volume_short_node_names')

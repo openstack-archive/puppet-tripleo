@@ -91,7 +91,7 @@ class tripleo::profile::base::database::redis (
       $tls_certfile = $certificate_specs['service_certificate']
       $tls_keyfile = $certificate_specs['service_key']
 
-      include ::tripleo::stunnel
+      include tripleo::stunnel
 
       ::tripleo::stunnel::service_proxy { 'redis':
         accept_host  => $tls_proxy_bind_ip,
@@ -107,14 +107,14 @@ class tripleo::profile::base::database::redis (
     } else {
       $slaveof = "${redis_short_bootstrap_node_name} 6379"
     }
-    class { '::redis' :
+    class { 'redis' :
       slaveof => $slaveof,
     }
 
     if count($redis_node_ips) > 1 {
       Class['::tripleo::redis_notification'] -> Service['redis-sentinel']
-      include ::redis::sentinel
-      include ::tripleo::redis_notification
+      include redis::sentinel
+      include tripleo::redis_notification
     }
   }
 }

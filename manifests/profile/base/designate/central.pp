@@ -51,13 +51,13 @@ class tripleo::profile::base::designate::central (
     path    => '/etc/designate/pools.yaml',
     content => $pools_file_content_real,
   }
-  include ::tripleo::profile::base::designate
+  include tripleo::profile::base::designate
   if ($step >= 4 or ($step >= 3 and $sync_db)) {
-    class { '::designate::db':
+    class { 'designate::db':
       sync_db => $sync_db,
     }
-    include ::designate::central
-    include ::designate::quota
+    include designate::central
+    include designate::quota
   }
   if ($step == 5 and $sync_db) {
     exec { 'pool update':
