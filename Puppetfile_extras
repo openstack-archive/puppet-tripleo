@@ -3,7 +3,7 @@
 
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
-  :ref => 'master'
+  :ref => 'df96ffc5276ee316be925f9423612e9190055d8f'
 
 mod 'tomcat',
   :git => 'https://github.com/puppetlabs/puppetlabs-tomcat',
@@ -31,7 +31,7 @@ mod 'etcd',
 
 mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
-  :ref => 'master'
+  :ref => '6fd1c8e407eb57bcb42198975dd1fdb1c0de1013'
 
 # NOTE(aschultz): Include a fixed version for alternate source until
 # https://github.com/soylent/konstantin-fluentd/pull/40 is merged
@@ -54,11 +54,11 @@ mod 'systemd',
 
 mod 'opendaylight',
   :git => 'https://git.opendaylight.org/gerrit/integration/packaging/puppet-opendaylight',
-  :ref => 'master'
+  :ref => 'stable/fluorine'
 
 mod 'rsyslog',
   :git => 'https://github.com/voxpupuli/puppet-rsyslog',
-  :ref => 'master'
+  :ref => '0c2b6c8d6ef5401e069a7ba2d69d33aedb295fd1'
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
@@ -79,7 +79,7 @@ mod 'pacemaker',
 
 mod 'collectd',
   :git => 'https://github.com/voxpupuli/puppet-collectd',
-  :ref => 'master'
+  :ref => '785a71bd4be0d0e7e96aa6acea3c2120430058fc'
 
 # see https://github.com/rdo-packages/puppet-keepalived-distgit/blob/rpm-master/puppet-keepalived.spec
 mod 'keepalived',
