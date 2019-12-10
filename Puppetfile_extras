@@ -35,7 +35,7 @@ mod 'fdio',
 
 mod 'fluentd',
   :git => 'https://github.com/soylent/konstantin-fluentd',
-  :ref => 'master'
+  :ref => '4dfc15a70970fc9e182c876d6dc74b3764fbea4b'
 
 mod 'certmonger',
   :git => 'https://github.com/saltedsignal/puppet-certmonger',
@@ -56,7 +56,7 @@ mod 'systemd',
 
 mod 'opendaylight',
   :git => 'https://git.opendaylight.org/gerrit/integration/packaging/puppet-opendaylight',
-  :ref => 'master'
+  :ref => 'stable/fluorine'
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
@@ -77,7 +77,7 @@ mod 'pacemaker',
 
 mod 'collectd',
   :git => 'https://github.com/voxpupuli/puppet-collectd',
-  :ref => 'master'
+  :ref => 'd7b6b8c493e808534bdd4b1e500065ce46e40434'
 
 # see https://github.com/rdo-packages/puppet-keepalived-distgit/blob/rpm-master/puppet-keepalived.spec
 mod 'keepalived',
