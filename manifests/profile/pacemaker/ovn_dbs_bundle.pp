@@ -86,24 +86,31 @@
 #   (Optional) timeout for monitor of ovn dbs resource
 #   Defaults to 60
 #
+# [*listen_on_master_ip_only*]
+#   (Optional) t If set to yes, the OVNDBs will listen on master IP. Otherwise,
+#   it will listen on 0.0.0.0. Set to yes when using pacemaker managed vip resource
+#   as MASTER_IP; set to no when using external LB VIP.
+#   Defaults to 'yes'
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
-  $ovn_dbs_docker_image = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
-  $ovn_dbs_control_port = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::control_port', '3125'),
-  $bootstrap_node       = hiera('ovn_dbs_short_bootstrap_node_name'),
-  $step                 = Integer(hiera('step')),
-  $pcs_tries            = hiera('pcs_tries', 20),
-  $ovn_dbs_vip          = hiera('ovn_dbs_vip'),
-  $nb_db_port           = 6641,
-  $sb_db_port           = 6642,
-  $meta_params          = '',
-  $op_params            = '',
-  $container_backend    = 'docker',
-  $tls_priorities       = hiera('tripleo::pacemaker::tls_priorities', undef),
-  $log_driver           = undef,
-  $enable_internal_tls  = hiera('enable_internal_tls', false),
-  $ca_file              = undef,
-  $dbs_timeout          = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::dbs_timeout', 60),
+  $ovn_dbs_docker_image     = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
+  $ovn_dbs_control_port     = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::control_port', '3125'),
+  $bootstrap_node           = hiera('ovn_dbs_short_bootstrap_node_name'),
+  $step                     = Integer(hiera('step')),
+  $pcs_tries                = hiera('pcs_tries', 20),
+  $ovn_dbs_vip              = hiera('ovn_dbs_vip'),
+  $nb_db_port               = 6641,
+  $sb_db_port               = 6642,
+  $meta_params              = '',
+  $op_params                = '',
+  $container_backend        = 'docker',
+  $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $log_driver               = undef,
+  $enable_internal_tls      = hiera('enable_internal_tls', false),
+  $ca_file                  = undef,
+  $dbs_timeout              = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::dbs_timeout', 60),
+  $listen_on_master_ip_only = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::listen_on_master_ip_only', 'yes'),
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -171,7 +178,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
       }
       $ovn_dbs_vip_norm = normalize_ip_for_uri($ovn_dbs_vip)
       $resource_params = "master_ip=${ovn_dbs_vip_norm} nb_master_port=${nb_db_port} \
-sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000"
+sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000 \
+listen_on_master_ip_only=${listen_on_master_ip_only}"
       $ovn_dbs_location_rule = {
         resource_discovery => 'exclusive',
         score              => 0,
