@@ -3,7 +3,7 @@
 
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
-  :ref => 'master'
+  :ref => '6215a5e735b7f7bb470d0c10c5e8f72e6c17f4b7'
 
 mod 'tomcat',
   :git => 'https://github.com/puppetlabs/puppetlabs-tomcat',
@@ -31,11 +31,11 @@ mod 'etcd',
 
 mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
-  :ref => 'master'
+  :ref => '2dd7507d2e7b1be052ad8301f951b50422ee51f0'
 
 mod 'fluentd',
   :git => 'https://github.com/soylent/konstantin-fluentd',
-  :ref => 'master'
+  :ref => '4dfc15a70970fc9e182c876d6dc74b3764fbea4b'
 
 mod 'certmonger',
   :git => 'https://github.com/saltedsignal/puppet-certmonger',
@@ -56,7 +56,7 @@ mod 'systemd',
 
 mod 'opendaylight',
   :git => 'https://git.opendaylight.org/gerrit/integration/packaging/puppet-opendaylight',
-  :ref => 'master'
+  :ref => 'stable/oxygen'
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
@@ -74,11 +74,11 @@ mod 'sensu',
 
 mod 'pacemaker',
   :git => 'https://github.com/openstack/puppet-pacemaker',
-  :ref => 'master'
+  :ref => '447cef0ad8891e89495fef7a9be5e2152b07edfa'
 
 mod 'collectd',
   :git => 'https://github.com/voxpupuli/puppet-collectd',
-  :ref => 'master'
+  :ref => 'f04aa34cb4b8781aadcb7724839d2b763f280866'
 
 # see https://github.com/rdo-packages/puppet-keepalived-distgit/blob/rpm-master/puppet-keepalived.spec
 mod 'keepalived',
