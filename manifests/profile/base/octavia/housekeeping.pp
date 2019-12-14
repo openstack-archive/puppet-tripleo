@@ -30,6 +30,7 @@ class tripleo::profile::base::octavia::housekeeping (
 
   if $step >= 5 {
     include ::octavia::controller
+    include ::octavia::nova
     include ::octavia::housekeeping
   }
 }
