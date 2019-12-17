@@ -36,7 +36,7 @@ define tripleo::profile::base::metrics::collectd::sqlalchemy_collectd (
   $log_messages   = 'info',
 
 ) {
-  include ::collectd
+  include collectd
 
   package { 'python-collectd-sqlalchemy':
     ensure => 'present',

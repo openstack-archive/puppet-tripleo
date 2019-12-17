@@ -209,7 +209,7 @@ class tripleo::profile::base::metrics::qdr (
       $listen_on = $listener_addr
     }
 
-    class { '::qdr':
+    class { 'qdr':
       listener_addr            => $listen_on,
       listener_port            => $listener_port,
       listener_require_encrypt => $listener_require_encrypt,

@@ -33,7 +33,7 @@ class tripleo::profile::base::neutron::ovn_northd (
     # Note this only runs on the first node in the cluster when
     # deployed on a role where multiple nodes exist.
     if $::hostname == downcase($bootstrap_node) {
-      include ::ovn::northd
+      include ovn::northd
     }
   }
 }

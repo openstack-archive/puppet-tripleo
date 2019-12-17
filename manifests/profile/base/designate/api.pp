@@ -37,12 +37,12 @@ class tripleo::profile::base::designate::api (
   $listen_port    = '9001',
 ) {
 
-  include ::tripleo::profile::base::designate
+  include tripleo::profile::base::designate
 
   if ($step >= 3) {
     $listen_uri = normalize_ip_for_uri($listen_ip)
-    include ::designate::keystone::authtoken
-    class { '::designate::api':
+    include designate::keystone::authtoken
+    class { 'designate::api':
       listen => "${listen_uri}:${listen_port}",
     }
   }

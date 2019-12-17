@@ -230,7 +230,7 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::keystone':
+    class { 'keystone':
       sync_db                    => $sync_db,
       enable_bootstrap           => $sync_db,
       default_transport_url      => os_transport_url({
@@ -255,18 +255,18 @@ class tripleo::profile::base::keystone (
     }
 
     if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{
-      include ::keystone::messaging::amqp
+      include keystone::messaging::amqp
     }
 
-    include ::keystone::config
-    include ::keystone::logging
-    include ::tripleo::profile::base::apache
-    class { '::keystone::wsgi::apache':
+    include keystone::config
+    include keystone::logging
+    include tripleo::profile::base::apache
+    class { 'keystone::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }
-    include ::keystone::cors
-    include ::keystone::security_compliance
+    include keystone::cors
+    include keystone::security_compliance
 
     if $ldap_backend_enable {
       validate_legacy(Hash, 'validate_hash', $ldap_backends_config)
@@ -282,20 +282,20 @@ class tripleo::profile::base::keystone (
     }
 
     if $keystone_federation_enabled {
-      include ::keystone::federation
+      include keystone::federation
     }
 
     if $keystone_openidc_enabled {
       $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
 
-      class { '::keystone::federation::openidc':
+      class { 'keystone::federation::openidc':
         memcached_servers => $memcached_servers,
       }
     }
   }
 
   if $step >= 4 and $manage_db_purge {
-    include ::keystone::cron::token_flush
+    include keystone::cron::token_flush
   }
 
   if $step == 3 and $manage_domain {
@@ -328,7 +328,7 @@ class tripleo::profile::base::keystone (
     } else {
       $admin_roles = ['admin']
     }
-    class { '::keystone::roles::admin':
+    class { 'keystone::roles::admin':
       admin_roles => $admin_roles,
     }
 
@@ -349,88 +349,88 @@ class tripleo::profile::base::keystone (
   }
 
   if $step == 3 and $manage_endpoint {
-    include ::keystone::endpoint
+    include keystone::endpoint
     if hiera('aodh_api_enabled', false) {
-      include ::aodh::keystone::auth
+      include aodh::keystone::auth
     }
     if hiera('barbican_api_enabled', false) {
-      include ::barbican::keystone::auth
+      include barbican::keystone::auth
     }
     # ceilometer user is needed even when ceilometer api
     # not running, so it can authenticate with keystone
     # and dispatch data.
     if hiera('ceilometer_auth_enabled', false) {
-      include ::ceilometer::keystone::auth
+      include ceilometer::keystone::auth
     }
     if hiera('ceph_rgw_enabled', false) {
-      include ::ceph::rgw::keystone::auth
+      include ceph::rgw::keystone::auth
     }
     if hiera('cinder_api_enabled', false) {
-      include ::cinder::keystone::auth
+      include cinder::keystone::auth
     }
     if hiera('designate_api_enabled', false) {
-      include ::designate::keystone::auth
+      include designate::keystone::auth
     }
     if hiera('glance_api_enabled', false) {
-      include ::glance::keystone::auth
+      include glance::keystone::auth
     }
     if hiera('gnocchi_api_enabled', false) {
-      include ::gnocchi::keystone::auth
+      include gnocchi::keystone::auth
     }
     if hiera('heat_api_enabled', false) {
-      include ::heat::keystone::auth
+      include heat::keystone::auth
     }
     if hiera('heat_api_cfn_enabled', false) {
-      include ::heat::keystone::auth_cfn
+      include heat::keystone::auth_cfn
     }
     if hiera('ironic_api_enabled', false) {
-      include ::ironic::keystone::auth
+      include ironic::keystone::auth
     }
     if hiera('ironic_inspector_enabled', false) {
-      include ::ironic::keystone::auth_inspector
+      include ironic::keystone::auth_inspector
     }
     if hiera('manila_api_enabled', false) {
-      include ::manila::keystone::auth
+      include manila::keystone::auth
     }
     if hiera('mistral_api_enabled', false) {
-      include ::mistral::keystone::auth
+      include mistral::keystone::auth
     }
     if hiera('neutron_api_enabled', false) {
-      include ::neutron::keystone::auth
+      include neutron::keystone::auth
     }
     if hiera('nova_api_enabled', false) {
-      include ::nova::keystone::auth
+      include nova::keystone::auth
     }
     if hiera('placement_enabled', false) {
-      include ::placement::keystone::auth
+      include placement::keystone::auth
     }
     if hiera('octavia_api_enabled', false) {
-      include ::octavia::keystone::auth
+      include octavia::keystone::auth
     }
     if hiera('panko_api_enabled', false) {
-      include ::panko::keystone::auth
+      include panko::keystone::auth
     }
     if hiera('sahara_api_enabled', false) {
-      include ::sahara::keystone::auth
+      include sahara::keystone::auth
     }
     if hiera('swift_proxy_enabled', false) or hiera('external_swift_proxy_enabled',false) {
-      include ::swift::keystone::auth
+      include swift::keystone::auth
     }
     if hiera('trove_api_enabled', false) {
-      include ::trove::keystone::auth
+      include trove::keystone::auth
     }
     if hiera('zaqar_api_enabled', false) {
-      include ::zaqar::keystone::auth
-      include ::zaqar::keystone::auth_websocket
+      include zaqar::keystone::auth
+      include zaqar::keystone::auth_websocket
     }
     if hiera('ec2_api_enabled', false) {
-      include ::ec2api::keystone::auth
+      include ec2api::keystone::auth
     }
     if hiera('novajoin_enabled', false) {
-      include ::nova::metadata::novajoin::auth
+      include nova::metadata::novajoin::auth
     }
     if hiera('veritas_hyperscale_controller_enabled', false) {
-      include ::veritas_hyperscale::hs_keystone
+      include veritas_hyperscale::hs_keystone
     }
   }
 }

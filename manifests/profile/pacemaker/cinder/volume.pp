@@ -49,7 +49,7 @@ class tripleo::profile::pacemaker::cinder::volume (
     $pacemaker_master = false
   }
 
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 2 {
     pacemaker::property { 'cinder-volume-role-node-property':

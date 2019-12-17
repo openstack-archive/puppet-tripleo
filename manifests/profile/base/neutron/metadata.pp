@@ -27,8 +27,8 @@ class tripleo::profile::base::neutron::metadata (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::tripleo::profile::base::neutron
-    include ::neutron::agents::metadata
+    include tripleo::profile::base::neutron
+    include neutron::agents::metadata
 
     Service<| title == 'neutron-server' |> -> Service<| title == 'neutron-metadata' |>
   }

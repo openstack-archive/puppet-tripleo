@@ -120,8 +120,8 @@ class tripleo::network::contrail::neutron_plugin (
   $package_ensure         = 'present',
 ) {
 
-  include ::neutron::deps
-  include ::neutron::params
+  include neutron::deps
+  include neutron::params
 
   validate_legacy(Array, 'validate_array', $contrail_extensions)
 

@@ -82,7 +82,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
     $log_driver_real = $log_driver
   }
 
-  include ::tripleo::profile::base::cinder::backup
+  include tripleo::profile::base::cinder::backup
 
   if $step >= 2 and $pacemaker_master {
     $cinder_backup_short_node_names = hiera('cinder_backup_short_node_names')

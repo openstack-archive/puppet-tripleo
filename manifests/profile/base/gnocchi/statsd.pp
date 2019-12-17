@@ -26,9 +26,9 @@
 class tripleo::profile::base::gnocchi::statsd (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::gnocchi
+  include tripleo::profile::base::gnocchi
 
   if $step >= 5 {
-    include ::gnocchi::statsd
+    include gnocchi::statsd
   }
 }

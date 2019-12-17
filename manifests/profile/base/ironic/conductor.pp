@@ -40,7 +40,7 @@ class tripleo::profile::base::ironic::conductor (
   $manage_pxe     = true,
   $enable_staging = false,
 ) {
-  include ::tripleo::profile::base::ironic
+  include tripleo::profile::base::ironic
   # Database is accessed by both API and conductor, hence it's here.
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -50,33 +50,33 @@ class tripleo::profile::base::ironic::conductor (
 
   # Ironic conductor class expects PXE directories exist
   if ($step >= 3 and $sync_db) and $manage_pxe {
-      include ::ironic::pxe
+      include ironic::pxe
   }
 
   if $step >= 4 {
-      include ::ironic::conductor
-      include ::ironic::drivers::interfaces
-      include ::ironic::drivers::pxe
+      include ironic::conductor
+      include ironic::drivers::interfaces
+      include ironic::drivers::pxe
       if $manage_pxe {
-          include ::ironic::pxe
+          include ironic::pxe
       }
 
       # Configure a few popular drivers
-      include ::ironic::drivers::ansible
-      include ::ironic::drivers::drac
-      include ::ironic::drivers::ilo
-      include ::ironic::drivers::ipmi
-      include ::ironic::drivers::redfish
+      include ironic::drivers::ansible
+      include ironic::drivers::drac
+      include ironic::drivers::ilo
+      include ironic::drivers::ipmi
+      include ironic::drivers::redfish
       if $enable_staging {
-          include ::ironic::drivers::staging
+          include ironic::drivers::staging
       }
 
       # Configure access to other services
-      include ::ironic::cinder
-      include ::ironic::drivers::inspector
-      include ::ironic::glance
-      include ::ironic::neutron
-      include ::ironic::service_catalog
-      include ::ironic::swift
+      include ironic::cinder
+      include ironic::drivers::inspector
+      include ironic::glance
+      include ironic::neutron
+      include ironic::service_catalog
+      include ironic::swift
   }
 }

@@ -34,7 +34,7 @@ class tripleo::profile::base::cinder::volume::veritas_hyperscale (
   $backend_name = hiera('cinder::backend::veritas_hyperscale::volume_backend_name', 'Veritas_HyperScale'),
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::veritas_hyperscale { $backend_name :

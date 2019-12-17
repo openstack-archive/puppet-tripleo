@@ -54,7 +54,7 @@ class tripleo::profile::base::ceilometer::upgrade (
 
     # NOTE(sileht): Ensure we run before ceilometer-agent-notification is
     # started and after gnocchi-api is running
-    include ::gnocchi::deps
+    include gnocchi::deps
     Anchor['gnocchi::service::end']
     ~> Exec['ceilometer-db-upgrade']
     ~> Anchor['ceilometer::service::begin']

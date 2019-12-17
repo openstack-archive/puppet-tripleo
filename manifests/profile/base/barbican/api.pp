@@ -132,15 +132,15 @@ class tripleo::profile::base::barbican::api (
     $tls_keyfile = undef
   }
 
-  include ::tripleo::profile::base::barbican
-  include ::tripleo::profile::base::barbican::authtoken
+  include tripleo::profile::base::barbican
+  include tripleo::profile::base::barbican::authtoken
 
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
-    include ::tripleo::profile::base::barbican::backends
+    include tripleo::profile::base::barbican::backends
 
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::barbican::api':
+    class { 'barbican::api':
       sync_db                        => $sync_db,
       default_transport_url          => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
@@ -161,12 +161,12 @@ class tripleo::profile::base::barbican::api (
       multiple_secret_stores_enabled => true,
       enabled_secret_stores          => $::tripleo::profile::base::barbican::backends::enabled_secret_stores,
     }
-    include ::barbican::keystone::authtoken
-    include ::barbican::api::logging
-    include ::barbican::keystone::notification
-    include ::barbican::quota
-    include ::tripleo::profile::base::apache
-    class { '::barbican::wsgi::apache':
+    include barbican::keystone::authtoken
+    include barbican::api::logging
+    include barbican::keystone::notification
+    include barbican::quota
+    include tripleo::profile::base::apache
+    class { 'barbican::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

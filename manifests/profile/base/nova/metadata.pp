@@ -59,8 +59,8 @@ class tripleo::profile::base::nova::metadata (
     $is_bootstrap = false
   }
 
-  include ::tripleo::profile::base::nova
-  include ::tripleo::profile::base::nova::authtoken
+  include tripleo::profile::base::nova
+  include tripleo::profile::base::nova::authtoken
 
   if $enable_internal_tls {
     if !$nova_metadata_network {
@@ -74,11 +74,11 @@ class tripleo::profile::base::nova::metadata (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::nova::cors
-    include ::nova::network::neutron
-    include ::nova::metadata
-    include ::tripleo::profile::base::apache
-    class { '::nova::wsgi::apache_metadata':
+    include nova::cors
+    include nova::network::neutron
+    include nova::metadata
+    include tripleo::profile::base::apache
+    class { 'nova::wsgi::apache_metadata':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

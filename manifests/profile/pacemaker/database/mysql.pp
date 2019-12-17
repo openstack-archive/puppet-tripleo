@@ -223,7 +223,7 @@ class tripleo::profile::pacemaker::database::mysql (
     $remove_default_accounts = false
   }
 
-  class { '::tripleo::profile::base::database::mysql':
+  class { 'tripleo::profile::base::database::mysql':
     bootstrap_node          => $bootstrap_node,
     manage_resources        => false,
     remove_default_accounts => $remove_default_accounts,

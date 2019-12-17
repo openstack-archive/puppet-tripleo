@@ -30,6 +30,6 @@ class tripleo::profile::base::neutron::agents::l2gw (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::neutron::agents::l2gw
+    include neutron::agents::l2gw
   }
 }

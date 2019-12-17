@@ -47,7 +47,7 @@ class tripleo::certmonger::openvswitch (
   $postsave_cmd  = 'systemctl reload openvswitch',
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   certmonger_certificate { 'openvswitch' :
     ensure       => 'present',

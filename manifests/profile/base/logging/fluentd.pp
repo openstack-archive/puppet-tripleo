@@ -122,8 +122,8 @@ class tripleo::profile::base::logging::fluentd (
   if $step >= 4 {
     warning('Service fluentd is deprecated. Please take in mind, that it going to be removed in T release.')
 
-    include ::fluentd
-    include ::systemd::systemctl::daemon_reload
+    include fluentd
+    include systemd::systemctl::daemon_reload
 
     $_fluentd_service_user = pick($fluentd_service_user,
                                   $::fluentd::config_owner,

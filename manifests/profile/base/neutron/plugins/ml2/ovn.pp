@@ -79,7 +79,7 @@ class tripleo::profile::base::neutron::plugins::ml2::ovn (
   $step                     = Integer(hiera('step'))
 ) {
   if $step >= 4 {
-    class { '::neutron::plugins::ml2::ovn':
+    class { 'neutron::plugins::ml2::ovn':
       ovn_nb_connection  => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
       ovn_sb_connection  => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
       ovn_nb_private_key => $ovn_nb_private_key,

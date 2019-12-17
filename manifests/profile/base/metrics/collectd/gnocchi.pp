@@ -137,7 +137,7 @@ define tripleo::profile::base::metrics::collectd::gnocchi (
   $resource_type                = 'collectd',
   $batch_size                   = 10,
 ) {
-  include ::collectd
+  include collectd
 
   package { 'python-collectd-gnocchi':
     ensure => $ensure,

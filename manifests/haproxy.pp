@@ -849,7 +849,7 @@ class tripleo::haproxy (
     $httplog = {}
   }
 
-  class { '::haproxy':
+  class { 'haproxy':
     service_manage   => $haproxy_service_manage,
     global_options   => merge($haproxy_global_options, $haproxy_daemonize, $haproxy_globals_override),
     defaults_options => merge($haproxy_defaults_options, $httplog, $haproxy_defaults_override),
@@ -888,7 +888,7 @@ class tripleo::haproxy (
     $haproxy_stats_ips_raw = union(any2array($controller_virtual_ip), any2array($haproxy_stats_bind_address))
     $haproxy_stats_ips = delete_undef_values($haproxy_stats_ips_raw)
 
-    class { '::tripleo::haproxy::stats':
+    class { 'tripleo::haproxy::stats':
       haproxy_listen_bind_param => $haproxy_listen_bind_param,
       ip                        => $haproxy_stats_ips,
       password                  => $haproxy_stats_password,
@@ -1277,7 +1277,7 @@ class tripleo::haproxy (
   }
 
   if $horizon {
-    class { '::tripleo::haproxy::horizon_endpoint':
+    class { 'tripleo::haproxy::horizon_endpoint':
       public_virtual_ip           => $public_virtual_ip,
       internal_ip                 => hiera('horizon_vip', $controller_virtual_ip),
       haproxy_listen_bind_param   => $haproxy_listen_bind_param,
@@ -1378,7 +1378,7 @@ class tripleo::haproxy (
       options           => $mysql_member_options_real,
     }
     if $manage_firewall {
-      include ::tripleo::firewall
+      include tripleo::firewall
       $mysql_firewall_rules = {
         '100 mysql_haproxy' => {
           'dport' => 3306,
@@ -1475,7 +1475,7 @@ class tripleo::haproxy (
       verifyhost        => false,
     }
     if $manage_firewall {
-      include ::tripleo::firewall
+      include tripleo::firewall
       $redis_firewall_rules = {
         '100 redis_haproxy' => {
           'dport' => 6379,

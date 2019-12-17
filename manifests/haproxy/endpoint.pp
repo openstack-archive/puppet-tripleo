@@ -272,7 +272,7 @@ define tripleo::haproxy::endpoint (
   }
 
   if $manage_firewall {
-    include ::tripleo::firewall
+    include tripleo::firewall
     # This block will construct firewall rules only when we specify
     # a port for the regular service and also the ssl port for the service.
     # It makes sure we're not trying to create TCP iptables rules where no port

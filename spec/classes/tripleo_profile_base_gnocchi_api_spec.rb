@@ -25,7 +25,7 @@ describe 'tripleo::profile::base::gnocchi::api' do
   shared_examples_for 'tripleo::profile::base::gnocchi::api' do
     let(:pre_condition) do
       "
-        class { '::tripleo::profile::base::gnocchi': step => #{params[:step]}, }
+        class { 'tripleo::profile::base::gnocchi': step => #{params[:step]}, }
       "
     end
 

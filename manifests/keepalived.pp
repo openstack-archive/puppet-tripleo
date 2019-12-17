@@ -118,7 +118,7 @@ class tripleo::keepalived (
     $keepalived_vrrp_script_real = $keepalived_vrrp_script
   }
 
-  class { '::keepalived': }
+  class { 'keepalived': }
   keepalived::vrrp_script { 'haproxy':
     name_is_process => $keepalived_name_is_process,
     script          => $keepalived_vrrp_script_real,

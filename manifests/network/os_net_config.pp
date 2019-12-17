@@ -19,7 +19,7 @@
 #
 class tripleo::network::os_net_config {
 
-  include ::vswitch::ovs
+  include vswitch::ovs
   ensure_packages('os-net-config', { ensure => present })
 
   exec { 'os-net-config':

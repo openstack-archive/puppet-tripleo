@@ -38,9 +38,9 @@ class tripleo::profile::base::placement (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include ::placement
-    include ::placement::config
-    include ::placement::logging
-    include ::placement::db
+    include placement
+    include placement::config
+    include placement::logging
+    include placement::db
   }
 }

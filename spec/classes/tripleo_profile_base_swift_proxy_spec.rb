@@ -24,14 +24,14 @@ describe 'tripleo::profile::base::swift::proxy' do
   shared_examples_for 'tripleo::profile::base::swift::proxy' do
 
     let :pre_condition do
-      "class { '::swift':
+      "class { 'swift':
          swift_hash_path_prefix => 'foo',
        }
-       include ::memcached
-       class { '::swift::proxy':
+       include memcached
+       class { 'swift::proxy':
          proxy_local_net_ip => '127.0.0.1',
        }
-       include ::swift::proxy::tempauth
+       include swift::proxy::tempauth
       "
     end
 

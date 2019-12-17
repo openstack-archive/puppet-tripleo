@@ -61,7 +61,7 @@ class tripleo::profile::base::pacemaker_remote (
   if $pcs_password == undef {
     fail('The $pcs_password param is and the hiera key "hacluster_pwd" hiera key are both undefined, this is not allowed')
   }
-  class { '::pacemaker::remote':
+  class { 'pacemaker::remote':
     pcs_user       => $pcs_user,
     pcs_password   => $pcs_password,
     remote_authkey => $remote_authkey,
@@ -69,7 +69,7 @@ class tripleo::profile::base::pacemaker_remote (
     tls_priorities => $tls_priorities,
   }
   if str2bool(hiera('docker_enabled', false)) {
-    include ::systemd::systemctl::daemon_reload
+    include systemd::systemctl::daemon_reload
 
     Package<| name == 'docker' |>
     -> file { '/etc/systemd/system/resource-agents-deps.target.wants':
@@ -90,7 +90,7 @@ class tripleo::profile::base::pacemaker_remote (
   $enable_fencing_real = str2bool($enable_fencing) and $step >= 5
 
   if $enable_fencing_real {
-    include ::tripleo::fencing
+    include tripleo::fencing
 
     # enable stonith after all Pacemaker resources have been created
     Pcmk_resource<||> -> Class['tripleo::fencing']

@@ -20,7 +20,7 @@ describe 'tripleo::profile::base::novajoin' do
 
   let :pre_condition do
     "include nova
-     class { '::nova::metadata::novajoin::authtoken':
+     class { 'nova::metadata::novajoin::authtoken':
        password => 'passw0rd',
      }"
   end

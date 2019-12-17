@@ -28,7 +28,7 @@ class tripleo::profile::base::neutron::opencontrail::vrouter (
 
   if $step >= 4 {
 
-    include ::contrail::vrouter
+    include contrail::vrouter
     # NOTE: it's not possible to use this class without a functional
     # contrail controller up and running
     #class {'::contrail::vrouter::provision_vrouter':

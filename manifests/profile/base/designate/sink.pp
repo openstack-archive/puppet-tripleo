@@ -26,8 +26,8 @@
 class tripleo::profile::base::designate::sink (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::designate
+  include tripleo::profile::base::designate
   if $step >= 4 {
-    include ::designate::sink
+    include designate::sink
   }
 }

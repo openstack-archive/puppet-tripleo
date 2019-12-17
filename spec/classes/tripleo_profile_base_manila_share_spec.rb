@@ -25,7 +25,7 @@ describe 'tripleo::profile::base::manila::share' do
 
     let(:pre_condition) do
       <<-eos
-      class { '::tripleo::profile::base::manila':
+      class { 'tripleo::profile::base::manila':
         step => #{params[:step]},
         oslomsg_rpc_hosts    => [ 'localhost' ],
         oslomsg_rpc_username => 'manila',

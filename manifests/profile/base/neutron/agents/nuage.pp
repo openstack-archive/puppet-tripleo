@@ -51,10 +51,10 @@ class tripleo::profile::base::neutron::agents::nuage (
   $step                    = Integer(hiera('step')),
 ) {
   if $step >= 4 {
-    include ::nuage::vrs
+    include nuage::vrs
 
     if $enable_metadata_agent {
-      class { '::nuage::metadataagent':
+      class { 'nuage::metadataagent':
         nova_os_tenant_name => $nova_os_tenant_name,
         nova_os_password    => $nova_os_password,
         nova_metadata_ip    => $nova_metadata_ip,

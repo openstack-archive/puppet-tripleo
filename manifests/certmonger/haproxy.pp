@@ -58,8 +58,8 @@ define tripleo::certmonger::haproxy (
   $principal     = undef,
   $postsave_cmd  = undef,
 ){
-    include ::certmonger
-    include ::haproxy::params
+    include certmonger
+    include haproxy::params
     if $certmonger_ca == 'local' {
       if defined(Class['::haproxy']) {
         Class['::tripleo::certmonger::ca::local'] ~> Class['::haproxy']

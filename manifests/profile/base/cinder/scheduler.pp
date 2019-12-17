@@ -26,10 +26,10 @@
 class tripleo::profile::base::cinder::scheduler (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder
+  include tripleo::profile::base::cinder
 
   if $step >= 4 {
-    include ::cinder::scheduler
+    include cinder::scheduler
   }
 
 }

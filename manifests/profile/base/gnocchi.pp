@@ -29,10 +29,10 @@ class tripleo::profile::base::gnocchi (
   if $step >= 3 {
     warning('Gnocchi is deprecated and is going to be removed in future.')
 
-    include ::gnocchi
-    include ::gnocchi::config
-    include ::gnocchi::cors
-    include ::gnocchi::client
-    include ::gnocchi::logging
+    include gnocchi
+    include gnocchi::config
+    include gnocchi::cors
+    include gnocchi::client
+    include gnocchi::logging
   }
 }

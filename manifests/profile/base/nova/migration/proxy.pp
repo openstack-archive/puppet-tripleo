@@ -43,11 +43,11 @@ class tripleo::profile::base::nova::migration::proxy (
   $target_port  = 22
 ) {
 
-  include ::tripleo::profile::base::nova::migration
+  include tripleo::profile::base::nova::migration
 
   if $step >= 4 {
     if !empty($ssh_private_key) {
-      class { '::tripleo::profile::base::nova::migration::target':
+      class { 'tripleo::profile::base::nova::migration::target':
         step            => $step,
         wrapper_command => "/bin/ssh \
 -p ${target_port} \

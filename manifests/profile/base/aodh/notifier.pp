@@ -27,11 +27,11 @@ class tripleo::profile::base::aodh::notifier (
   $step = Integer(hiera('step')),
 ) {
 
-  include ::tripleo::profile::base::aodh
+  include tripleo::profile::base::aodh
 
   if $step >= 4 {
     warning('Service aodh is deprecated. Please take in mind, that it is going to be removed in T release.')
-    include ::aodh::notifier
+    include aodh::notifier
   }
 
 }

@@ -122,14 +122,14 @@ class tripleo::profile::base::nova (
     } else {
       $oslomsg_rpc_hosts_real = $oslomsg_rpc_hosts
     }
-    include ::nova::config
-    include ::nova::logging
-    class { '::nova::cache':
+    include nova::config
+    include nova::logging
+    class { 'nova::cache':
       enabled          => $enable_cache,
       backend          => 'oslo_cache.memcache_pool',
       memcache_servers => $memcache_servers,
     }
-    class { '::nova':
+    class { 'nova':
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts_real,
@@ -147,7 +147,7 @@ class tripleo::profile::base::nova (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include ::nova::placement
-    include ::nova::keystone::service_user
+    include nova::placement
+    include nova::keystone::service_user
   }
 }

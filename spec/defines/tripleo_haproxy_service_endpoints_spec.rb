@@ -4,7 +4,7 @@ describe 'tripleo::haproxy::service_endpoints' do
 
 
   let :pre_condition do
-    'include ::haproxy'
+    'include haproxy'
   end
 
   shared_examples_for 'tripleo haproxy service_endpoints' do

@@ -93,10 +93,10 @@ class tripleo::profile::base::zaqar (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::zaqar
+    include zaqar
 
     if $messaging_store == 'swift' {
-      include ::zaqar::messaging::swift
+      include zaqar::messaging::swift
     } elsif $messaging_store == 'redis' {
       class {'::zaqar::messaging::redis':
         uri => join(['redis://:', $zaqar_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
@@ -106,21 +106,21 @@ class tripleo::profile::base::zaqar (
     }
 
     if $management_store == 'sqlalchemy' {
-      include ::zaqar::management::sqlalchemy
+      include zaqar::management::sqlalchemy
     } else {
       fail("unsupported Zaqar management_store set: ${management_store}")
     }
 
-    include ::zaqar::transport::websocket
-    include ::tripleo::profile::base::apache
-    include ::zaqar::transport::wsgi
-    include ::zaqar::config
-    include ::zaqar::logging
+    include zaqar::transport::websocket
+    include tripleo::profile::base::apache
+    include zaqar::transport::wsgi
+    include zaqar::config
+    include zaqar::logging
 
     # TODO (bcrochet): At some point, the transports should be split out to
     # separate services.
-    include ::zaqar::server
-    class { '::zaqar::wsgi::apache':
+    include zaqar::server
+    class { 'zaqar::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

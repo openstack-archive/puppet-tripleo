@@ -69,7 +69,7 @@ class tripleo::profile::base::ironic (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
-    class { '::ironic':
+    class { 'ironic':
       sync_db                   => $sync_db,
       db_online_data_migrations => $sync_db,
       default_transport_url     => os_transport_url({
@@ -82,8 +82,8 @@ class tripleo::profile::base::ironic (
       }),
     }
 
-    include ::ironic::config
-    include ::ironic::cors
-    include ::ironic::logging
+    include ironic::config
+    include ironic::cors
+    include ironic::logging
   }
 }

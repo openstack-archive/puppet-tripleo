@@ -54,10 +54,10 @@ class tripleo::profile::base::ceilometer::agent::polling (
   $redis_vip                 = hiera('redis_vip', undef),
   $step                      = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::ceilometer
+  include tripleo::profile::base::ceilometer
 
   if $central_namespace {
-    include ::tripleo::profile::base::ceilometer::upgrade
+    include tripleo::profile::base::ceilometer::upgrade
   }
 
   if $enable_internal_tls {
@@ -67,8 +67,8 @@ class tripleo::profile::base::ceilometer::agent::polling (
   }
 
   if $step >= 4 {
-    include ::ceilometer::agent::auth
-    class { '::ceilometer::agent::polling':
+    include ceilometer::agent::auth
+    class { 'ceilometer::agent::polling':
       central_namespace => $central_namespace,
       compute_namespace => $compute_namespace,
       ipmi_namespace    => $ipmi_namespace,

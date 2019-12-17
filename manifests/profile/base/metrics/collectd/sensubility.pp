@@ -110,8 +110,8 @@ class tripleo::profile::base::metrics::collectd::sensubility (
   $amqp_user          = undef,
   $amqp_password      = undef
 ) {
-  include ::collectd
-  include ::collectd::plugin::exec
+  include collectd
+  include collectd::plugin::exec
 
   package { 'collectd-sensubility':
     ensure => $ensure,

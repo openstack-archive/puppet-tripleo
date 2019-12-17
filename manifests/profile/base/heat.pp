@@ -97,12 +97,12 @@ class tripleo::profile::base::heat (
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
 ) {
 
-  include ::tripleo::profile::base::heat::authtoken
+  include tripleo::profile::base::heat::authtoken
 
   # Domain resources will be created at step5 on the node running keystone.pp
   # configure heat.conf at step3 and 4 but actually create the domain later.
   if $step >= 3 {
-    class { '::heat::keystone::domain':
+    class { 'heat::keystone::domain':
       manage_domain => false,
       manage_user   => false,
       manage_role   => false,
@@ -110,7 +110,7 @@ class tripleo::profile::base::heat (
 
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class { '::heat' :
+    class { 'heat' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
@@ -128,14 +128,14 @@ class tripleo::profile::base::heat (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include ::heat::config
-    include ::heat::cors
-    include ::heat::logging
+    include heat::config
+    include heat::cors
+    include heat::logging
   }
 
   if $step >= 5 {
     if $manage_db_purge {
-      include ::heat::cron::purge_deleted
+      include heat::cron::purge_deleted
     }
   }
 }

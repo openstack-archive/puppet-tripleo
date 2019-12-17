@@ -31,7 +31,7 @@ class tripleo::profile::base::cinder::volume::netapp (
   $backend_name = hiera('cinder::backend::netapp::volume_backend_name', 'tripleo_netapp'),
   $step         = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     if hiera('cinder::backend::netapp::nfs_shares', undef) {

@@ -114,7 +114,7 @@ class tripleo::profile::base::pacemaker (
   }
 
   if $pcs_password == undef {
-    fail('The $pcs_password param is undefined, did you forget to include ::tripleo::profile::base::pacemaker in your role?')
+    fail('The $pcs_password param is undefined, did you forget to include tripleo::profile::base::pacemaker in your role?')
   }
 
   Pcmk_resource <| |> {
@@ -163,10 +163,10 @@ class tripleo::profile::base::pacemaker (
     } else {
       $cluster_setup_extras = $cluster_setup_extras_pre
     }
-    class { '::pacemaker':
+    class { 'pacemaker':
       hacluster_pwd => $pcs_password,
     }
-    -> class { '::pacemaker::corosync':
+    -> class { 'pacemaker::corosync':
       cluster_members      => $pacemaker_cluster_members,
       setup_cluster        => $pacemaker_master,
       cluster_setup_extras => $cluster_setup_extras,
@@ -175,7 +175,7 @@ class tripleo::profile::base::pacemaker (
       tls_priorities       => $tls_priorities,
     }
     if str2bool(hiera('docker_enabled', false)) {
-      include ::systemd::systemctl::daemon_reload
+      include systemd::systemctl::daemon_reload
 
       Package<| name == 'docker' |>
       -> file { '/etc/systemd/system/resource-agents-deps.target.wants':
@@ -195,14 +195,14 @@ class tripleo::profile::base::pacemaker (
     }
 
     if $pacemaker_master {
-      class { '::pacemaker::stonith':
+      class { 'pacemaker::stonith':
         disable => !$enable_fencing,
         tries   => $pcs_tries,
       }
       Class['pacemaker::stonith'] -> Exec<|tag == 'pacemaker-scaleup'|>
     }
     if $enable_fencing {
-      include ::tripleo::fencing
+      include tripleo::fencing
 
       # enable stonith after all Pacemaker resources have been created
       Pcmk_resource<||> -> Class['tripleo::fencing']
@@ -245,16 +245,16 @@ class tripleo::profile::base::pacemaker (
   }
 
   if $enable_instanceha and $pacemaker_master {
-    include ::tripleo::profile::base::pacemaker::instance_ha
+    include tripleo::profile::base::pacemaker::instance_ha
   }
 
   if ($step >= 2 and $pacemaker_master) {
     if ! $enable_instanceha {
-      include ::pacemaker::resource_defaults
+      include pacemaker::resource_defaults
     }
     # Set pacemaker resource op defaults only when specified
     if $resource_op_defaults != undef {
-      class { '::pacemaker::resource_op_defaults':
+      class { 'pacemaker::resource_op_defaults':
         tries    => $pcs_tries,
         defaults => $resource_op_defaults,
       }

@@ -41,7 +41,7 @@ class tripleo::profile::base::neutron::plugins::ml2::vpp (
   }
 
   if $step >= 4 {
-    class { '::neutron::plugins::ml2::vpp':
+    class { 'neutron::plugins::ml2::vpp':
       etcd_host => $etcd_host,
       etcd_port => $etcd_port,
     }

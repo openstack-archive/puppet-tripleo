@@ -36,16 +36,16 @@ class tripleo::profile::base::neutron::n1k (
   $n1kv_version = hiera('n1kv_vem_version', undef),
   $step         = Integer(hiera('step')),
 ) {
-  include ::neutron::plugins::ml2::cisco::nexus1000v
-  include ::tripleo::profile::base::neutron
+  include neutron::plugins::ml2::cisco::nexus1000v
+  include tripleo::profile::base::neutron
 
   if $step >= 4 {
-    class { '::neutron::agents::n1kv_vem':
+    class { 'neutron::agents::n1kv_vem':
       n1kv_source  => $n1kv_source,
       n1kv_version => $n1kv_version,
     }
 
-    class { '::n1k_vsm':
+    class { 'n1k_vsm':
       n1kv_source       => $n1kv_source,
       n1kv_version      => $n1kv_version,
       pacemaker_control => false,

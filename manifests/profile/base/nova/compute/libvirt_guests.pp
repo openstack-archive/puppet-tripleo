@@ -33,9 +33,9 @@ class tripleo::profile::base::nova::compute::libvirt_guests (
 ) {
   # only configure libvirt-guests if enabled
   if $step >= 4 and $enabled {
-    class { '::nova::compute::libvirt_guests':
+    class { 'nova::compute::libvirt_guests':
       enabled => $enabled,
     }
-    include ::nova::compute::libvirt_guests
+    include nova::compute::libvirt_guests
   }
 }

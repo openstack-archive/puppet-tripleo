@@ -50,7 +50,7 @@ class tripleo::profile::pacemaker::cinder::backup (
     $pacemaker_master = false
   }
 
-  include ::tripleo::profile::base::cinder::backup
+  include tripleo::profile::base::cinder::backup
 
   if $step >= 2 {
     pacemaker::property { 'cinder-backup-role-node-property':

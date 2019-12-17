@@ -5,7 +5,7 @@ describe 'tripleo::haproxy::endpoint' do
   let(:title) { 'neutron' }
 
   let :pre_condition do
-    'include ::haproxy'
+    'include haproxy'
   end
 
   let :params do {
@@ -58,7 +58,7 @@ describe 'tripleo::haproxy::endpoint' do
         })
       end
       let :pre_condition do
-        'include ::haproxy
+        'include haproxy
         ::tripleo::haproxy::userlist {"starwars": users => ["leia password sister"]}
         '
       end

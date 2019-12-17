@@ -86,8 +86,8 @@ class tripleo::profile::base::gnocchi::api (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::gnocchi
-  include ::tripleo::profile::base::gnocchi::authtoken
+  include tripleo::profile::base::gnocchi
+  include tripleo::profile::base::gnocchi::authtoken
 
   if $enable_internal_tls {
     if !$gnocchi_network {
@@ -112,41 +112,41 @@ class tripleo::profile::base::gnocchi::api (
         $db_sync_extra_opts = undef
       }
 
-      class { '::gnocchi::db::sync':
+      class { 'gnocchi::db::sync':
         extra_opts => $db_sync_extra_opts,
       }
     }
 
-    include ::gnocchi::api
-    include ::tripleo::profile::base::apache
-    class { '::gnocchi::wsgi::apache':
+    include gnocchi::api
+    include tripleo::profile::base::apache
+    class { 'gnocchi::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }
 
-    class { '::gnocchi::storage':
+    class { 'gnocchi::storage':
       coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
     }
 
     if $incoming_storage_driver == 'redis' {
-      class { '::gnocchi::storage::incoming::redis':
+      class { 'gnocchi::storage::incoming::redis':
         redis_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
       }
     }
 
     case $gnocchi_backend {
       'swift': {
-        include ::gnocchi::storage::swift
+        include gnocchi::storage::swift
         if $sync_db {
-          include ::swift::deps
+          include swift::deps
           # Ensure we have swift proxy available before running gnocchi-upgrade
           # as storage is initialized at this point.
           Anchor<| title == 'swift::service::end' |> ~> Anchor['gnocchi::dbsync::begin']
         }
       }
-      'file': { include ::gnocchi::storage::file }
+      'file': { include gnocchi::storage::file }
       'rbd': {
-        include ::gnocchi::storage::ceph
+        include gnocchi::storage::ceph
         exec{ "exec-setfacl-${gnocchi_rbd_client_name}-gnocchi":
           path    => ['/bin', '/usr/bin'],
           command => "setfacl -m u:gnocchi:r-- /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring",
@@ -158,7 +158,7 @@ class tripleo::profile::base::gnocchi::api (
           unless  => "getfacl /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q mask::r",
         }
       }
-      's3': { include ::gnocchi::storage::s3 }
+      's3': { include gnocchi::storage::s3 }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
   }

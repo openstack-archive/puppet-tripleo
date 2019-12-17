@@ -54,7 +54,7 @@ class tripleo::certmonger::redis (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   ensure_resource('file', '/usr/bin/certmonger-redis-refresh.sh', {
     source  => 'puppet:///modules/tripleo/certmonger-redis-refresh.sh',

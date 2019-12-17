@@ -69,7 +69,7 @@ class tripleo::profile::base::cinder::volume::nfs (
   $cinder_nas_secure_file_permissions = $::os_service_default,
   $step                               = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     package {'nfs-utils': }

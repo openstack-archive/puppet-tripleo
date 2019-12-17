@@ -29,7 +29,7 @@ describe 'tripleo::profile::base::cinder::volume' do
 
     let(:pre_condition) do
       "
-        class { '::tripleo::profile::base::cinder': step => #{params[:step]}, oslomsg_rpc_hosts => ['127.0.0.1'] }
+        class { 'tripleo::profile::base::cinder': step => #{params[:step]}, oslomsg_rpc_hosts => ['127.0.0.1'] }
       "
     end
 

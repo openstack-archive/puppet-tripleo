@@ -27,10 +27,10 @@ class tripleo::profile::base::cinder::backup (
   $step = Integer(hiera('step')),
 ) {
 
-  include ::tripleo::profile::base::cinder
+  include tripleo::profile::base::cinder
 
   if $step >= 4 {
-    include ::cinder::backup
+    include cinder::backup
   }
 
 }

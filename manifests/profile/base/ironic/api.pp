@@ -54,8 +54,8 @@ class tripleo::profile::base::ironic::api (
   $enable_internal_tls = hiera('enable_internal_tls', false),
   $step                = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::ironic
-  include ::tripleo::profile::base::ironic::authtoken
+  include tripleo::profile::base::ironic
+  include tripleo::profile::base::ironic::authtoken
 
   if $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -75,10 +75,10 @@ class tripleo::profile::base::ironic::api (
   }
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
-    include ::ironic::api
-    include ::ironic::cors
-    include ::tripleo::profile::base::apache
-    class { '::ironic::wsgi::apache':
+    include ironic::api
+    include ironic::cors
+    include tripleo::profile::base::apache
+    class { 'ironic::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }

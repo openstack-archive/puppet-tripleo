@@ -51,13 +51,13 @@ class tripleo::profile::base::nova::migration::client (
   $libvirt_tls              = false,
 ) {
 
-  include ::tripleo::profile::base::nova::migration
+  include tripleo::profile::base::nova::migration
 
   if $step >= 4 {
 
     # Libvirt setup (live-migration)
     if $libvirt_tls {
-      class { '::nova::migration::libvirt':
+      class { 'nova::migration::libvirt':
         transport         => 'tls',
         configure_libvirt => $libvirt_enabled,
         configure_nova    => $nova_compute_enabled,
@@ -65,7 +65,7 @@ class tripleo::profile::base::nova::migration::client (
       }
     } else {
       # Reuse the cold-migration SSH tunnel when TLS is not enabled
-      class { '::nova::migration::libvirt':
+      class { 'nova::migration::libvirt':
         transport          => 'ssh',
         configure_libvirt  => $libvirt_enabled,
         configure_nova     => $nova_compute_enabled,

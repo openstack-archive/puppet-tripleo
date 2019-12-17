@@ -144,7 +144,7 @@ class tripleo::profile::pacemaker::database::redis (
       $tls_certfile = $certificate_specs['service_certificate']
       $tls_keyfile = $certificate_specs['service_key']
 
-      include ::tripleo::stunnel
+      include tripleo::stunnel
 
       # encrypted endpoint for incoming redis service
       ::tripleo::stunnel::service_proxy { 'redis':
@@ -200,11 +200,11 @@ slave-announce-port ${local_tuple[0][2]}
     $old_redis_file_limit = hiera('redis_file_limit', undef)
     if $old_redis_file_limit != undef {
       warning('redis_file_limit parameter is deprecated, use redis::ulimit in hiera.')
-      class { '::redis':
+      class { 'redis':
         ulimit => $old_redis_file_limit,
       }
     } else {
-      include ::redis
+      include redis
     }
     if $pacemaker_master and hiera('stack_action') == 'UPDATE' {
       tripleo::pacemaker::resource_restart_flag { 'redis-master':

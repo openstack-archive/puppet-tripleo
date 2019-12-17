@@ -58,11 +58,11 @@ class tripleo::profile::base::snmp (
     }
     if $snmpd_config {
       validate_legacy(Array, 'validate_array', $snmpd_config)
-      class { '::snmp':
+      class { 'snmp':
         snmpd_config => $snmpd_config,
       }
     } else {
-      class { '::snmp':
+      class { 'snmp':
         snmpd_config => [ join(['createUser ', $snmpd_user, ' MD5 "', $snmpd_password, '"']),
                           join(['rouser ', $snmpd_user]),
                           'proc  cron',

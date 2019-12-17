@@ -27,7 +27,7 @@ class tripleo::profile::base::swift::dispersion (
   $step = Integer(hiera('step')),
 ) {
   if $step >= 5 {
-    include ::swift::client
-    include ::swift::dispersion
+    include swift::client
+    include swift::dispersion
   }
 }

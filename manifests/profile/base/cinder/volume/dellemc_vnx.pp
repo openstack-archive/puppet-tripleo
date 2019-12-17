@@ -31,7 +31,7 @@ class tripleo::profile::base::cinder::volume::dellemc_vnx (
   $backend_name = hiera('cinder::backend::emc_vnx::volume_backend_name', 'tripleo_dellemc_vnx'),
   $step         = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     # Accept recently deprecated 'storage_vnx_pool_name'

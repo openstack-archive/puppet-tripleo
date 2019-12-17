@@ -55,10 +55,10 @@ class tripleo::profile::base::cinder::volume::iscsi (
   $cinder_lvm_loop_device_size = '10280',
   $step                        = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    class { '::cinder::setup_test_volume':
+    class { 'cinder::setup_test_volume':
       size => join([$cinder_lvm_loop_device_size, 'M']),
     }
 

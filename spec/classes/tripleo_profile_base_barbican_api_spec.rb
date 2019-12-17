@@ -23,7 +23,7 @@ describe 'tripleo::profile::base::barbican::api' do
     end
 
     let(:pre_condition) do
-      "class { '::tripleo::profile::base::barbican': step => #{params[:step]} }"
+      "class { 'tripleo::profile::base::barbican': step => #{params[:step]} }"
     end
 
     context 'with step less than 3' do

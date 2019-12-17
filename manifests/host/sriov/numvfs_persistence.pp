@@ -24,7 +24,7 @@ define tripleo::host::sriov::numvfs_persistence(
   # Since reduce isn't available, we use recursion to iterate each entries of
   # "physical_interface:vfs" and accumulate the content that needs to be
   # written to the script file.
-  include ::stdlib
+  include stdlib
 
   if empty($vf_defs) {
     file { '/etc/sysconfig/allocate_vfs':

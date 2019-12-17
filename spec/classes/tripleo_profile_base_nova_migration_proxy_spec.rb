@@ -22,7 +22,7 @@ describe 'tripleo::profile::base::nova::migration::proxy' do
     context 'with step 4 with defaults (disabled)' do
       let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos
@@ -40,7 +40,7 @@ eos
     context 'with step 4 with ssh_private_key' do
       let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos
@@ -66,7 +66,7 @@ eos
     context 'with step 4 with host and port' do
       let(:pre_condition) {
         <<-eos
-        class { '::tripleo::profile::base::nova::migration':
+        class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
 eos

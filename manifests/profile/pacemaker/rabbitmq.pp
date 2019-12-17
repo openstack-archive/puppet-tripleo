@@ -92,7 +92,7 @@ class tripleo::profile::pacemaker::rabbitmq (
     $pacemaker_master = false
   }
 
-  include ::tripleo::profile::base::rabbitmq
+  include tripleo::profile::base::rabbitmq
 
   file { '/var/lib/rabbitmq/.erlang.cookie':
     ensure  => file,
@@ -118,7 +118,7 @@ class tripleo::profile::pacemaker::rabbitmq (
       node     => $::hostname,
     }
     if $pacemaker_master {
-      include ::stdlib
+      include stdlib
       # The default nr of ha queues is ceiling(N/2)
       if $user_ha_queues == 0 {
         $nr_rabbit_nodes = size($rabbit_nodes)

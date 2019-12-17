@@ -66,10 +66,10 @@ class tripleo::profile::base::manila::share (
   $manila_user_enabled_backends = hiera('manila_user_enabled_backends', undef),
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::manila
+  include tripleo::profile::base::manila
 
   if $step >= 4 {
-    include ::manila::share
+    include manila::share
 
     # manila generic:
     if $backend_generic_enabled {
@@ -96,7 +96,7 @@ class tripleo::profile::base::manila::share (
         "${manila_generic_backend}/service_instance_flavor_id": value => $service_instance_flavor_id;
       }
 
-      include ::manila::volume::cinder
+      include manila::volume::cinder
     }
 
     # manila cephfs:
@@ -257,7 +257,7 @@ class tripleo::profile::base::manila::share (
                                       $manila_user_enabled_backends))
     $manila_enabled_backends = delete($backends, '')
 
-    class { '::manila::backends' :
+    class { 'manila::backends' :
       enabled_share_backends => $manila_enabled_backends,
     }
   }

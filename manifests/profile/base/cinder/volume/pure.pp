@@ -36,7 +36,7 @@ class tripleo::profile::base::cinder::volume::pure (
   $multi_config = hiera('cinder::backend::pure::volume_multi_config', {}),
   $step         = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::cinder::volume
+  include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     $backend_defaults = {

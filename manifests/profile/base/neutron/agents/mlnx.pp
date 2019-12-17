@@ -29,6 +29,6 @@ class tripleo::profile::base::neutron::agents::mlnx(
 
   if $step >= 3 {
 
-    include ::neutron::agents::ml2::mlnx
+    include neutron::agents::ml2::mlnx
   }
 }

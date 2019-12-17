@@ -42,7 +42,7 @@ class tripleo::certmonger::etcd (
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   $postsave_cmd = 'systemctl reload etcd'
   certmonger_certificate { 'etcd' :

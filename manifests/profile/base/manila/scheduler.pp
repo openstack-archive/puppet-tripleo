@@ -26,11 +26,11 @@
 class tripleo::profile::base::manila::scheduler (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::manila
+  include tripleo::profile::base::manila
 
   if $step >= 4 {
-    include ::manila::compute::nova
-    include ::manila::network::neutron
-    include ::manila::scheduler
+    include manila::compute::nova
+    include manila::network::neutron
+    include manila::scheduler
   }
 }

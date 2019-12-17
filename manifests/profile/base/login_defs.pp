@@ -52,7 +52,7 @@ class tripleo::profile::base::login_defs (
   $fail_delay        = hiera('fail_delay', 4),
   $step              = Integer(hiera('step'))
 ) {
-  include ::tripleo::profile::base::login_defs
+  include tripleo::profile::base::login_defs
 
   if $step >= 1 {
     package { 'shadow-utils':

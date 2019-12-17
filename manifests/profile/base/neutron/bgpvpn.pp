@@ -29,9 +29,9 @@
 class tripleo::profile::base::neutron::bgpvpn (
   $step           = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
   if $step >= 4 {
-    include ::neutron::services::bgpvpn
+    include neutron::services::bgpvpn
   }
 }

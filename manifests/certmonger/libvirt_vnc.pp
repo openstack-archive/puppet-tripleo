@@ -58,8 +58,8 @@ define tripleo::certmonger::libvirt_vnc (
   $cacertfile       = undef,
   $notify_service   = undef,
 ) {
-  include ::certmonger
-  include ::nova::params
+  include certmonger
+  include nova::params
 
   $notify_service_real = pick($notify_service, $::nova::params::libvirt_service_name)
 

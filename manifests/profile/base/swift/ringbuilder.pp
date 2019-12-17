@@ -106,7 +106,7 @@ class tripleo::profile::base::swift::ringbuilder (
 
   if $step >= 2 {
     # pre-install swift here so we can build rings
-    include ::swift
+    include swift
   }
 
   if $step >= 3 {

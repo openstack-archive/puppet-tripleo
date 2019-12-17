@@ -94,11 +94,11 @@ class tripleo::profile::base::nova::api (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::nova
-  include ::tripleo::profile::base::nova::authtoken
+  include tripleo::profile::base::nova
+  include tripleo::profile::base::nova::authtoken
 
   if $step >= 3 and $sync_db {
-    include ::nova::cell_v2::simple_setup
+    include nova::cell_v2::simple_setup
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
@@ -119,14 +119,14 @@ class tripleo::profile::base::nova::api (
       Tripleo::Tls_proxy['nova-metadata-api'] ~> Anchor<| title == 'nova::service::begin' |>
     }
 
-    class { '::nova::api':
+    class { 'nova::api':
       sync_db                    => $sync_db,
       sync_db_api                => $sync_db,
       nova_metadata_wsgi_enabled => $nova_metadata_wsgi_enabled,
     }
-    include ::nova::cors
-    include ::nova::network::neutron
-    include ::nova::pci
+    include nova::cors
+    include nova::network::neutron
+    include nova::pci
   }
   # Temporarily disable Nova API deployed in WSGI
   # https://bugs.launchpad.net/nova/+bug/1661360
@@ -142,8 +142,8 @@ class tripleo::profile::base::nova::api (
       $tls_keyfile = undef
     }
     if $step >= 4 or ($step >= 3 and $sync_db) {
-      include ::tripleo::profile::base::apache
-      class { '::nova::wsgi::apache_api':
+      include tripleo::profile::base::apache
+      class { 'nova::wsgi::apache_api':
         ssl_cert => $tls_certfile,
         ssl_key  => $tls_keyfile,
       }
@@ -152,9 +152,9 @@ class tripleo::profile::base::nova::api (
 
   if $step >= 5 {
     if hiera('nova_enable_db_archive', true) {
-      include ::nova::cron::archive_deleted_rows
+      include nova::cron::archive_deleted_rows
       if hiera('nova_enable_db_purge', true) {
-        include ::nova::cron::purge_shadow_tables
+        include nova::cron::purge_shadow_tables
       }
     }
 

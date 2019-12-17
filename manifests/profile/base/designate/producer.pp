@@ -26,8 +26,8 @@
 class tripleo::profile::base::designate::producer (
   $step = Integer(hiera('step')),
 ) {
-  include ::tripleo::profile::base::designate
+  include tripleo::profile::base::designate
   if $step >= 4 {
-    include ::designate::producer
+    include designate::producer
   }
 }

@@ -46,7 +46,7 @@ class tripleo::certmonger::ovn_controller (
   $postsave_cmd  = undef,
   $principal     = undef,
 ) {
-  include ::certmonger
+  include certmonger
 
   certmonger_certificate { 'ovn_controller' :
     ensure       => 'present',

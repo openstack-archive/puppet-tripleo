@@ -106,8 +106,8 @@ class tripleo::profile::base::neutron::server (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::neutron
-  include ::tripleo::profile::base::neutron::authtoken
+  include tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron::authtoken
 
   # Calculate neutron::server::l3_ha based on the number of API nodes
   # combined with if DVR is enabled.
@@ -137,22 +137,22 @@ class tripleo::profile::base::neutron::server (
       Tripleo::Tls_proxy['neutron-api'] ~> Anchor<| title == 'neutron::service::begin' |>
     }
     if $designate_api_enabled {
-      include ::neutron::designate
+      include neutron::designate
     }
-    include ::tripleo::profile::base::apache
+    include tripleo::profile::base::apache
   }
   # We start neutron-server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens
   # before it starts on other nodes
   if $step >= 4 and $sync_db or $step >= 5 and !$sync_db {
 
-    include ::neutron::server::notifications
+    include neutron::server::notifications
     # We need to override the hiera value neutron::server::sync_db which is set
     # to true
-    class { '::neutron::server':
+    class { 'neutron::server':
       sync_db => $sync_db,
       l3_ha   => $l3_ha,
     }
-    include ::neutron::quota
+    include neutron::quota
   }
 }

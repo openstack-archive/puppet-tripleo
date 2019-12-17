@@ -37,10 +37,10 @@ class tripleo::profile::base::mistral::engine (
     $sync_db = false
   }
 
-  include ::tripleo::profile::base::mistral
+  include tripleo::profile::base::mistral
 
   if $step >= 4 or ($step >= 3 and $sync_db)  {
-    include ::mistral::engine
+    include mistral::engine
   }
 
 }
