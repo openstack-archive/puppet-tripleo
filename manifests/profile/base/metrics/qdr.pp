@@ -142,7 +142,7 @@ class tripleo::profile::base::metrics::qdr (
   if $step >= 1 {
     $interior_nodes = any2array(split($interior_mesh_nodes, ','))
 
-    if ssl_internal_profile_name {
+    if $ssl_internal_profile_name {
       $node_base = {'sslProfile' => $ssl_internal_profile_name}
     } else {
       $node_base = {}
