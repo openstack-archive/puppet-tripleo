@@ -60,6 +60,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*bundle_user*]
+#   (optional) Set the --user= switch to be passed to pcmk
+#   Defaults to 'root'
+#
 class tripleo::profile::pacemaker::manila::share_bundle (
   $bootstrap_node             = hiera('manila_share_short_bootstrap_node_name'),
   $manila_share_docker_image  = hiera('tripleo::profile::pacemaker::manila::share_bundle::manila_share_docker_image', undef),
@@ -68,6 +72,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
   $ceph_nfs_enabled           = hiera('ceph_nfs_enabled', false),
   $container_backend          = 'docker',
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user                = 'root',
   $log_driver                 = undef,
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
@@ -237,7 +242,9 @@ class tripleo::profile::pacemaker::manila::share_bundle (
           expression         => ['manila-share-role eq true'],
         },
         container_options => 'network=host',
-        options           => "--ipc=host --privileged=true --user=root --log-driver=${log_driver_real} ${docker_env}${tls_priorities_real}",
+        # lint:ignore:140chars
+        options           => "--ipc=host --privileged=true --user=${bundle_user} --log-driver=${log_driver_real} ${docker_env}${tls_priorities_real}",
+        # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => $storage_maps,
         container_backend => $container_backend,

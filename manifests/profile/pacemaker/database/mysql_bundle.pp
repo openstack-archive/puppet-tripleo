@@ -127,6 +127,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*bundle_user*]
+#   (optional) Set the --user= switch to be passed to pcmk
+#   Defaults to 'root'
+#
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef),
   $control_port                   = hiera('tripleo::profile::pacemaker::database::mysql_bundle::control_port', '3123'),
@@ -148,6 +152,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $container_backend              = 'docker',
   $log_driver                     = undef,
   $tls_priorities                 = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user                    = 'root',
   $pcs_tries                      = hiera('pcs_tries', 20),
   $step                           = Integer(hiera('step')),
 ) {
@@ -437,7 +442,9 @@ MYSQL_HOST=localhost\n",
           expression         => ['galera-role eq true'],
         },
         container_options => 'network=host',
-        options           => "--user=root --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:ignore:140chars
+        options           => "--user=${bundle_user} --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
