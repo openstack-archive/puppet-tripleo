@@ -92,6 +92,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*bundle_user*]
+#   (optional) Set the --user= switch to be passed to pcmk
+#   Defaults to 'root'
+#
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef),
   $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122'),
@@ -112,6 +116,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $container_backend            = 'docker',
   $log_driver                   = undef,
   $tls_priorities               = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user                  = 'root',
 ) {
   # is this an additional nova cell?
   if hiera('nova_is_additional_cell', undef) {
@@ -284,7 +289,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => "--user=root --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
+        options           => "--user=${bundle_user} --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${rabbitmq_docker_control_port}",

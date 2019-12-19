@@ -89,6 +89,10 @@
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
 #
+# [*bundle_user*]
+#   (optional) Set the --user= switch to be passed to pcmk
+#   Defaults to 'root'
+#
 class tripleo::profile::pacemaker::haproxy_bundle (
   $haproxy_docker_image     = hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef),
   $bootstrap_node           = hiera('haproxy_short_bootstrap_node_name'),
@@ -103,6 +107,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   $op_params                = '',
   $container_backend        = 'docker',
   $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user              = 'root',
   $log_driver               = undef,
   $step                     = Integer(hiera('step')),
   $pcs_tries                = hiera('pcs_tries', 20),
@@ -270,7 +275,9 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         replicas          => $haproxy_nodes_count,
         location_rule     => $haproxy_location_rule,
         container_options => 'network=host',
-        options           => "--user=root --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:ignore:140chars
+        options           => "--user=${bundle_user} --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => merge($storage_maps, $cert_storage_maps, $storage_maps_internal_tls),
         container_backend => $container_backend,
