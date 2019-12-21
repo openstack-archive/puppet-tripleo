@@ -85,6 +85,10 @@
 #  (Optional) Boolean driving the Instance HA controlplane configuration
 #  Defaults to false
 #
+# [*pcsd_bind_addr*]
+#   (Optional) List of IP addresses pcsd should bind to
+#   Defaults to undef
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -106,6 +110,7 @@ class tripleo::profile::base::pacemaker (
   $encryption                = true,
   $resource_op_defaults      = undef,
   $enable_instanceha         = hiera('tripleo::instanceha', false),
+  $pcsd_bind_addr            = undef,
   $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
 ) {
 
@@ -172,6 +177,7 @@ class tripleo::profile::base::pacemaker (
       cluster_setup_extras => $cluster_setup_extras,
       remote_authkey       => $remote_authkey,
       cluster_members_addr => $pacemaker_node_ips_real,
+      pcsd_bind_addr       => $pcsd_bind_addr,
       tls_priorities       => $tls_priorities,
     }
     if str2bool(hiera('docker_enabled', false)) {

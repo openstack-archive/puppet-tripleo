@@ -40,6 +40,10 @@
 #   (Optional) Whether or not to manage stonith devices for nodes
 #   Defaults to hiera('enable_fencing', false)
 #
+# [*pcsd_bind_addr*]
+#   (Optional) List of IP addresses pcsd should bind to
+#   Defaults to undef
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -55,6 +59,7 @@ class tripleo::profile::base::pacemaker_remote (
   $pcs_user       = 'hacluster',
   $pcs_password   = hiera('hacluster_pwd', undef),
   $enable_fencing = hiera('enable_fencing', false),
+  $pcsd_bind_addr = undef,
   $tls_priorities = hiera('tripleo::pacemaker::tls_priorities', undef),
   $step           = Integer(hiera('step')),
 ) {
@@ -66,6 +71,7 @@ class tripleo::profile::base::pacemaker_remote (
     pcs_password   => $pcs_password,
     remote_authkey => $remote_authkey,
     use_pcsd       => true,
+    pcsd_bind_addr => pcsd_bind_addr,
     tls_priorities => $tls_priorities,
   }
   if str2bool(hiera('docker_enabled', false)) {
