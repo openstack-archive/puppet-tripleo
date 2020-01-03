@@ -29,6 +29,7 @@ class tripleo::profile::base::octavia::health_manager (
   include ::tripleo::profile::base::octavia
   if $step >= 5 {
     include ::octavia::controller
+    include ::octavia::nova
     include ::octavia::health_manager
     include ::octavia::certificates
   }
