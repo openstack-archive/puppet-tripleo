@@ -310,6 +310,10 @@
 #  and if mysql cluster checking is disabled, the member options will be: "union($haproxy_member_options, ['backup'])"
 #  Defaults to undef
 #
+# [*mysql_custom_listen_options*]
+#  Hash to pass to the mysql haproxy listen stanza to be deepmerged with the other options
+#  Defaults to {}
+#
 # [*rabbitmq*]
 #  (optional) Enable or not RabbitMQ binding
 #  Defaults to false
@@ -654,6 +658,7 @@ class tripleo::haproxy (
   $mysql_clustercheck          = false,
   $mysql_max_conn              = undef,
   $mysql_member_options        = undef,
+  $mysql_custom_listen_options = {},
   $openshift_master            = hiera('openshift_master_enabled', false),
   $rabbitmq                    = false,
   $etcd                        = hiera('etcd_enabled', false),
@@ -1367,7 +1372,7 @@ class tripleo::haproxy (
     }
     haproxy::listen { 'mysql':
       bind             => $mysql_bind_opts,
-      options          => $mysql_listen_options,
+      options          => deep_merge($mysql_listen_options, $mysql_custom_listen_options),
       collect_exported => false,
     }
     haproxy::balancermember { 'mysql-backup':
