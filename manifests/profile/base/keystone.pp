@@ -163,7 +163,8 @@
 #   Can be disabled if Ansible manages these resources instead of Puppet.
 #   The resources are: endpoints, roles, services, projects, users and their
 #   assignment.
-#   Defaults to hiera('keystone_resources_managed', true)
+#   This parameter is deprecated and is being removed in U cycle.
+#   Defaults to hiera('keystone_resources_managed', undef)
 #
 class tripleo::profile::base::keystone (
   $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
@@ -198,18 +199,12 @@ class tripleo::profile::base::keystone (
   $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
   $memcached_ips                  = hiera('memcached_node_ips', []),
-  $keystone_resources_managed     = hiera('keystone_resources_managed', true),
+  $keystone_resources_managed     = hiera('keystone_resources_managed', undef),
 ) {
-  if $::hostname == downcase($bootstrap_node) and $keystone_resources_managed {
+  if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
-    $manage_roles = true
-    $manage_endpoint = true
-    $manage_domain = true
   } else {
     $sync_db = false
-    $manage_roles = false
-    $manage_endpoint = false
-    $manage_domain = false
   }
 
   if $enable_internal_tls {
@@ -276,9 +271,7 @@ class tripleo::profile::base::keystone (
             persistent => true,
         }
       }
-      create_resources('::keystone::ldap_backend', $ldap_backends_config, {
-        create_domain_entry => $manage_domain,
-      })
+      create_resources('::keystone::ldap_backend', $ldap_backends_config, {})
     }
 
     if $keystone_federation_enabled {
@@ -298,139 +291,4 @@ class tripleo::profile::base::keystone (
     include keystone::cron::token_flush
   }
 
-  if $step == 3 and $manage_domain {
-    if hiera('heat_engine_enabled', false) {
-      # create these seperate and don't use ::heat::keystone::domain since
-      # that class writes out the configs
-      keystone_domain { $heat_admin_domain:
-        ensure  => 'present',
-        enabled => true
-      }
-      keystone_user { "${heat_admin_user}::${heat_admin_domain}":
-        ensure   => 'present',
-        enabled  => true,
-        email    => $heat_admin_email,
-        password => $heat_admin_password
-      }
-      keystone_user_role { "${heat_admin_user}::${heat_admin_domain}@::${heat_admin_domain}":
-        roles   => ['admin'],
-        require => Class['::keystone::roles::admin']
-      }
-    }
-  }
-
-  if $step == 3 and $manage_roles {
-    if $keystone_enable_member {
-      keystone_role { '_member_':
-        ensure => present,
-      }
-      $admin_roles = ['admin', '_member_']
-    } else {
-      $admin_roles = ['admin']
-    }
-    class { 'keystone::roles::admin':
-      admin_roles => $admin_roles,
-    }
-
-    if hiera('barbican_api_enabled', false) {
-      keystone_role { 'key-manager:service-admin':
-        ensure => present
-      }
-      keystone_role { 'creator':
-        ensure => present
-      }
-      keystone_role { 'observer':
-        ensure => present
-      }
-      keystone_role { 'audit':
-        ensure => present
-      }
-    }
-  }
-
-  if $step == 3 and $manage_endpoint {
-    include keystone::endpoint
-    if hiera('aodh_api_enabled', false) {
-      include aodh::keystone::auth
-    }
-    if hiera('barbican_api_enabled', false) {
-      include barbican::keystone::auth
-    }
-    # ceilometer user is needed even when ceilometer api
-    # not running, so it can authenticate with keystone
-    # and dispatch data.
-    if hiera('ceilometer_auth_enabled', false) {
-      include ceilometer::keystone::auth
-    }
-    if hiera('ceph_rgw_enabled', false) {
-      include ceph::rgw::keystone::auth
-    }
-    if hiera('cinder_api_enabled', false) {
-      include cinder::keystone::auth
-    }
-    if hiera('designate_api_enabled', false) {
-      include designate::keystone::auth
-    }
-    if hiera('glance_api_enabled', false) {
-      include glance::keystone::auth
-    }
-    if hiera('gnocchi_api_enabled', false) {
-      include gnocchi::keystone::auth
-    }
-    if hiera('heat_api_enabled', false) {
-      include heat::keystone::auth
-    }
-    if hiera('heat_api_cfn_enabled', false) {
-      include heat::keystone::auth_cfn
-    }
-    if hiera('ironic_api_enabled', false) {
-      include ironic::keystone::auth
-    }
-    if hiera('ironic_inspector_enabled', false) {
-      include ironic::keystone::auth_inspector
-    }
-    if hiera('manila_api_enabled', false) {
-      include manila::keystone::auth
-    }
-    if hiera('mistral_api_enabled', false) {
-      include mistral::keystone::auth
-    }
-    if hiera('neutron_api_enabled', false) {
-      include neutron::keystone::auth
-    }
-    if hiera('nova_api_enabled', false) {
-      include nova::keystone::auth
-    }
-    if hiera('placement_enabled', false) {
-      include placement::keystone::auth
-    }
-    if hiera('octavia_api_enabled', false) {
-      include octavia::keystone::auth
-    }
-    if hiera('panko_api_enabled', false) {
-      include panko::keystone::auth
-    }
-    if hiera('sahara_api_enabled', false) {
-      include sahara::keystone::auth
-    }
-    if hiera('swift_proxy_enabled', false) or hiera('external_swift_proxy_enabled',false) {
-      include swift::keystone::auth
-    }
-    if hiera('trove_api_enabled', false) {
-      include trove::keystone::auth
-    }
-    if hiera('zaqar_api_enabled', false) {
-      include zaqar::keystone::auth
-      include zaqar::keystone::auth_websocket
-    }
-    if hiera('ec2_api_enabled', false) {
-      include ec2api::keystone::auth
-    }
-    if hiera('novajoin_enabled', false) {
-      include nova::metadata::novajoin::auth
-    }
-    if hiera('veritas_hyperscale_controller_enabled', false) {
-      include veritas_hyperscale::hs_keystone
-    }
-  }
 }
