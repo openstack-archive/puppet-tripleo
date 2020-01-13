@@ -172,3 +172,5 @@ neutron::plugins::ovs::opendaylight::odl_username: 'admin'
 neutron::plugins::ovs::opendaylight::odl_password: 'admin'
 # swift related
 swift_proxy_short_bootstrap_node_name: node
+# required to avoid EPEL repo management when testing collectd::sensubility
+collectd::manage_repo: false

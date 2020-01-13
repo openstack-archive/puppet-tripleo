@@ -91,6 +91,19 @@
 #  (Optional) String. Password part of credentials used to authenticate
 #  to the AMQP 1.0 intermediary.
 #  Defaults to undef
+#
+# [*exec_user*]
+#  (Optional) String. User under which sensubility is executed via collectd-exec.
+#  Defaults to 'collectd'
+#
+# [*exec_group*]
+#  (Optional) String. Group under which sensubility is executed via collectd-exec.
+#  Defaults to 'collectd'
+#
+# [*exec_sudo_rule*]
+#  (Optional) String. Rule which will be saved in /etc/sudoers.d for user specified
+#  by parameter exec_user.
+#  Defaults to undef
 class tripleo::profile::base::metrics::collectd::sensubility (
   $ensure             = 'present',
   $config_path        = '/etc/collectd-sensubility.conf',
@@ -108,7 +121,10 @@ class tripleo::profile::base::metrics::collectd::sensubility (
   $amqp_host          = undef,
   $amqp_port          = undef,
   $amqp_user          = undef,
-  $amqp_password      = undef
+  $amqp_password      = undef,
+  $exec_user          = 'collectd',
+  $exec_group         = 'collectd',
+  $exec_sudo_rule     = undef
 ) {
   include ::collectd
   include ::collectd::plugin::exec
@@ -140,8 +156,25 @@ class tripleo::profile::base::metrics::collectd::sensubility (
   }
 
   collectd::plugin::exec::cmd { 'sensubility':
-    user  => 'collectd',
-    group => 'collectd',
+    user  => $exec_user,
+    group => $exec_group,
     exec  => ['collectd-sensubility'],
   }
+
+  if $exec_sudo_rule {
+    $sudoers_path = "/etc/sudoers.d/sensubility_${exec_user}"
+    file { $sudoers_path:
+      ensure  => $ensure,
+      mode    => '0440',
+      content => "${exec_user}  ${exec_sudo_rule}",
+      notify  => Exec["${exec_user}-sudo-syntax-check"]
+    }
+
+    exec { "${exec_user}-sudo-syntax-check":
+      path        => ['/usr/sbin/', '/usr/bin/'],
+      command     => "visudo -c -f '${sudoers_path}' || (rm -f '${sudoers_path}' && exit 1)",
+      refreshonly => true,
+    }
+  }
+
 }
