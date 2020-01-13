@@ -174,3 +174,5 @@ neutron::plugins::ovs::opendaylight::odl_password: 'admin'
 swift_proxy_short_bootstrap_node_name: node
 # required for metrics::qdr_user
 ctlplane: '192.168.24.123'
+# required to avoid EPEL repo management when testing collectd::sensubility
+collectd::manage_repo: false
