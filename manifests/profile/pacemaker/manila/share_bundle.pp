@@ -104,8 +104,6 @@ class tripleo::profile::pacemaker::manila::share_bundle (
 
   if $step >= 5 {
     if $pacemaker_master {
-      $manila_share_nodes_count = count(hiera('manila_share_short_node_names', []))
-
       $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', '')
       $docker_vol_arr = delete(any2array($docker_volumes), '').flatten()
 
