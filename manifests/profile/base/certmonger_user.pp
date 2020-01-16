@@ -107,6 +107,11 @@
 #   it will create.
 #   Defaults to hiera('ceph_grafana_certificate_specs', {}).
 #
+# [*ceph_dashboard_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('ceph_dashboard_certificate_specs', {}).
+#
 # [*etcd_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -190,6 +195,7 @@ class tripleo::profile::base::certmonger_user (
   $neutron_certificate_specs          = hiera('tripleo::profile::base::neutron::certificate_specs', {}),
   $novnc_proxy_certificates_specs     = hiera('novnc_proxy_certificates_specs',{}),
   $ceph_grafana_certificate_specs     = hiera('ceph_grafana_certificate_specs', {}),
+  $ceph_dashboard_certificate_specs   = hiera('ceph_dashboard_certificate_specs', {}),
   $ovn_dbs_certificate_specs          = hiera('ovn_dbs_certificate_specs', {}),
   $ovn_controller_certificate_specs   = hiera('ovn_controller_certificate_specs', {}),
   $ovn_metadata_certificate_specs     = hiera('ovn_metadata_certificate_specs', {}),
@@ -283,6 +289,9 @@ class tripleo::profile::base::certmonger_user (
     }
     unless empty($ceph_grafana_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::ceph_grafana', $ceph_grafana_certificate_specs)
+    }
+    unless empty($ceph_dashboard_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::ceph_dashboard', $ceph_dashboard_certificate_specs)
     }
     unless empty($ovn_dbs_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::ovn_dbs', $ovn_dbs_certificate_specs)
