@@ -167,7 +167,8 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $log_driver_real = $log_driver
   }
   # FQDN are lowercase in /etc/hosts, so are pacemaker node names
-  $galera_node_names_lookup = downcase(hiera('mysql_short_node_names', $::hostname))
+  $galera_node_names_lookup = downcase(hiera('mysql_short_node_names_override',
+                                              hiera('mysql_short_node_names', $::hostname)))
   if (hiera('mysql_node_names_override', undef)) {
     $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names_override'))
   } else {
