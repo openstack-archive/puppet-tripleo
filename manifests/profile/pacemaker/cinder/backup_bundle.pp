@@ -56,6 +56,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*bundle_user*]
+#   (optional) Set the --user= switch to be passed to pcmk
+#   Defaults to 'root'
+#
 class tripleo::profile::pacemaker::cinder::backup_bundle (
   $bootstrap_node             = hiera('cinder_backup_short_bootstrap_node_name'),
   $cinder_backup_docker_image = hiera('tripleo::profile::pacemaker::cinder::backup_bundle::cinder_backup_docker_image', undef),
@@ -64,6 +68,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
   $container_backend          = 'docker',
   $log_driver                 = undef,
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user                = 'root',
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
 ) {
@@ -219,7 +224,9 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
           expression         => ['cinder-backup-role eq true'],
         },
         container_options => 'network=host',
-        options           => "--ipc=host --privileged=true --user=root --log-driver=${log_driver_real} ${docker_env}${tls_priorities_real}",
+        # lint:ignore:140chars
+        options           => "--ipc=host --privileged=true --user=${bundle_user} --log-driver=${log_driver_real} ${docker_env}${tls_priorities_real}",
+        # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => $storage_maps,
         container_backend => $container_backend,

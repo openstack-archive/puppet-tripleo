@@ -104,6 +104,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*bundle_user*]
+#   (optional) Set the --user= switch to be passed to pcmk
+#   Defaults to 'root'
+#
 class tripleo::profile::pacemaker::database::redis_bundle (
   $certificate_specs         = hiera('redis_certificate_specs', {}),
   $enable_internal_tls       = hiera('enable_internal_tls', false),
@@ -122,6 +126,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $tls_proxy_fqdn            = undef,
   $tls_proxy_port            = 6379,
   $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user               = 'root',
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -348,7 +353,9 @@ slave-announce-port ${local_tuple[0][2]}
           expression         => ['redis-role eq true'],
         },
         container_options => 'network=host',
-        options           => "--user=root --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:ignore:140chars
+        options           => "--user=${bundle_user} --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${redis_docker_control_port}",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
