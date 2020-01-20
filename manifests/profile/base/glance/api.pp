@@ -39,13 +39,21 @@
 #   Defaults to hiera('enable_internal_tls', false)
 #
 # [*glance_backend*]
-#   (Optional) Glance backend(s) to use.
+#   (Optional) Default glance backend type.
 #   Defaults to downcase(hiera('glance_backend', 'swift'))
+#
+# [*glance_backend_id*]
+#   (Optional) Default glance backend identifier.
+#   Defaults to 'default_backend'
 #
 # [*glance_network*]
 #   (Optional) The network name where the glance endpoint is listening on.
 #   This is set by t-h-t.
 #   Defaults to hiera('glance_api_network', undef)
+#
+# [*multistore_config*]
+#   (Optional) Hash of settings for configuring additional glance-api backends.
+#   Defaults to {}
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -115,15 +123,20 @@
 #   enable_internal_tls is set.
 #   defaults to 9292
 #
+# DEPRECATED PARAMETERS
+#
 # [*glance_rbd_client_name*]
-#   RBD client naem
-#   (optional) Defaults to hiera('glance::backend::rbd::rbd_store_user')
+#   (optional) Deprecated. RBD client name
+#   Defaults to undef
+#
 class tripleo::profile::base::glance::api (
   $bootstrap_node          = hiera('glance_api_short_bootstrap_node_name', undef),
   $certificates_specs      = hiera('apache_certificates_specs', {}),
   $enable_internal_tls     = hiera('enable_internal_tls', false),
   $glance_backend          = downcase(hiera('glance_backend', 'swift')),
+  $glance_backend_id       = 'default_backend',
   $glance_network          = hiera('glance_api_network', undef),
+  $multistore_config       = {},
   $step                    = Integer(hiera('step')),
   $oslomsg_rpc_proto       = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
   $oslomsg_rpc_hosts       = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
@@ -140,7 +153,8 @@ class tripleo::profile::base::glance::api (
   $tls_proxy_bind_ip       = undef,
   $tls_proxy_fqdn          = undef,
   $tls_proxy_port          = 9292,
-  $glance_rbd_client_name  = hiera('glance::backend::rbd::rbd_store_user','openstack'),
+  # DEPRECATED PARAMETERS
+  $glance_rbd_client_name  = undef,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -174,35 +188,45 @@ class tripleo::profile::base::glance::api (
       }
       include ::tripleo::profile::base::apache
     }
-    case $glance_backend {
-        'swift': { $backend_store = 'swift' }
-        'file': { $backend_store = 'file' }
-        'rbd': {
-          $backend_store = 'rbd'
-          exec{ "exec-setfacl-${glance_rbd_client_name}-glance":
-            path    => ['/bin', '/usr/bin'],
-            command => "setfacl -m u:glance:r-- /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring",
-            unless  => "getfacl /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring | grep -q user:glance:r--",
-          }
-          -> exec{ "exec-setfacl-${glance_rbd_client_name}-glance-mask":
-            path    => ['/bin', '/usr/bin'],
-            command => "setfacl -m m::r /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring",
-            unless  => "getfacl /etc/ceph/ceph.client.${glance_rbd_client_name}.keyring | grep -q mask::r",
-          }
-        }
-        'cinder': { $backend_store = 'cinder' }
-        default: { fail('Unrecognized glance_backend parameter.') }
+
+    $multistore_backends = $multistore_config.map |$backend_config| {
+      unless has_key($backend_config[1], 'GlanceBackend') {
+        fail("multistore_config '${backend_config[0]}' does not specify a glance_backend.")
+      }
+      "${backend_config[0]}:${backend_config[1]['GlanceBackend']}"
     }
-    $http_store = ['http']
-    $glance_store = concat($http_store, $backend_store)
+
+    $enabled_backends = ["${glance_backend_id}:${glance_backend}", 'http:http'] + $multistore_backends
 
     include ::glance
     include ::glance::config
     include ::glance::api::logging
     class { '::glance::api':
-      stores  => $glance_store,
-      sync_db => $sync_db,
+      enabled_backends => $enabled_backends,
+      default_backend  => $glance_backend_id,
+      sync_db          => $sync_db,
     }
+
+    ['cinder', 'file', 'rbd', 'swift'].each |String $backend_type| {
+
+      # Generate a list of backend names for a given backend type
+      $backend_names = $enabled_backends.reduce([]) |$accum, String $backend| {
+        $backend_info = $backend.split(':')
+        if $backend_info[1] == $backend_type {
+          $accum << $backend_info[0]
+        } else {
+          $accum
+        }
+      }
+
+      unless empty($backend_names) {
+        class { "tripleo::profile::base::glance::backend::${backend_type}":
+          backend_names     => $backend_names,
+          multistore_config => $multistore_config,
+        }
+      }
+    }
+
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
     class { '::glance::notify::rabbitmq' :
@@ -223,7 +247,6 @@ class tripleo::profile::base::glance::api (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include join(['::glance::backend::', $glance_backend])
   }
 
 }

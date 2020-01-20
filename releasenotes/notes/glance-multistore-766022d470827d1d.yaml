@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Add support for configuring the glance-api service with multiple store
+    backends. The primary backend becomes the service's default backend, and
+    additional backends may be specified using an optional 'multistore_config'
+    hash.
+    
