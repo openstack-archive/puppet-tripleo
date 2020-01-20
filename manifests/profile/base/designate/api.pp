@@ -38,10 +38,10 @@ class tripleo::profile::base::designate::api (
 ) {
 
   include tripleo::profile::base::designate
+  include tripleo::profile::base::designate::authtoken
 
   if ($step >= 3) {
     $listen_uri = normalize_ip_for_uri($listen_ip)
-    include designate::keystone::authtoken
     class { 'designate::api':
       listen => "${listen_uri}:${listen_port}",
     }
