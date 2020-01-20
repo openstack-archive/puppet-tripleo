@@ -28,14 +28,14 @@ describe 'tripleo::profile::base::glance::api' do
         :step => 1,
       } }
 
-      it {
+      it 'should not configure glance' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to_not contain_class('glance')
         is_expected.to_not contain_class('glance::config')
         is_expected.to_not contain_class('glance::api::logging')
         is_expected.to_not contain_class('glance::api')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
-      }
+      end
     end
 
     context 'with step 3 on bootstrap node' do
@@ -52,7 +52,7 @@ describe 'tripleo::profile::base::glance::api' do
         :oslomsg_notify_port     => '5678',
       } }
 
-      it {
+      it 'should configure glance' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to contain_class('glance')
         is_expected.to contain_class('glance::config')
@@ -62,7 +62,7 @@ describe 'tripleo::profile::base::glance::api' do
           :default_transport_url      => 'rabbit://glance1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://glance2:baa@192.168.0.2:5678/?ssl=0',
         )
-      }
+      end
     end
 
     context 'with step 3 not on bootstrap node' do
@@ -71,14 +71,14 @@ describe 'tripleo::profile::base::glance::api' do
         :bootstrap_node => 'other.example.com',
       } }
 
-      it {
+      it 'should not configure glance' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to_not contain_class('glance')
         is_expected.to_not contain_class('glance::config')
         is_expected.to_not contain_class('glance::api::logging')
         is_expected.to_not contain_class('glance::api')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
-      }
+      end
     end
 
     context 'with step 4' do
@@ -95,21 +95,94 @@ describe 'tripleo::profile::base::glance::api' do
         :oslomsg_notify_port     => '5678',
       } }
 
-      it {
+      it 'should configure glance' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to contain_class('glance')
         is_expected.to contain_class('glance::config')
         is_expected.to contain_class('glance::api::logging')
-        is_expected.to contain_class('glance::api')
+        is_expected.to contain_class('glance::api').with(
+          :enabled_backends => ['default_backend:swift', 'http:http'],
+          :default_backend  => 'default_backend',
+        )
+        is_expected.to_not contain_class('tripleo::profile::base::glance::backend::cinder')
+        is_expected.to_not contain_class('tripleo::profile::base::glance::backend::file')
+        is_expected.to_not contain_class('tripleo::profile::base::glance::backend::rbd')
+        is_expected.to contain_class('tripleo::profile::base::glance::backend::swift').with(
+          :backend_names => ['default_backend'],
+        )
         is_expected.to contain_class('glance::notify::rabbitmq').with(
           :default_transport_url      => 'rabbit://glance1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://glance2:baa@192.168.0.2:5678/?ssl=0',
         )
-      }
+      end
+
+      context 'with multistore_config' do
+        before :each do
+          params.merge!({
+            :glance_backend    => 'cinder',
+            :glance_backend_id => 'my_cinder',
+            :multistore_config => {
+              'my_file' => {
+                'GlanceBackend' => 'file',
+              },
+              'rbd1' => {
+                'GlanceBackend'      => 'rbd',
+                'CephClusterName'    => 'ceph1',
+                'CephClientUserName' => 'user1',
+                'GlanceRbdPoolName'  => 'pool1',
+              },
+              'rbd2' => {
+                'GlanceBackend'      => 'rbd',
+                'CephClusterName'    => 'ceph2',
+                'CephClientUserName' => 'user2',
+                'GlanceRbdPoolName'  => 'pool2',
+              },
+              'my_swift' => {
+                'GlanceBackend' => 'swift',
+              },
+            },
+          })
+        end
+        it 'should configure multiple backends' do
+          is_expected.to contain_class('glance::api').with(
+            :enabled_backends => [
+              'my_cinder:cinder',
+              'http:http',
+              'my_file:file',
+              'rbd1:rbd',
+              'rbd2:rbd',
+              'my_swift:swift'
+            ],
+            :default_backend  => 'my_cinder',
+          )
+          is_expected.to contain_class('tripleo::profile::base::glance::backend::cinder').with(
+            :backend_names => ['my_cinder'],
+          )
+          is_expected.to contain_class('tripleo::profile::base::glance::backend::file').with(
+            :backend_names => ['my_file'],
+          )
+          is_expected.to contain_class('tripleo::profile::base::glance::backend::rbd').with(
+            :backend_names => ['rbd1', 'rbd2'],
+          )
+          is_expected.to contain_class('tripleo::profile::base::glance::backend::swift').with(
+            :backend_names => ['my_swift'],
+          )
+        end
+      end
+      context 'with invalid multistore_config' do
+        before :each do
+          params.merge!({
+            :multistore_config  => {
+              'rbd' => {
+                'GlanceBackend_typo' => 'rbd',
+              },
+            },
+          })
+        end
+        it_raises 'a Puppet::Error', / does not specify a glance_backend./
+      end
     end
-
   end
-
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do
