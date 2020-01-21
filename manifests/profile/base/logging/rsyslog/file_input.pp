@@ -17,7 +17,8 @@ define tripleo::profile::base::logging::rsyslog::file_input (
   $default_startmsg = '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}(.[0-9]+ [0-9]+)? (DEBUG|INFO|WARNING|ERROR) '
 ) {
   if $sources {
-    $rsyslog_sources = $sources.reduce([]) |$memo, $config| {
+    $sources_array = Array($sources, true)
+    $rsyslog_sources = $sources_array.reduce([]) |$memo, $config| {
       if ! $config['startmsg.regex'] {
         $record = $config + {'startmsg.regex' => $default_startmsg}
       } else {
