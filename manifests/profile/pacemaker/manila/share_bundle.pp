@@ -76,7 +76,15 @@ class tripleo::profile::pacemaker::manila::share_bundle (
 
   if $step >= 2 and $pacemaker_master {
     $manila_share_short_node_names = hiera('manila_share_short_node_names')
-    $manila_share_short_node_names.each |String $node_name| {
+
+    if (hiera('pacemaker_short_node_names_override', undef)) {
+      $pacemaker_short_node_names = hiera('pacemaker_short_node_names_override')
+    } else {
+      $pacemaker_short_node_names = hiera('pacemaker_short_node_names')
+    }
+
+    $pcmk_cinder_volume_nodes = intersection($manila_share_short_node_names, $pacemaker_short_node_names)
+    $pcmk_cinder_volume_nodes.each |String $node_name| {
       pacemaker::property { "manila-share-role-${node_name}":
         property => 'manila-share-role',
         value    => true,
