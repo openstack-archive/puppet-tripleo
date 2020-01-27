@@ -208,7 +208,7 @@ class tripleo::profile::base::certmonger_user (
         include tripleo::certmonger::ca::local
     }
     unless empty($haproxy_certificates_specs) {
-      $reload_haproxy = ['systemctl reload haproxy']
+      $reload_haproxy = ['systemctl reload tripleo_haproxy']
       Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>
       if defined(Class['::haproxy']) {
         Class['::tripleo::certmonger::ca::crl'] ~> Class['::haproxy']
