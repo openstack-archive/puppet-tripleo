@@ -23,15 +23,89 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*notifier_enabled*]
+#   (optional) Enable configuration of notifier as pipeline publisher.
+#   Defaults to false
+#
+# [*notifier_events_enabled*]
+#   (optional) Enable configuration of event notifier as pipeline publisher.
+#   Defaults to false
+#
+# [*notifier_host_addr*]
+#   (optional) IP address of Ceilometer notifier (edge qdr Endpoint)
+#   Defaults to undef
+#
+# [*notifier_host_port*]
+#   (optional) Ceilometer notifier port
+#   Defaults to undef
+#
+# [*notifier_params*]
+#   (optional) Query parameters for notifier URL
+#   Defaults to {'driver' => 'amqp', 'topic' => 'ceilometer/metering.sample'}
+#
+# [*notifier_event_params*]
+#   (optional) Query parameters for event notifier URL
+#   Defaults to {'driver' => 'amqp', 'topic' => 'ceilometer/event.sample'}
+#
+# [*event_pipeline_publishers*]
+#   (Optional) A list of event pipeline publishers
+#   Defaults to undef
+#
+# [*pipeline_publishers*]
+#   (Optional) A list of pipeline publishers
+#   Defaults to undef
 class tripleo::profile::base::ceilometer::agent::notification (
-  $step = Integer(hiera('step')),
+  $step                      = Integer(hiera('step')),
+  $notifier_enabled          = false,
+  $notifier_events_enabled   = false,
+  $notifier_host_addr        = undef,
+  $notifier_host_port        = undef,
+  $notifier_params           = {'driver' => 'amqp', 'topic' => 'ceilometer/metering.sample'},
+  $notifier_event_params     = {'driver' => 'amqp', 'topic' => 'ceilometer/event.sample'},
+  $pipeline_publishers       = undef,
+  $event_pipeline_publishers = undef,
 ) {
   include tripleo::profile::base::ceilometer
   include tripleo::profile::base::ceilometer::upgrade
 
   if $step >= 4 {
     include ceilometer::agent::auth
-    include ceilometer::agent::notification
-  }
 
+    if $pipeline_publishers {
+      $other_publishers = Array($pipeline_publishers, true)
+    } else {
+      $other_publishers = []
+    }
+    if $notifier_enabled {
+      $real_pipeline_publishers = $other_publishers + [os_transport_url({
+        'transport' => 'notifier',
+        'host'      => $notifier_host_addr,
+        'port'      => $notifier_host_port,
+        'query'     => $notifier_params,
+      })]
+    } else {
+      $real_pipeline_publishers = $other_publishers
+    }
+
+    if $event_pipeline_publishers {
+      $other_event_publishers = Array($event_pipeline_publishers, true)
+    } else {
+      $other_event_publishers = []
+    }
+    if $notifier_events_enabled {
+      $real_event_pipeline_publishers = $other_event_publishers + [os_transport_url({
+        'transport' => 'notifier',
+        'host'      => $notifier_host_addr,
+        'port'      => $notifier_host_port,
+        'query'     => $notifier_event_params,
+      })]
+    } else {
+      $real_event_pipeline_publishers = $other_event_publishers
+    }
+
+    class { '::ceilometer::agent::notification':
+      event_pipeline_publishers => $real_event_pipeline_publishers,
+      pipeline_publishers       => $real_pipeline_publishers,
+    }
+  }
 }
