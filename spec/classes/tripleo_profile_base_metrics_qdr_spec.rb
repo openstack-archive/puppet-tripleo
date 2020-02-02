@@ -30,9 +30,6 @@ describe 'tripleo::profile::base::metrics::qdr' do
 
     context 'with step 3 node in edge-only mode' do
       before do
-        facts.merge!({
-          :hostname => 'node.example.com',
-        })
         params.merge!({
           :interior_mesh_nodes => '',
           :router_mode => 'edge',
@@ -50,16 +47,13 @@ describe 'tripleo::profile::base::metrics::qdr' do
 
     context 'with step 3, edge node with defined interior_node and explicit external connectors' do
       before do
-        facts.merge!({
-          :hostname => 'edge-node.example.com',
-        })
         params.merge!({
           :connectors => [
             {'host' => 'saf-node1.example.com','port' => '5666','role' => 'interior','authenticatePeer' => 'no',
              'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'},
             {'host' => 'saf-node2.example.com','port' => '5666','role' => 'interior','authenticatePeer' => 'no',
              'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'}],
-          :interior_mesh_nodes => 'interior-node.example.com,',
+          :interior_mesh_nodes => '192.168.24.124,',
           :router_mode => 'edge',
           :ssl_internal_profile_name => 'sslProfile',
         })
@@ -69,7 +63,7 @@ describe 'tripleo::profile::base::metrics::qdr' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [],
           :connectors => [
-            {'host' => 'interior-node.example.com','port' => '5668','role' => 'edge','verifyHostname' => false,
+            {'host' => '192.168.24.124','port' => '5668','role' => 'edge','verifyHostname' => false,
              'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'}],
         )
       end
@@ -77,17 +71,14 @@ describe 'tripleo::profile::base::metrics::qdr' do
 
     context 'with step 3, interior node with defined interior_node and explicit external connectors' do
       before do
-        facts.merge!({
-          :hostname => 'interior-node.example.com',
-        })
         params.merge!({
-          :listener_addr => 'interior-node.example.com',
+          :listener_addr => '172.17.1.1',
           :connectors => [
             {'host' => 'saf-node1.example.com','port' => '5666','role' => 'interior','authenticatePeer' => 'no',
              'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'},
             {'host' => 'saf-node2.example.com','port' => '5666','role' => 'interior','authenticatePeer' => 'no',
              'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'}],
-          :interior_mesh_nodes => 'interior-node.example.com,',
+          :interior_mesh_nodes => '192.168.24.123,',
           :router_mode => 'interior',
           :ssl_internal_profile_name => 'sslProfile',
         })
@@ -96,7 +87,7 @@ describe 'tripleo::profile::base::metrics::qdr' do
       it 'should setup explicit connectors and edge listener' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [
-            {'host' => 'interior-node.example.com','port' => '5668','role' => 'edge','authenticatePeer' => 'no',
+            {'host' => '192.168.24.123','port' => '5668','role' => 'edge','authenticatePeer' => 'no',
              'saslMechanisms' => 'ANONYMOUS','sslProfile' => 'sslProfile'}],
           :connectors => [
             {'host' => 'saf-node1.example.com','port' => '5666','role' => 'interior','authenticatePeer' => 'no',
@@ -109,12 +100,10 @@ describe 'tripleo::profile::base::metrics::qdr' do
 
     context 'with step 3 and three interior nodes, on node1' do
       before do
-        facts.merge!({
-          :hostname => 'node1.example.com',
-        })
         params.merge!({
-          :listener_addr => 'node1.example.com',
-          :interior_mesh_nodes => 'node1.example.com,node2.example.com,node3.example.com,',
+          :listener_addr => '172.17.1.1',
+          :interior_mesh_nodes => '192.168.24.1,192.168.24.2,192.168.24.3,',
+          :interior_ip => '192.168.24.1',
           :router_mode => 'interior',
           :ssl_internal_profile_name => 'sslProfile',
         })
@@ -123,9 +112,9 @@ describe 'tripleo::profile::base::metrics::qdr' do
       it 'should set edge listener, interior listener and no connectors' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [
-            {'sslProfile' => 'sslProfile', 'host' => 'node1.example.com', 'port' => '5668',
+            {'sslProfile' => 'sslProfile', 'host' => '192.168.24.1', 'port' => '5668',
              'role' => 'edge', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'},
-            {'sslProfile' => 'sslProfile', 'host' => 'node1.example.com', 'port' => '5667',
+            {'sslProfile' => 'sslProfile', 'host' => '192.168.24.1', 'port' => '5667',
              'role' => 'inter-router', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'}],
           :connectors => [],
         )
@@ -134,12 +123,10 @@ describe 'tripleo::profile::base::metrics::qdr' do
 
     context 'with step 3 and three interior nodes, on node2' do
       before do
-        facts.merge!({
-          :hostname => 'node2.example.com',
-        })
         params.merge!({
-          :listener_addr => 'node2.example.com',
-          :interior_mesh_nodes => 'node1.example.com,node2.example.com,node3.example.com,',
+          :listener_addr => '172.17.1.2',
+          :interior_mesh_nodes => '192.168.24.1,192.168.24.2,192.168.24.3,',
+          :interior_ip => '192.168.24.2',
           :router_mode => 'interior',
           :ssl_internal_profile_name => 'sslProfile',
         })
@@ -148,12 +135,12 @@ describe 'tripleo::profile::base::metrics::qdr' do
       it 'should set up edge listener, interior listener and one interior connector to node1' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [
-            {'sslProfile' => 'sslProfile', 'host' => 'node2.example.com', 'port' => '5668',
+            {'sslProfile' => 'sslProfile', 'host' => '192.168.24.2', 'port' => '5668',
              'role' => 'edge', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'},
-            {'sslProfile' => 'sslProfile', 'host' => 'node2.example.com', 'port' => '5667',
+            {'sslProfile' => 'sslProfile', 'host' => '192.168.24.2', 'port' => '5667',
              'role' => 'inter-router', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'}],
           :connectors => [
-            {'host' => 'node1.example.com','role' => 'inter-router','port' => '5667',
+            {'host' => '192.168.24.1','role' => 'inter-router','port' => '5667',
              'verifyHostname' => 'false','sslProfile' => 'sslProfile'}],
         )
       end
@@ -161,12 +148,10 @@ describe 'tripleo::profile::base::metrics::qdr' do
 
     context 'with step 3 and three interior nodes, on node3' do
       before do
-        facts.merge!({
-          :hostname => 'node3.example.com',
-        })
         params.merge!({
-          :listener_addr => 'node3.example.com',
-          :interior_mesh_nodes => 'node1.example.com,node2.example.com,node3.example.com,',
+          :listener_addr => '172.17.1.3',
+          :interior_mesh_nodes => '192.168.24.1,192.168.24.2,192.168.24.3,',
+          :interior_ip => '192.168.24.3',
           :router_mode => 'interior',
           :ssl_internal_profile_name => 'sslProfile',
         })
@@ -175,14 +160,14 @@ describe 'tripleo::profile::base::metrics::qdr' do
       it 'should set up edge listener, interior listener and two interior connectors to node1 and node2' do
         is_expected.to contain_class('qdr').with(
           :extra_listeners => [
-            {'sslProfile' => 'sslProfile', 'host' => 'node3.example.com', 'port' => '5668',
+            {'sslProfile' => 'sslProfile', 'host' => '192.168.24.3', 'port' => '5668',
              'role' => 'edge', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'},
-            {'sslProfile' => 'sslProfile', 'host' => 'node3.example.com', 'port' => '5667',
+            {'sslProfile' => 'sslProfile', 'host' => '192.168.24.3', 'port' => '5667',
              'role' => 'inter-router', 'authenticatePeer' => 'no', 'saslMechanisms' => 'ANONYMOUS'}],
          :connectors => [
-            {"host"=>"node1.example.com", "role"=>"inter-router", "port"=>"5667",
+            {"host"=>"192.168.24.1", "role"=>"inter-router", "port"=>"5667",
              "verifyHostname" => 'false',"sslProfile" => "sslProfile"},
-            {"host"=>"node2.example.com", "role"=>"inter-router", "port"=>"5667",
+            {"host"=>"192.168.24.2", "role"=>"inter-router", "port"=>"5667",
              "verifyHostname" => 'false',"sslProfile" => "sslProfile"}],
         )
       end
@@ -190,11 +175,8 @@ describe 'tripleo::profile::base::metrics::qdr' do
 
     context 'with step 3 and three interior nodes, on edge node' do
       before do
-        facts.merge!({
-          :hostname => 'edge.example.com',
-        })
         params.merge!({
-          :interior_mesh_nodes => 'node1.example.com,node2.example.com,node3.example.com,',
+          :interior_mesh_nodes => '192.168.24.1,192.168.24.2,192.168.24.3,',
           :router_mode => 'edge',
           :ssl_internal_profile_name => 'sslProfile',
         })

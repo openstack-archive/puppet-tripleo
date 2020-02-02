@@ -84,6 +84,11 @@
 #   (optional) Comma separated list of controller nodes' fqdns
 #   Defaults to hiera('controller_node_names', '')
 #
+# [*interior_ip*]
+#   (optional) IP address which should be used for internal communication.
+#   Has to be member of interior_mesh_nodes
+#   Defaults to hiera('ctlplane', undef)
+#
 # [*connectors*]
 #   (optional) List of hashes containing configuration for outgoing connections
 #   from the router. Each hash should contain 'host', 'role' and 'port' key.
@@ -131,6 +136,7 @@ class tripleo::profile::base::metrics::qdr (
   $listener_ssl_password     = undef,
   $listener_trusted_certs    = undef,
   $interior_mesh_nodes       = hiera('controller_node_ips', ''),
+  $interior_ip               = hiera('ctlplane', undef),
   $connectors                = [],
   $ssl_profiles              = [],
   $ssl_internal_profile_name = undef,
@@ -165,9 +171,13 @@ class tripleo::profile::base::metrics::qdr (
       # and don't provide any internal listener
       $internal_listeners = []
     } else {
+      # validate interior_ip
+      if ! ($interior_ip in $interior_nodes) {
+        fail("Value of interior_ip '${interior_ip}' is not member of interior_mesh_nodes '${interior_mesh_nodes}'.")
+      }
       # provide listener for edge node and listener for other interior nodes (if required)
       $edge_listener = merge($node_base,
-        {'host' => $listener_addr,
+        {'host' => $interior_ip,
         'port' => '5668',
         'role' => 'edge',
         'authenticatePeer' => 'no',
@@ -175,7 +185,7 @@ class tripleo::profile::base::metrics::qdr (
       if length($interior_nodes) > 1 {
         $internal_listeners = [
           $edge_listener,
-          merge($node_base, {'host' => $listener_addr,
+          merge($node_base, {'host' => $interior_ip,
           'port' => '5667',
           'role' => 'inter-router',
           'authenticatePeer' => 'no',
@@ -183,7 +193,7 @@ class tripleo::profile::base::metrics::qdr (
         ]
         # build mesh with other interior nodes
         $internal_connectors = $interior_nodes.reduce([]) |$memo, $node| {
-          if $::hostname in $node {
+          if strip($node) == strip($interior_ip) {
             $memo << true
           } elsif true in $memo {
             $memo
