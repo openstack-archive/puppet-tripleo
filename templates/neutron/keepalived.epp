@@ -34,7 +34,8 @@ CMD='echo noop'
 LIST=$($CLI ps -a --filter name=neutron-keepalived- --format '{{.ID}}:{{.Names}}:{{.Status}}' | awk '{print $1}')
 
 # Find orphaned containers left for dead after its main process terminated by neutron parent process
-ORPHANTS=$(printf "%s\n" "${LIST}" | grep ":Exited")
+# FIXME(cjeanner): https://github.com/containers/libpod/issues/1703
+ORPHANTS=$(printf "%s\n" "${LIST}" | grep -E ":(Exited|Created)")
 if [ -n "${ORPHANTS}" ]; then
     for orphant in $(printf "%s\n" "${ORPHANTS}" | awk -F':' '{print $1}'); do
         echo "Removing orphaned container ${orphant}"
