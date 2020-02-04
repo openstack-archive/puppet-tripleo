@@ -58,7 +58,7 @@ class tripleo::profile::base::logging::rsyslog (
     #       other choice than using hiera currently.
     $rsyslog_confdir = hiera('rsyslog::confdir', '/etc/rsyslog.d')
 
-    if defined('$elasticsearch_tls_ca_cert') {
+    if $elasticsearch_tls_ca_cert {
       $cacert_path = "${rsyslog_confdir}/es-ca-cert.crt"
       $cacert_conf = {'tls.cacert' => $cacert_path}
 
@@ -72,7 +72,7 @@ class tripleo::profile::base::logging::rsyslog (
       $esconf1 = $elasticsearch
     }
 
-    if defined('$elasticsearch_tls_client_cert') {
+    if $elasticsearch_tls_client_cert {
       $clientcert_path = "${rsyslog_confdir}/es-client-cert.pem"
       $clientcert_conf = {'tls.mycert' => $clientcert_path}
 
@@ -86,7 +86,7 @@ class tripleo::profile::base::logging::rsyslog (
       $esconf2 = $esconf1
     }
 
-    if defined('$elasticsearch_tls_client_key') {
+    if $elasticsearch_tls_client_key {
       $clientkey_path = "${rsyslog_confdir}/es-client-key.pem"
       $clientkey_conf = {'tls.myprivkey' => $clientkey_path}
 
