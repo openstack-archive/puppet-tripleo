@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Added tripleo::profile::base::octavia::provider::ovn for configuring OVN driver
+    properties, including protocol.
