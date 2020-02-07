@@ -71,22 +71,6 @@
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('oslo_messaging_notify_use_ssl', '0')
 #
-# [*notifier_host_addr*]
-#   (optional) Ip address of ceilometer notifier (edge qdr Endpoint)
-#   Defaults to false
-#
-# [*notifier_host_port*]
-#   (optional) Ceilometer notifier port
-#   Defaults to undef
-#
-# [*event_pipeline_publishers*]
-#   (Optional) A list of event pipeline publishers
-#   Defaults to undef
-#
-# [*pipeline_publishers*]
-#   (Optional) A list of pipeline publishers
-#   Defaults to undef
-
 class tripleo::profile::base::ceilometer (
   $step                      = Integer(hiera('step')),
   $oslomsg_rpc_proto         = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
@@ -101,10 +85,6 @@ class tripleo::profile::base::ceilometer (
   $oslomsg_notify_port       = hiera('oslo_messaging_notify_port', '5672'),
   $oslomsg_notify_username   = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl    = hiera('oslo_messaging_notify_use_ssl', '0'),
-  $notifier_host_addr        = false,
-  $notifier_host_port        = undef,
-  $event_pipeline_publishers = undef,
-  $pipeline_publishers       = undef,
 ) {
 
   if $step >= 3 {
@@ -131,28 +111,6 @@ class tripleo::profile::base::ceilometer (
       }),
     }
 
-    if $notifier_host_addr {
-      class {'::ceilometer::agent::notification' :
-        event_pipeline_publishers => concat(any2array(os_transport_url({
-          'transport' => 'notifier',
-          'host'      => $notifier_host_addr,
-          'port'      => $notifier_host_port,
-          'query'     => { 'driver' => 'amqp' },
-        })), $event_pipeline_publishers),
-        pipeline_publishers       => concat(any2array(os_transport_url({
-          'transport' => 'notifier',
-          'host'      => $notifier_host_addr,
-          'port'      => $notifier_host_port,
-          'query'     => { 'driver' => 'amqp' },
-        })), $pipeline_publishers),
-      }
-    }
-    else {
-      class {'::ceilometer::agent::notification' :
-        event_pipeline_publishers => $event_pipeline_publishers,
-        pipeline_publishers       => $pipeline_publishers,
-      }
-    }
     include ceilometer::config
     include ceilometer::logging
   }
