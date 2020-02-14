@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add support to change virtlogd config options.
+    New hieradata tripleo::profile::base::nova::libvirt::virtlogd_config can
+    be used to override virtlogd config options.
