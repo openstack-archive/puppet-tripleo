@@ -101,6 +101,9 @@
 #   (optional) Set the --user= switch to be passed to pcmk
 #   Defaults to 'root'
 #
+# [*force_ocf*]
+#   (optional) Use --force when creating the ocf resource via pcs
+#   Defaults to false
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = undef,
   $rabbitmq_docker_control_port = 3122,
@@ -123,6 +126,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $log_file                     = '/var/log/containers/stdouts/rabbitmq-bundle.log',
   $tls_priorities               = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user                  = 'root',
+  $force_ocf                    = false,
 ) {
   # is this an additional nova cell?
   if hiera('nova_is_additional_cell', undef) {
@@ -338,6 +342,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         require         => [Class['::rabbitmq'],
                             Pacemaker::Resource::Bundle['rabbitmq-bundle']],
         before          => Exec['rabbitmq-ready'],
+        force           => $force_ocf,
       }
 
       if size($rabbit_nodes) == 1 {

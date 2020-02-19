@@ -145,6 +145,9 @@
 #   (Optional) Maximum value for open-files-limit
 #   Defaults to 16384
 #
+# [*force_ocf*]
+#   (optional) Use --force when creating the ocf resource via pcs
+#   Defaults to false
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = undef,
   $control_port                   = 3123,
@@ -172,6 +175,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $pcs_tries                      = hiera('pcs_tries', 20),
   $step                           = Integer(hiera('step')),
   $open_files_limit               = 16384,
+  $force_ocf                      = false,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -491,6 +495,7 @@ MYSQL_HOST=localhost\n",
         require         => [Class['::mysql::server'],
                             Pacemaker::Resource::Bundle['galera-bundle']],
         before          => Exec['galera-ready'],
+        force           => $force_ocf,
       }
 
       exec { 'galera-ready' :

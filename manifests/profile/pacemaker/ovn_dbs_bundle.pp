@@ -101,6 +101,9 @@
 #   as MASTER_IP; set to no when using external LB VIP.
 #   Defaults to 'yes'
 #
+# [*force_ocf*]
+#   (optional) Use --force when creating the ocf resource via pcs
+#   Defaults to false
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image     = undef,
@@ -121,7 +124,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $enable_internal_tls      = hiera('enable_internal_tls', false),
   $ca_file                  = undef,
   $dbs_timeout              = 60,
-  $listen_on_master_ip_only = 'yes'
+  $listen_on_master_ip_only = 'yes',
+  $force_ocf                = false,
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -280,6 +284,7 @@ monitor interval=30s role=Slave timeout=${dbs_timeout}s",
         location_rule   => $ovn_dbs_location_rule,
         meta_params     => 'notify=true container-attribute-target=host',
         bundle          => 'ovn-dbs-bundle',
+        force           => $force_ocf,
       }
 
       # This code tells us if ovn_dbs is using a separate ip or is using a the per-network VIP
