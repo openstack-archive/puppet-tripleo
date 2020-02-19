@@ -113,6 +113,9 @@
 #   (optional) Set the --user= switch to be passed to pcmk
 #   Defaults to 'root'
 #
+# [*force_ocf*]
+#   (optional) Use --force when creating the ocf resource via pcs
+#   Defaults to false
 class tripleo::profile::pacemaker::database::redis_bundle (
   $certificate_specs         = hiera('redis_certificate_specs', {}),
   $enable_internal_tls       = hiera('enable_internal_tls', false),
@@ -133,6 +136,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $tls_proxy_port            = 6379,
   $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user               = 'root',
+  $force_ocf                 = false,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -394,6 +398,7 @@ slave-announce-port ${local_tuple[0][2]}
         },
         bundle          => 'redis-bundle',
         require         => [Pacemaker::Resource::Bundle['redis-bundle']],
+        force           => $force_ocf,
       }
 
     }

@@ -155,6 +155,9 @@
 #   before pacemaker considers the operation timed out.
 #   Defaults to 300
 #
+# [*force_ocf*]
+#   (optional) Use --force when creating the ocf resource via pcs
+#   Defaults to false
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef),
   $control_port                   = hiera('tripleo::profile::pacemaker::database::mysql_bundle::control_port', '3123'),
@@ -184,6 +187,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $step                           = Integer(hiera('step')),
   $open_files_limit               = 16384,
   $promote_timeout                = 300,
+  $force_ocf                      = false,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -509,6 +513,7 @@ MYSQL_HOST=localhost\n",
         bundle          => 'galera-bundle',
         require         => [Class['::mysql::server']],
         before          => Exec['galera-ready'],
+        force           => $force_ocf,
       }
 
       # Resource relation: we normally want the bundle resource to

@@ -107,6 +107,9 @@
 #   dict called: force_vip_nic_overrides[<vip/network name>] = 'dummy'
 #   Defaults to hiera('tripleo::pacemaker::force_nic', undef)
 #
+# [*force_ocf*]
+#   (optional) Use --force when creating the ocf resource via pcs
+#   Defaults to false
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image     = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
@@ -129,6 +132,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $dbs_timeout              = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::dbs_timeout', 60),
   $listen_on_master_ip_only = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::listen_on_master_ip_only', 'yes'),
   $force_nic                = hiera('tripleo::pacemaker::force_nic', undef),
+  $force_ocf                = false,
 ) {
 
   if $::hostname == downcase($bootstrap_node) {
@@ -289,6 +293,7 @@ monitor interval=30s role=Slave timeout=${dbs_timeout}s",
         location_rule   => $ovn_dbs_location_rule,
         meta_params     => 'notify=true container-attribute-target=host',
         bundle          => 'ovn-dbs-bundle',
+        force           => $force_ocf,
       }
 
       if downcase($listen_on_master_ip_only) == 'yes' {
