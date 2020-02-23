@@ -351,10 +351,6 @@
 #  (optional) Enable or not OpenDaylight binding
 #  Defaults to hiera('opendaylight_api_enabled', false)
 #
-# [*openshift_master*]
-#  (optional) Enable or not Kubernetes API binding
-#  Defaults to hiera('openshift_master_enabled', false)
-#
 # [*ovn_dbs*]
 #  (optional) Enable or not OVN northd binding
 #  Defaults to hiera('ovn_dbs_enabled', false)
@@ -501,10 +497,6 @@
 #  (optional) Specify the network opendaylight is running on.
 #  Defaults to hiera('opendaylight_api_network', undef)
 #
-# [*openshift_master_network*]
-#  (optional) Specify the network openshift_master is running on.
-#  Defaults to hiera('openshift_master_network', undef)
-#
 # [*panko_network*]
 #  (optional) Specify the network panko is running on.
 #  Defaults to hiera('panko_api_network', undef)
@@ -569,8 +561,6 @@
 #    'nova_novnc_ssl_port' (Defaults to 13080)
 #    'octavia_api_port' (Defaults to 9876)
 #    'octavia_api_ssl_port' (Defaults to 13876)
-#    'openshift_master_port' (Defaults to 6444)
-#    'openshift_master_ssl_port' (Defaults to 13443)
 #    'opendaylight_api_port' (Defaults to 8081)
 #    'panko_api_port' (Defaults to 8977)
 #    'panko_api_ssl_port' (Defaults to 13977)
@@ -667,7 +657,6 @@ class tripleo::haproxy (
   $mysql_max_conn              = undef,
   $mysql_member_options        = undef,
   $mysql_custom_listen_options = {},
-  $openshift_master            = hiera('openshift_master_enabled', false),
   $rabbitmq                    = false,
   $etcd                        = hiera('etcd_enabled', false),
   $docker_registry             = hiera('enable_docker_registry', false),
@@ -710,7 +699,6 @@ class tripleo::haproxy (
   $placement_network           = hiera('placement_network', undef),
   $octavia_network             = hiera('octavia_api_network', undef),
   $opendaylight_network        = hiera('opendaylight_api_network', undef),
-  $openshift_master_network    = hiera('openshift_master_network', undef),
   $panko_network               = hiera('panko_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $ec2_api_network             = hiera('ec2_api_network', undef),
@@ -765,8 +753,6 @@ class tripleo::haproxy (
     octavia_api_ssl_port => 13876,
     opendaylight_api_port => 8081,
     opendaylight_ws_port => 8185,
-    openshift_master_port => 8443,
-    openshift_master_ssl_port => 18443,
     panko_api_port => 8977,
     panko_api_ssl_port => 13977,
     placement_port => 8778,
@@ -1681,21 +1667,6 @@ class tripleo::haproxy (
         # tunnel timeout for the same reasons mentioned above.
         'timeout' => ['tunnel 3600s'],
       },
-    }
-  }
-
-  if $openshift_master {
-    ::tripleo::haproxy::endpoint { 'openshift-master':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('openshift_master_vip', $controller_virtual_ip),
-      service_port      => $ports[openshift_master_port],
-      ip_addresses      => hiera('openshift_master_node_ips', $controller_hosts_real),
-      server_names      => hiera('openshift_master_node_names', $controller_hosts_names_real),
-      public_ssl_port   => $ports[openshift_master_ssl_port],
-      service_network   => $openshift_master_network,
-      listen_options    => {
-        'balance' => 'source',
-      }
     }
   }
 
