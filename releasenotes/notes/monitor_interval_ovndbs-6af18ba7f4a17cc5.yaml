@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Add parameter for setting monitor interval for ovndbs (default is 30s)
