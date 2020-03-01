@@ -1,0 +1,7 @@
+---
+deprecations:
+  - |
+    tripleo::profile::base::nova::api::nova_api_wsgi_enabled and
+    tripleo::profile::base::nova::api::nova_metadata_api_wsgi_enabled are
+    removed, because the issue in nova was already resolved and using
+    standalone eventlet server is discouraged.

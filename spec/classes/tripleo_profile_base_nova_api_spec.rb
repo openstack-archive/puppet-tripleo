@@ -40,7 +40,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to_not contain_class('nova::keystone::authtoken')
+        is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
         is_expected.to_not contain_class('nova::api')
         is_expected.to_not contain_class('nova::cors')
         is_expected.to_not contain_class('nova::network::neutron')
@@ -50,36 +50,38 @@ eos
 
     context 'with step 3 on bootstrap node' do
       let(:params) { {
-        :step => 3,
+        :step           => 3,
         :bootstrap_node => 'node.example.com',
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
         is_expected.to contain_class('nova::cell_v2::simple_setup')
-        is_expected.to contain_class('nova::keystone::authtoken')
-        is_expected.to contain_class('nova::api')
+        is_expected.to contain_class('nova::api').with(
+          :nova_metadata_wsgi_enabled => true
+        )
         is_expected.to contain_class('nova::cors')
         is_expected.to contain_class('nova::network::neutron')
-        is_expected.to_not contain_class('nova::wsgi::apache_api')
+        is_expected.to contain_class('nova::wsgi::apache_api')
       }
     end
 
-    context 'with step 3 on bootstrap node' do
+    context 'with step 3 not on bootstrap node' do
       let(:params) { {
-        :step => 3,
-        :bootstrap_node => 'node.example.com',
+        :step           => 3,
+        :bootstrap_node => 'other.example.com',
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to contain_class('nova::cell_v2::simple_setup')
-        is_expected.to contain_class('nova::keystone::authtoken')
-        is_expected.to contain_class('nova::api')
-        is_expected.to contain_class('nova::cors')
-        is_expected.to contain_class('nova::network::neutron')
+        is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
+        is_expected.to_not contain_class('nova::cell_v2::simple_setup')
+        is_expected.to_not contain_class('nova::api')
+        is_expected.to_not contain_class('nova::cors')
+        is_expected.to_not contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::wsgi::apache_api')
       }
     end
@@ -91,28 +93,13 @@ eos
       } }
 
       it {
-        is_expected.to_not contain_class('nova::db::sync_cell_v2')
-        is_expected.to contain_class('nova::keystone::authtoken')
-        is_expected.to contain_class('nova::api')
-        is_expected.to contain_class('nova::cors')
-        is_expected.to contain_class('nova::network::neutron')
-        is_expected.to_not contain_class('nova::wsgi::apache_api')
-      }
-    end
-
-    context 'with step 4 not on bootstrap node' do
-      let(:params) { {
-        :step                  => 4,
-        :bootstrap_node        => 'other.example.com',
-        :nova_api_wsgi_enabled => true,
-      } }
-
-      it {
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
-        is_expected.to_not contain_class('nova::db::sync_cell_v2')
-        is_expected.to contain_class('nova::keystone::authtoken')
-        is_expected.to contain_class('nova::api')
+        is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
+        is_expected.to_not contain_class('nova::cell_v2::simple_setup')
+        is_expected.to contain_class('nova::api').with(
+          :nova_metadata_wsgi_enabled => true
+        )
         is_expected.to contain_class('nova::cors')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::wsgi::apache_api')

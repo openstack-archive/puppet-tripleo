@@ -41,15 +41,6 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('nova_api_network', undef)
 #
-# [*nova_api_wsgi_enabled*]
-#   (Optional) Whether or not deploy Nova API in WSGI with Apache.
-#   Nova Team discourages it.
-#   Defaults to hiera('nova_wsgi_enabled', false)
-#
-# [*nova_metadata_wsgi_enabled*]
-#   (Optional) Whether or not deploy Nova Metadata in WSGI with Apache.
-#   Defaults to hiera('nova_metadata_wsgi_enabled', false)
-#
 # [*nova_metadata_network*]
 #   DEPRECATED: (Optional) The network name where the nova metadata endpoint is listening on.
 #   This is set by t-h-t.
@@ -76,17 +67,15 @@
 #   defaults to 8080
 #
 class tripleo::profile::base::nova::api (
-  $bootstrap_node                = hiera('nova_api_short_bootstrap_node_name', undef),
-  $certificates_specs            = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $nova_api_network              = hiera('nova_api_network', undef),
-  $nova_api_wsgi_enabled         = hiera('nova_wsgi_enabled', false),
-  $nova_metadata_wsgi_enabled    = hiera('nova_metadata_wsgi_enabled', false),
-  $nova_metadata_network         = hiera('nova_metadata_network', undef),
-  $step                          = Integer(hiera('step')),
-  $metadata_tls_proxy_bind_ip    = undef,
-  $metadata_tls_proxy_fqdn       = undef,
-  $metadata_tls_proxy_port       = 8775,
+  $bootstrap_node             = hiera('nova_api_short_bootstrap_node_name', undef),
+  $certificates_specs         = hiera('apache_certificates_specs', {}),
+  $enable_internal_tls        = hiera('enable_internal_tls', false),
+  $nova_api_network           = hiera('nova_api_network', undef),
+  $nova_metadata_network      = hiera('nova_metadata_network', undef),
+  $step                       = Integer(hiera('step')),
+  $metadata_tls_proxy_bind_ip = undef,
+  $metadata_tls_proxy_fqdn    = undef,
+  $metadata_tls_proxy_port    = 8775,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -102,51 +91,32 @@ class tripleo::profile::base::nova::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    if $enable_internal_tls and !$nova_api_wsgi_enabled and !$nova_metadata_wsgi_enabled {
-      if !$nova_metadata_network {
-        fail('nova_metadata_network is not set in the hieradata.')
-      }
-      $metadata_tls_certfile = $certificates_specs["httpd-${nova_metadata_network}"]['service_certificate']
-      $metadata_tls_keyfile = $certificates_specs["httpd-${nova_metadata_network}"]['service_key']
-
-      ::tripleo::tls_proxy { 'nova-metadata-api':
-        servername => $metadata_tls_proxy_fqdn,
-        ip         => $metadata_tls_proxy_bind_ip,
-        port       => $metadata_tls_proxy_port,
-        tls_cert   => $metadata_tls_certfile,
-        tls_key    => $metadata_tls_keyfile,
-      }
-      Tripleo::Tls_proxy['nova-metadata-api'] ~> Anchor<| title == 'nova::service::begin' |>
-    }
-
     class { 'nova::api':
       sync_db                    => $sync_db,
       sync_db_api                => $sync_db,
-      nova_metadata_wsgi_enabled => $nova_metadata_wsgi_enabled,
+      nova_metadata_wsgi_enabled => true
     }
     include nova::cors
     include nova::network::neutron
     include nova::pci
   }
-  # Temporarily disable Nova API deployed in WSGI
-  # https://bugs.launchpad.net/nova/+bug/1661360
-  if $nova_api_wsgi_enabled {
-    if $enable_internal_tls {
-      if !$nova_api_network {
-        fail('nova_api_network is not set in the hieradata.')
-      }
-      $tls_certfile = $certificates_specs["httpd-${nova_api_network}"]['service_certificate']
-      $tls_keyfile = $certificates_specs["httpd-${nova_api_network}"]['service_key']
-    } else {
-      $tls_certfile = undef
-      $tls_keyfile = undef
+
+  if $enable_internal_tls {
+    if !$nova_api_network {
+      fail('nova_api_network is not set in the hieradata.')
     }
-    if $step >= 4 or ($step >= 3 and $sync_db) {
-      include tripleo::profile::base::apache
-      class { 'nova::wsgi::apache_api':
-        ssl_cert => $tls_certfile,
-        ssl_key  => $tls_keyfile,
-      }
+    $tls_certfile = $certificates_specs["httpd-${nova_api_network}"]['service_certificate']
+    $tls_keyfile = $certificates_specs["httpd-${nova_api_network}"]['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
+  }
+
+  if $step >= 4 or ($step >= 3 and $sync_db) {
+    include tripleo::profile::base::apache
+    class { 'nova::wsgi::apache_api':
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
     }
   }
 
