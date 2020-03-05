@@ -163,6 +163,10 @@ class tripleo::profile::base::pacemaker (
       $pacemaker_node_ips_real = []
     }
 
+    # (bandini) We want to make sure that any rule that opens up services takes place
+    # before we invoke pcs commands (see LP#1866209)
+    Firewall<|tag == 'tripleo-firewall-rule'|> -> Exec <|tag == 'pacemaker-auth'|>
+
     if $encryption {
       $cluster_setup_extras = merge($cluster_setup_extras_pre, {'--encryption' => '1'})
     } else {
