@@ -105,6 +105,11 @@
 #   Should be an hash.
 #   Defaults to hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}
 #
+# [*mysql_auth_ed25519*]
+#   (Optional) Use MariaDB's ed25519 authentication plugin to authenticate
+#   a user when connecting to the server
+#   Defaults to hiera('mysql_auth_ed25519', false)
+#
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
@@ -145,6 +150,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $sst_tls_options                = undef,
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
   $mysql_server_options           = hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}),
+  $mysql_auth_ed25519             = hiera('mysql_auth_ed25519', false),
   $container_backend              = 'docker',
   $log_driver                     = undef,
   $tls_priorities                 = hiera('tripleo::pacemaker::tls_priorities', undef),
@@ -489,6 +495,23 @@ MYSQL_HOST=localhost\n",
       mysql_user { 'root@%':
         ensure        => present,
         password_hash => mysql_password($mysql_root_password),
+      }
+
+      # declare the clustercheck user resource to configure
+      # ed25519 authentication on stack creation or update.
+      if ($mysql_auth_ed25519) {
+        $clustercheck_resource_config = {
+          plugin        => 'ed25519',
+          password_hash => mysql_ed25519_password($clustercheck_password),
+        }
+      } else {
+        $clustercheck_resource_config = {
+          password_hash => mysql_password($clustercheck_password),
+        }
+      }
+      mysql_user { 'clustercheck@localhost':
+        ensure => present,
+        *      => $clustercheck_resource_config,
       }
 
       # We create databases and users for services at step 2 as well. This ensures
