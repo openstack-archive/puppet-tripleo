@@ -63,6 +63,7 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
+
       context 'with only pure' do
         before :each do
           params.merge!({
@@ -86,6 +87,34 @@ describe 'tripleo::profile::base::cinder::volume' do
           it 'should enable each backend' do
             is_expected.to contain_class('cinder::backends').with(
               :enabled_backends => ['tripleo_pure_1', 'tripleo_pure_2']
+            )
+          end
+        end
+      end
+
+      context 'with only powermax' do
+        before :each do
+          params.merge!({
+            :cinder_enable_dellemc_powermax_backend  => true,
+            :cinder_enable_iscsi_backend             => false,
+          })
+        end
+        it 'should configure only powermax' do
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_powermax')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume')
+          is_expected.to contain_class('tripleo::profile::base::cinder')
+          is_expected.to contain_class('cinder::volume')
+          is_expected.to contain_class('cinder::backends').with(
+            :enabled_backends => ['tripleo_dellemc_powermax']
+          )
+        end
+        context 'with multiple powermax backends' do
+          # Step 5's hiera specifies two powermax backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_dellemc_powermax_1', 'tripleo_dellemc_powermax_2']
             )
           end
         end
