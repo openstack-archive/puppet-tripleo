@@ -1,0 +1,5 @@
+---
+features:
+  - Add new PowerMax backend Cinder driver options.
+    Supports both iSCSI and FC volume drivers and
+    multiple backends as well.
