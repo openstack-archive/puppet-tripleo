@@ -281,7 +281,7 @@ class tripleo::profile::base::metrics::collectd (
       logtraces   => true,
     }
 
-    $python_packages = concat(['collectd-python'], $python_read_plugins)
+    $python_packages = $python_read_plugins
     package { $python_packages:
       ensure => 'present'
     }
