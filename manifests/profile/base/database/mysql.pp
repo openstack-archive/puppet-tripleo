@@ -205,6 +205,15 @@ class tripleo::profile::base::database::mysql (
 
   if $step >= 2 and $sync_db {
     Class['::mysql::server'] -> Mysql_database<||>
+    if ($manage_resources) {
+      # the mysql module handles password for user 'root@localhost', but it
+      # doesn't modify 'root@%'. So make sure this user password is managed
+      # as well by creating a resource appropriately.
+      mysql_user { 'root@%':
+        ensure        => present,
+        password_hash => mysql_password(hiera('mysql::server::root_password')),
+      }
+    }
     if hiera('aodh_api_enabled', false) {
       include ::aodh::db::mysql
     }
