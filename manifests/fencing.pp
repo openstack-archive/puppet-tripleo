@@ -142,6 +142,7 @@ class tripleo::fencing(
           tries             => $tries,
           try_sleep         => $try_sleep,
         }
+        Pcmk_stonith<||> -> Pcmk_stonith_level<||>
       }
     }
   }
