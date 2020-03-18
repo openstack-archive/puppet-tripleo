@@ -158,11 +158,6 @@
 #  (Optional) String. Name of the transport.
 #  Default to 'metrics'
 #
-# [*amqp_external_host*]
-#  (Optional) String. Host which QDR service, to which collectd should be connected,
-#  is using for external connections.
-#  Defaults to hiera('tripleo::profile::base::metrics::qdr::external_listener_addr', 'localhost')
-#
 # [*amqp_host*]
 #  (Optional) String. Hostname or IP address of the AMQP 1.0 intermediary.
 #  Defaults to the undef
@@ -211,11 +206,6 @@
 #  should be connected, is running.
 #  Defaults to hiera('tripleo::profile::base::metrics::qdr::router_mode', 'edge')
 #
-# [*qdr_listens_on_external*]
-#  (Optional) Boolean.  Whether QDR service, to which collectd should be connected,
-#  is listening for connections on amqp_external_host rather than amqp_host.
-#  Defaults to hiera('tripleo::profile::base::metrics::qdr::listen_on_external', false)
-#
 # [*python_read_plugins*]
 #  (Optional) List of strings. List of third party python packages to install.
 #  Defaults to [].
@@ -256,7 +246,6 @@ class tripleo::profile::base::metrics::collectd (
   $sqlalchemy_collectd_bind_host = undef,
   $sqlalchemy_collectd_log_messages = undef,
   $amqp_transport_name = 'metrics',
-  $amqp_external_host = hiera('tripleo::profile::base::metrics::qdr::external_listener_addr', 'localhost'),
   $amqp_host = undef,
   $amqp_port = undef,
   $amqp_user = undef,
@@ -266,7 +255,6 @@ class tripleo::profile::base::metrics::collectd (
   $amqp_retry_delay = undef,
   $amqp_interval = undef,
   $qdr_mode = hiera('tripleo::profile::base::metrics::qdr::router_mode', 'edge'),
-  $qdr_listens_on_external = hiera('tripleo::profile::base::metrics::qdr::listen_on_external', false),
   $service_names = hiera('service_names', []),
   $collectd_manage_repo = false,
   $python_read_plugins = [],
@@ -337,16 +325,11 @@ class tripleo::profile::base::metrics::collectd (
         securitylevel => $_collectd_securitylevel,
       }
     } elsif !empty($amqp_host) {
-      if $qdr_listens_on_external and $qdr_mode == 'interior' {
-        $connect_to = $amqp_external_host
-      } else {
-        $connect_to = $amqp_host
-      }
       class { '::collectd::plugin::amqp1':
         ensure         => 'present',
         manage_package => true,
         transport      => $amqp_transport_name,
-        host           => $connect_to,
+        host           => $amqp_host,
         port           => $amqp_port,
         user           => $amqp_user,
         password       => $amqp_password,
