@@ -122,8 +122,6 @@
 class tripleo::profile::base::metrics::qdr (
   $username                  = undef,
   $password                  = undef,
-  $listen_on_external        = false,
-  $external_listener_addr    = 'localhost',
   $listener_addr             = 'localhost',
   $listener_port             = '5666',
   $listener_require_ssl      = false,
@@ -213,14 +211,8 @@ class tripleo::profile::base::metrics::qdr (
       $all_connectors = $connectors + $internal_connectors
     }
 
-    if $listen_on_external and $router_mode == 'interior' {
-      $listen_on = $external_listener_addr
-    } else {
-      $listen_on = $listener_addr
-    }
-
     class { 'qdr':
-      listener_addr            => $listen_on,
+      listener_addr            => $listener_addr,
       listener_port            => $listener_port,
       listener_require_encrypt => $listener_require_encrypt,
       listener_require_ssl     => $listener_require_ssl,
