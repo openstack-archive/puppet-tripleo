@@ -1,0 +1,7 @@
+---
+deprecations:
+  - |
+    ovn_db_host and ovn_nb_port from tripleo::profile::base::octavia::api
+    are now deprecated and will be removed in the future release. Please use
+    ovn_db_host and ovn_nb_port from tripleo::profile::base::octavia::provider::ovn
+    instead.

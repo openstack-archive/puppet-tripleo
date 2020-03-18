@@ -48,15 +48,15 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# DEPRECATED PARAMETERS
+#
 # [*ovn_db_host*]
 #   (Optional) The IP-Address where OVN DBs are listening.
-#   Defaults to hiera('ovn_dbs_vip')
+#   Defaults to undef
 #
 # [*ovn_nb_port*]
 #   (Optional) Port number on which northbound database is listening
-#   Defaults to hiera('ovn::northbound::port')
-#
-# DEPRECATED PARAMETERS
+#   Defaults to undef
 #
 # [*neutron_driver*]
 #   (Optional) The neutron driver for ml2 currently default tripleo value is ovn.
@@ -70,8 +70,8 @@ class tripleo::profile::base::octavia::api (
   $octavia_network     = hiera('octavia_api_network', undef),
   $step                = Integer(hiera('step')),
   $neutron_driver      = hiera('neutron::plugins::ml2::mechanism_drivers', []),
-  $ovn_db_host         = hiera('ovn_dbs_vip', undef),
-  $ovn_nb_port         = hiera('ovn::northbound::port', undef),
+  $ovn_db_host         = undef,
+  $ovn_nb_port         = undef,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -99,12 +99,12 @@ class tripleo::profile::base::octavia::api (
   # before it starts on other nodes
   if ($step >= 4 and $sync_db) or ($step >= 5 and !$sync_db) {
     include octavia::controller
-    if $ovn_db_host and $ovn_nb_port {
-      $ovn_nb_connection = join(['tcp', normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':')
+    if $ovn_db_host or $ovn_nb_port {
+      warning('The ovn_db_host and ovn_nb_port parameters are deprecated from tripleo::profile::base::octavia::api. \
+Use tripleo::profile::base::octavia::provider::ovn.')
     }
     class { 'octavia::api':
       sync_db           => $sync_db,
-      ovn_nb_connection => $ovn_nb_connection,
     }
     include tripleo::profile::base::apache
     class { 'octavia::wsgi::apache':
