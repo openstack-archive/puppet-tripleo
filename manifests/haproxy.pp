@@ -1022,7 +1022,7 @@ class tripleo::haproxy (
 
   if $ceph_grafana {
     ::tripleo::haproxy::endpoint { 'ceph_grafana':
-      internal_ip     => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      internal_ip     => hiera('ceph_dashboard_vip', $controller_virtual_ip),
       service_port    => $ports[ceph_grafana_port],
       ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
       server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
