@@ -157,7 +157,7 @@ class tripleo::profile::base::cinder::volume (
       } else {
         $protocol = 'http'
       }
-      $backend_url = sprintf('etcd3+%s://%s:%s', $protocol, $etcd_host, $etcd_port)
+      $backend_url = sprintf('etcd3+%s://%s:%s', $protocol, normalize_ip_for_uri($etcd_host), $etcd_port)
       class { 'cinder::coordination' :
         backend_url => $backend_url,
       }
