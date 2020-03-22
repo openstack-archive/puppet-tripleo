@@ -24,72 +24,90 @@ describe 'tripleo::profile::base::gnocchi::api' do
 
   shared_examples_for 'tripleo::profile::base::gnocchi::api' do
     let(:pre_condition) do
-      "
-        class { 'tripleo::profile::base::gnocchi': step => #{params[:step]}, }
-      "
+      <<-eos
+      class { 'tripleo::profile::base::gnocchi':
+        step => #{params[:step]},
+      }
+eos
     end
 
     context 'with step less than 3' do
       let(:params) { {
         :step => 2,
-        :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1'
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::authtoken')
+        is_expected.to_not contain_class('gnocchi::db::sync')
         is_expected.to_not contain_class('gnocchi::api')
         is_expected.to_not contain_class('gnocchi::wsgi::apache')
       }
     end
 
-    context 'with step 4 on bootstrap' do
+    context 'with step 3 on bootstrap' do
       let(:params) { {
-        :step => 4,
+        :step           => 3,
         :bootstrap_node => 'node.example.com',
-        :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1'
       } }
 
       it {
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::authtoken')
         is_expected.to contain_class('gnocchi::db::sync')
         is_expected.to contain_class('gnocchi::api')
         is_expected.to contain_class('gnocchi::wsgi::apache')
       }
     end
 
-    context 'with step 4' do
+    context 'with step 3 not on bootstrap' do
       let(:params) { {
-        :step => 4,
-        :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1'
+        :step           => 3,
+        :bootstrap_node => 'other.example.com',
       } }
 
       it {
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::authtoken')
+        is_expected.to_not contain_class('gnocchi::db::sync')
+        is_expected.to_not contain_class('gnocchi::api')
+        is_expected.to_not contain_class('gnocchi::wsgi::apache')
+      }
+    end
+
+    context 'with step 4' do
+      let(:params) { {
+        :step  => 4,
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::authtoken')
         is_expected.to contain_class('gnocchi::api')
         is_expected.to contain_class('gnocchi::wsgi::apache')
-        is_expected.to contain_class('gnocchi::storage').with(
-          :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
-        )
         is_expected.to contain_class('gnocchi::storage::swift')
       }
     end
 
     context 'with step 4 with file backend' do
       let(:params) { {
-        :step => 4,
-        :gnocchi_backend => 'file',
-        :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1',
+        :step                    => 4,
+        :gnocchi_backend         => 'file',
+        :gnocchi_redis_password  => 'gnocchi',
+        :redis_vip               => '127.0.0.1',
         :incoming_storage_driver => 'redis',
       } }
 
       it {
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::authtoken')
         is_expected.to contain_class('gnocchi::api')
         is_expected.to contain_class('gnocchi::wsgi::apache')
-        is_expected.to contain_class('gnocchi::storage').with(
-          :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
-        )
         is_expected.to contain_class('gnocchi::storage::incoming::redis').with(
           :redis_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
@@ -99,20 +117,20 @@ describe 'tripleo::profile::base::gnocchi::api' do
 
     context 'with step 4 with ceph backend' do
       let(:params) { {
-        :step => 4,
-        :gnocchi_backend => 'rbd',
-        :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1',
+        :step                    => 4,
+        :gnocchi_backend         => 'rbd',
+        :gnocchi_redis_password  => 'gnocchi',
+        :redis_vip               => '127.0.0.1',
         :gnocchi_rbd_client_name => 'openstack',
         :incoming_storage_driver => 'redis',
       } }
 
       it {
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::authtoken')
         is_expected.to contain_class('gnocchi::api')
         is_expected.to contain_class('gnocchi::wsgi::apache')
-        is_expected.to contain_class('gnocchi::storage').with(
-          :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
-        )
         is_expected.to contain_class('gnocchi::storage::incoming::redis').with(
           :redis_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
@@ -124,10 +142,10 @@ describe 'tripleo::profile::base::gnocchi::api' do
 
     context 'skip incoming storage in step 4' do
       let(:params) { {
-        :step => 4,
-        :gnocchi_backend => 'rbd',
-        :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1',
+        :step                    => 4,
+        :gnocchi_backend         => 'rbd',
+        :gnocchi_redis_password  => 'gnocchi',
+        :redis_vip               => '127.0.0.1',
         :incoming_storage_driver => '',
       } }
 
@@ -138,13 +156,14 @@ describe 'tripleo::profile::base::gnocchi::api' do
 
     context 'with step 5 on bootstrap' do
       let(:params) { {
-        :step => 5,
+        :step           => 5,
         :bootstrap_node => 'node.example.com',
-        :gnocchi_redis_password => 'gnocchi',
-        :redis_vip => '127.0.0.1'
       } }
 
       it {
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::api')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi')
+        is_expected.to contain_class('tripleo::profile::base::gnocchi::authtoken')
         is_expected.to contain_class('gnocchi::api')
         is_expected.to contain_class('gnocchi::wsgi::apache')
       }
