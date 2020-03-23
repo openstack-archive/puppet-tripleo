@@ -307,6 +307,32 @@ describe 'tripleo::profile::base::cinder::volume' do
           end
         end
 
+        context 'with an ipv6 etcd_host' do
+          before :each do
+            params.merge!({
+              :etcd_host => 'fe80::1ff:fe23:4567:890a',
+            })
+          end
+          it 'should normalize it in the URI' do
+            is_expected.to contain_class('cinder::coordination').with(
+              :backend_url => 'etcd3+http://[fe80::1ff:fe23:4567:890a]:2379',
+            )
+          end
+        end
+
+        context 'with a named etcd_host' do
+          before :each do
+            params.merge!({
+              :etcd_host => 'etcdhost.localdomain',
+            })
+          end
+          it 'should craft a correct URI' do
+            is_expected.to contain_class('cinder::coordination').with(
+              :backend_url => 'etcd3+http://etcdhost.localdomain:2379',
+            )
+          end
+        end
+
         context 'with etcd service not enabled' do
           before :each do
             params.merge!({
