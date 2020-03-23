@@ -167,6 +167,11 @@
 #   it will create.
 #   Defaults to hiera('neutron_ovn_certificate_specs', {})
 #
+# [*ovn_octavia_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('ovn_octavia_certificate_specs', {})
+#
 # === Deprecated
 #
 # [*haproxy_postsave_cmd*]
@@ -206,6 +211,7 @@ class tripleo::profile::base::certmonger_user (
   $ovn_controller_certificate_specs   = hiera('ovn_controller_certificate_specs', {}),
   $ovn_metadata_certificate_specs     = hiera('ovn_metadata_certificate_specs', {}),
   $neutron_ovn_certificate_specs      = hiera('neutron_ovn_certificate_specs', {}),
+  $ovn_octavia_certificate_specs      = hiera('ovn_octavia_certificate_specs', {}),
   $novnc_proxy_postsave_cmd           = undef,
   # Deprecated
   $haproxy_postsave_cmd               = undef,
@@ -313,6 +319,9 @@ class tripleo::profile::base::certmonger_user (
     }
     unless empty($neutron_ovn_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::neutron_ovn', $neutron_ovn_certificate_specs)
+    }
+    unless empty($ovn_octavia_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::ovn_octavia', $ovn_octavia_certificate_specs)
     }
   }
 }
