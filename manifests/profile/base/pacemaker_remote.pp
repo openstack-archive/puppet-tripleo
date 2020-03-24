@@ -66,11 +66,14 @@ class tripleo::profile::base::pacemaker_remote (
   if $pcs_password == undef {
     fail('The $pcs_password param is and the hiera key "hacluster_pwd" hiera key are both undefined, this is not allowed')
   }
+
+  include pacemaker::params
+
   class { '::pacemaker::remote':
     pcs_user       => $pcs_user,
     pcs_password   => $pcs_password,
     remote_authkey => $remote_authkey,
-    use_pcsd       => true,
+    use_pcsd       => $pacemaker::params::pcs_010,
     pcsd_bind_addr => $pcsd_bind_addr,
     tls_priorities => $tls_priorities,
   }
