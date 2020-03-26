@@ -122,6 +122,7 @@ class tripleo::profile::base::heat (
     }
     include ::heat::config
     include ::heat::cors
+    include ::heat::cache
   }
 
   if $step >= 5 {
