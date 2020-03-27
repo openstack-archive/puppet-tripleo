@@ -87,6 +87,11 @@
 #   (Optional) Maximum number of connections to MySQL.
 #   Defaults to hiera('mysql_max_connections', undef)
 #
+# [*mysql_auth_ed25519*]
+#   (Optional) Use MariaDB's ed25519 authentication plugin to authenticate
+#   a user when connecting to the server
+#   Defaults to hiera('mysql_auth_ed25519', false)
+#
 # [*remove_default_accounts*]
 #   (Optional) Whether or not remove default MySQL accounts.
 #   Defaults to true
@@ -112,6 +117,7 @@ class tripleo::profile::base::database::mysql (
   $manage_resources              = true,
   $mysql_server_options          = {},
   $mysql_max_connections         = hiera('mysql_max_connections', undef),
+  $mysql_auth_ed25519            = hiera('mysql_auth_ed25519', false),
   $remove_default_accounts       = true,
   $step                          = Integer(hiera('step')),
 ) {
@@ -174,6 +180,7 @@ class tripleo::profile::base::database::mysql (
         'ssl-cert'                => $tls_certfile,
         'ssl-cipher'              => $tls_cipher_list,
         'ssl-ca'                  => undef,
+        'plugin_load_add'         => 'auth_ed25519',
       }
     }
     $mysql_server_options_real = deep_merge($mysql_server_default, $mysql_server_options)
@@ -214,78 +221,88 @@ class tripleo::profile::base::database::mysql (
         password_hash => mysql_password(hiera('mysql::server::root_password')),
       }
     }
+    if ($mysql_auth_ed25519) {
+      ['root@localhost', 'root@%'].each |$user| {
+        Mysql_user<| title == $user |> {
+          plugin        => 'ed25519',
+          password_hash => mysql_ed25519_password(hiera('mysql::server::root_password'))
+        }
+      }
+    }
+    # Note: use 'include_and_check_auth' below rather than 'include'
+    # to support ed25519 authentication
     if hiera('aodh_api_enabled', false) {
-      include aodh::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'aodh::db::mysql':}
     }
     if hiera('ceilometer_collector_enabled', false) {
-      include ceilometer::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'ceilometer::db::mysql':}
     }
     if hiera('cinder_api_enabled', false) {
-      include cinder::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'cinder::db::mysql':}
     }
     if hiera('barbican_api_enabled', false) {
-      include barbican::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'barbican::db::mysql':}
     }
     if hiera('designate_api_enabled', false) {
-      include designate::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'designate::db::mysql':}
     }
     if hiera('glance_api_enabled', false) {
-      include glance::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'glance::db::mysql':}
     }
     if hiera('gnocchi_api_enabled', false) {
-      include gnocchi::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'gnocchi::db::mysql':}
     }
     if hiera('heat_engine_enabled', false) {
-      include heat::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'heat::db::mysql':}
     }
     if hiera('ironic_api_enabled', false) {
-      include ironic::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'ironic::db::mysql':}
     }
     if hiera('ironic_inspector_enabled', false) {
-      include ironic::inspector::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'ironic::inspector::db::mysql':}
     }
     if hiera('keystone_enabled', false) {
-      include keystone::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'keystone::db::mysql':}
     }
     if hiera('manila_api_enabled', false) {
-      include manila::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'manila::db::mysql':}
     }
     if hiera('mistral_api_enabled', false) {
-      include mistral::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'mistral::db::mysql':}
     }
     if hiera('neutron_api_enabled', false) {
-      include neutron::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'neutron::db::mysql':}
     }
-    if hiera('nova_conductor_enabled', false) {
-      include nova::db::mysql
-    }
+    if hiera('nova_conductor_enabled', false) {
+      tripleo::profile::base::database::mysql::include_and_check_auth{'nova::db::mysql':}
+    }
     if hiera('nova_api_enabled', false) {
-      include nova::db::mysql_api
+      tripleo::profile::base::database::mysql::include_and_check_auth{'nova::db::mysql_api':}
     }
     if hiera('placement_enabled', false) {
-      include placement::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'placement::db::mysql':}
     }
     if hiera('octavia_api_enabled', false) {
-      include octavia::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'octavia::db::mysql':}
     }
     if hiera('sahara_api_enabled', false) {
-      include sahara::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'sahara::db::mysql':}
     }
     if hiera('trove_api_enabled', false) {
-      include trove::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'trove::db::mysql':}
     }
     if hiera('panko_api_enabled', false) {
-      include panko::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'panko::db::mysql':}
     }
     if hiera('ec2_api_enabled', false) {
-      include ec2api::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'ec2api::db::mysql':}
     }
     if hiera('zaqar_api_enabled', false) and hiera('zaqar::db::mysql::user', '') == 'zaqar' {
       # NOTE: by default zaqar uses sqlalchemy
-      include zaqar::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'zaqar::db::mysql':}
     }
     if hiera('veritas_hyperscale_controller_enabled', false) {
-      include veritas_hyperscale::db::mysql
+      tripleo::profile::base::database::mysql::include_and_check_auth{'veritas_hyperscale::db::mysql':}
     }
   }
 
