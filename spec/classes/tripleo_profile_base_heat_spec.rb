@@ -52,7 +52,8 @@ eos
         :oslomsg_notify_hosts    => [ '192.168.0.2' ],
         :oslomsg_notify_username => 'heat2',
         :oslomsg_notify_password => 'baa',
-        :oslomsg_notify_port     => '5678'
+        :oslomsg_notify_port     => '5678',
+        :memcached_ips           => '127.0.0.1',
       } }
 
       it 'should trigger complete configuration without db_purge' do
@@ -70,7 +71,9 @@ eos
         is_expected.to contain_class('heat::config')
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::logging')
-        is_expected.to contain_class('heat::cache')
+        is_expected.to contain_class('heat::cache').with(
+          :memcache_servers => ['127.0.0.1:11211']
+        )
         is_expected.to_not contain_class('heat::cron::purge_deleted')
       end
     end
@@ -85,7 +88,8 @@ eos
         :oslomsg_notify_hosts    => [ '192.168.0.2' ],
         :oslomsg_notify_username => 'heat2',
         :oslomsg_notify_password => 'baa',
-        :oslomsg_notify_port     => '5678'
+        :oslomsg_notify_port     => '5678',
+        :memcached_ips           => '127.0.0.1',
       } }
 
       it 'should trigger complete configuration' do
@@ -104,6 +108,9 @@ eos
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::logging')
         is_expected.to contain_class('heat::cache')
+        is_expected.to contain_class('heat::cache').with(
+          :memcache_servers => ['127.0.0.1:11211']
+        )
         is_expected.to contain_class('heat::cron::purge_deleted')
       end
     end
@@ -120,7 +127,8 @@ eos
         :oslomsg_notify_username => 'heat2',
         :oslomsg_notify_password => 'baa',
         :oslomsg_notify_port     => '5678',
-        :manage_db_purge         => false
+        :manage_db_purge         => false,
+        :memcached_ips           => '::1',
       } }
 
       it 'should trigger complete configuration without db_purge' do
@@ -138,7 +146,9 @@ eos
         is_expected.to contain_class('heat::config')
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::logging')
-        is_expected.to contain_class('heat::cache')
+        is_expected.to contain_class('heat::cache').with(
+          :memcache_servers => ['[::1]:11211']
+        )
         is_expected.to_not contain_class('heat::cron::purge_deleted')
       end
     end

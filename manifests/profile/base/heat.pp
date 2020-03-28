@@ -78,7 +78,11 @@
 # [*oslomsg_notify_use_ssl*]
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('oslo_messaging_notify_use_ssl', '0')
-
+#
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_ips')
+#
 class tripleo::profile::base::heat (
   $bootstrap_node          = downcase(hiera('heat_engine_short_bootstrap_node_name')),
   $manage_db_purge         = hiera('heat_enable_db_purge', true),
@@ -95,6 +99,7 @@ class tripleo::profile::base::heat (
   $oslomsg_notify_port     = hiera('oslo_messaging_notify_port', '5672'),
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
+  $memcached_ips           = hiera('memcached_node_ips'),
 ) {
 
   include tripleo::profile::base::heat::authtoken
@@ -128,10 +133,20 @@ class tripleo::profile::base::heat (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
+
     include heat::config
     include heat::cors
     include heat::logging
-    include heat::cache
+
+    if is_ipv6_address($memcached_ips[0]) {
+      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211'), 'inet6:')
+    } else {
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+    }
+
+    class { 'heat::cache':
+      memcache_servers => $memcache_servers
+    }
   }
 
   if $step >= 5 {
