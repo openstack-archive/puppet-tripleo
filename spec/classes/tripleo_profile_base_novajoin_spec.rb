@@ -18,22 +18,24 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::novajoin' do
 
-  let :pre_condition do
-    "include nova
-     class { 'nova::metadata::novajoin::authtoken':
-       password => 'passw0rd',
-     }"
-  end
-
-  let :params do
-    { :oslomsg_rpc_hosts    => ['some.server.com'],
-      :oslomsg_rpc_password => 'somepassword',
-      :service_password     => 'passw0rd',
-      :step                 => 5
-    }
-  end
-
   shared_examples_for 'tripleo::profile::base::novajoin' do
+
+    let :pre_condition do
+      <<-eos
+      include nova
+      class { 'tripleo::profile::base::novajoin::authtoken':
+        step => #{params[:step]},
+      }
+eos
+    end
+
+    let :params do
+      { :oslomsg_rpc_hosts    => ['some.server.com'],
+        :oslomsg_rpc_password => 'somepassword',
+        :service_password     => 'passw0rd',
+        :step                 => 5
+      }
+    end
 
     context 'with step less than 3' do
       before do
@@ -41,6 +43,7 @@ describe 'tripleo::profile::base::novajoin' do
       end
 
       it 'should not do anything' do
+        is_expected.to contain_class('tripleo::profile::base::novajoin::authtoken')
         is_expected.to_not contain_class('nova::metadata::novajoin::api')
       end
     end
@@ -51,6 +54,7 @@ describe 'tripleo::profile::base::novajoin' do
       end
 
       it 'should provide basic initialization' do
+        is_expected.to contain_class('tripleo::profile::base::novajoin::authtoken')
         is_expected.to contain_class('nova::metadata::novajoin::api').with(
           :transport_url => 'rabbit://guest:somepassword@some.server.com:5672/?ssl=0'
         )

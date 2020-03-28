@@ -72,6 +72,8 @@ manila_share_short_node_names:
  - 'node.example.com'
  - 'manila-2'
 manila_api_short_bootstrap_node_name: node
+# mistral related items
+mistral::keystone::authtoken::password: 'password'
 # nova related items
 ec2_api_short_bootstrap_node_name: node
 nova_api_short_bootstrap_node_name: node
@@ -80,6 +82,7 @@ nova_placement_short_bootstrap_node_name: node
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
 nova::network::neutron::password: 'password'
+nova::metadata::novajoin::authtoken::password: 'password'
 # panko related items
 panko::keystone::authtoken::password: 'password'
 # placement related items
@@ -175,6 +178,8 @@ neutron::plugins::ovs::opendaylight::odl_username: 'admin'
 neutron::plugins::ovs::opendaylight::odl_password: 'admin'
 # swift related
 swift_proxy_short_bootstrap_node_name: node
+# zaqar related
+zaqar::keystone::authtoken::password: 'password'
 # required for metrics::qdr_user
 ctlplane: '192.168.24.123'
 # required to avoid EPEL repo management when testing collectd::sensubility

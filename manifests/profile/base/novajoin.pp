@@ -65,6 +65,9 @@ class tripleo::profile::base::novajoin (
   $oslomsg_rpc_use_ssl       = hiera('oslo_messaging_rpc_use_ssl', '0'),
   $step                      = Integer(hiera('step')),
 ) {
+
+  include tripleo::profile::base::novajoin::authtoken
+
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     class { 'nova::metadata::novajoin::api' :
