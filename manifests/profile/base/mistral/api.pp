@@ -67,6 +67,7 @@ class tripleo::profile::base::mistral::api (
   }
 
   include tripleo::profile::base::mistral
+  include tripleo::profile::base::mistral::authtoken
 
   if $enable_internal_tls {
     if !$mistral_api_network {

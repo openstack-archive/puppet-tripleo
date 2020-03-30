@@ -81,6 +81,8 @@ class tripleo::profile::base::zaqar (
     $is_bootstrap = false
   }
 
+  include tripleo::profile::base::zaqar::authtoken
+
   if $enable_internal_tls {
     if !$zaqar_api_network {
       fail('zaqar_api_network is not set in the hieradata.')
