@@ -33,6 +33,8 @@ class tripleo::profile::base::cinder::volume::dellemc_vmax_iscsi (
 ) {
   include tripleo::profile::base::cinder::volume
 
+  warning('The tripleo_dellemc_vmax_iscsi class is not supported, please use the triplo_dellemc_powermax resource instead.')
+
   if $step >= 4 {
     cinder::backend::dellemc_vmax_iscsi { $backend_name :
       backend_availability_zone => hiera('cinder::backend::dellemc_vmax_iscsi::backend_availability_zone', undef),
