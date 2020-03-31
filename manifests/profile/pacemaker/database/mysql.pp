@@ -93,6 +93,10 @@
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to hiera('pcs_tries', 20)
 #
+# [*open_files_limit*]
+#   (Optional) Maximum value for open-files-limit
+#   Defaults to 16384
+#
 class tripleo::profile::pacemaker::database::mysql (
   $bootstrap_node                 = hiera('mysql_short_bootstrap_node_name'),
   $bind_address                   = $::hostname,
@@ -108,6 +112,7 @@ class tripleo::profile::pacemaker::database::mysql (
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
   $step                           = Integer(hiera('step')),
   $pcs_tries                      = hiera('pcs_tries', 20),
+  $open_files_limit               = 16384,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -250,7 +255,7 @@ class tripleo::profile::pacemaker::database::mysql (
         op_params       => 'promote timeout=300s on-fail=block',
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true",
-        resource_params => "additional_parameters='--open-files-limit=16384' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map}'",
+        resource_params => "additional_parameters='--open-files-limit=${open_files_limit}' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map}'",
         tries           => $pcs_tries,
         location_rule   => {
           resource_discovery => 'exclusive',
