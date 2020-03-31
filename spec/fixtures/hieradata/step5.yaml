@@ -6,3 +6,6 @@ tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools:
 cinder::backend::pure::volume_backend_name:
   - 'tripleo_pure_1'
   - 'tripleo_pure_2'
+cinder::backend::dellemc_powermax::volume_backend_name:
+  - 'tripleo_dellemc_powermax_1'
+  - 'tripleo_dellemc_powermax_2'
