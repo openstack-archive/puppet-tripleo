@@ -124,10 +124,6 @@ class tripleo::profile::base::gnocchi::api (
       ssl_key  => $tls_keyfile,
     }
 
-    class { 'gnocchi::storage':
-      coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
-    }
-
     if $incoming_storage_driver == 'redis' {
       class { 'gnocchi::storage::incoming::redis':
         redis_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
