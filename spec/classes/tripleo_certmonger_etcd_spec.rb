@@ -29,22 +29,44 @@ describe 'tripleo::certmonger::etcd' do
       }
     end
 
-    it 'should include the base for using certmonger' do
-      is_expected.to contain_class('certmonger')
-    end
+    context 'with defaults' do
+      it 'should include the base for using certmonger' do
+        is_expected.to contain_class('certmonger')
+      end
 
-    it 'should request a certificate' do
-      is_expected.to contain_certmonger_certificate('etcd').with(
-        :ensure       => 'present',
-        :certfile     => '/etc/pki/cert.crt',
-        :keyfile      => '/etc/pki/key.pem',
-        :hostname     => 'localhost',
-        :dnsname      => 'localhost',
-        :ca           => 'local',
-        :wait         => true,
-      )
-      is_expected.to contain_file('/etc/pki/cert.crt')
-      is_expected.to contain_file('/etc/pki/key.pem')
+      it 'should request a certificate' do
+        is_expected.to contain_certmonger_certificate('etcd').with(
+          :ensure       => 'present',
+          :certfile     => '/etc/pki/cert.crt',
+          :keyfile      => '/etc/pki/key.pem',
+          :hostname     => 'localhost',
+          :dnsname      => 'localhost',
+          :principal    => nil,
+          :postsave_cmd => nil,
+          :ca           => 'local',
+          :wait         => true,
+        )
+        is_expected.to contain_file('/etc/pki/cert.crt')
+        is_expected.to contain_file('/etc/pki/key.pem')
+      end
+    end
+    context 'with overrides' do
+      before :each do
+        params.merge!({
+          :certmonger_ca => 'IPA',
+          :dnsnames      => 'host1,127.0.0.42',
+          :postsave_cmd  => '/usr/bin/refresh_me.sh',
+          :principal     => 'Principal_Lewis',
+        })
+      end
+      it 'should request a certificate with overrides' do
+        is_expected.to contain_certmonger_certificate('etcd').with(
+          :dnsname      => 'host1,127.0.0.42',
+          :principal    => 'Principal_Lewis',
+          :postsave_cmd => '/usr/bin/refresh_me.sh',
+          :ca           => 'IPA',
+        )
+      end
     end
   end
 

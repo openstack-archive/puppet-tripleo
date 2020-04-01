@@ -98,6 +98,10 @@
 #   (Optional) Whether TLS in the internal network is enabled or not
 #   Defaults to hiera('enable_internal_tls', false)
 #
+# [*etcd_certificate_specs*]
+#   (optional) TLS certificate specs for the etcd service
+#   Defaults to hiera('tripleo::profile::base::etcd::certificate_specs', {})
+#
 # [*etcd_enabled*]
 #   (optional) Whether the etcd service is enabled or not
 #   Defaults to hiera('etcd_enabled', false)
@@ -136,6 +140,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_rbd_client_name                      = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name','openstack'),
   $cinder_volume_cluster                       = hiera('tripleo::profile::base::cinder::volume::cinder_volume_cluster', ''),
   $enable_internal_tls                         = hiera('enable_internal_tls', false),
+  $etcd_certificate_specs                      = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
   $etcd_enabled                                = hiera('etcd_enabled', false),
   $etcd_host                                   = hiera('etcd_vip', undef),
   $etcd_port                                   = hiera('tripleo::profile::base::etcd::client_port', '2379'),
@@ -159,10 +164,14 @@ class tripleo::profile::base::cinder::volume (
       }
       if $enable_internal_tls {
         $protocol = 'https'
+        $tls_keyfile = $etcd_certificate_specs['service_key']
+        $tls_certfile = $etcd_certificate_specs['service_certificate']
+        $options = sprintf('?cert_key=%s&cert_cert=%s', $tls_keyfile, $tls_certfile)
       } else {
         $protocol = 'http'
+        $options = ''
       }
-      $backend_url = sprintf('etcd3+%s://%s:%s', $protocol, normalize_ip_for_uri($etcd_host), $etcd_port)
+      $backend_url = sprintf('etcd3+%s://%s:%s%s', $protocol, normalize_ip_for_uri($etcd_host), $etcd_port, $options)
       class { 'cinder::coordination' :
         backend_url => $backend_url,
       }
