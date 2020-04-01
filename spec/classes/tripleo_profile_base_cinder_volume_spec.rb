@@ -326,12 +326,16 @@ describe 'tripleo::profile::base::cinder::volume' do
         context 'with internal tls enabled' do
           before :each do
             params.merge!({
-              :enable_internal_tls => true,
+              :enable_internal_tls    => true,
+              :etcd_certificate_specs => {
+                'service_certificate' => '/path/to/etcd.cert',
+                'service_key'         => '/path/to/etcd.key',
+              },
             })
           end
           it 'should configure coordination backend_url with https' do
             is_expected.to contain_class('cinder::coordination').with(
-              :backend_url => 'etcd3+https://127.0.0.1:2379',
+              :backend_url => 'etcd3+https://127.0.0.1:2379?cert_key=/path/to/etcd.key&cert_cert=/path/to/etcd.cert',
             )
           end
         end
