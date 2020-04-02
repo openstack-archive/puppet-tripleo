@@ -1,4 +1,4 @@
-# Copyright 2019 Red Hat, Inc.
+# Copyright 2020 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::certmonger::ovn_metadata
+# == Class: tripleo::certmonger::ovn_octavia
 #
 # Request a certificate for the ovn_controller service and do the necessary setup.
 #
@@ -38,7 +38,7 @@
 #   (Optional) The haproxy service principal that is set for neutron in kerberos.
 #   Defaults to undef
 #
-class tripleo::certmonger::ovn_metadata (
+class tripleo::certmonger::ovn_octavia (
   $hostname,
   $service_certificate,
   $service_key,
@@ -48,7 +48,7 @@ class tripleo::certmonger::ovn_metadata (
 ) {
   include certmonger
 
-  certmonger_certificate { 'ovn_metadata' :
+  certmonger_certificate { 'ovn_octavia' :
     ensure       => 'present',
     certfile     => $service_certificate,
     keyfile      => $service_key,
@@ -61,10 +61,10 @@ class tripleo::certmonger::ovn_metadata (
     require      => Class['::certmonger'],
   }
   file { $service_certificate :
-    require => Certmonger_certificate['ovn_metadata']
+    require => Certmonger_certificate['ovn_octavia']
   }
   file { $service_key :
-    require => Certmonger_certificate['ovn_metadata']
+    require => Certmonger_certificate['ovn_octavia']
   }
 
 }
