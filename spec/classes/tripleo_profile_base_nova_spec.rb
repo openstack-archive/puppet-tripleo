@@ -54,8 +54,6 @@ describe 'tripleo::profile::base::nova' do
         is_expected.to contain_class('nova::config')
         is_expected.to contain_class('nova::logging')
         is_expected.to contain_class('nova::cache').with(
-          :enabled => true,
-          :backend => 'dogpile.cache.memcached',
           :memcache_servers => ['127.0.0.1:11211']
         )
         is_expected.to contain_class('nova::placement')

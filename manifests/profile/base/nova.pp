@@ -82,15 +82,6 @@
 #   (Optional) Memcached port to use.
 #   Defaults to hiera('memcached_port', 11211)
 #
-# [*enable_cache*]
-#   (Optional) Enable the use of cache. Note that it is unsupported
-#   to disable this key. It is only useful for debugging purposes.
-#   Defaults to true
-#
-# [*cache_backend*]
-#   (Optional) Backend implementation to store cache
-#   Defaults to 'dogpile.cache.memcached'
-#
 class tripleo::profile::base::nova (
   $bootstrap_node          = hiera('nova_api_short_bootstrap_node_name', undef),
   $oslomsg_rpc_proto       = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
@@ -106,10 +97,8 @@ class tripleo::profile::base::nova (
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $step                    = Integer(hiera('step')),
-  $memcached_ips           = hiera('memcached_node_ips', []),
+  $memcached_ips           = hiera('memcached_node_ips'),
   $memcached_port          = hiera('memcached_port', 11211),
-  $enable_cache            = true,
-  $cache_backend           = 'dogpile.cache.memcached',
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -135,8 +124,6 @@ class tripleo::profile::base::nova (
     include ::nova::config
     include ::nova::logging
     class { '::nova::cache':
-      enabled          => $enable_cache,
-      backend          => $cache_backend,
       memcache_servers => $memcache_servers,
     }
     class { '::nova':
