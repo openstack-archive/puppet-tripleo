@@ -31,6 +31,15 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
+# [*dnsnames*]
+#   (Optional) The DNS names that will be added for the SubjectAltNames entry
+#   in the certificate.
+#   Defaults to $hostname
+#
+# [*postsave_cmd*]
+#   (Optional) Specifies the command to execute after requesting a certificate.
+#   Defaults to undef
+#
 # [*principal*]
 #   (Optional) The haproxy service principal that is set for etcd in kerberos.
 #   Defaults to undef
@@ -40,17 +49,21 @@ class tripleo::certmonger::etcd (
   $service_certificate,
   $service_key,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
+  $dnsnames      = $hostname,
+  $postsave_cmd  = undef,
   $principal     = undef,
 ) {
   include certmonger
 
-  $postsave_cmd = 'systemctl reload etcd'
+  # Note: A $postsave_cmd should not be needed because etcd doesn't cache
+  # certificates. See https://github.com/etcd-io/etcd/pull/7784.
+
   certmonger_certificate { 'etcd' :
     ensure       => 'present',
     certfile     => $service_certificate,
     keyfile      => $service_key,
     hostname     => $hostname,
-    dnsname      => $hostname,
+    dnsname      => $dnsnames,
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
@@ -58,13 +71,9 @@ class tripleo::certmonger::etcd (
     require      => Class['::certmonger'],
   }
   file { $service_certificate :
-    owner   => 'etcd',
-    group   => 'etcd',
     require => Certmonger_certificate['etcd'],
   }
   file { $service_key :
-    owner   => 'etcd',
-    group   => 'etcd',
     require => Certmonger_certificate['etcd'],
   }
 
