@@ -106,7 +106,6 @@ class tripleo::profile::base::cinder::api (
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
     }
-    include cinder::ceilometer
   }
 
   if $step == 4 and $manage_type and $default_volume_type != '' {
