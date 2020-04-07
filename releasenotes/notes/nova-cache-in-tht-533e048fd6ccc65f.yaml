@@ -1,0 +1,6 @@
+---
+deprecations:
+  - |
+    The ``enable_cache`` and ``cache_backend`` in
+    ``tripleo::profile::base::nova`` class were removed because now these
+    parameters are defined in tripleo-heat-templates.
