@@ -32,7 +32,7 @@ class tripleo::profile::base::ceilometer::upgrade (
   $bootstrap_node = hiera('gnocchi_api_short_bootstrap_node_name', undef),
   $step           = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

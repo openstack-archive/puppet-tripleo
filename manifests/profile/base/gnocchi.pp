@@ -67,7 +67,7 @@ class tripleo::profile::base::gnocchi (
 ) {
   warning('Gnocchi is deprecated and is going to be removed in future.')
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

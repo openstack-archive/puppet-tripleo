@@ -100,7 +100,7 @@ class tripleo::profile::base::neutron::server (
   $tls_proxy_port                = 9696,
   $designate_api_enabled   = hiera('designate_api_enabled', false),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

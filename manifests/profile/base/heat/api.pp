@@ -55,7 +55,7 @@ class tripleo::profile::base::heat::api (
   $heat_api_network              = hiera('heat_api_network', undef),
   $step                          = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
     $is_bootstrap = false

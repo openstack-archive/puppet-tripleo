@@ -37,7 +37,7 @@ class tripleo::profile::base::mistral::executor (
   $step           = Integer(hiera('step')),
   $docker_group   = false,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

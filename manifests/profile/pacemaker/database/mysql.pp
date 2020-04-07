@@ -114,7 +114,7 @@ class tripleo::profile::pacemaker::database::mysql (
   $pcs_tries                      = hiera('pcs_tries', 20),
   $open_files_limit               = 16384,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

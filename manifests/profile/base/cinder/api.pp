@@ -74,7 +74,7 @@ class tripleo::profile::base::cinder::api (
   $step                          = Integer(hiera('step')),
   $keystone_resources_managed    = hiera('keystone_resources_managed', true),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
     $manage_type = $keystone_resources_managed
   } else {

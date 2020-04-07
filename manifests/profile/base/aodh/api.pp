@@ -56,7 +56,7 @@ class tripleo::profile::base::aodh::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $step                          = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
     $is_bootstrap = false

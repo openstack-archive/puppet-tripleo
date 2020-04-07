@@ -80,7 +80,7 @@ class tripleo::profile::base::gnocchi::api (
   $step                          = Integer(hiera('step')),
   $incoming_storage_driver       = hiera('incoming_storage_driver', undef),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

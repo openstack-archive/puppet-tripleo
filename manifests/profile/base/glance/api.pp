@@ -156,7 +156,7 @@ class tripleo::profile::base::glance::api (
   # DEPRECATED PARAMETERS
   $glance_rbd_client_name  = undef,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false
