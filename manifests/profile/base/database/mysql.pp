@@ -288,9 +288,6 @@ class tripleo::profile::base::database::mysql (
     if hiera('sahara_api_enabled', false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'sahara::db::mysql':}
     }
-    if hiera('trove_api_enabled', false) {
-      tripleo::profile::base::database::mysql::include_and_check_auth{'trove::db::mysql':}
-    }
     if hiera('panko_api_enabled', false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'panko::db::mysql':}
     }
