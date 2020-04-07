@@ -57,7 +57,7 @@ class tripleo::profile::base::ironic::api (
   include ::tripleo::profile::base::ironic
   include ::tripleo::profile::base::ironic::authtoken
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
     $is_bootstrap = false

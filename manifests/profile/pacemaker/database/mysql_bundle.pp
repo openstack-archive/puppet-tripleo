@@ -189,7 +189,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $promote_timeout                = 300,
   $force_ocf                      = false,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

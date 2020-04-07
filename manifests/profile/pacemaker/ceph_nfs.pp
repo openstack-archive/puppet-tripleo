@@ -36,7 +36,7 @@ class tripleo::profile::pacemaker::ceph_nfs (
   $step                    = hiera('step'),
   $pcs_tries               = hiera('pcs_tries', 20),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

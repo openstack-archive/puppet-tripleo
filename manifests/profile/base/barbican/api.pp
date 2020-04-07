@@ -115,7 +115,7 @@ class tripleo::profile::base::barbican::api (
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

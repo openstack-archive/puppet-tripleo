@@ -73,7 +73,7 @@ class tripleo::profile::base::octavia::api (
   $ovn_db_host         = undef,
   $ovn_nb_port         = undef,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

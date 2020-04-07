@@ -118,7 +118,7 @@ class tripleo::profile::base::swift::proxy (
   $tls_proxy_fqdn       = undef,
   $tls_proxy_port       = 8080,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
     $is_bootstrap = false

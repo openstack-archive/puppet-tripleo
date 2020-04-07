@@ -60,7 +60,7 @@ class tripleo::profile::base::panko::api (
   $enable_panko_expirer          = hiera('enable_panko_expirer', true),
   $step                          = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

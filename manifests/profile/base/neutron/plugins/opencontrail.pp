@@ -29,7 +29,7 @@ class tripleo::profile::base::neutron::plugins::opencontrail (
   $bootstrap_node = hiera('contrail_neutron_plugin_short_bootstrap_node_name', undef),
   $step           = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

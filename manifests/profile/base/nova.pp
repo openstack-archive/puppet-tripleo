@@ -102,7 +102,7 @@ class tripleo::profile::base::nova (
   $enable_cache            = true,
 ) {
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

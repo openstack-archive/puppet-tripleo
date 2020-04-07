@@ -31,7 +31,7 @@ class tripleo::profile::base::trove::api (
   $bootstrap_node = hiera('trove_api_short_bootstrap_node_name', undef),
   $step           = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false
