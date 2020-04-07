@@ -360,10 +360,6 @@
 #  (optional) Enable or not Zaqar Websockets binding
 #  Defaults to false
 #
-# [*ui*]
-#  (optional) Enable or not TripleO UI
-#  Defaults to false
-#
 # [*aodh_network*]
 #  (optional) Specify the network aodh is running on.
 #  Defaults to hiera('aodh_api_network', undef)
@@ -657,8 +653,6 @@ class tripleo::haproxy (
   $ovn_dbs                     = hiera('ovn_dbs_enabled', false),
   $ovn_dbs_manage_lb           = false,
   $zaqar_ws                    = hiera('zaqar_api_enabled', false),
-  # For backward compatibility with instack-undercloud, keep enable_ui support)
-  $ui                          = pick(hiera('tripleo_ui_enabled', undef), hiera('enable_ui', undef), false),
   $aodh_network                = hiera('aodh_api_network', undef),
   $barbican_network            = hiera('barbican_api_network', false),
   $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
@@ -756,8 +750,6 @@ class tripleo::haproxy (
     sahara_api_ssl_port => 13386,
     swift_proxy_port => 8080,
     swift_proxy_ssl_port => 13808,
-    ui_port => 3000,
-    ui_ssl_port => 443,
     zaqar_api_port => 8888,
     zaqar_api_ssl_port => 13888,
     ceph_rgw_port => 8080,
@@ -1622,24 +1614,6 @@ class tripleo::haproxy (
       },
       public_ssl_port           => $ports[zaqar_ws_ssl_port],
       service_network           => $zaqar_api_network,
-    }
-  }
-
-  if $ui {
-    ::tripleo::haproxy::endpoint { 'ui':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ui_vip', $controller_virtual_ip),
-      service_port      => $ports[ui_port],
-      ip_addresses      => hiera('ui_ips', $controller_hosts_real),
-      server_names      => $controller_hosts_names_real,
-      mode              => 'http',
-      public_ssl_port   => $ports[ui_ssl_port],
-      listen_options    => {
-        # NOTE(dtrainor): in addition to the zaqar_ws endpoint, the HTTPS
-        # (443/tcp) endpoint that answers for the UI must also use a long-lived
-        # tunnel timeout for the same reasons mentioned above.
-        'timeout' => ['tunnel 3600s'],
-      },
     }
   }
 
