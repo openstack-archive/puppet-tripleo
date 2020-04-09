@@ -102,7 +102,6 @@ memcached_node_ips_v6:
 memcached_node_ips:
  - '127.0.0.1'
 # octavia related items
-octavia::rabbit_password: 'password'
 octavia::keystone::authtoken::password: 'password'
 # horizon related
 horizon_short_bootstrap_node_name: node
