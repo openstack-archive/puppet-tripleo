@@ -136,7 +136,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
     $rabbit_nodes = []
   }
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

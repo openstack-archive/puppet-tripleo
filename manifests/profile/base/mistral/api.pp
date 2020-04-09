@@ -60,7 +60,7 @@ class tripleo::profile::base::mistral::api (
   $mistral_api_wsgi_enabled      = hiera('mistral_wsgi_enabled', true),
   $step                          = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
     $is_bootstrap = false

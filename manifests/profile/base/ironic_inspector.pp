@@ -61,7 +61,7 @@ class tripleo::profile::base::ironic_inspector (
 
   include tripleo::profile::base::ironic_inspector::authtoken
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

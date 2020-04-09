@@ -61,7 +61,7 @@ class tripleo::profile::base::ironic (
   $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
 ) {
   # Database is accessed by both API and conductor, hence it's here.
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

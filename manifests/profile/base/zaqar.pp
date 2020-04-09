@@ -75,7 +75,7 @@ class tripleo::profile::base::zaqar (
   $redis_vip            = hiera('redis_vip', undef),
   $step                 = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
     $is_bootstrap = false

@@ -31,7 +31,7 @@ class tripleo::profile::base::heat::engine (
   $bootstrap_node = hiera('heat_engine_short_bootstrap_node_name', undef),
   $step           = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

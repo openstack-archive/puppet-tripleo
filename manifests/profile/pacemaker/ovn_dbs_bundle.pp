@@ -118,7 +118,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $listen_on_master_ip_only = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::listen_on_master_ip_only', 'yes'),
 ) {
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

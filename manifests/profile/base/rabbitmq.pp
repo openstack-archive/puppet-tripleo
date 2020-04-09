@@ -222,7 +222,7 @@ class tripleo::profile::base::rabbitmq (
     }
   }
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $rabbitmq_bootstrapnode = true
   } else {
     $rabbitmq_bootstrapnode = false
