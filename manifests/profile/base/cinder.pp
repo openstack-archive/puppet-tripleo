@@ -113,8 +113,6 @@ class tripleo::profile::base::cinder (
         'password'  => $oslomsg_rpc_password,
         'ssl'       => $oslomsg_rpc_use_ssl_real,
       }),
-    }
-    class { 'cinder::ceilometer' :
       notification_transport_url => os_transport_url({
         'transport' => $oslomsg_notify_proto,
         'hosts'     => $oslomsg_notify_hosts,

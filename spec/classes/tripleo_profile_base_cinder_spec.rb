@@ -23,7 +23,6 @@ describe 'tripleo::profile::base::cinder' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to_not contain_class('cinder')
-        is_expected.to_not contain_class('cinder::ceilometer')
         is_expected.to_not contain_class('cinder::config')
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
@@ -49,9 +48,7 @@ describe 'tripleo::profile::base::cinder' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('cinder').with(
-          :default_transport_url => 'rabbit://cinder1:foo@192.168.0.1:1234/?ssl=0'
-        )
-        is_expected.to contain_class('cinder::ceilometer').with(
+          :default_transport_url => 'rabbit://cinder1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://cinder2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
@@ -71,7 +68,6 @@ describe 'tripleo::profile::base::cinder' do
 
       it 'should not trigger any configuration' do
         is_expected.to_not contain_class('cinder')
-        is_expected.to_not contain_class('cinder::ceilometer')
         is_expected.to_not contain_class('cinder::config')
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
@@ -97,9 +93,7 @@ describe 'tripleo::profile::base::cinder' do
 
       it 'should trigger cinder configuration without mysql grant' do
         is_expected.to contain_class('cinder').with(
-          :default_transport_url => 'rabbit://cinder1:foo@192.168.0.1:1234/?ssl=0'
-        )
-        is_expected.to contain_class('cinder::ceilometer').with(
+          :default_transport_url => 'rabbit://cinder1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://cinder2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
@@ -124,7 +118,6 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder').with(
           :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
-        is_expected.to contain_class('cinder::ceilometer')
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
@@ -148,7 +141,6 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder').with(
           :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
-        is_expected.to contain_class('cinder::ceilometer')
         is_expected.to contain_class('cinder::config')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
