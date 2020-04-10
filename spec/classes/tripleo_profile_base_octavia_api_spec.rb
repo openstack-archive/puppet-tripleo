@@ -102,22 +102,6 @@ eos
       end
     end
 
-    context 'with step 4 with ovn' do
-      before do
-        params.merge!({
-          :step           => 4,
-          :bootstrap_node => 'node.example.com',
-          :neutron_driver => ['ovn'],
-          :ovn_db_host    => '127.0.0.1',
-          :ovn_nb_port    => '6641'
-        })
-      end
-
-      it 'should should set provider drivers and ovn nb connection' do
-        is_expected.to contain_class('octavia::api').with(:ovn_nb_connection => 'tcp:127.0.0.1:6641')
-      end
-    end
-
     context 'with step 4 on non-bootstrap node' do
       before do
         params.merge!({ :step => 4 })
