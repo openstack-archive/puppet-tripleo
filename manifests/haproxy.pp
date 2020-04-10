@@ -198,10 +198,6 @@
 #  (optional) Enable or not Sahara API binding
 #  defaults to hiera('sahara_api_enabled', false)
 #
-# [*trove*]
-#  (optional) Enable or not Trove API binding
-#  defaults to hiera('trove_api_enabled', false)
-#
 # [*glance_api*]
 #  (optional) Enable or not Glance API binding
 #  Defaults to hiera('glance_api_enabled', false)
@@ -513,10 +509,6 @@
 #  (optional) Specify the network swift_proxy_server is running on.
 #  Defaults to hiera('swift_proxy_network', undef)
 #
-# [*trove_network*]
-#  (optional) Specify the network trove is running on.
-#  Defaults to hiera('trove_api_network', undef)
-#
 # [*zaqar_api_network*]
 #  (optional) Specify the network zaqar_api is running on.
 #  Defaults to hiera('zaqar_api_network', undef)
@@ -574,8 +566,6 @@
 #    'sahara_api_ssl_port' (Defaults to 13386)
 #    'swift_proxy_port' (Defaults to 8080)
 #    'swift_proxy_ssl_port' (Defaults to 13808)
-#    'trove_api_port' (Defaults to 8779)
-#    'trove_api_ssl_port' (Defaults to 13779)
 #    'zaqar_api_port' (Defaults to 8888)
 #    'zaqar_api_ssl_port' (Defaults to 13888)
 #    'ceph_rgw_port' (Defaults to 8080)
@@ -628,7 +618,6 @@ class tripleo::haproxy (
   $cinder                      = hiera('cinder_api_enabled', false),
   $manila                      = hiera('manila_api_enabled', false),
   $sahara                      = hiera('sahara_api_enabled', false),
-  $trove                       = hiera('trove_api_enabled', false),
   $glance_api                  = hiera('glance_api_enabled', false),
   $nova_osapi                  = hiera('nova_api_enabled', false),
   $placement                   = hiera('placement_enabled', false),
@@ -706,7 +695,6 @@ class tripleo::haproxy (
   $etcd_network                = hiera('etcd_network', undef),
   $sahara_network              = hiera('sahara_api_network', undef),
   $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
-  $trove_network               = hiera('trove_api_network', undef),
   $zaqar_api_network           = hiera('zaqar_api_network', undef),
   $service_ports               = {}
 ) {
@@ -768,8 +756,6 @@ class tripleo::haproxy (
     sahara_api_ssl_port => 13386,
     swift_proxy_port => 8080,
     swift_proxy_ssl_port => 13808,
-    trove_api_port => 8779,
-    trove_api_ssl_port => 13779,
     ui_port => 3000,
     ui_ssl_port => 443,
     zaqar_api_port => 8888,
@@ -989,19 +975,6 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[sahara_api_ssl_port],
       service_network   => $sahara_network,
-    }
-  }
-
-  if $trove {
-    ::tripleo::haproxy::endpoint { 'trove':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('trove_api_vip', $controller_virtual_ip),
-      service_port      => $ports[trove_api_port],
-      ip_addresses      => hiera('trove_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('trove_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      public_ssl_port   => $ports[trove_api_ssl_port],
-      service_network   => $trove_network,
     }
   }
 
