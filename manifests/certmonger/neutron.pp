@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::certmonger::neutron
 #
-# Request a certificate for the opendaylight service and do the necessary setup.
+# Request a certificate for the Neutron service and do the necessary setup.
 #
 # === Parameters
 #

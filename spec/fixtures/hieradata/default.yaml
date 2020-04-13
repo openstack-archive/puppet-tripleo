@@ -176,10 +176,6 @@ tripleo::haproxy_basic_auth::haproxy_userlists:
 redis_short_bootstrap_node_name: node
 redis_vip: '127.0.0.1'
 redis::bind: '10.0.0.1'
-# OpenDaylight
-neutron::plugins::ovs::opendaylight::odl_port: '8081'
-neutron::plugins::ovs::opendaylight::odl_username: 'admin'
-neutron::plugins::ovs::opendaylight::odl_password: 'admin'
 # swift related
 swift_proxy_short_bootstrap_node_name: node
 # zaqar related

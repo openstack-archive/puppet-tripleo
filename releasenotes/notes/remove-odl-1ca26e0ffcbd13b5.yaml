@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Support for OpenDaylight has been removed because its templates and
+    environment files are already removed in tripleo-heat-templates.
