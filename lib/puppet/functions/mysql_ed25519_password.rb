@@ -12,7 +12,9 @@ Puppet::Functions.create_function(:'mysql_ed25519_password') do
     # out of the sha512(password). Unfortunately, there is no native
     # ruby implementation of ed25519's unclamped scalar multiplication
     # just yet, so rely on an binary to get the hash for now.
-    hashed = `/etc/puppet/modules/tripleo/files/mysql_ed25519_password.py #{password}`
+    python = `(which python3 || which python2 || which python) 2>/dev/null`
+    raise Puppet::Error, 'python interpreter not found in path' unless $?.success?
+    hashed = `#{python.rstrip()} /etc/puppet/modules/tripleo/files/mysql_ed25519_password.py #{password}`
     raise Puppet::Error, 'generated hash is not 43 bytes long.' unless hashed.length == 43
     return hashed
   end
