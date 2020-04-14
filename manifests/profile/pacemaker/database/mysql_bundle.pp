@@ -128,6 +128,11 @@
 #   when container_cli is set to podman and 'journald' when it is set to docker.
 #   Defaults to undef
 #
+# [*log_file*]
+#   (optional) Container log file to use. Only relevant when log_driver is
+#   set to 'k8s-file'.
+#   Defaults to '/var/log/containers/stdouts/galera-bundle.log'
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -161,6 +166,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_auth_ed25519             = hiera('mysql_auth_ed25519', false),
   $container_backend              = 'docker',
   $log_driver                     = undef,
+  $log_file                       = '/var/log/containers/stdouts/galera-bundle.log',
   $tls_priorities                 = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user                    = 'root',
   $pcs_tries                      = hiera('pcs_tries', 20),
@@ -181,6 +187,11 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     }
   } else {
     $log_driver_real = $log_driver
+  }
+  if $log_driver_real == 'k8s-file' {
+    $log_file_real = " --log-opt path=${log_file}"
+  } else {
+    $log_file_real = ''
   }
   # FQDN are lowercase in /etc/hosts, so are pacemaker node names
   $galera_node_names_lookup = downcase(hiera('mysql_short_node_names_override',
@@ -455,7 +466,7 @@ MYSQL_HOST=localhost\n",
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => "--user=${bundle_user} --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=${bundle_user} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${control_port}",

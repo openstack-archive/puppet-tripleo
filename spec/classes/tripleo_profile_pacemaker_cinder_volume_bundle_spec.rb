@@ -88,12 +88,13 @@ describe 'tripleo::profile::pacemaker::cinder::volume_bundle' do
             :docker_volumes     => ['/src/1:/tgt/1', '/src/2:/tgt/2:ro', '/src/3:/tgt/3:ro,z'],
             :docker_environment => ['RIGHT=LEFT', 'UP=DOWN'],
             :log_driver         => 'k8s-file',
+            :log_file           => '/var/log/containers/stdouts/cinder_volume.log'
           })
         end
         it 'should create custom cinder-volume resource bundle' do
           is_expected.to contain_pacemaker__resource__bundle('openstack-cinder-volume').with(
             :image        => 'c-vol-docker-image',
-            :options      => '--ipc=host --privileged=true --user=root --log-driver=k8s-file -e RIGHT=LEFT -e UP=DOWN',
+            :options      => '--ipc=host --privileged=true --user=root --log-driver=k8s-file --log-opt path=/var/log/containers/stdouts/cinder_volume.log -e RIGHT=LEFT -e UP=DOWN',
             :storage_maps => {
               'cinder-volume-src-1' => {
                 'source-dir' => '/src/1',
