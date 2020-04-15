@@ -32,7 +32,6 @@ describe 'tripleo::profile::base::cinder::volume::iscsi' do
         is_expected.to contain_class('tripleo::profile::base::cinder::volume::iscsi')
         is_expected.to contain_class('tripleo::profile::base::cinder::volume')
         is_expected.to contain_class('tripleo::profile::base::cinder')
-        is_expected.to_not contain_class('cinder::setup_test_volume')
         is_expected.to_not contain_cinder__backend__iscsi('tripleo_iscsi')
       end
     end
@@ -45,9 +44,6 @@ describe 'tripleo::profile::base::cinder::volume::iscsi' do
 
       context 'with defaults' do
         it 'should trigger complete configuration' do
-          is_expected.to contain_class('cinder::setup_test_volume').with(
-            :size => '10280M'
-          )
           is_expected.to contain_cinder__backend__iscsi('tripleo_iscsi').with(
             :target_ip_address => '127.0.0.1',
             :target_helper     => 'tgtadm',
@@ -65,9 +61,6 @@ describe 'tripleo::profile::base::cinder::volume::iscsi' do
             })
         end
         it 'should trigger complete configuration' do
-          is_expected.to contain_class('cinder::setup_test_volume').with(
-            :size => '10280M'
-          )
           is_expected.to contain_cinder__backend__iscsi('tripleo_iscsi').with(
             :backend_availability_zone => 'my_zone',
             :target_ip_address         => '[fe80::fc54:ff:fe9e:7846]',
