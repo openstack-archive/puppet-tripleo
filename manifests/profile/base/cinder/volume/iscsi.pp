@@ -52,16 +52,11 @@ class tripleo::profile::base::cinder::volume::iscsi (
   $backend_availability_zone   = hiera('cinder::backend::iscsi::backend_availability_zone', undef),
   $cinder_iscsi_helper         = 'tgtadm',
   $cinder_iscsi_protocol       = 'iscsi',
-  $cinder_lvm_loop_device_size = '10280',
   $step                        = Integer(hiera('step')),
 ) {
   include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    class { '::cinder::setup_test_volume':
-      size => join([$cinder_lvm_loop_device_size, 'M']),
-    }
-
     # NOTE(gfidente): never emit in hieradata:
     # key: [ipv6]
     # as it will cause hiera parsing errors
