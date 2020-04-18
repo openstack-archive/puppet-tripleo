@@ -100,6 +100,11 @@
 #   when container_cli is set to podman and 'journald' when it is set to docker.
 #   Defaults to undef
 #
+# [*log_file*]
+#   (optional) Container log file to use. Only relevant when log_driver is
+#   set to 'k8s-file'.
+#   Defaults to '/var/log/containers/stdouts/redis-bundle.log'
+#
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
@@ -117,6 +122,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $container_backend         = 'docker',
   $pcs_tries                 = hiera('pcs_tries', 20),
   $log_driver                = undef,
+  $log_file                  = '/var/log/containers/stdouts/redis-bundle.log',
   $step                      = Integer(hiera('step')),
   $redis_network             = hiera('redis_network', undef),
   $extra_config_file         = '/etc/redis-tls.conf',
@@ -142,6 +148,11 @@ class tripleo::profile::pacemaker::database::redis_bundle (
     }
   } else {
     $log_driver_real = $log_driver
+  }
+  if $log_driver_real == 'k8s-file' {
+    $log_file_real = " --log-opt path=${log_file}"
+  } else {
+    $log_file_real = ''
   }
   if $enable_internal_tls {
     if !$redis_network {
@@ -354,7 +365,7 @@ slave-announce-port ${local_tuple[0][2]}
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => "--user=${bundle_user} --log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=${bundle_user} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${redis_docker_control_port}",
