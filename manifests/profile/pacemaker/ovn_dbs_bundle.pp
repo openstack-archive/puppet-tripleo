@@ -73,6 +73,10 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*bundle_user*]
+#   (optional) Set the --user= switch to be passed to pcmk
+#   Defaults to undef
+#
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
@@ -106,6 +110,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $op_params                = '',
   $container_backend        = 'docker',
   $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user              = undef,
   $log_driver               = undef,
   $enable_internal_tls      = hiera('enable_internal_tls', false),
   $ca_file                  = undef,
@@ -217,6 +222,11 @@ nb_master_protocol=ssl sb_master_protocol=ssl"
         $tls_params = ''
         $ovn_storage_maps_tls = {}
       }
+      if $bundle_user == undef {
+        $bundle_user_real = ''
+      } else {
+        $bundle_user_real = "--user=${bundle_user} "
+      }
       $resource_map = "${resource_params}${tls_params}"
       pacemaker::resource::bundle { 'ovn-dbs-bundle':
         image             => $ovn_dbs_docker_image,
@@ -224,7 +234,9 @@ nb_master_protocol=ssl sb_master_protocol=ssl"
         masters           => 1,
         location_rule     => $ovn_dbs_location_rule,
         container_options => 'network=host',
-        options           => "--log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:ignore:140chars
+        options           => "${bundle_user_real}--log-driver=${log_driver_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${ovn_dbs_control_port}",
         storage_maps      => merge($storage_maps, $ovn_storage_maps_tls),
