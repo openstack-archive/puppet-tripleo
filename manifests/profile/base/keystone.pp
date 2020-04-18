@@ -284,7 +284,8 @@ class tripleo::profile::base::keystone (
     if $keystone_openidc_enabled {
 
       class { 'keystone::federation::openidc':
-        memcached_servers => $memcached_servers,
+        openidc_cache_type => 'memcache',
+        memcached_servers  => $memcached_servers,
       }
     }
   }
