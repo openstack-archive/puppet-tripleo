@@ -9,8 +9,8 @@
 #   Defaults to hiera('step')
 #
 # [*controller_node_ip*]
-#   (Optional)  controller node ip, contains either odl,
-#   ovn or openstack controller ip.
+#   (Optional)  controller node ip, contains either ovn or openstack controller
+#   ip.
 #
 # [*tenant_subnet*]
 #   (required) Tenant network's ip of the compute node
@@ -37,10 +37,6 @@
 #   (optional) used by Liquidio service only when bonding
 #   is disabled, input format is <extrenal-network-name>:interface
 #
-# [*opendaylight_api_vip*]
-#   (optional) used by Liquidio service to communicate with ODL Controller
-#   Defaults to hiera('opendaylight_api_vip')
-#
 # [*ovn_dbs_vip*]
 #   (optional) used by Liquidio service to communicate with OVN Controller
 #   Defaults to hiera('ovn_dbs_vip')
@@ -61,7 +57,6 @@ class tripleo::host::liquidio::compute (
   $provider_mappings,
   $tenant_subnet         = hiera('tenant_subnet'),
   $step                  = Integer(hiera('step')),
-  $opendaylight_api_vip  = hiera('opendaylight_api_vip', undef),
   $ovn_dbs_vip           = hiera('ovn_dbs_vip', undef),
   $controller_virtual_ip = hiera('controller_virtual_ip', undef),
   $pci_passthrough       = hiera('nova::compute::pci::passthrough', undef),
@@ -70,7 +65,6 @@ class tripleo::host::liquidio::compute (
     if $step >= 5 {
         case $configure_mode {
 
-          'ml2-odl': { $controller_node_ip = $opendaylight_api_vip }
           'ml2-ovn': { $controller_node_ip = $ovn_dbs_vip }
           default  : { $controller_node_ip = $controller_virtual_ip }
 

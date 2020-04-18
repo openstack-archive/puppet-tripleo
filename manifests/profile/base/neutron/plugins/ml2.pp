@@ -72,10 +72,6 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include neutron::plugins::ml2::bigswitch::restproxy
     }
 
-    if ('opendaylight' in $mechanism_drivers) or ('opendaylight_v2' in $mechanism_drivers) {
-      include tripleo::profile::base::neutron::plugins::ml2::opendaylight
-    }
-
     if 'ovn' in $mechanism_drivers {
       include tripleo::profile::base::neutron::plugins::ml2::ovn
     }

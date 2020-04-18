@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::certmonger::redis
 #
-# Request a certificate for RabbitMQ and do the necessary setup.
+# Request a certificate for Redis and do the necessary setup.
 #
 # === Parameters
 #

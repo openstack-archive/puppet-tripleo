@@ -343,10 +343,6 @@
 #  (optional) Enable or not Ceph Dashboard binding
 #  Defaults to hiera('ceph_mgr_enabled', false)
 #
-# [*opendaylight*]
-#  (optional) Enable or not OpenDaylight binding
-#  Defaults to hiera('opendaylight_api_enabled', false)
-#
 # [*ovn_dbs*]
 #  (optional) Enable or not OVN northd binding
 #  Defaults to hiera('ovn_dbs_enabled', false)
@@ -489,10 +485,6 @@
 #  (optional) Specify the network octavia is running on.
 #  Defaults to hiera('octavia_api_network', undef)
 #
-# [*opendaylight_network*]
-#  (optional) Specify the network opendaylight is running on.
-#  Defaults to hiera('opendaylight_api_network', undef)
-#
 # [*panko_network*]
 #  (optional) Specify the network panko is running on.
 #  Defaults to hiera('panko_api_network', undef)
@@ -553,7 +545,6 @@
 #    'nova_novnc_ssl_port' (Defaults to 13080)
 #    'octavia_api_port' (Defaults to 9876)
 #    'octavia_api_ssl_port' (Defaults to 13876)
-#    'opendaylight_api_port' (Defaults to 8081)
 #    'panko_api_port' (Defaults to 8977)
 #    'panko_api_ssl_port' (Defaults to 13977)
 #    'placement_port' (Defaults to 8778)
@@ -653,7 +644,6 @@ class tripleo::haproxy (
   $redis_password              = undef,
   $zaqar_api                   = hiera('zaqar_api_enabled', false),
   $ceph_rgw                    = hiera('ceph_rgw_enabled', false),
-  $opendaylight                = hiera('opendaylight_api_enabled', false),
   $ovn_dbs                     = hiera('ovn_dbs_enabled', false),
   $ovn_dbs_manage_lb           = false,
   $zaqar_ws                    = hiera('zaqar_api_enabled', false),
@@ -687,7 +677,6 @@ class tripleo::haproxy (
   $nova_osapi_network          = hiera('nova_api_network', undef),
   $placement_network           = hiera('placement_network', undef),
   $octavia_network             = hiera('octavia_api_network', undef),
-  $opendaylight_network        = hiera('opendaylight_api_network', undef),
   $panko_network               = hiera('panko_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $ec2_api_network             = hiera('ec2_api_network', undef),
@@ -739,8 +728,6 @@ class tripleo::haproxy (
     nova_novnc_ssl_port => 13080,
     octavia_api_port => 9876,
     octavia_api_ssl_port => 13876,
-    opendaylight_api_port => 8081,
-    opendaylight_ws_port => 8185,
     panko_api_port => 8977,
     panko_api_ssl_port => 13977,
     placement_port => 8778,
@@ -1516,38 +1503,6 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
       listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk HEAD /' ] }),
-    }
-  }
-
-  if $opendaylight {
-    ::tripleo::haproxy::endpoint { 'opendaylight':
-      internal_ip     => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
-      service_port    => $ports[opendaylight_api_port],
-      ip_addresses    => hiera('opendaylight_api_node_ips', $controller_hosts_real),
-      server_names    => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      member_options  => union($haproxy_member_options, $internal_tls_member_options),
-      service_network => $opendaylight_network,
-      listen_options  => merge($default_listen_options,
-        { 'option' => [ 'httpchk GET /diagstatus', 'httplog' ] }),
-    }
-
-    ::tripleo::haproxy::endpoint { 'opendaylight_ws':
-      internal_ip     => unique([hiera('opendaylight_api_vip', $controller_virtual_ip), $controller_virtual_ip]),
-      service_port    => $ports[opendaylight_ws_port],
-      ip_addresses    => hiera('opendaylight_api_node_ips', $controller_hosts_real),
-      server_names    => hiera('opendaylight_api_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      service_network => $opendaylight_network,
-      listen_options  => {
-        # NOTE(jaosorior): Websockets have more overhead in establishing
-        # connections than regular HTTP connections. Also, since it begins
-        # as an HTTP connection and then "upgrades" to a TCP connection, some
-        # timeouts get overridden by others at certain times of the connection.
-        # The following values were taken from the following site:
-        # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
-        'timeout' => ['connect 5s', 'client 25s', 'server 25s', 'tunnel 3600s'],
-      },
     }
   }
 

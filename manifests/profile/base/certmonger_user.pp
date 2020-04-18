@@ -122,16 +122,6 @@
 #   it will create.
 #   Defaults to hiera('tripleo::profile::base::etcd::certificate_specs', {}).
 #
-# [*odl_certificate_specs*]
-#   (Optional) The specifications to give to certmonger for the certificate(s)
-#   it will create.
-#   Defaults to hiera('tripleo::profile::base::odl::certificate_specs', {}).
-#
-# [*ovs_certificate_specs*]
-#   (Optional) The specifications to give to certmonger for the certificate(s)
-#   it will create.
-#   Defaults to hiera('tripleo::profile::base::ovs::certificate_specs', {}).
-#
 # [*neutron_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -200,8 +190,6 @@ class tripleo::profile::base::certmonger_user (
   $rabbitmq_certificate_specs         = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
   $redis_certificate_specs            = hiera('redis_certificate_specs', {}),
   $etcd_certificate_specs             = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
-  $odl_certificate_specs              = hiera('tripleo::profile::base::neutron::opendaylight::certificate_specs', {}),
-  $ovs_certificate_specs              = hiera('tripleo::profile::base::neutron::plugins::ovs::opendaylight::certificate_specs', {}),
   $neutron_certificate_specs          = hiera('tripleo::profile::base::neutron::certificate_specs', {}),
   $novnc_proxy_certificates_specs     = hiera('novnc_proxy_certificates_specs',{}),
   $ceph_grafana_certificate_specs     = hiera('ceph_grafana_certificate_specs', {}),
@@ -285,12 +273,6 @@ class tripleo::profile::base::certmonger_user (
     }
     unless empty($etcd_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::etcd', $etcd_certificate_specs)
-    }
-    unless empty($odl_certificate_specs) {
-      ensure_resource('class', 'tripleo::certmonger::opendaylight', $odl_certificate_specs)
-    }
-    unless empty($ovs_certificate_specs) {
-      ensure_resource('class', 'tripleo::certmonger::openvswitch', $ovs_certificate_specs)
     }
     unless empty($neutron_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::neutron', $neutron_certificate_specs)

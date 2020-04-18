@@ -52,10 +52,6 @@ mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
   :ref => '20a465b0d8751bc08913b556d0a5b7fdac139271'
 
-mod 'opendaylight',
-  :git => 'https://git.opendaylight.org/gerrit/integration/packaging/puppet-opendaylight',
-  :ref => 'master'
-
 # NOTE(aschultz): rsyslog broke backwards compatibility with
 # https://github.com/voxpupuli/puppet-rsyslog/pull/136
 mod 'rsyslog',
