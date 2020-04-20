@@ -230,10 +230,6 @@
 #  (optional) Enable or not Aodh API binding
 #  Defaults to hiera('aodh_api_enabled', false)
 #
-# [*panko*]
-#  (optional) Enable or not Panko API binding
-#  Defaults to hiera('panko_api_enabled', false)
-#
 # [*barbican*]
 #  (optional) Enable or not Barbican API binding
 #  Defaults to hiera('barbican_api_enabled', false)
@@ -481,10 +477,6 @@
 #  (optional) Specify the network octavia is running on.
 #  Defaults to hiera('octavia_api_network', undef)
 #
-# [*panko_network*]
-#  (optional) Specify the network panko is running on.
-#  Defaults to hiera('panko_api_network', undef)
-#
 # [*ovn_dbs_network*]
 #  (optional) Specify the network ovn_dbs is running on.
 #  Defaults to hiera('ovn_dbs_network', undef)
@@ -541,8 +533,6 @@
 #    'nova_novnc_ssl_port' (Defaults to 13080)
 #    'octavia_api_port' (Defaults to 9876)
 #    'octavia_api_ssl_port' (Defaults to 13876)
-#    'panko_api_port' (Defaults to 8977)
-#    'panko_api_ssl_port' (Defaults to 13977)
 #    'placement_port' (Defaults to 8778)
 #    'placement_ssl_port' (Defaults to 13778)
 #    'ovn_nbdb_port' (Defaults to 6641)
@@ -613,7 +603,6 @@ class tripleo::haproxy (
   $ec2_api                     = hiera('ec2_api_enabled', false),
   $ec2_api_metadata            = hiera('ec2_api_enabled', false),
   $aodh                        = hiera('aodh_api_enabled', false),
-  $panko                       = hiera('panko_api_enabled', false),
   $barbican                    = hiera('barbican_api_enabled', false),
   $ceph_grafana                = hiera('ceph_grafana_enabled', false),
   $ceph_dashboard              = hiera('ceph_mgr_enabled', false),
@@ -671,7 +660,6 @@ class tripleo::haproxy (
   $nova_osapi_network          = hiera('nova_api_network', undef),
   $placement_network           = hiera('placement_network', undef),
   $octavia_network             = hiera('octavia_api_network', undef),
-  $panko_network               = hiera('panko_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $ec2_api_network             = hiera('ec2_api_network', undef),
   $ec2_api_metadata_network    = hiera('ec2_api_network', undef),
@@ -722,8 +710,6 @@ class tripleo::haproxy (
     nova_novnc_ssl_port => 13080,
     octavia_api_port => 9876,
     octavia_api_ssl_port => 13876,
-    panko_api_port => 8977,
-    panko_api_ssl_port => 13977,
     placement_port => 8778,
     placement_ssl_port => 13778,
     ovn_nbdb_port => 6641,
@@ -1125,20 +1111,6 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[aodh_api_ssl_port],
       service_network   => $aodh_network,
-      member_options    => union($haproxy_member_options, $internal_tls_member_options),
-    }
-  }
-
-  if $panko {
-    ::tripleo::haproxy::endpoint { 'panko':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('panko_api_vip', $controller_virtual_ip),
-      service_port      => $ports[panko_api_port],
-      ip_addresses      => hiera('panko_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('panko_api_node_names', $controller_hosts_names_real),
-      public_ssl_port   => $ports[panko_api_ssl_port],
-      mode              => 'http',
-      service_network   => $panko_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
