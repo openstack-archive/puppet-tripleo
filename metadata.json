@@ -14,11 +14,11 @@
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
-      "operatingsystemrelease": ["7"]
+      "operatingsystemrelease": ["8"]
     },
     {
       "operatingsystem": "CentOS",
-      "operatingsystemrelease": ["7"]
+      "operatingsystemrelease": ["8"]
     }
   ],
   "dependencies": [

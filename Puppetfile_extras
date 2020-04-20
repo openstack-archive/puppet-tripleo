@@ -26,8 +26,8 @@ mod 'datacat',
   :ref => '0.6.2'
 
 mod 'etcd',
-  :git => 'https://github.com/cristifalcas/puppet-etcd',
-  :ref => '1.11.0'
+  :git => 'https://github.com/puppet-etcd/puppet-etcd',
+  :ref => 'master'
 
 mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
@@ -85,11 +85,9 @@ mod 'keepalived',
   :git => 'https://github.com/Unyonsys/puppet-module-keepalived',
   :ref => 'bbca37ade629a9178f09366fd0368187fb645f4e'
 
-# NOTE(aschultz) this redis module was dropped from p-o-i due to issues for
-# bionic, so we'll just keep it here for now. LP#1784422
 mod 'redis',
-  :git => 'https://github.com/arioch/puppet-redis',
-  :ref => 'v3.3.0'
+  :git => 'https://github.com/voxpupuli/puppet-redis',
+  :ref => 'master'
 
 # NOTE(aschultz): in puppet 6 this was extracted out
 mod 'selinux_core',
