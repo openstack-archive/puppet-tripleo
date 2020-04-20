@@ -289,7 +289,8 @@ class tripleo::profile::base::keystone (
       $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
 
       class { '::keystone::federation::openidc':
-        memcached_servers => $memcached_servers,
+        openidc_cache_type => 'memcache',
+        memcached_servers  => $memcached_servers,
       }
     }
   }
