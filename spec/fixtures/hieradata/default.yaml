@@ -49,9 +49,12 @@ glance::backend::swift::swift_store_key: 'foo'
 # gnocchi related items
 gnocchi_api_short_bootstrap_node_name: node
 gnocchi::keystone::authtoken::password: 'password'
+gnocchi::statsd::resource_id: '0a8b55df-f90f-491c-8cb9-7cdecec6fc26'
+gnocchi::statsd::flush_delay: 10
 gnocchi::storage::ceph::ceph_username: 'gnocchi'
 gnocchi::storage::ceph::ceph_secret: 'password'
 gnocchi_redis_password: 'password'
+
 # ironic related items
 ironic::api::authtoken::password: 'password'
 ironic_api_short_bootstrap_node_name: node
