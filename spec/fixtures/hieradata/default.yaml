@@ -39,8 +39,9 @@ cinder::backup::nfs::backup_share: '/mnt/backup'
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
 # designate related items
-designate_api_short_bootstrap_node_name: node
+designate_central_short_bootstrap_node_name: node
 designate::keystone::authtoken::password: 'password'
+designate::rabbit_password: 'password'
 # glance related items
 glance_api_short_bootstrap_node_name : node
 glance::api::authtoken::password: 'password'
