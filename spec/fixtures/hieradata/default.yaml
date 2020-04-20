@@ -88,8 +88,6 @@ nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
 nova::network::neutron::password: 'password'
 nova::metadata::novajoin::authtoken::password: 'password'
-# panko related items
-panko::keystone::authtoken::password: 'password'
 # placement related items
 placement_api_short_bootstrap_node_name: node
 placement_short_bootstrap_node_name: node
