@@ -20,7 +20,7 @@
 #
 # [*cinder_volume_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
-#   Defaults to hiera('tripleo::profile::pacemaker::cinder::volume_bundle::cinder_docker_image', undef)
+#   Defaults undef
 #
 # [*docker_volumes*]
 #   (Optional) The list of volumes to be mounted in the docker container
@@ -67,7 +67,7 @@
 #
 class tripleo::profile::pacemaker::cinder::volume_bundle (
   $bootstrap_node             = hiera('cinder_volume_short_bootstrap_node_name'),
-  $cinder_volume_docker_image = hiera('tripleo::profile::pacemaker::cinder::volume_bundle::cinder_volume_docker_image', undef),
+  $cinder_volume_docker_image = undef,
   $docker_volumes             = [],
   $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
   $pcs_tries                  = hiera('pcs_tries', 20),

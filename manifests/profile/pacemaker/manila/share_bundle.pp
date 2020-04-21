@@ -24,7 +24,7 @@
 #
 # [*manila_share_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
-#   Defaults to hiera('tripleo::profile::pacemaker::manila::share_bundle::manila_docker_image', undef)
+#   Defaults to undef,
 #
 # [*docker_volumes*]
 #   (Optional) The list of volumes to be mounted in the docker container
@@ -71,7 +71,7 @@
 #
 class tripleo::profile::pacemaker::manila::share_bundle (
   $bootstrap_node             = hiera('manila_share_short_bootstrap_node_name'),
-  $manila_share_docker_image  = hiera('tripleo::profile::pacemaker::manila::share_bundle::manila_share_docker_image', undef),
+  $manila_share_docker_image  = undef,
   $docker_volumes             = [],
   $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
   $ceph_nfs_enabled           = hiera('ceph_nfs_enabled', false),

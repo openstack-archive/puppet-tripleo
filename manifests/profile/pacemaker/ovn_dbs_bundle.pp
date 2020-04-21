@@ -20,11 +20,11 @@
 #
 # [*ovn_dbs_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
-#   Defaults to hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef)
+#   Defaults to undef
 #
 # [*ovn_dbs_control_port*]
 #   (Optional) The bundle's pacemaker_remote control port on the host
-#   Defaults to hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::control_port', '3125')
+#   Defaults to 3125
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
@@ -103,8 +103,8 @@
 #
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
-  $ovn_dbs_docker_image     = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::ovn_dbs_docker_image', undef),
-  $ovn_dbs_control_port     = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::control_port', '3125'),
+  $ovn_dbs_docker_image     = undef,
+  $ovn_dbs_control_port     = 3125,
   $bootstrap_node           = hiera('ovn_dbs_short_bootstrap_node_name'),
   $step                     = Integer(hiera('step')),
   $pcs_tries                = hiera('pcs_tries', 20),
@@ -120,8 +120,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $log_file                 = '/var/log/containers/stdouts/ovn-dbs-bundle.log',
   $enable_internal_tls      = hiera('enable_internal_tls', false),
   $ca_file                  = undef,
-  $dbs_timeout              = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::dbs_timeout', 60),
-  $listen_on_master_ip_only = hiera('tripleo::profile::pacemaker::ovn_dbs_bundle::listen_on_master_ip_only', 'yes'),
+  $dbs_timeout              = 60,
+  $listen_on_master_ip_only = 'yes'
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
