@@ -26,6 +26,10 @@
 #   (Optional) Whether to enable the delsc backend
 #   Defaults to false
 #
+# [*cinder_enable_dellemc_sc_backend*]
+#   (Optional) Whether to enable the sc backend
+#   Defaults to false
+#
 # [*cinder_enable_dellemc_unity_backend*]
 #   (Optional) Whether to enable the unity backend
 #   Defaults to false
@@ -126,6 +130,7 @@
 class tripleo::profile::base::cinder::volume (
   $cinder_enable_pure_backend                  = false,
   $cinder_enable_dellsc_backend                = false,
+  $cinder_enable_dellemc_sc_backend            = false,
   $cinder_enable_dellemc_unity_backend         = false,
   $cinder_enable_dellemc_powermax_backend      = false,
   $cinder_enable_dellemc_vmax_iscsi_backend    = false,
@@ -198,6 +203,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellsc_backend_name = hiera('cinder::backend::dellsc_iscsi::volume_backend_name', 'tripleo_dellsc')
     } else {
       $cinder_dellsc_backend_name = undef
+    }
+
+    if $cinder_enable_dellemc_sc_backend {
+      include tripleo::profile::base::cinder::volume::dellemc_sc
+      $cinder_dellemc_sc_backend_name = hiera('cinder::backend::dellemc_sc::volume_backend_name', 'tripleo_dellemc_sc')
+    } else {
+      $cinder_dellemc_sc_backend_name = undef
     }
 
     if $cinder_enable_dellemc_unity_backend {
@@ -335,6 +347,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_pure_backend_name,
                                       $cinder_dellps_backend_name,
                                       $cinder_dellsc_backend_name,
+                                      $cinder_dellemc_sc_backend_name,
                                       $cinder_dellemc_unity_backend_name,
                                       $cinder_dellemc_powermax_backend_name,
                                       $cinder_dellemc_vmax_iscsi_backend_name,
