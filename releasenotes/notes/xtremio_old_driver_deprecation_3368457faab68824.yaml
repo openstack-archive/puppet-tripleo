@@ -1,0 +1,4 @@
+---
+deprecations:
+  - Resource tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi
+    will be removed in V-Release.
