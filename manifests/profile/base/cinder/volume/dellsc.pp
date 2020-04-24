@@ -33,6 +33,8 @@ class tripleo::profile::base::cinder::volume::dellsc (
 ) {
   include tripleo::profile::base::cinder::volume
 
+  warning('The tripleo_dellsc class will be removed in V-Release, please use the triplo_dellemc_sc resource instead.')
+
   if $step >= 4 {
 
     # Include support for 'excluded_domain_ip' until it's deprecated in THT
