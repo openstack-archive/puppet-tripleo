@@ -36,6 +36,9 @@ cat "$service_certificate" "$ca_path" "$service_key" > "$service_pem"
 haproxy_container_name=$($container_cli ps --format="{{.Names}}" | grep haproxy)
 
 if [ "$ACTION" == "reload" ]; then
+    # Refresh the cert at the mount-point
+    $container_cli cp $service_pem "$haproxy_container_name:/var/lib/kolla/config_files/src-tls/$service_pem"
+
     # Copy the new cert from the mount-point to the real path
     $container_cli exec "$haproxy_container_name" cp "/var/lib/kolla/config_files/src-tls$service_pem" "$service_pem"
 
