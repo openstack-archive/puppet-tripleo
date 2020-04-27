@@ -20,11 +20,11 @@
 #
 # [*rabbitmq_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
-#   Defaults to hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef)
+#   Defaults to undef
 #
 # [*rabbitmq_docker_control_port*]
 #   (Optional) The bundle's pacemaker_remote control port on the host
-#   Defaults to hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122')
+#   Defaults to 3122
 #
 # [*erlang_cookie*]
 #   (Optional) Content of erlang cookie.
@@ -102,8 +102,8 @@
 #   Defaults to 'root'
 #
 class tripleo::profile::pacemaker::rabbitmq_bundle (
-  $rabbitmq_docker_image        = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::rabbitmq_docker_image', undef),
-  $rabbitmq_docker_control_port = hiera('tripleo::profile::pacemaker::rabbitmq_bundle::control_port', '3122'),
+  $rabbitmq_docker_image        = undef,
+  $rabbitmq_docker_control_port = 3122,
   $erlang_cookie                = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
   $rpc_scheme                   = hiera('oslo_messaging_rpc_scheme'),

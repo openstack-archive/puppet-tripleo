@@ -20,11 +20,11 @@
 #
 # [*mysql_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
-#   Defaults to hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef)
+#   Defaults to undef
 #
 # [*control_port*]
 #   (Optional) The bundle's pacemaker_remote control port on the host
-#   Defaults to hiera('tripleo::profile::pacemaker::database::mysql_bundle::control_port', '3123')
+#   Defaults to 3123
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
@@ -146,8 +146,8 @@
 #   Defaults to 16384
 #
 class tripleo::profile::pacemaker::database::mysql_bundle (
-  $mysql_docker_image             = hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef),
-  $control_port                   = hiera('tripleo::profile::pacemaker::database::mysql_bundle::control_port', '3123'),
+  $mysql_docker_image             = undef,
+  $control_port                   = 3123,
   $bootstrap_node                 = hiera('mysql_short_bootstrap_node_name'),
   $bind_address                   = $::hostname,
   $ca_file                        = undef,

@@ -20,11 +20,11 @@
 #
 # [*redis_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
-#   Defaults to hiera('tripleo::profile::pacemaker::redis_bundle::redis_docker_image', undef)
+#   Defaults to undef
 #
 # [*redis_docker_control_port*]
 #   (Optional) The bundle's pacemaker_remote control port on the host
-#   Defaults to hiera('tripleo::profile::pacemaker::redis_bundle::control_port', '3124')
+#   Defaults to 3124
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
@@ -117,8 +117,8 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $certificate_specs         = hiera('redis_certificate_specs', {}),
   $enable_internal_tls       = hiera('enable_internal_tls', false),
   $bootstrap_node            = hiera('redis_short_bootstrap_node_name'),
-  $redis_docker_image        = hiera('tripleo::profile::pacemaker::database::redis_bundle::redis_docker_image', undef),
-  $redis_docker_control_port = hiera('tripleo::profile::pacemaker::database::redis_bundle::control_port', '3124'),
+  $redis_docker_image        = undef,
+  $redis_docker_control_port = 3124,
   $container_backend         = 'docker',
   $pcs_tries                 = hiera('pcs_tries', 20),
   $log_driver                = undef,
