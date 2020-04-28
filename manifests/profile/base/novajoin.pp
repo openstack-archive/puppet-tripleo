@@ -71,7 +71,7 @@ class tripleo::profile::base::novajoin (
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     class { 'nova::metadata::novajoin::api' :
-      service_password          => $service_password,
+      password                  => $service_password,
       enable_ipa_client_install => $enable_ipa_client_install,
       transport_url             => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
