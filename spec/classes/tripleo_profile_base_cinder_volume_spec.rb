@@ -337,6 +337,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellps')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_sc')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_powermax')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_vxflexos')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_xtremio')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::netapp')
@@ -362,6 +363,7 @@ describe 'tripleo::profile::base::cinder::volume' do
             :cinder_enable_dellps_backend           => true,
             :cinder_enable_dellsc_backend           => true,
             :cinder_enable_dellemc_sc_backend       => true,
+            :cinder_enable_dellemc_powermax_backend => true,
             :cinder_enable_dellemc_vxflexos_backend => true,
             :cinder_enable_dellemc_xtremio_backend  => true,
             :cinder_enable_netapp_backend           => true,
@@ -376,6 +378,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_sc')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_vxflexos')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_xtremio')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_powermax')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::netapp')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::veritas_hyperscale')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::nfs')
@@ -385,7 +388,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('cinder::volume')
           is_expected.to contain_class('cinder::backends').with(
             :enabled_backends => ['tripleo_iscsi', 'tripleo_ceph', 'tripleo_pure', 'tripleo_dellps', 'tripleo_dellsc',
-                                  'tripleo_dellemc_sc', 'tripleo_dellemc_vxflexos', 'tripleo_dellemc_xtremio', 'tripleo_netapp',
+                                  'tripleo_dellemc_sc', 'tripleo_dellemc_powermax', 'tripleo_dellemc_vxflexos', 'tripleo_dellemc_xtremio', 'tripleo_netapp',
                                   'tripleo_nfs', 'Veritas_HyperScale']
           )
         end

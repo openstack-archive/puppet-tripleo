@@ -33,7 +33,7 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::cinder::volume::dellemc_powermax (
-  $backend_name = hiera('cinder::backend::dellemc_powermax::volume_backend_name', ['tripleo_dellemc_powermx']),
+  $backend_name = hiera('cinder::backend::dellemc_powermax::volume_backend_name', ['tripleo_dellemc_powermax']),
   $multi_config = hiera('cinder::backend::dellemc_powermax::volume_multi_config', {}),
   $step         = Integer(hiera('step')),
 ) {
@@ -51,7 +51,7 @@ class tripleo::profile::base::cinder::volume::dellemc_powermax (
       'CinderPowermaxPortGroups'       => hiera('cinder::backend::dellemc_powermax::powermax_port_groups', undef),
     }
 
-    $backend_name.each |String $backend| {
+    any2array($backend_name).each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
       cinder::backend::dellemc_powermax { $backend :
