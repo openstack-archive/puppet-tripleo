@@ -1,0 +1,60 @@
+<%- | String  $image_name    = '',
+      String  $bind_socket   = '',
+      Boolean $debug,
+      String  $container_cli = ''
+| -%>
+#!/bin/bash
+<%- if $debug { -%>set -x<%- } -%>
+
+<%- if $bind_socket { -%>
+export DOCKER_HOST="<%=$bind_socket%>"
+<%- } -%>
+ARGS="$@"
+
+# Extract the network namespace UUID from the command line args provided by
+# neutron. Typically of the form (with dnsmasq as an example):
+#
+# dnsmasq --no-hosts --no-resolv --except-interface=lo \
+#   --pid-file=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/pid  \
+#   --dhcp-hostsfile=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/host ...
+NETWORK_ID=$(echo $ARGS| awk '{if (match($0, /(\w{8}-\w{4}-\w{4}-\w{4}-\w{12})/,m)) print m[0] }')
+NAME=neutron-radvd-${NETWORK_ID}
+<%- if $container_cli == 'docker' { -%>
+CLI='docker'
+LOGGING=''
+CMD="ip netns exec qrouter-${NETWORK_ID} /usr/sbin/radvd -n"
+<%- } elsif $container_cli == 'podman' { -%>
+CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
+LOGGING="--log-driver k8s-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
+CMD='/usr/sbin/radvd -n'
+<%- } else { -%>
+CLI='echo noop'
+CMD='echo noop'
+<%- } -%>
+LIST=$($CLI ps -a --filter name=neutron-radvd- --format '{{.ID}}:{{.Names}}:{{.Status}}' | awk '{print $1}')
+
+# Find orphaned containers left for dead after its main process terminated by neutron parent process
+ORPHANTS=$(printf "%s\n" "${LIST}" | grep ":Exited")
+if [ -n "${ORPHANTS}" ]; then
+    for orphant in $(printf "%s\n" "${ORPHANTS}" | awk -F':' '{print $1}'); do
+        echo "Removing orphaned container ${orphant}"
+        $CLI stop ${orphant} || true
+        $CLI rm -f ${orphant} || true
+    done
+fi
+
+# If the NAME is already taken by a container, give it an unique name
+printf "%s\n" "${LIST}" | grep -q "${NAME}$" && NAME="${NAME}-$(date +%Y-%m-%d-%H%M%S-%N)"
+echo "Starting a new child container ${NAME}"
+$CLI run --detach ${LOGGING} \
+     -v /var/lib/config-data/puppet-generated/neutron/etc/neutron:/etc/neutron:ro \
+     -v /run/netns:/run/netns:shared \
+     -v /var/lib/neutron:/var/lib/neutron:z,shared \
+     -v /dev/log:/dev/log \
+     --net host \
+     --pid host \
+     --privileged \
+     -u root \
+     --name $NAME \
+     <%=$image_name%> \
+     $CMD $ARGS
