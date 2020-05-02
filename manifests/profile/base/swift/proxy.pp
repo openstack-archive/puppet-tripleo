@@ -72,7 +72,7 @@
 #
 # [*memcache_servers*]
 #   (Optional) List of memcache servers
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to hiera('memcached_node_ips', [])
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -111,7 +111,7 @@ class tripleo::profile::base::swift::proxy (
   $certificates_specs   = hiera('apache_certificates_specs', {}),
   $enable_internal_tls  = hiera('enable_internal_tls', false),
   $memcache_port        = 11211,
-  $memcache_servers     = hiera('memcached_node_ips'),
+  $memcache_servers     = hiera('memcached_node_ips', []),
   $step                 = Integer(hiera('step')),
   $swift_proxy_network  = hiera('swift_proxy_network', undef),
   $tls_proxy_bind_ip    = undef,

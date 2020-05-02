@@ -76,7 +76,7 @@
 #
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to hiera('memcached_node_ips', [])
 #
 class tripleo::profile::base::nova (
   $bootstrap_node          = hiera('nova_api_short_bootstrap_node_name', undef),
@@ -93,7 +93,7 @@ class tripleo::profile::base::nova (
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $step                    = Integer(hiera('step')),
-  $memcached_ips           = hiera('memcached_node_ips'),
+  $memcached_ips           = hiera('memcached_node_ips', []),
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {

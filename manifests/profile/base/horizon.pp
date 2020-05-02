@@ -54,7 +54,7 @@
 #
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to hiera('memcached_node_ips', [])
 #
 class tripleo::profile::base::horizon (
   $step                = Integer(hiera('step')),
@@ -63,7 +63,7 @@ class tripleo::profile::base::horizon (
   $enable_internal_tls = hiera('enable_internal_tls', false),
   $horizon_network     = hiera('horizon_network', undef),
   $neutron_options     = hiera('horizon::neutron_options', {}),
-  $memcached_ips       = hiera('memcached_node_ips')
+  $memcached_ips       = hiera('memcached_node_ips', [])
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true

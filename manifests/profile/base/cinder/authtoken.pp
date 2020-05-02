@@ -23,11 +23,11 @@
 #
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to hiera('memcached_node_ips', [])
 #
 class tripleo::profile::base::cinder::authtoken (
   $step                = Integer(hiera('step')),
-  $memcached_ips       = hiera('memcached_node_ips'),
+  $memcached_ips       = hiera('memcached_node_ips', []),
 ) {
 
   if $step >= 3 {

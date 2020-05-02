@@ -81,7 +81,7 @@
 #
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to hiera('memcached_node_ips', [])
 #
 class tripleo::profile::base::heat (
   $bootstrap_node          = downcase(hiera('heat_engine_short_bootstrap_node_name')),
@@ -99,7 +99,7 @@ class tripleo::profile::base::heat (
   $oslomsg_notify_port     = hiera('oslo_messaging_notify_port', '5672'),
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
-  $memcached_ips           = hiera('memcached_node_ips'),
+  $memcached_ips           = hiera('memcached_node_ips', []),
 ) {
 
   include tripleo::profile::base::heat::authtoken
