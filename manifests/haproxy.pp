@@ -1061,6 +1061,7 @@ class tripleo::haproxy (
       service_port      => $ports[nova_novnc_port],
       ip_addresses      => hiera('nova_vnc_proxy_node_ips', $controller_hosts_real),
       server_names      => $novncproxy_server_names_real,
+      mode              => 'http',
       listen_options    => merge($default_listen_options, {
         'option'  => [ 'tcpka', 'tcplog' ],
         'balance' => 'source',
