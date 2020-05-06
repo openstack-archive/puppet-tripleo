@@ -156,7 +156,7 @@
 #
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to hiera('memcached_node_ips', [])
 #
 # [*keystone_resources_managed*]
 #   (Optional) Enable the management of Keystone resources with Puppet.
