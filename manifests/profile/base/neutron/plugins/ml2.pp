@@ -76,16 +76,6 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include tripleo::profile::base::neutron::plugins::ml2::ovn
     }
 
-    if 'fujitsu_cfab' in $mechanism_drivers {
-      include neutron::plugins::ml2::fujitsu
-      include neutron::plugins::ml2::fujitsu::cfab
-    }
-
-    if 'fujitsu_fossw' in $mechanism_drivers {
-      include neutron::plugins::ml2::fujitsu
-      include neutron::plugins::ml2::fujitsu::fossw
-    }
-
     if 'vpp' in $mechanism_drivers {
       include tripleo::profile::base::neutron::plugins::ml2::vpp
     }
