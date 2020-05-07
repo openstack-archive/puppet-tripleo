@@ -58,9 +58,6 @@ describe 'tripleo::profile::base::metrics::collectd' do
         is_expected.to contain_package('python-collectd-gnocchi').with(
           :ensure => 'present',
         )
-        is_expected.to contain_package('collectd-python').with(
-          :ensure => 'present',
-        )
         is_expected.to_not contain_class('epel')
         is_expected.to_not contain_class('collectd::plugin::amqp1')
         is_expected.to_not contain_class('collectd::plugin::logfile')
