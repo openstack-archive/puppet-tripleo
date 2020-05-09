@@ -1,0 +1,5 @@
+---
+features:
+  - Add Dell EMC XtremIO  backend Cinder driver options.
+    Supports both iSCSI and FC volume drivers and
+    multiple backends as well
