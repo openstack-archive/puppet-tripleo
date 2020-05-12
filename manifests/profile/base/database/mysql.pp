@@ -218,7 +218,7 @@ class tripleo::profile::base::database::mysql (
       # as well by creating a resource appropriately.
       mysql_user { 'root@%':
         ensure        => present,
-        password_hash => mysql_password(hiera('mysql::server::root_password')),
+        password_hash => mysql::password(hiera('mysql::server::root_password')),
       }
     }
     if ($mysql_auth_ed25519) {
