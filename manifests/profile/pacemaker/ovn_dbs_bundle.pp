@@ -119,32 +119,37 @@
 #   (Optional) monitor interval for ovn dbs resource
 #   Defaults to 30
 #
+# [*replication_probe_interval*]
+#   (Optional) probe interval for ovsdb-server. It configure probe interval for connection for ovsdb-server when it is
+#   in backup mode and connects to the active ovsdb-server for replication
+#   Defaults to 60000
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
-  $ovn_dbs_docker_image     = undef,
-  $ovn_dbs_control_port     = 3125,
-  $bootstrap_node           = hiera('ovn_dbs_short_bootstrap_node_name'),
-  $step                     = Integer(hiera('step')),
-  $pcs_tries                = hiera('pcs_tries', 20),
-  $ovn_dbs_vip              = hiera('ovn_dbs_vip'),
-  $nb_db_port               = 6641,
-  $sb_db_port               = 6642,
-  $meta_params              = '',
-  $op_params                = '',
-  $container_backend        = 'docker',
-  $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
-  $bundle_user              = undef,
-  $log_driver               = undef,
-  $log_file                 = '/var/log/containers/stdouts/ovn-dbs-bundle.log',
-  $enable_internal_tls      = hiera('enable_internal_tls', false),
-  $ca_file                  = undef,
-  $dbs_timeout              = 60,
-  $listen_on_master_ip_only = 'yes',
-  $force_ocf                = false,
-  $force_nic                = hiera('tripleo::pacemaker::force_nic', undef),
-  $monitor_interval_master  = 10,
-  $monitor_interval_slave   = 30,
-
+  $ovn_dbs_docker_image        = undef,
+  $ovn_dbs_control_port        = 3125,
+  $bootstrap_node              = hiera('ovn_dbs_short_bootstrap_node_name'),
+  $step                        = Integer(hiera('step')),
+  $pcs_tries                   = hiera('pcs_tries', 20),
+  $ovn_dbs_vip                 = hiera('ovn_dbs_vip'),
+  $nb_db_port                  = 6641,
+  $sb_db_port                  = 6642,
+  $meta_params                 = '',
+  $op_params                   = '',
+  $container_backend           = 'docker',
+  $tls_priorities              = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $bundle_user                 = undef,
+  $log_driver                  = undef,
+  $log_file                    = '/var/log/containers/stdouts/ovn-dbs-bundle.log',
+  $enable_internal_tls         = hiera('enable_internal_tls', false),
+  $ca_file                     = undef,
+  $dbs_timeout                 = 60,
+  $listen_on_master_ip_only    = 'yes',
+  $force_ocf                   = false,
+  $force_nic                   = hiera('tripleo::pacemaker::force_nic', undef),
+  $monitor_interval_master     = 10,
+  $monitor_interval_slave      = 30,
+  $replication_probe_interval  =  60000,
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -235,7 +240,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
       $ovn_dbs_vip_norm = normalize_ip_for_uri($ovn_dbs_vip)
       $resource_params = "master_ip=${ovn_dbs_vip_norm} nb_master_port=${nb_db_port} \
 sb_master_port=${sb_db_port} manage_northd=yes inactive_probe_interval=180000 \
-listen_on_master_ip_only=${listen_on_master_ip_only}"
+listen_on_master_ip_only=${listen_on_master_ip_only} inactive_probe_interval_to_master=${replication_probe_interval}"
       $ovn_dbs_location_rule = {
         resource_discovery => 'exclusive',
         score              => 0,
