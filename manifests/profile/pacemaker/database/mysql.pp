@@ -280,7 +280,7 @@ class tripleo::profile::pacemaker::database::mysql (
       # the other members. We also make sure that the permissions are the minimum necessary
       mysql_user { 'clustercheck@localhost':
         ensure        => 'present',
-        password_hash => mysql_password(hiera('mysql_clustercheck_password')),
+        password_hash => mysql::password(hiera('mysql_clustercheck_password')),
         require       => Exec['galera-ready'],
       }
       mysql_grant { 'clustercheck@localhost/*.*':
