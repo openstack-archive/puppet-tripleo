@@ -267,92 +267,94 @@ monitor interval=30s role=Slave timeout=${dbs_timeout}s",
         bundle          => 'ovn-dbs-bundle',
       }
 
-      # This code tells us if ovn_dbs is using a separate ip or is using a the per-network VIP
-      $ovn_dbs_network = hiera('ovn_dbs_network', undef)
-      $net_vip_map = hiera('network_virtual_ips', undef)
-      if $ovn_dbs_network != undef and $net_vip_map != undef and $ovn_dbs_network in $net_vip_map {
-        $old_vip = $net_vip_map[$ovn_dbs_network]['ip_address']
-        if $old_vip != $ovn_dbs_vip {
-          $ovn_separate_vip = true
+      if downcase($listen_on_master_ip_only) == 'yes' {
+        # This code tells us if ovn_dbs is using a separate ip or is using a the per-network VIP
+        $ovn_dbs_network = hiera('ovn_dbs_network', undef)
+        $net_vip_map = hiera('network_virtual_ips', undef)
+        if $ovn_dbs_network != undef and $net_vip_map != undef and $ovn_dbs_network in $net_vip_map {
+          $old_vip = $net_vip_map[$ovn_dbs_network]['ip_address']
+          if $old_vip != $ovn_dbs_vip {
+            $ovn_separate_vip = true
+          } else {
+            $ovn_separate_vip = false
+          }
         } else {
-          $ovn_separate_vip = false
-        }
-      } else {
-          $ovn_separate_vip = false
-      }
-
-      # We create a separate VIP only in case OVN has been configured so via THT
-      # in the non-separate case it will be created in the haproxy vip manifests
-      if $ovn_separate_vip {
-        if is_ipv6_address($ovn_dbs_vip) {
-          $netmask        = '128'
-          $nic            = interface_for_ip($ovn_dbs_vip)
-          $ipv6_addrlabel = '99'
-        } else {
-          $netmask        = '32'
-          $nic            = ''
-          $ipv6_addrlabel = ''
+            $ovn_separate_vip = false
         }
 
-        pacemaker::resource::ip { "${ovndb_vip_resource_name}":
-          ip_address     => $ovn_dbs_vip,
-          cidr_netmask   => $netmask,
-          nic            => $nic,
-          ipv6_addrlabel => $ipv6_addrlabel,
-          location_rule  => $ovn_dbs_location_rule,
-          meta_params    => "resource-stickiness=INFINITY ${meta_params}",
-          op_params      => $op_params,
-          tries          => $pcs_tries,
-        }
-      }
+        # We create a separate VIP only in case OVN has been configured so via THT
+        # in the non-separate case it will be created in the haproxy vip manifests
+        if $ovn_separate_vip {
+          if is_ipv6_address($ovn_dbs_vip) {
+            $netmask        = '128'
+            $nic            = interface_for_ip($ovn_dbs_vip)
+            $ipv6_addrlabel = '99'
+          } else {
+            $netmask        = '32'
+            $nic            = ''
+            $ipv6_addrlabel = ''
+          }
 
-      pacemaker::constraint::colocation { "${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}":
-        source       => "${ovndb_vip_resource_name}",
-        target       => 'ovn-dbs-bundle',
-        master_slave => true,
-        score        => 'INFINITY',
-        tries        => $pcs_tries,
-      }
-
-      pacemaker::constraint::order { "${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}":
-        first_resource    => 'ovn-dbs-bundle',
-        second_resource   => "${ovndb_vip_resource_name}",
-        first_action      => 'promote',
-        second_action     => 'start',
-        constraint_params => 'kind=Optional',
-        tries             => $pcs_tries,
-      }
-
-      # (bandini) we can remove this old constraint removal piece once queens is out of support
-      # If we do a minor update or a redeploy against a cloud that did not already have the
-      # separate OVN VIP, we want to be sure that the old constraints are gone. At this
-      # point we cannot use the ovndb_resource_name because that is now the new IP
-      # To be on the safe side, we fetch the network that ovn_dbs is supposed to listen on
-      # hiera('ovn_dbs_network') and find out the VIP on that network
-      # NB: we cannot use ensure -> absent and a pacmeaker constraint resource because we would
-      # get duplicate resource errors, hence the exec usage
-      if hiera('stack_action') == 'UPDATE' and $ovn_separate_vip {
-        # We only remove these constraints if we're sure the ovn_dbs VIP is different
-        # from the old VIP
-        $old_vip_name = "ip-${old_vip}"
-        $old_order_constraint = "order-ovn-dbs-bundle-${old_vip_name}-Optional"
-        exec { "remove-old-${old_vip_name}-order-${ovndb_servers_resource_name}":
-          command => "pcs constraint remove ${old_order_constraint}",
-          onlyif  => "pcs constraint order --full | egrep -q 'id:${old_order_constraint}'",
-          tries   => $pcs_tries,
-          path    => ['/sbin', '/usr/sbin', '/bin', '/usr/bin'],
-          tag     => 'ovn_dbs_remove_old_cruft',
+          pacemaker::resource::ip { "${ovndb_vip_resource_name}":
+            ip_address     => $ovn_dbs_vip,
+            cidr_netmask   => $netmask,
+            nic            => $nic,
+            ipv6_addrlabel => $ipv6_addrlabel,
+            location_rule  => $ovn_dbs_location_rule,
+            meta_params    => "resource-stickiness=INFINITY ${meta_params}",
+            op_params      => $op_params,
+            tries          => $pcs_tries,
+          }
         }
-        $old_colocation_constraint = "colocation-${old_vip_name}-ovn-dbs-bundle-INFINITY"
-        exec { "remove-old-${old_vip_name}-colocation-${ovndb_servers_resource_name}":
-          command => "pcs constraint remove ${old_colocation_constraint}",
-          onlyif  => "pcs constraint colocation --full | egrep -q 'id:${old_colocation_constraint}'",
-          tries   => $pcs_tries,
-          path    => ['/sbin', '/usr/sbin', '/bin', '/usr/bin'],
-          tag     => 'ovn_dbs_remove_old_cruft',
+
+        pacemaker::constraint::colocation { "${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}":
+          source       => "${ovndb_vip_resource_name}",
+          target       => 'ovn-dbs-bundle',
+          master_slave => true,
+          score        => 'INFINITY',
+          tries        => $pcs_tries,
         }
-      }
-      # End of constraint removal section
+
+        pacemaker::constraint::order { "${ovndb_vip_resource_name}-with-${ovndb_servers_resource_name}":
+          first_resource    => 'ovn-dbs-bundle',
+          second_resource   => "${ovndb_vip_resource_name}",
+          first_action      => 'promote',
+          second_action     => 'start',
+          constraint_params => 'kind=Optional',
+          tries             => $pcs_tries,
+        }
+
+        # (bandini) we can remove this old constraint removal piece once queens is out of support
+        # If we do a minor update or a redeploy against a cloud that did not already have the
+        # separate OVN VIP, we want to be sure that the old constraints are gone. At this
+        # point we cannot use the ovndb_resource_name because that is now the new IP
+        # To be on the safe side, we fetch the network that ovn_dbs is supposed to listen on
+        # hiera('ovn_dbs_network') and find out the VIP on that network
+        # NB: we cannot use ensure -> absent and a pacmeaker constraint resource because we would
+        # get duplicate resource errors, hence the exec usage
+        if hiera('stack_action') == 'UPDATE' and $ovn_separate_vip {
+          # We only remove these constraints if we're sure the ovn_dbs VIP is different
+          # from the old VIP
+          $old_vip_name = "ip-${old_vip}"
+          $old_order_constraint = "order-ovn-dbs-bundle-${old_vip_name}-Optional"
+          exec { "remove-old-${old_vip_name}-order-${ovndb_servers_resource_name}":
+            command => "pcs constraint remove ${old_order_constraint}",
+            onlyif  => "pcs constraint order --full | egrep -q 'id:${old_order_constraint}'",
+            tries   => $pcs_tries,
+            path    => ['/sbin', '/usr/sbin', '/bin', '/usr/bin'],
+            tag     => 'ovn_dbs_remove_old_cruft',
+          }
+          $old_colocation_constraint = "colocation-${old_vip_name}-ovn-dbs-bundle-INFINITY"
+          exec { "remove-old-${old_vip_name}-colocation-${ovndb_servers_resource_name}":
+            command => "pcs constraint remove ${old_colocation_constraint}",
+            onlyif  => "pcs constraint colocation --full | egrep -q 'id:${old_colocation_constraint}'",
+            tries   => $pcs_tries,
+            path    => ['/sbin', '/usr/sbin', '/bin', '/usr/bin'],
+            tag     => 'ovn_dbs_remove_old_cruft',
+          }
+        }
+        # End of constraint removal section
+      } # Only run when enable_load_balancer is set to true
 
       Pcmk_bundle<| title == 'ovn-dbs-bundle' |>
       -> Pcmk_resource<| title == "${ovndb_servers_resource_name}" |>
