@@ -33,6 +33,9 @@ class tripleo::profile::base::cinder::volume::scaleio (
 ) {
   include tripleo::profile::base::cinder::volume
 
+
+  warning('The scaleio class will be removed in W-Release, please use the dellemc_vxflexos resource instead.')
+
   if $step >= 4 {
     cinder::backend::scaleio { $backend_name :
       backend_availability_zone        => hiera('cinder::backend::scaleio::backend_availability_zone', undef),
