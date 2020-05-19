@@ -127,6 +127,7 @@ class tripleo::profile::base::nova::api (
     include ::nova::cors
     include ::nova::network::neutron
     include ::nova::pci
+    include ::nova::vendordata
   }
   # Temporarily disable Nova API deployed in WSGI
   # https://bugs.launchpad.net/nova/+bug/1661360

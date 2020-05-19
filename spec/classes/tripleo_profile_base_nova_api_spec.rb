@@ -43,6 +43,8 @@ eos
         is_expected.to_not contain_class('nova::keystone::authtoken')
         is_expected.to_not contain_class('nova::api')
         is_expected.to_not contain_class('nova::cors')
+        is_expected.to_not contain_class('nova::pci')
+        is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::wsgi::apache_api')
       }
@@ -61,6 +63,8 @@ eos
         is_expected.to contain_class('nova::keystone::authtoken')
         is_expected.to contain_class('nova::api')
         is_expected.to contain_class('nova::cors')
+        is_expected.to contain_class('nova::pci')
+        is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::wsgi::apache_api')
       }
@@ -79,6 +83,8 @@ eos
         is_expected.to contain_class('nova::keystone::authtoken')
         is_expected.to_not contain_class('nova::api')
         is_expected.to_not contain_class('nova::cors')
+        is_expected.to_not contain_class('nova::pci')
+        is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::wsgi::apache_api')
       }
@@ -114,6 +120,8 @@ eos
         is_expected.to contain_class('nova::keystone::authtoken')
         is_expected.to contain_class('nova::api')
         is_expected.to contain_class('nova::cors')
+        is_expected.to contain_class('nova::pci')
+        is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::wsgi::apache_api')
       }

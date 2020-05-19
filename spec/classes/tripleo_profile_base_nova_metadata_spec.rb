@@ -45,6 +45,7 @@ eos
         is_expected.to_not contain_class('nova::wsgi::apache_metadata')
         is_expected.to_not contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::metadata')
+        is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
       }
     end
@@ -62,6 +63,7 @@ eos
         is_expected.to_not contain_class('nova::wsgi::apache_metadata')
         is_expected.to_not contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::metadata')
+        is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
       }
     end
@@ -80,6 +82,7 @@ eos
         is_expected.to contain_class('nova::wsgi::apache_metadata')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::metadata')
+        is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('tripleo::profile::base::apache')
       }
     end
@@ -98,6 +101,7 @@ eos
         is_expected.to contain_class('nova::wsgi::apache_metadata')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::metadata')
+        is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('tripleo::profile::base::apache')
       }
     end
@@ -116,6 +120,7 @@ eos
         is_expected.to contain_class('nova::wsgi::apache_metadata')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::metadata')
+        is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('tripleo::profile::base::apache')
       }
     end
@@ -145,6 +150,7 @@ eos
           :ssl_key  => '/foo.key')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::metadata')
+        is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('tripleo::profile::base::apache')
       }
     end
