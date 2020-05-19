@@ -77,6 +77,7 @@ class tripleo::profile::base::nova::metadata (
     include nova::cors
     include nova::network::neutron
     include nova::metadata
+    include nova::vendordata
     include tripleo::profile::base::apache
     class { 'nova::wsgi::apache_metadata':
       ssl_cert => $tls_certfile,
