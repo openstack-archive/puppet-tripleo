@@ -160,7 +160,7 @@ class tripleo::profile::base::certmonger_user (
 ) {
   if $step == 1  {
     unless empty($haproxy_certificates_specs) {
-      $reload_haproxy = ['systemctl reload haproxy']
+      $reload_haproxy = ['pkill -f -HUP haproxy-systemd-wrapper']
       Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>
       if defined(Class['::haproxy']) {
         Class['::tripleo::certmonger::ca::crl'] ~> Class['::haproxy']
