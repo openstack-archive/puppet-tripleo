@@ -493,6 +493,10 @@
 #  (optional) Specify the network zaqar_api is running on.
 #  Defaults to hiera('zaqar_api_network', undef)
 #
+# [*zaqar_ws_timeout_tunnel*]
+# (optional) Specify the tunnel timeout in seconds for the Zaqar API.
+# Defaults to hiera('zaqar_ws_timeout_tunnel', '14400')
+#
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
@@ -667,6 +671,7 @@ class tripleo::haproxy (
   $sahara_network              = hiera('sahara_api_network', undef),
   $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
   $zaqar_api_network           = hiera('zaqar_api_network', undef),
+  $zaqar_ws_timeout_tunnel     = hiera('zaqar_ws_timeout_tunnel', '14400'),
   $service_ports               = {}
 ) {
   $default_service_ports = {
@@ -1538,7 +1543,7 @@ class tripleo::haproxy (
         # timeouts get overridden by others at certain times of the connection.
         # The following values were taken from the following site:
         # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
-        'timeout' => ['connect 5s', 'client 25s', 'server 25s', 'tunnel 14400s'],
+        'timeout' => ['connect 5s', 'client 25s', 'server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
       },
       public_ssl_port           => $ports[zaqar_ws_ssl_port],
       service_network           => $zaqar_api_network,
