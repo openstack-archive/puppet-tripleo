@@ -221,6 +221,11 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
           'target-dir' => '/etc/ovn',
           'options'    => 'rw',
         },
+        'ovn-dbs-dev-log' => {
+          'source-dir' => '/dev/log',
+          'target-dir' => '/dev/log',
+          'options'    => 'rw',
+        },
       }
       if (hiera('ovn_dbs_short_node_names_override', undef)) {
         $ovn_dbs_short_node_names = hiera('ovn_dbs_short_node_names_override')
