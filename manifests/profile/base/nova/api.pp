@@ -99,6 +99,7 @@ class tripleo::profile::base::nova::api (
     include nova::cors
     include nova::network::neutron
     include nova::pci
+    include nova::vendordata
   }
 
   if $enable_internal_tls {
