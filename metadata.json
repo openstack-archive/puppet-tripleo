@@ -1,6 +1,6 @@
 {
   "name": "openstack-tripleo",
-  "version": "12.3.0",
+  "version": "13.0.0",
   "author": "OpenStack Contributors",
   "summary": "Puppet module for TripleO",
   "license": "Apache-2.0",
@@ -24,6 +24,6 @@
   "dependencies": [
     { "name": "puppetlabs/stdlib", "version_requirement": ">= 5.0.0 < 6.0.0" },
     { "name": "puppetlabs/mysql", "version_requirement": ">= 5.0.0" },
-    { "name": "openstack/openstacklib", "version_requirement": ">=15.0.0 <16.0.0" }
+    { "name": "openstack/openstacklib", "version_requirement": ">=17.0.0 <18.0.0" }
   ]
 }
