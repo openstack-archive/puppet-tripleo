@@ -51,7 +51,7 @@ $CLI run --detach ${LOGGING} \
     -v /lib/modules:/lib/modules:ro \
     -v /sbin/modprobe:/sbin/modprobe:ro \
     -v /run/netns:/run/netns:shared \
-    -v /var/lib/neutron:/var/lib/neutron:z,shared \
+    -v /var/lib/neutron:/var/lib/neutron:shared \
     -v /dev/log:/dev/log \
     --net host \
     --pid host \
