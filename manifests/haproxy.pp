@@ -1504,6 +1504,11 @@ class tripleo::haproxy (
       service_network   => $octavia_network,
       mode              => 'http',
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
+      listen_options    => merge($default_listen_options, {
+        'hash-type' => 'consistent',
+        'option'    => [ 'httpchk HEAD /' ],
+        'balance'   => 'source',
+      }),
     }
   }
 
