@@ -42,6 +42,10 @@
 #   (Optional) Whether to enable the vnx backend
 #   Defaults to false
 #
+# [*cinder_enable_dellemc_xtremio_backend*]
+#   (Optional) Whether to enable the xtremio backend
+#   Defaults to false
+#
 # [*cinder_enable_dellemc_xtremio_iscsi_backend*]
 #   (Optional) Whether to enable the extremio iscsi backend
 #   Defaults to false
@@ -126,6 +130,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_dellemc_powermax_backend      = false,
   $cinder_enable_dellemc_vmax_iscsi_backend    = false,
   $cinder_enable_dellemc_vnx_backend           = false,
+  $cinder_enable_dellemc_xtremio_backend       = false,
   $cinder_enable_dellemc_xtremio_iscsi_backend = false,
   $cinder_enable_hpelefthand_backend           = false,
   $cinder_enable_dellps_backend                = false,
@@ -223,6 +228,14 @@ class tripleo::profile::base::cinder::volume (
           'tripleo_dellemc_vnx')
     } else {
       $cinder_dellemc_vnx_backend_name = undef
+    }
+
+    if $cinder_enable_dellemc_xtremio_backend {
+      include tripleo::profile::base::cinder::volume::dellemc_xtremio
+      $cinder_dellemc_xtremio_backend_name = hiera('cinder::backend::dellemc_xtremio::volume_backend_name',
+          'tripleo_dellemc_xtremio')
+    } else {
+      $cinder_dellemc_xtremio_backend_name = undef
     }
 
     if $cinder_enable_dellemc_xtremio_iscsi_backend {
@@ -326,6 +339,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_dellemc_powermax_backend_name,
                                       $cinder_dellemc_vmax_iscsi_backend_name,
                                       $cinder_dellemc_vnx_backend_name,
+                                      $cinder_dellemc_xtremio_backend_name,
                                       $cinder_dellemc_xtremio_iscsi_backend_name,
                                       $cinder_hpelefthand_backend_name,
                                       $cinder_netapp_backend_name,
