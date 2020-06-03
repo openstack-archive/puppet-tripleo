@@ -1284,14 +1284,31 @@ class tripleo::haproxy (
   }
 
   if $metrics_qdr {
-    ::tripleo::haproxy::endpoint { 'metrics_qdr':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => $controller_virtual_ip,
-      service_port      => $ports[metrics_qdr_port],
-      ip_addresses      => $controller_hosts_real,
-      server_names      => $controller_hosts_names_real,
-      public_ssl_port   => $ports[metrics_qdr_port],
-      service_network   => $metrics_qdr_network,
+    $metrics_bind_opts = {
+      "${public_virtual_ip}:${ports[metrics_qdr_port]}" => $haproxy_listen_bind_param,
+    }
+    haproxy::listen { 'metrics_qdr':
+      bind             => $metrics_bind_opts,
+      options          => {
+        'option'    => [ 'tcp-check', 'tcplog' ],
+        'tcp-check' => ["connect port ${ports[metrics_qdr_port]}"],
+      },
+      collect_exported => false,
+    }
+    # Note(mmagr): while MetricsQdr service runs on all overcloud nodes, we need load balancing
+    # only on controllers as those are only QDRs forming mesh (listening on connection
+    # from QDRs running other nodes [storage, compute, etc.]). Sadly we don't have another
+    # reasonable way to get list of internal_api interfaces of controllers than using list
+    # of other services running only on controllers and also using internal_api network.
+    # MetricsQdr will be refactored (split to QDR running on controller or on other node)
+    # to better integrate, but for now we need this hack to enable the feature
+    haproxy::balancermember { 'metrics_qdr':
+      listening_service => 'metrics_qdr',
+      ports             => $ports[metrics_qdr_port],
+      ipaddresses       => hiera('pacemaker_node_ips', $controller_hosts_real),
+      server_names      => hiera('pacemaker_node_names', $controller_hosts_names_real),
+      options           => union($haproxy_member_options, ['on-marked-down shutdown-sessions']),
+      verifyhost        => false,
     }
   }
 
