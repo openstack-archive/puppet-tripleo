@@ -148,6 +148,34 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
+      context 'with only sc' do
+        before :each do
+          params.merge!({
+            :cinder_enable_dellemc_sc_backend  => true,
+            :cinder_enable_iscsi_backend       => false,
+          })
+        end
+        it 'should configure only sc' do
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_sc')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume')
+          is_expected.to contain_class('tripleo::profile::base::cinder')
+          is_expected.to contain_class('cinder::volume')
+          is_expected.to contain_class('cinder::backends').with(
+            :enabled_backends => ['tripleo_dellemc_sc']
+          )
+        end
+        context 'with multiple sc backends' do
+          # Step 5's hiera specifies multiple sc backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_dellemc_sc_1', 'tripleo_dellemc_sc_2']
+            )
+          end
+        end
+      end
+
       context 'with only dellsc' do
         before :each do
           params.merge!({
@@ -287,6 +315,7 @@ describe 'tripleo::profile::base::cinder::volume' do
         it 'should configure only user backend' do
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::pure')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_sc')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_xtremio')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellps')
@@ -306,20 +335,22 @@ describe 'tripleo::profile::base::cinder::volume' do
       context 'with all tripleo backends' do
         before :each do
           params.merge!({
-            :cinder_enable_nfs_backend        => true,
-            :cinder_enable_rbd_backend        => true,
-            :cinder_enable_iscsi_backend      => true,
-            :cinder_enable_pure_backend       => true,
-            :cinder_enable_dellps_backend     => true,
-            :cinder_enable_dellsc_backend     => true,
+            :cinder_enable_nfs_backend             => true,
+            :cinder_enable_rbd_backend             => true,
+            :cinder_enable_iscsi_backend           => true,
+            :cinder_enable_pure_backend            => true,
+            :cinder_enable_dellemc_sc_backend      => true,
             :cinder_enable_dellemc_xtremio_backend => true,
-            :cinder_enable_netapp_backend     => true,
-            :cinder_enable_vrts_hs_backend    => true,
+            :cinder_enable_dellps_backend          => true,
+            :cinder_enable_dellsc_backend          => true,
+            :cinder_enable_netapp_backend          => true,
+            :cinder_enable_vrts_hs_backend         => true,
           })
         end
         it 'should configure all backends' do
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::iscsi')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::pure')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_sc')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_xtremio')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellps')
@@ -331,7 +362,8 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('tripleo::profile::base::cinder')
           is_expected.to contain_class('cinder::volume')
           is_expected.to contain_class('cinder::backends').with(
-            :enabled_backends => ['tripleo_iscsi', 'tripleo_ceph', 'tripleo_pure','tripleo_dellps', 'tripleo_dellsc', 'tripleo_dellemc_xtremio',
+            :enabled_backends => ['tripleo_iscsi', 'tripleo_ceph', 'tripleo_pure','tripleo_dellps', 'tripleo_dellsc',
+                                  'tripleo_dellemc_sc', 'tripleo_dellemc_xtremio',
                                   'tripleo_netapp','tripleo_nfs','Veritas_HyperScale']
           )
         end
