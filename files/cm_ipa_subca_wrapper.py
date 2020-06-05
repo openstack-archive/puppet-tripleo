@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from __future__ import print_function
 try:
     import ConfigParser as configparser
 except ImportError:
