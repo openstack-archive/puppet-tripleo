@@ -101,7 +101,7 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to contain_class('glance::config')
         is_expected.to contain_class('glance::api::logging')
         is_expected.to contain_class('glance::api').with(
-          :enabled_backends => ['default_backend:swift', 'http:http'],
+          :enabled_backends => ['default_backend:swift'],
           :default_backend  => 'default_backend',
         )
         is_expected.to_not contain_class('tripleo::profile::base::glance::backend::cinder')
@@ -147,7 +147,6 @@ describe 'tripleo::profile::base::glance::api' do
           is_expected.to contain_class('glance::api').with(
             :enabled_backends => [
               'my_cinder:cinder',
-              'http:http',
               'my_file:file',
               'rbd1:rbd',
               'rbd2:rbd',

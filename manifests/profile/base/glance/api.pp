@@ -196,7 +196,7 @@ class tripleo::profile::base::glance::api (
       "${backend_config[0]}:${backend_config[1]['GlanceBackend']}"
     }
 
-    $enabled_backends = ["${glance_backend_id}:${glance_backend}", 'http:http'] + $multistore_backends
+    $enabled_backends = ["${glance_backend_id}:${glance_backend}"] + $multistore_backends
 
     include glance
     include glance::config
