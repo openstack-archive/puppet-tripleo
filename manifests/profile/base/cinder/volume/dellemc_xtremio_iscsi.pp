@@ -33,6 +33,9 @@ class tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi (
 ) {
   include tripleo::profile::base::cinder::volume
 
+
+  warning('The dellemc_xtremio_iscsi class will be removed in V-Release, please use the dellemc_xtremio resource instead.')
+
   if $step >= 4 {
     cinder::backend::dellemc_xtremio_iscsi { $backend_name :
       backend_availability_zone         => hiera('cinder::backend::dellemc_xtremio_iscsi::backend_availability_zone', undef),
