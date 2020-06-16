@@ -114,8 +114,8 @@ class tripleo::network::contrail::neutron_plugin (
   $auth_host              = hiera('contrail::auth_host'),
   $auth_port              = hiera('contrail::auth_port'),
   $auth_protocol          = hiera('contrail::auth_protocol'),
-  $ca_file                = hiera('tripleo::haproxy::service_certificate',false),
-  $cert_file              = hiera('tripleo::haproxy::service_certificate',false),
+  $ca_file                = hiera('contrail::service_certificate',false),
+  $cert_file              = hiera('contrail::service_certificate',false),
   $purge_config           = false,
   $package_ensure         = 'present',
 ) {
@@ -175,10 +175,6 @@ class tripleo::network::contrail::neutron_plugin (
   }
   resources { 'neutron_plugin_opencontrail':
     purge => $purge_config,
-  }
-
-  exec { 'add neutron user to haproxy group':
-    command => '/usr/sbin/usermod -a -G haproxy neutron',
   }
 
   $auth_url = join([$auth_protocol,'://',$auth_host,':',$auth_port,'/v2.0'])
