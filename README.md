@@ -17,4 +17,4 @@ Lightweight composition layer for Puppet TripleO.
 * Documentation:
   * TripleO: https://docs.openstack.org/tripleo-docs/latest/
   * Testing with puppet: https://docs.openstack.org/puppet-openstack-guide/latest/contributor/testing.html
-  * Release Notes https://docs.openstack.org/releasenotes/puppet-tripleo
+  * Release Notes: https://docs.openstack.org/releasenotes/puppet-tripleo
