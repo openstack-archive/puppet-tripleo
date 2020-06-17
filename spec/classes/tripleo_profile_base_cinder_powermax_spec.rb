@@ -40,9 +40,8 @@ describe 'tripleo::profile::base::cinder::volume::dellemc_powermax' do
       it 'should trigger complete configuration' do
         is_expected.to contain_cinder__backend__dellemc_powermax('tripleo_dellemc_powermax')
       end
-    end
 
-    context 'with multiple backends' do
+      context 'with multiple backends' do
         let(:params) { {
           :backend_name => ['tripleo_dellemc_powermax_1', 'tripleo_dellemc_powermax_2'],
           :multi_config => { 'tripleo_dellemc_powermax_2' => { 'CinderPowermaxStorageProtocol' => 'FC' }},
@@ -57,7 +56,9 @@ describe 'tripleo::profile::base::cinder::volume::dellemc_powermax' do
           is_expected.to contain_cinder_config('tripleo_dellemc_powermax_2/volume_driver')
              .with_value('cinder.volume.drivers.dell_emc.powermax.fc.PowerMaxFCDriver')
         end
-     end
+      end
+    end
+  end
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do
@@ -68,5 +69,4 @@ describe 'tripleo::profile::base::cinder::volume::dellemc_powermax' do
       it_behaves_like 'tripleo::profile::base::cinder::volume::dellemc_powermax'
     end
   end
-end
 end
