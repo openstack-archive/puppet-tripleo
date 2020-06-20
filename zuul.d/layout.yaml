@@ -1,22 +1,7 @@
-- project-template:
-    name: puppet-tripleo-module-unit-jobs
-    check:
-      jobs:
-        - puppet-openstack-unit-5.5-centos-7
-        - puppet-openstack-unit-5.5-centos-8
-        - puppet-openstack-unit-6.0-ubuntu-bionic
-        - puppet-openstack-unit-latest-ubuntu-bionic:
-            voting: false
-    gate:
-      jobs:
-        - puppet-openstack-unit-5.5-centos-7
-        - puppet-openstack-unit-5.5-centos-8
-        - puppet-openstack-unit-6.0-ubuntu-bionic
-
 - project:
     templates:
       - puppet-openstack-check-jobs
-      - puppet-tripleo-module-unit-jobs
+      - puppet-openstack-module-unit-jobs
       - tripleo-undercloud-jobs
       - tripleo-multinode-container-minimal
       - release-notes-jobs-python3
