@@ -4,12 +4,14 @@
   maxage <%= @purge_after_days %>
   # minsize 1 is required for GDPR compliance, all files in
   # /var/log/containers not managed with logrotate will be purged!
-  minsize 1
+  minsize <%= @minsize %>
   # Do not use size as it's not compatible with time-based rotation rules
   # required for GDPR compliance.
   maxsize <%= @maxsize %>
   missingok
+<%- if @notifempty %>
   notifempty
+<%- end %>
 <%- if @copytruncate %>
   copytruncate
 <%- end %>
