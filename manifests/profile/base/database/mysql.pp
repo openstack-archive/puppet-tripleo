@@ -288,9 +288,6 @@ class tripleo::profile::base::database::mysql (
     if hiera('sahara_api_enabled', false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'sahara::db::mysql':}
     }
-    if hiera('ec2_api_enabled', false) {
-      tripleo::profile::base::database::mysql::include_and_check_auth{'ec2api::db::mysql':}
-    }
     if hiera('zaqar_api_enabled', false) and hiera('zaqar::db::mysql::user', '') == 'zaqar' {
       # NOTE: by default zaqar uses sqlalchemy
       tripleo::profile::base::database::mysql::include_and_check_auth{'zaqar::db::mysql':}

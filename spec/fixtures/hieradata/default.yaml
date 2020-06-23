@@ -84,7 +84,6 @@ manila_api_short_bootstrap_node_name: node
 # mistral related items
 mistral::keystone::authtoken::password: 'password'
 # nova related items
-ec2_api_short_bootstrap_node_name: node
 nova_api_short_bootstrap_node_name: node
 nova_metadata_short_bootstrap_node_name: node
 nova_placement_short_bootstrap_node_name: node
