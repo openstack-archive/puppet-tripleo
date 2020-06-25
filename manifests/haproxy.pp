@@ -349,7 +349,7 @@
 #
 # [*ceph_dashboard*]
 #  (optional) Enable or not Ceph Dashboard binding
-#  Defaults to hiera('ceph_mgr_enabled', false)
+#  Defaults to hiera('ceph_grafana_enabled', false)
 #
 # [*opendaylight*]
 #  (optional) Enable or not OpenDaylight binding
@@ -664,7 +664,7 @@ class tripleo::haproxy (
   $panko                       = hiera('panko_api_enabled', false),
   $barbican                    = hiera('barbican_api_enabled', false),
   $ceph_grafana                = hiera('ceph_grafana_enabled', false),
-  $ceph_dashboard              = hiera('ceph_mgr_enabled', false),
+  $ceph_dashboard              = hiera('ceph_grafana_enabled', false),
   $gnocchi                     = hiera('gnocchi_api_enabled', false),
   $mistral                     = hiera('mistral_api_enabled', false),
   $swift_proxy_server          = hiera('swift_proxy_enabled', false),
