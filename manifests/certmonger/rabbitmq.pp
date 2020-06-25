@@ -48,7 +48,6 @@ class tripleo::certmonger::rabbitmq (
   $principal     = undef,
 ) {
   include ::certmonger
-  include ::rabbitmq::params
 
   ensure_resource('file', '/usr/bin/certmonger-rabbitmq-refresh.sh', {
     source  => 'puppet:///modules/tripleo/certmonger-rabbitmq-refresh.sh',
@@ -76,7 +75,4 @@ class tripleo::certmonger::rabbitmq (
   file { $service_key :
     require => Certmonger_certificate['rabbitmq'],
   }
-
-  File[$service_certificate] ~> Service<| title == $::rabbitmq::params::service_name |>
-  File[$service_key] ~> Service<| title == $::rabbitmq::params::service_name |>
 }
