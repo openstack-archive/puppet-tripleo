@@ -33,7 +33,7 @@ fi
 
 cat "$service_certificate" "$ca_path" "$service_key" > "$service_pem"
 
-haproxy_container_name=$($container_cli ps --format="{{.Names}}" | grep haproxy)
+haproxy_container_name=$($container_cli ps --format="{{.Names}}" | grep -w -E 'haproxy(-bundle-.*-[0-9]+)?')
 
 if [ "$ACTION" == "reload" ]; then
     # Refresh the cert at the mount-point
