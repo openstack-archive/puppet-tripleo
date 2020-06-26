@@ -3,7 +3,7 @@
 
 container_cli=$(hiera -c /etc/puppet/hiera.yaml container_cli podman)
 
-container_name=$($container_cli ps --format="{{.Names}}" | grep rabbitmq)
+container_name=$($container_cli ps --format="{{.Names}}" | grep -w -E 'rabbitmq(-bundle-.*-[0-9]+)?')
 
 service_pem="$(hiera -c /etc/puppet/hiera.yaml tripleo::rabbitmq::service_certificate)"
 
