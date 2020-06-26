@@ -23,6 +23,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*bootstrap_node*]
+#   (Optional) The hostname of the node responsible for bootstrapping tasks
+#   Defaults to hiera('nova_api_short_bootstrap_node_name')
+#
 class tripleo::profile::base::nova::conductor (
   $bootstrap_node = hiera('nova_api_short_bootstrap_node_name', undef),
   $step = Integer(hiera('step')),

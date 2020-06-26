@@ -23,12 +23,12 @@ class tripleo::profile::base::tuned (
       owner  => 'root',
       group  => 'root',
       mode   => '0755',
-    } ->
-    file { "/etc/tuned/${profile}/tuned.conf":
-      before => Exec['tuned-adm'],
+    }
+    -> file { "/etc/tuned/${profile}/tuned.conf":
       ensure  => present,
-      owner  => 'root',
-      group  => 'root',
+      before  => Exec['tuned-adm'],
+      owner   => 'root',
+      group   => 'root',
       mode    => '0644',
       content => $custom_profile,
     }
