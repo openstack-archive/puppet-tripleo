@@ -1437,7 +1437,7 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
-      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /' ] }),
+      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /swift/healthcheck' ] }),
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
