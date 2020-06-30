@@ -1490,7 +1490,7 @@ class tripleo::haproxy (
       server_names      => hiera('ceph_rgw_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
-      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /' ] }),
+      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /swift/healthcheck' ] }),
     }
   }
 
