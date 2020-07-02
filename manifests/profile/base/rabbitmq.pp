@@ -158,7 +158,11 @@ class tripleo::profile::base::rabbitmq (
 
     # Historically in THT the default value of RabbitAdditionalErlArgs was "'+sbwt none'", we
     # want to strip leading and trailing ' chars.
-    $additional_erl_args_real = regsubst($additional_erl_args, "(^'|'$)", '', 'G')
+    if $additional_erl_args != undef {
+      $additional_erl_args_real = regsubst($additional_erl_args, "(^'|'$)", '', 'G')
+    } else {
+      $additional_erl_args_real = ''
+    }
     $rabbitmq_additional_erl_args = "\"${cert_option} ${key_option} ${ciphers_option} ${secure_renegotiate} ${additional_erl_args_real}\""
     $environment_real = merge($environment, {
       'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS' => $rabbitmq_additional_erl_args,
