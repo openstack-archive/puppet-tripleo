@@ -6,6 +6,7 @@
       - tripleo-multinode-container-minimal
       - release-notes-jobs-python3
       - tripleo-standalone-scenarios-full
+      - tripleo-standalone-multinode-ipa
     check:
       jobs:
         - tripleo-ci-centos-8-scenario007-multinode-oooq-container:
