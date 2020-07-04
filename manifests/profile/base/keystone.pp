@@ -229,7 +229,6 @@ class tripleo::profile::base::keystone (
 
     class { 'keystone':
       sync_db                    => $sync_db,
-      enable_bootstrap           => $sync_db,
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,
