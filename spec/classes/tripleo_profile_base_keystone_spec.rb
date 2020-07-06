@@ -52,6 +52,7 @@ describe 'tripleo::profile::base::keystone' do
         is_expected.to_not contain_class('keystone::ldap_backend')
         is_expected.to_not contain_class('keystone::federation::openidc')
         is_expected.to_not contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::trust_flush')
       end
     end
 
@@ -75,6 +76,7 @@ describe 'tripleo::profile::base::keystone' do
         is_expected.to_not contain_class('keystone::ldap_backend')
         is_expected.to_not contain_class('keystone::federation::openidc')
         is_expected.to_not contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::trust_flush')
       end
     end
 
@@ -99,6 +101,7 @@ describe 'tripleo::profile::base::keystone' do
         is_expected.to_not contain_class('keystone::ldap_backend')
         is_expected.to_not contain_class('keystone::federation::openidc')
         is_expected.to_not contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::trust_flush')
       end
     end
 
@@ -122,6 +125,7 @@ describe 'tripleo::profile::base::keystone' do
         is_expected.to_not contain_class('keystone::ldap_backend')
         is_expected.to_not contain_class('keystone::federation::openidc')
         is_expected.to_not contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::trust_flush')
       end
     end
 
@@ -149,6 +153,7 @@ describe 'tripleo::profile::base::keystone' do
         is_expected.to_not contain_class('keystone::ldap_backend')
         is_expected.to_not contain_class('keystone::federation::openidc')
         is_expected.to_not contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::trust_flush')
       end
     end
 
@@ -162,8 +167,9 @@ describe 'tripleo::profile::base::keystone' do
         )
       end
 
-      it 'should not trigger token_flush configuration' do
+      it 'should not trigger purge configuration' do
         is_expected.to_not contain_class('keystone::cron::token_flush')
+        is_expected.to_not contain_class('keystone::cron::trust_flush')
       end
     end
 
@@ -177,8 +183,9 @@ describe 'tripleo::profile::base::keystone' do
         )
       end
 
-      it 'should trigger token_flush configuration' do
+      it 'should trigger purge configuration' do
         is_expected.to contain_class('keystone::cron::token_flush')
+        is_expected.to contain_class('keystone::cron::trust_flush')
       end
     end
   end
