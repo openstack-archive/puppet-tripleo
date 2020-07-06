@@ -290,7 +290,6 @@ class tripleo::profile::base::keystone (
   }
 
   if $step >= 4 and $manage_db_purge {
-    include keystone::cron::token_flush
     include keystone::cron::trust_flush
   }
 
