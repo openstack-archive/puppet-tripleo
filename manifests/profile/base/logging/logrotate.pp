@@ -62,9 +62,17 @@
 #    (optional) Defaults to True.
 #    Configures the logrotate compress parameter.
 #
+#  [*minsize*]
+#    (optional) Defaults to '1'.
+#    Configures the logrotate minsize parameter.
+#
 #  [*maxsize*]
 #    (optional) Defaults to '10M'.
 #    Configures the logrotate maxsize parameter.
+#
+#  [*notifempty*]
+#    (optional) Defaults to True.
+#    Configures the logrotate notifempty parameter.
 #
 #  [*rotation*]
 #    (optional) Defaults to 'daily'.
@@ -111,7 +119,9 @@ class tripleo::profile::base::logging::logrotate (
   $delaycompress    = true,
   $compress         = true,
   $rotation         = 'daily',
+  $minsize          = 1,
   $maxsize          = '10M',
+  $notifempty       = true,
   $rotate           = 14,
   $purge_after_days = 14,
   $dateext          = undef,
