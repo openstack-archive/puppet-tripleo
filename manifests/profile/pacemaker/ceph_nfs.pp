@@ -121,7 +121,12 @@ class tripleo::profile::pacemaker::ceph_nfs (
     }
 
     # See comment on pacemaker::property at step2
-    $ceph_nfs_short_node_names = hiera('ceph_nfs_short_node_names')
+    if (hiera('ceph_nfs_short_node_names_override', undef)) {
+      $ceph_nfs_short_node_names = hiera('ceph_nfs_short_node_names_override')
+    } else {
+      $ceph_nfs_short_node_names = hiera('ceph_nfs_short_node_names')
+    }
+
     $ceph_nfs_short_node_names.each |String $node_name| {
       # We only set the properties for the non-bootstrap nodes
       # because we set the property for the bootstrap node at step 2
