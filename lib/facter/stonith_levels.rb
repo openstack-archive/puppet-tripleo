@@ -19,7 +19,7 @@ Facter.add('stonith_levels') do
     # If crm_node is present, return true. Otherwise, return false.
     if Facter::Core::Execution.which('crm_node')
       hostname = Facter::Core::Execution.execute("crm_node -n 2> /dev/null", {})
-      stonith_levels = Facter::Core::Execution.execute("pcs stonith level | sed -n \"/^Target: #{hostname}$/,/^Target:/{/^Target: #{hostname}$/b;/^Target:/b;p}\" |tail -1 | awk '{print $2}' 2> /dev/null", {}).to_i
+      stonith_levels = Facter::Core::Execution.execute("pcs stonith level 2>&1 | sed -n \"/^Target: #{hostname}$/,/^Target:/{/^Target: #{hostname}$/b;/^Target:/b;p}\" |tail -1 | awk '{print $2}' 2> /dev/null", {}).to_i
       stonith_levels
     end
 
