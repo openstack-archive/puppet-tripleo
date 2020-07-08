@@ -143,16 +143,8 @@ class tripleo::profile::base::pacemaker (
     }
 
     $pacemaker_cluster_members = downcase(regsubst($pacemaker_short_node_names, ',', ' ', 'G'))
-    $corosync_ipv6 = str2bool(hiera('corosync_ipv6', false))
-    if $corosync_ipv6 {
-      $cluster_setup_extras_pre = {
-        '--token' => hiera('corosync_token_timeout', 1000),
-        '--ipv6' => ''
-      }
-    } else {
-      $cluster_setup_extras_pre = {
-        '--token' => hiera('corosync_token_timeout', 1000)
-      }
+    $cluster_setup_extras = {
+      "totem token=${hiera('corosync_token_timeout', 1000)}" => '',
     }
     # If pacemaker_node_ips is not empty we want to create the array
     # for puppet pacemaker to use as addresses list which is an array of arrays.
@@ -167,11 +159,6 @@ class tripleo::profile::base::pacemaker (
     # before we invoke pcs commands (see LP#1866209)
     Firewall<|tag == 'tripleo-firewall-rule'|> -> Exec <|tag == 'pacemaker-auth'|>
 
-    if $encryption {
-      $cluster_setup_extras = merge($cluster_setup_extras_pre, {'--encryption' => '1'})
-    } else {
-      $cluster_setup_extras = $cluster_setup_extras_pre
-    }
     class { 'pacemaker':
       hacluster_pwd => $pcs_password,
     }
