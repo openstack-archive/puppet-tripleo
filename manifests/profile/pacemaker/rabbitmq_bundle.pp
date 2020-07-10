@@ -341,7 +341,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       }
 
       if size($rabbit_nodes) == 1 {
-        $check_command = 'rabbitmqctl status | grep -F "{rabbit,"'
+        $check_command = 'rabbitmqctl eval "lists:keymember(rabbit, 1, application:which_applications())." | grep -q true'
       } else {
         # This grep makes sure the rabbit app in erlang is up and running
         # which is enough to guarantee that the user will eventually get

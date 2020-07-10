@@ -151,7 +151,7 @@ class tripleo::profile::pacemaker::rabbitmq (
       # replicated around the cluster
       exec { 'rabbitmq-ready':
         path        => '/usr/sbin:/usr/bin:/sbin:/bin',
-        command     => 'rabbitmqctl status | grep -F "{rabbit,"',
+        command     => 'rabbitmqctl eval "lists:keymember(rabbit, 1, application:which_applications())." | grep -q true',
         timeout     => 30,
         tries       => 180,
         try_sleep   => 10,
