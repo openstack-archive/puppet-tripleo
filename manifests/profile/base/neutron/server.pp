@@ -147,6 +147,7 @@ class tripleo::profile::base::neutron::server (
   if $step >= 4 and $sync_db or $step >= 5 and !$sync_db {
 
     include neutron::server::notifications
+    include neutron::server::notifications::nova
     include neutron::server::placement
     # We need to override the hiera value neutron::server::sync_db which is set
     # to true
