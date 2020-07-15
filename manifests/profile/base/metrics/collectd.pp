@@ -261,7 +261,7 @@ class tripleo::profile::base::metrics::collectd (
   $enable_sensubility = false,
 ) {
   if $step >= 3 {
-    class {'::collectd':
+    class {'collectd':
       manage_repo => $collectd_manage_repo
     }
 

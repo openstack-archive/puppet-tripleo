@@ -160,7 +160,7 @@ class tripleo::network::contrail::analyticsdatabase(
     }
   }
   if $step == 2 {
-    class {'::contrail::analyticsdatabase':
+    class {'contrail::analyticsdatabase':
       analyticsdatabase_params => {
         'auth_host'             => $auth_host,
         'api_server'            => $api_server,
@@ -188,7 +188,7 @@ class tripleo::network::contrail::analyticsdatabase(
     }
   }
   if $step >= 5 {
-    class {'::contrail::database::provision_database':
+    class {'contrail::database::provision_database':
       api_address                => $api_server,
       api_port                   => $api_port,
       database_node_address      => $host_ip,

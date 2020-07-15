@@ -57,7 +57,7 @@ class tripleo::profile::pacemaker::haproxy (
   $step                 = Integer(hiera('step')),
   $pcs_tries            = hiera('pcs_tries', 20),
 ) {
-  class {'::tripleo::profile::base::haproxy':
+  class {'tripleo::profile::base::haproxy':
     manage_firewall => $manage_firewall,
   }
 

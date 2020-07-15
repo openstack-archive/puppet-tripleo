@@ -100,7 +100,7 @@ class tripleo::profile::base::zaqar (
     if $messaging_store == 'swift' {
       include zaqar::messaging::swift
     } elsif $messaging_store == 'redis' {
-      class {'::zaqar::messaging::redis':
+      class {'zaqar::messaging::redis':
         uri => join(['redis://:', $zaqar_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/']),
       }
     } else {

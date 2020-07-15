@@ -76,7 +76,7 @@ class tripleo::network::contrail::heat(
 )
 {
 
-  class {'::contrail::heat':
+  class {'contrail::heat':
     heat_config            => {
       'clients_contrail' => {
         'api_base_url' => '/',

@@ -308,7 +308,7 @@ class tripleo::network::contrail::config(
     }
   }
   if $step >= 3 {
-    class {'::contrail::config':
+    class {'contrail::config':
       api_config              => {
         'DEFAULTS' => {
           'aaa_mode'              => $aaa_mode,
@@ -393,7 +393,7 @@ class tripleo::network::contrail::config(
     }
   }
   if $step >= 5 {
-    class {'::contrail::config::provision_config':
+    class {'contrail::config::provision_config':
       api_address                => $api_server,
       api_port                   => $api_port,
       config_node_address        => $host_ip,
@@ -404,7 +404,7 @@ class tripleo::network::contrail::config(
       openstack_vip              => $auth_host,
     }
     if $config_hostnames[0] == $::hostname {
-      class {'::contrail::config::provision_linklocal':
+      class {'contrail::config::provision_linklocal':
         api_address                => $api_server,
         api_port                   => $api_port,
         ipfabric_service_ip        => $api_server,

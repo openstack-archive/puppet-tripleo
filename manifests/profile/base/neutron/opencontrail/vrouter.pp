@@ -31,7 +31,7 @@ class tripleo::profile::base::neutron::opencontrail::vrouter (
     include contrail::vrouter
     # NOTE: it's not possible to use this class without a functional
     # contrail controller up and running
-    #class {'::contrail::vrouter::provision_vrouter':
+    #class {'contrail::vrouter::provision_vrouter':
     #  require => Class['contrail::vrouter'],
     #}
 

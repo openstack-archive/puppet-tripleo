@@ -100,7 +100,7 @@ class tripleo::profile::base::mistral (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    class  { '::mistral':
+    class  { 'mistral':
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
         'hosts'     => $oslomsg_rpc_hosts,

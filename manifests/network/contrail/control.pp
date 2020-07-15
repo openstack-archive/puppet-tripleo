@@ -157,7 +157,7 @@ class tripleo::network::contrail::control(
   $dns_ifmap_password     = "${ifmap_username}.dns"
 
   if $step >= 3 {
-    class {'::contrail::control':
+    class {'contrail::control':
       secret                 => $secret,
       manage_named           => $manage_named,
       control_config         => {
@@ -196,7 +196,7 @@ class tripleo::network::contrail::control(
     }
   }
   if $step >= 5 {
-    class {'::contrail::control::provision_control':
+    class {'contrail::control::provision_control':
       api_address                => $api_server,
       api_port                   => $api_port,
       control_node_address       => $host_ip,

@@ -112,7 +112,7 @@ class tripleo::network::contrail::webui(
   $redis_ip                  = hiera('contrail::webui::redis_ip'),
 )
 {
-  class {'::contrail::webui':
+  class {'contrail::webui':
     admin_user                => $admin_user,
     admin_password            => $admin_password,
     admin_token               => $admin_token,

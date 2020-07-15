@@ -264,7 +264,7 @@ class tripleo::network::contrail::analytics(
     }
   }
   if $step >= 3 {
-    class {'::contrail::analytics':
+    class {'contrail::analytics':
       alarm_gen_config         => {
         'DEFAULTS'  => {
           'host_ip'              => $host_ip,
@@ -367,7 +367,7 @@ class tripleo::network::contrail::analytics(
     }
   }
   if $step >= 5 {
-    class {'::contrail::analytics::provision_analytics':
+    class {'contrail::analytics::provision_analytics':
       api_address                => $api_server,
       api_port                   => $api_port,
       analytics_node_address     => $host_ip,

@@ -319,7 +319,7 @@ class tripleo::network::contrail::vrouter (
         },
       }
     }
-    class {'::contrail::vrouter':
+    class {'contrail::vrouter':
       discovery_ip           => $disc_server_ip,
       gateway                => $gateway,
       host_ip                => $host_ip,
@@ -341,7 +341,7 @@ class tripleo::network::contrail::vrouter (
       vnc_api_lib_config     => $vnc_api_lib_config,
     }
   if $step >= 5 {
-    class {'::contrail::vrouter::provision_vrouter':
+    class {'contrail::vrouter::provision_vrouter':
       api_address                => $api_server,
       api_port                   => $api_port,
       host_ip                    => $host_ip,

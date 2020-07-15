@@ -80,7 +80,7 @@ class tripleo::profile::base::etcd (
   if $step >= 2 {
     $bind_ip_normalized = normalize_ip_for_uri($bind_ip)
 
-    class {'::etcd':
+    class {'etcd':
       listen_client_urls          => "${protocol}://${bind_ip_normalized}:${client_port}",
       advertise_client_urls       => "${protocol}://${bind_ip_normalized}:${client_port}",
       listen_peer_urls            => "${protocol}://${bind_ip_normalized}:${peer_port}",

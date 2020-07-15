@@ -103,7 +103,7 @@ class tripleo::profile::base::ceilometer::agent::notification (
       $real_event_pipeline_publishers = $other_event_publishers
     }
 
-    class { '::ceilometer::agent::notification':
+    class { 'ceilometer::agent::notification':
       event_pipeline_publishers => $real_event_pipeline_publishers,
       pipeline_publishers       => $real_pipeline_publishers,
     }

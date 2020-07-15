@@ -54,7 +54,7 @@ class tripleo::profile::base::haproxy (
 ) {
   if $step >= 1 {
     if $enable_load_balancer {
-      class {'::tripleo::haproxy':
+      class {'tripleo::haproxy':
         internal_certificates_specs => $certificates_specs,
         manage_firewall             => $manage_firewall,
       }
