@@ -121,6 +121,14 @@ class tripleo::profile::base::pacemaker (
   if $pcs_password == undef {
     fail('The $pcs_password param is undefined, did you forget to include ::tripleo::profile::base::pacemaker in your role?')
   }
+  # During FFU when override keys are set we need to use the old authkey style
+  # This should be kept until FFU from CentOS 7->8 is being supported
+  if count(hiera('pacemaker_node_ips_override', [])) > 0 {
+    $force_old_style_remotes_real = true
+  } else {
+    $force_old_style_remotes_real = false
+  }
+
 
   Pcmk_resource <| |> {
     tries     => 10,
@@ -188,6 +196,7 @@ class tripleo::profile::base::pacemaker (
       setup_cluster        => $pacemaker_master,
       cluster_setup_extras => $cluster_setup_extras,
       remote_authkey       => $remote_authkey,
+      force_authkey        => $force_old_style_remotes_real,
       cluster_members_addr => $pacemaker_node_ips_real,
       pcsd_bind_addr       => $pcsd_bind_addr,
       tls_priorities       => $tls_priorities,
@@ -245,6 +254,9 @@ class tripleo::profile::base::pacemaker (
           try_sleep          => $remote_try_sleep,
           pcs_user           => $pcs_user,
           pcs_password       => $pcs_password,
+          # When we force the use of old style remotes we must also use --force
+          force              => $force_old_style_remotes_real,
+          force_oldstyle     => $force_old_style_remotes_real,
           before             => Exec["exec-wait-for-${remote_short_node}"],
           notify             => Exec["exec-wait-for-${remote_short_node}"],
         }
