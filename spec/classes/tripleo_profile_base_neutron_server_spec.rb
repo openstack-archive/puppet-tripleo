@@ -45,6 +45,7 @@ eos
         is_expected.to_not contain_class('neutron::server::notifications')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
+        is_expected.to_not contain_class('neutron::db')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -62,6 +63,7 @@ eos
         is_expected.to_not contain_class('neutron::server::notifications')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
+        is_expected.to_not contain_class('neutron::db')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -79,6 +81,7 @@ eos
         is_expected.to_not contain_class('neutron::server::notifications')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
+        is_expected.to_not contain_class('neutron::db')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -99,6 +102,7 @@ eos
           :sync_db => true,
           :l3_ha   => false,
         )
+        is_expected.to contain_class('neutron::db')
         is_expected.to contain_class('neutron::quota')
       end
     end
@@ -116,6 +120,7 @@ eos
         is_expected.to_not contain_class('neutron::server::notifications')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
+        is_expected.to_not contain_class('neutron::db')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -136,6 +141,7 @@ eos
           :sync_db => false,
           :l3_ha   => false,
         )
+        is_expected.to contain_class('neutron::db')
         is_expected.to contain_class('neutron::quota')
       end
     end
