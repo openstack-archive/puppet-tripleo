@@ -66,12 +66,20 @@ class tripleo::profile::base::pacemaker_remote (
   if $pcs_password == undef {
     fail('The $pcs_password param is and the hiera key "hacluster_pwd" hiera key are both undefined, this is not allowed')
   }
+  # During FFU when override keys are set we need to use the old authkey style
+  # This should be kept until FFU from CentOS 7->8 is being supported
+  if count(hiera('pacemaker_remote_node_ips_override', [])) > 0 {
+    $force_authkey = true
+  } else {
+    $force_authkey = false
+  }
   class { 'pacemaker::remote':
     pcs_user       => $pcs_user,
     pcs_password   => $pcs_password,
     remote_authkey => $remote_authkey,
     use_pcsd       => true,
     pcsd_bind_addr => $pcsd_bind_addr,
+    force_authkey  => $force_authkey,
     tls_priorities => $tls_priorities,
   }
   if str2bool(hiera('docker_enabled', false)) {
