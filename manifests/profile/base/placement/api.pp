@@ -75,6 +75,7 @@ class tripleo::profile::base::placement::api (
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include tripleo::profile::base::apache
+    include placement::api
     class { 'placement::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,

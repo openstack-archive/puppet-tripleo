@@ -37,6 +37,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::placement::api')
         is_expected.to_not contain_class('placement::keystone::authtoken')
+        is_expected.to_not contain_class('placement::api')
         is_expected.to_not contain_class('placement::wsgi::apache')
       }
     end
@@ -58,6 +59,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::placement::api')
         is_expected.to_not contain_class('placement::keystone::authtoken')
+        is_expected.to_not contain_class('placement::api')
         is_expected.to_not contain_class('placement::wsgi::apache')
       }
     end
@@ -70,6 +72,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::placement::api')
         is_expected.to contain_class('placement::keystone::authtoken')
+        is_expected.to_not contain_class('placement::api')
         is_expected.not_to contain_class('placement::wsgi::apache')
       }
     end
@@ -83,6 +86,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::placement::api')
         is_expected.to contain_class('placement::keystone::authtoken')
+        is_expected.to contain_class('placement::api')
         is_expected.to contain_class('placement::wsgi::apache')
       }
     end
@@ -106,6 +110,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::placement::api')
         is_expected.to contain_class('placement::keystone::authtoken')
+        is_expected.to contain_class('placement::api')
         is_expected.to contain_class('placement::wsgi::apache').with(
           :ssl_cert => '/foo.pem',
           :ssl_key  => '/foo.key')
