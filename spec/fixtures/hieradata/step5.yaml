@@ -9,6 +9,9 @@ cinder::backend::pure::volume_backend_name:
 cinder::backend::dellemc_powermax::volume_backend_name:
   - 'tripleo_dellemc_powermax_1'
   - 'tripleo_dellemc_powermax_2'
+cinder::backend::dellemc_powerstore::volume_backend_name:
+  - 'tripleo_dellemc_powerstore_1'
+  - 'tripleo_dellemc_powerstore_2'
 cinder::backend::dellemc_sc::volume_backend_name:
   - 'tripleo_dellemc_sc_1'
   - 'tripleo_dellemc_sc_2'
