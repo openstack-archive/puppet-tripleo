@@ -63,6 +63,12 @@
 #  If you enter an already existing key, it will override the default.
 #  Defaults to {}
 #
+# [*haproxy_lb_mode_longrunning*]
+#  HAProxy LB mode to use with the services the clients of which may have the notion
+#  of the longrunning requests, like RPC or just API requests that take time.
+#  The HAProxy's default roundrobin balance algorithm can be replaced with it.
+#  Defaults to "leastconn".
+#
 # [*haproxy_defaults_override*]
 #  HAProxy defaults option we can append to the default base set in this class.
 #  If you enter an already existing key, it will override the default.
@@ -559,6 +565,7 @@ class tripleo::haproxy (
   $activate_httplog            = false,
   $haproxy_globals_override    = {},
   $haproxy_defaults_override   = {},
+  $haproxy_lb_mode_longrunning = 'leastconn',
   $haproxy_daemon              = true,
   $haproxy_socket_access_level = 'user',
   $haproxy_stats_user          = 'admin',
@@ -1136,6 +1143,10 @@ class tripleo::haproxy (
     'timeout client' => '10m',
     'timeout server' => '10m',
   }
+  $heat_durability_options = {
+    'option'         => [ 'tcpka' ],
+    'balance'        => $haproxy_lb_mode_longrunning,
+  }
   if $service_certificate {
     $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
@@ -1144,6 +1155,7 @@ class tripleo::haproxy (
   } else {
     $heat_options = merge($default_listen_options, $heat_timeout_options)
   }
+  $heat_options_real = merge($heat_options, $heat_durability_options)
 
   if $heat_api {
     ::tripleo::haproxy::endpoint { 'heat_api':
@@ -1153,7 +1165,7 @@ class tripleo::haproxy (
       ip_addresses      => $heat_ip_addresses,
       server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => $heat_options,
+      listen_options    => $heat_options_real,
       public_ssl_port   => $ports[heat_api_ssl_port],
       service_network   => $heat_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1168,7 +1180,7 @@ class tripleo::haproxy (
       ip_addresses      => $heat_ip_addresses,
       server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => $heat_options,
+      listen_options    => $heat_options_real,
       public_ssl_port   => $ports[heat_cfn_ssl_port],
       service_network   => $heat_cfn_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),

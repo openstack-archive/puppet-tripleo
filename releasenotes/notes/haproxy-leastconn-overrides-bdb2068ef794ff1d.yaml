@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Add `haproxy_lb_mode_longrunning` parameter for the use with the services
+    that may have longrunning API requests. Defaults to 'leastconn' (replaces
+    the HAProxy default 'roundrobin').
+upgrade:
+  - |
+    Since Heat API can be given longrunning API requests its backends will
+    become load-balanced based on LRU 'leastconn' algorithm and its sessions
+    will also benefit from the TCP-keepalive feature of HAProxy.
