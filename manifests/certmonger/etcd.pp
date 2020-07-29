@@ -55,8 +55,12 @@ class tripleo::certmonger::etcd (
 ) {
   include certmonger
 
-  # Note: A $postsave_cmd should not be needed because etcd doesn't cache
-  # certificates. See https://github.com/etcd-io/etcd/pull/7784.
+  ensure_resource('file', '/usr/bin/certmonger-etcd-refresh.sh', {
+    source  => 'puppet:///modules/tripleo/certmonger-etcd-refresh.sh',
+    mode    => '0700',
+    seltype => 'bin_t',
+    notify  => Service['certmonger']
+  })
 
   certmonger_certificate { 'etcd' :
     ensure       => 'present',
