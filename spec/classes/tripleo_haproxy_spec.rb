@@ -187,6 +187,48 @@ describe 'tripleo::haproxy' do
         )
       end
     end
+
+    describe "APIs with long running actions to use leastconn" do
+      before :each do
+        params.merge!({
+          :neutron            => true,
+          :cinder             => true,
+          :swift_proxy_server => true,
+          :heat_api           => true,
+          :heat_cfn           => true,
+          :ironic_inspector   => true,
+          :ceph_rgw           => true,
+        })
+      end
+
+      %w(neutron cinder swift_proxy_server heat_cfn ironic-inspector ceph_rgw).each do |api|
+        it 'should configure haproxy ' + api + ' endpoint' do
+          is_expected.to contain_haproxy__listen(api)
+          p = catalogue.resource('tripleo::haproxy::endpoint', api).send(:parameters)
+          expect(p).to include(listen_options: a_hash_including('balance' => 'leastconn'))
+        end
+      end
+    end
+
+    describe "source-based sticky sessions w/o use of consistent hashing" do
+      before :each do
+        params.merge!({
+          :etcd            => true,
+          :ceph_grafana    => true,
+          :ceph_dashboard  => true,
+          :nova_novncproxy => true,
+        })
+      end
+
+      %w(etcd ceph_grafana ceph_dashboard nova_novncproxy).each do |svc|
+        it 'should configure haproxy ' + svc + ' endpoint' do
+          is_expected.to contain_haproxy__listen(svc)
+          p = catalogue.resource('tripleo::haproxy::endpoint', svc).send(:parameters)
+          expect(p).to include(listen_options: a_hash_including(
+            'balance' => 'source'))
+        end
+      end
+    end
   end
 
   on_supported_os.each do |os, facts|

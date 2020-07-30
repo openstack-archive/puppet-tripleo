@@ -885,6 +885,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, { 'balance' => $haproxy_lb_mode_longrunning }),
       public_ssl_port   => $ports[neutron_api_ssl_port],
       service_network   => $neutron_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -899,6 +900,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
       server_names      => hiera('cinder_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, { 'balance' => $haproxy_lb_mode_longrunning }),
       public_ssl_port   => $ports[cinder_api_ssl_port],
       service_network   => $cinder_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1120,6 +1122,7 @@ class tripleo::haproxy (
   if $swift_proxy_server {
     $swift_proxy_server_listen_options = {
       'option'         => [ 'httpchk GET /healthcheck', ],
+      'balance'        => $haproxy_lb_mode_longrunning,
       'timeout client' => '2m',
       'timeout server' => '2m',
     }
@@ -1227,6 +1230,7 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
       mode              => 'http',
+      listen_options    => merge($default_listen_options, { 'balance' => $haproxy_lb_mode_longrunning }),
     }
   }
 
@@ -1449,7 +1453,13 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
-      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /swift/healthcheck' ] }),
+      listen_options    => merge(
+        $default_listen_options,
+        {
+          'option'  => [ 'httpchk GET /swift/healthcheck' ],
+          'balance' => $haproxy_lb_mode_longrunning
+        }
+      ),
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
