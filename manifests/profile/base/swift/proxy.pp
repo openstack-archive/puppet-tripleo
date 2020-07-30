@@ -142,6 +142,7 @@ class tripleo::profile::base::swift::proxy (
       include tripleo::profile::base::apache
     }
   }
+  include tripleo::profile::base::swift
   if $step >= 4 {
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
     include swift
@@ -184,10 +185,5 @@ class tripleo::profile::base::swift::proxy (
     include swift::keymaster
     include swift::proxy::s3api
     include swift::proxy::s3token
-
-    class { 'swift::objectexpirer':
-      pipeline         => ['catch_errors', 'cache', 'proxy-server'],
-      memcache_servers => $swift_memcache_servers
-    }
   }
 }
