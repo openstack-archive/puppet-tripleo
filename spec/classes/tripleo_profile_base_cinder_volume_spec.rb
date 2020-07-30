@@ -148,6 +148,35 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
+      context 'with only powerstore' do
+        before :each do
+          params.merge!({
+            :cinder_enable_dellemc_powerstore_backend  => true,
+            :cinder_enable_iscsi_backend               => false,
+          })
+        end
+        it 'should configure only powerstore' do
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_powerstore')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume')
+          is_expected.to contain_class('tripleo::profile::base::cinder')
+          is_expected.to contain_class('cinder::volume')
+          is_expected.to contain_class('cinder::backends').with(
+            :enabled_backends => ['tripleo_dellemc_powerstore']
+          )
+        end
+        context 'with multiple powerstore backends' do
+          # Step 5's hiera specifies two powerstore backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_dellemc_powerstore_1', 'tripleo_dellemc_powerstore_2']
+            )
+          end
+        end
+      end
+
+
       context 'with only sc' do
         before :each do
           params.merge!({
@@ -195,7 +224,7 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
-        context 'with only vxflexos' do
+      context 'with only vxflexos' do
         before :each do
           params.merge!({
             :cinder_enable_dellemc_vxflexos_backend => true,
@@ -319,6 +348,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_xtremio')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_powermax')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_powerstore')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_vxflexos')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::netapp')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::veritas_hyperscale')
@@ -336,17 +366,18 @@ describe 'tripleo::profile::base::cinder::volume' do
       context 'with all tripleo backends' do
         before :each do
           params.merge!({
-            :cinder_enable_nfs_backend              => true,
-            :cinder_enable_rbd_backend              => true,
-            :cinder_enable_iscsi_backend            => true,
-            :cinder_enable_pure_backend             => true,
-            :cinder_enable_dellemc_powermax_backend => true,
-            :cinder_enable_dellemc_sc_backend       => true,
-            :cinder_enable_dellsc_backend           => true,
-            :cinder_enable_dellemc_xtremio_backend  => true,
-            :cinder_enable_dellemc_vxflexos_backend => true,
-            :cinder_enable_netapp_backend           => true,
-            :cinder_enable_vrts_hs_backend          => true,
+            :cinder_enable_nfs_backend                => true,
+            :cinder_enable_rbd_backend                => true,
+            :cinder_enable_iscsi_backend              => true,
+            :cinder_enable_pure_backend               => true,
+            :cinder_enable_dellemc_powermax_backend   => true,
+            :cinder_enable_dellemc_powerstore_backend => true,
+            :cinder_enable_dellemc_sc_backend         => true,
+            :cinder_enable_dellsc_backend             => true,
+            :cinder_enable_dellemc_xtremio_backend    => true,
+            :cinder_enable_dellemc_vxflexos_backend   => true,
+            :cinder_enable_netapp_backend             => true,
+            :cinder_enable_vrts_hs_backend            => true,
           })
         end
         it 'should configure all backends' do
@@ -356,6 +387,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_xtremio')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_powermax')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_powerstore')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_vxflexos')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::netapp')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::veritas_hyperscale')
@@ -366,7 +398,8 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('cinder::volume')
           is_expected.to contain_class('cinder::backends').with(
             :enabled_backends => ['tripleo_iscsi', 'tripleo_ceph', 'tripleo_pure', 'tripleo_dellsc', 'tripleo_dellemc_sc','tripleo_dellemc_powermax',
-                                  'tripleo_dellemc_vxflexos', 'tripleo_dellemc_xtremio', 'tripleo_netapp','tripleo_nfs','Veritas_HyperScale']
+                                  'tripleo_dellemc_powerstore','tripleo_dellemc_vxflexos', 'tripleo_dellemc_xtremio',
+                                  'tripleo_netapp','tripleo_nfs','Veritas_HyperScale']
           )
         end
       end

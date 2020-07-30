@@ -38,6 +38,10 @@
 #   (Optional) Whether to enable the powermax backend
 #   Defaults to false
 #
+# [*cinder_enable_dellemc_powerstore_backend*]
+#   (Optional) Whether to enable the powerstore backend
+#   Defaults to false
+#
 # [*cinder_enable_dellemc_vmax_iscsi_backend*]
 #   (Optional) Whether to enable the vmax iscsi backend
 #   Defaults to false
@@ -133,6 +137,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_dellemc_sc_backend            = false,
   $cinder_enable_dellemc_unity_backend         = false,
   $cinder_enable_dellemc_powermax_backend      = false,
+  $cinder_enable_dellemc_powerstore_backend    = false,
   $cinder_enable_dellemc_vmax_iscsi_backend    = false,
   $cinder_enable_dellemc_vnx_backend           = false,
   $cinder_enable_dellemc_vxflexos_backend      = false,
@@ -224,6 +229,14 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellemc_powermax_backend_name = hiera('cinder::backend::dellemc_powermax::volume_backend_name', 'tripleo_dellemc_powermax')
     } else {
       $cinder_dellemc_powermax_backend_name = undef
+    }
+
+    if $cinder_enable_dellemc_powerstore_backend {
+      include tripleo::profile::base::cinder::volume::dellemc_powerstore
+      $cinder_dellemc_powerstore_backend_name = hiera('cinder::backend::dellemc_powerstore::volume_backend_name',
+                                                      'tripleo_dellemc_powerstore')
+    } else {
+      $cinder_dellemc_powerstore_backend_name = undef
     }
 
     if $cinder_enable_dellemc_vmax_iscsi_backend {
@@ -350,6 +363,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_dellemc_sc_backend_name,
                                       $cinder_dellemc_unity_backend_name,
                                       $cinder_dellemc_powermax_backend_name,
+                                      $cinder_dellemc_powerstore_backend_name,
                                       $cinder_dellemc_vmax_iscsi_backend_name,
                                       $cinder_dellemc_vnx_backend_name,
                                       $cinder_dellemc_vxflexos_backend_name,
