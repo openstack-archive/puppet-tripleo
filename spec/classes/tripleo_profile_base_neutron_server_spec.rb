@@ -43,6 +43,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::neutron::authtoken')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('neutron::server::notifications')
+        is_expected.to_not contain_class('neutron::server::notifications::nova')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
@@ -61,6 +62,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::neutron::authtoken')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('neutron::server::notifications')
+        is_expected.to_not contain_class('neutron::server::notifications::nova')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
@@ -79,6 +81,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::neutron::authtoken')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('neutron::server::notifications')
+        is_expected.to_not contain_class('neutron::server::notifications::nova')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
@@ -97,6 +100,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::neutron::authtoken')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('neutron::server::notifications')
+        is_expected.to contain_class('neutron::server::notifications::nova')
         is_expected.to contain_class('neutron::server::placement')
         is_expected.to contain_class('neutron::server').with(
           :sync_db => true,
@@ -118,6 +122,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::neutron::authtoken')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('neutron::server::notifications')
+        is_expected.to_not contain_class('neutron::server::notifications::nova')
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
@@ -136,6 +141,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::neutron::authtoken')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('neutron::server::notifications')
+        is_expected.to contain_class('neutron::server::notifications::nova')
         is_expected.to contain_class('neutron::server::placement')
         is_expected.to contain_class('neutron::server').with(
           :sync_db => false,
