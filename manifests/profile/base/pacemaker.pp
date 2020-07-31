@@ -136,6 +136,8 @@ class tripleo::profile::base::pacemaker (
   $enable_fencing = str2bool(hiera('enable_fencing', false)) and $step >= 5
 
   if $step >= 1 {
+    include ::pacemaker::params
+
     if (hiera('pacemaker_short_node_names_override', undef)) {
       $pacemaker_short_node_names = join(hiera('pacemaker_short_node_names_override'), ',')
     } else {
@@ -143,15 +145,21 @@ class tripleo::profile::base::pacemaker (
     }
 
     $pacemaker_cluster_members = downcase(regsubst($pacemaker_short_node_names, ',', ' ', 'G'))
-    $corosync_ipv6 = str2bool(hiera('corosync_ipv6', false))
-    if $corosync_ipv6 {
-      $cluster_setup_extras_pre = {
-        '--token' => hiera('corosync_token_timeout', 1000),
-        '--ipv6' => ''
+    if !$::pacemaker::params::pcs_010 {
+      $corosync_ipv6 = str2bool(hiera('corosync_ipv6', false))
+      if $corosync_ipv6 {
+        $cluster_setup_extras_pre = {
+          '--token' => hiera('corosync_token_timeout', 1000),
+          '--ipv6' => ''
+        }
+      } else {
+        $cluster_setup_extras_pre = {
+          '--token' => hiera('corosync_token_timeout', 1000)
+        }
       }
     } else {
       $cluster_setup_extras_pre = {
-        '--token' => hiera('corosync_token_timeout', 1000)
+        "totem token=${hiera('corosync_token_timeout', 1000)}" => '',
       }
     }
     # If pacemaker_node_ips is not empty we want to create the array
@@ -167,7 +175,7 @@ class tripleo::profile::base::pacemaker (
     # before we invoke pcs commands (see LP#1866209)
     Firewall<|tag == 'tripleo-firewall-rule'|> -> Exec <|tag == 'pacemaker-auth'|>
 
-    if $encryption {
+    if $encryption and !$::pacemaker::params::pcs_010 {
       $cluster_setup_extras = merge($cluster_setup_extras_pre, {'--encryption' => '1'})
     } else {
       $cluster_setup_extras = $cluster_setup_extras_pre
