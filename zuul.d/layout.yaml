@@ -8,7 +8,7 @@
       - tripleo-standalone-scenarios-full
     check:
       jobs:
-        - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
+        - tripleo-ci-centos-8-scenario007-multinode-oooq-container:
             files:
               - ^manifests/profile/pacemaker/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
