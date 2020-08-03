@@ -59,7 +59,7 @@ class tripleo::profile::base::octavia::provider::ovn (
   $ovn_nb_ca_cert     = $::os_service_default
 ) {
 
-  include tripleo::profile::base::octavia::api
+  include ::tripleo::profile::base::octavia::api
 
   if ($step >= 4) {
     # For backward compatibility
@@ -75,7 +75,7 @@ class tripleo::profile::base::octavia::provider::ovn (
     if $ovn_db_host_real {
       $ovn_nb_conn_args = ["${protocol}", normalize_ip_for_uri($ovn_db_host_real), "${ovn_nb_port_real}"].filter |$c| { !$c.empty() }
       $ovn_nb_connection = join($ovn_nb_conn_args, ':')
-      class { 'octavia::provider::ovn':
+      class { '::octavia::provider::ovn':
         ovn_nb_connection  => $ovn_nb_connection,
         ovn_nb_private_key => $ovn_nb_private_key,
         ovn_nb_certificate => $ovn_nb_certificate,

@@ -103,7 +103,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
   } else {
     $log_file_real = ''
   }
-  include tripleo::profile::base::manila::share
+  include ::tripleo::profile::base::manila::share
 
   if $step >= 2 and $pacemaker_master {
     $manila_share_short_node_names = hiera('manila_share_short_node_names')

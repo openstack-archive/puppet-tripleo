@@ -37,7 +37,7 @@ class tripleo::profile::base::designate::authtoken (
       $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
     }
 
-    class { 'designate::keystone::authtoken':
+    class { '::designate::keystone::authtoken':
       memcached_servers => $memcache_servers
     }
   }

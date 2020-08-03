@@ -36,7 +36,7 @@ class tripleo::profile::base::cinder::volume::dellemc_xtremio (
   $multi_config = hiera('cinder::backend::dellemc_xtremio::volume_multi_config', {}),
   $step         = Integer(hiera('step')),
 ) {
-  include tripleo::profile::base::cinder::volume
+  include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
 

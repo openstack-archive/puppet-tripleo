@@ -211,7 +211,7 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_dellemc_sc_backend {
-      include tripleo::profile::base::cinder::volume::dellemc_sc
+      include ::tripleo::profile::base::cinder::volume::dellemc_sc
       $cinder_dellemc_sc_backend_name = hiera('cinder::backend::dellemc_sc::volume_backend_name', 'tripleo_dellemc_sc')
     } else {
       $cinder_dellemc_sc_backend_name = undef
@@ -225,7 +225,7 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_dellemc_powermax_backend {
-      include tripleo::profile::base::cinder::volume::dellemc_powermax
+      include ::tripleo::profile::base::cinder::volume::dellemc_powermax
       $cinder_dellemc_powermax_backend_name = hiera('cinder::backend::dellemc_powermax::volume_backend_name', 'tripleo_dellemc_powermax')
     } else {
       $cinder_dellemc_powermax_backend_name = undef
@@ -248,7 +248,7 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_dellemc_vxflexos_backend {
-      include tripleo::profile::base::cinder::volume::dellemc_vxflexos
+      include ::tripleo::profile::base::cinder::volume::dellemc_vxflexos
       $cinder_dellemc_vxflexos_backend_name = hiera('cinder::backend::dellemc_vxflexos::volume_backend_name',
           'tripleo_dellemc_vxflexos')
     } else {
@@ -256,7 +256,7 @@ class tripleo::profile::base::cinder::volume (
     }
 
     if $cinder_enable_dellemc_xtremio_backend {
-      include tripleo::profile::base::cinder::volume::dellemc_xtremio
+      include ::tripleo::profile::base::cinder::volume::dellemc_xtremio
       $cinder_dellemc_xtremio_backend_name = hiera('cinder::backend::dellemc_xtremio::volume_backend_name',
           'tripleo_dellemc_xtremio')
     } else {

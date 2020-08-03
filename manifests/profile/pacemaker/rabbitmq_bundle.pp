@@ -162,7 +162,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   } else {
     $log_file_real = ''
   }
-  include tripleo::profile::base::rabbitmq
+  include ::tripleo::profile::base::rabbitmq
 
   file { '/var/lib/rabbitmq/.erlang.cookie':
     ensure  => file,

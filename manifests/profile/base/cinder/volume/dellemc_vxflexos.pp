@@ -31,7 +31,7 @@ class tripleo::profile::base::cinder::volume::dellemc_vxflexos (
   $backend_name = hiera('cinder::backend::dellemc_vxflexos::volume_backend_name', 'tripleo_dellemc_vxflexos'),
   $step         = Integer(hiera('step')),
 ) {
-  include tripleo::profile::base::cinder::volume
+  include ::tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     cinder::backend::dellemc_vxflexos { $backend_name :
