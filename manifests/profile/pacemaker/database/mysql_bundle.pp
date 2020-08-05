@@ -145,6 +145,11 @@
 #   (Optional) Maximum value for open-files-limit
 #   Defaults to 16384
 #
+# [*promote_timeout*]
+#   (Optional) Maximum time in second for starting up a galera server
+#   before pacemaker considers the operation timed out.
+#   Defaults to 300
+#
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = hiera('tripleo::profile::pacemaker::database::mysql_bundle::mysql_docker_image', undef),
   $control_port                   = hiera('tripleo::profile::pacemaker::database::mysql_bundle::control_port', '3123'),
@@ -172,6 +177,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $pcs_tries                      = hiera('pcs_tries', 20),
   $step                           = Integer(hiera('step')),
   $open_files_limit               = 16384,
+  $promote_timeout                = 300,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -479,7 +485,7 @@ MYSQL_HOST=localhost\n",
         ocf_agent_name  => 'heartbeat:galera',
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true container-attribute-target=host",
-        op_params       => 'promote timeout=300s on-fail=block',
+        op_params       => "promote timeout=${promote_timeout}s on-fail=block",
         resource_params => "log='/var/log/mysql/mysqld.log' additional_parameters='--open-files-limit=${open_files_limit}' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map_string}'",
         tries           => $pcs_tries,
         location_rule   => {

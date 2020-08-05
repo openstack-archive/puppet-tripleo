@@ -97,6 +97,11 @@
 #   (Optional) Maximum value for open-files-limit
 #   Defaults to 16384
 #
+# [*promote_timeout*]
+#   (Optional) Maximum time in second for starting up a galera server
+#   before pacemaker considers the operation timed out.
+#   Defaults to 300
+#
 class tripleo::profile::pacemaker::database::mysql (
   $bootstrap_node                 = hiera('mysql_short_bootstrap_node_name'),
   $bind_address                   = $::hostname,
@@ -113,6 +118,7 @@ class tripleo::profile::pacemaker::database::mysql (
   $step                           = Integer(hiera('step')),
   $pcs_tries                      = hiera('pcs_tries', 20),
   $open_files_limit               = 16384,
+  $promote_timeout                = 300,
 ) {
   if $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -252,7 +258,7 @@ class tripleo::profile::pacemaker::database::mysql (
     if $pacemaker_master {
       pacemaker::resource::ocf { 'galera' :
         ocf_agent_name  => 'heartbeat:galera',
-        op_params       => 'promote timeout=300s on-fail=block',
+        op_params       => "promote timeout=${promote_timeout}s on-fail=block",
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true",
         resource_params => "additional_parameters='--open-files-limit=${open_files_limit}' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map}'",
