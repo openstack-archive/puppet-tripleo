@@ -34,6 +34,10 @@
 #   (Optional) Whether to enable the unity backend
 #   Defaults to false
 #
+# [*cinder_enable_dellemc_powerflex_backend*]
+#   (Optional) Whether to enable the powerflex backend
+#   Defaults to false
+#
 # [*cinder_enable_dellemc_powermax_backend*]
 #   (Optional) Whether to enable the powermax backend
 #   Defaults to false
@@ -136,6 +140,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_dellsc_backend                = false,
   $cinder_enable_dellemc_sc_backend            = false,
   $cinder_enable_dellemc_unity_backend         = false,
+  $cinder_enable_dellemc_powerflex_backend     = false,
   $cinder_enable_dellemc_powermax_backend      = false,
   $cinder_enable_dellemc_powerstore_backend    = false,
   $cinder_enable_dellemc_vmax_iscsi_backend    = false,
@@ -222,6 +227,13 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellemc_unity_backend_name = hiera('cinder::backend::dellemc_unity::volume_backend_name', 'tripleo_dellemc_unity')
     } else {
       $cinder_dellemc_unity_backend_name = undef
+    }
+
+    if $cinder_enable_dellemc_powerflex_backend {
+      include tripleo::profile::base::cinder::volume::dellemc_powerflex
+      $cinder_dellemc_powerflex_backend_name = hiera('cinder::backend::dellemc_powerflex::volume_backend_name', 'tripleo_dellemc_powerflex')
+    } else {
+      $cinder_dellemc_powerflex_backend_name = undef
     }
 
     if $cinder_enable_dellemc_powermax_backend {
@@ -362,6 +374,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_dellsc_backend_name,
                                       $cinder_dellemc_sc_backend_name,
                                       $cinder_dellemc_unity_backend_name,
+                                      $cinder_dellemc_powerflex_backend_name,
                                       $cinder_dellemc_powermax_backend_name,
                                       $cinder_dellemc_powerstore_backend_name,
                                       $cinder_dellemc_vmax_iscsi_backend_name,
