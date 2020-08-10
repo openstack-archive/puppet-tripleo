@@ -9,7 +9,10 @@
   "issues_url": "https://bugs.launchpad.net/puppet-tripleo",
   "description": "Installs and configures Tripleo.",
   "requirements": [
-    { "name": "puppet","version_requirement": "5.x" }
+    {
+      "name": "puppet",
+      "version_requirement": ">= 6.0.0 < 7.0.0"
+    }
   ],
   "operatingsystem_support": [
     {
