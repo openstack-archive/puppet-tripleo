@@ -18,15 +18,46 @@
 #
 # === Parameters
 #
+# [*enable_internal_memcached_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not for
+#   Memcached servers.
+#   Defaults to undef
+#
+# [*certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate
+#   it will create. Note that the certificate nickname must be 'memcached' in
+#   the case of this service.
+#   Example with hiera:
+#     tripleo::profile::base::memcached::certificate_specs:
+#       hostname: <overcloud controller fqdn>
+#       service_certificate: <service certificate path>
+#       service_key: <service key path>
+#       principal: "memcached/<overcloud controller fqdn>"
+#   Defaults to {}.
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::memcached (
-  $step = Integer(hiera('step')),
+  $enable_internal_memcached_tls = false,
+  $certificate_specs             = {},
+  $step                          = Integer(hiera('step')),
 ) {
   if $step >= 1 {
-      include memcached
+    if $enable_internal_memcached_tls {
+      $tls_cert_chain = $certificate_specs['service_certificate']
+      $tls_key = $certificate_specs['service_key']
+    } else {
+      $tls_cert_chain = undef
+      $tls_key = undef
+    }
+
+    class { 'memcached':
+      use_tls        => $enable_internal_memcached_tls,
+      tls_cert_chain => $tls_cert_chain,
+      tls_key        => $tls_key
+    }
   }
 }

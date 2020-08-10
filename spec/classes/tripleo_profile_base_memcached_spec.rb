@@ -36,7 +36,30 @@ describe 'tripleo::profile::base::memcached' do
 
       it {
         is_expected.to contain_class('tripleo::profile::base::memcached')
-        is_expected.to contain_class('memcached')
+        is_expected.to contain_class('memcached').with(
+          :use_tls        => false,
+          :tls_cert_chain => nil,
+          :tls_key        => nil
+        )
+      }
+    end
+
+    context 'with step 1 and tls enabled' do
+      let(:params) { {
+        :step                          => 1,
+        :enable_internal_memcached_tls => true,
+        :certificate_specs             => {
+          'service_certificate' => '/etc/pki/cert.crt',
+          'service_key'         => '/etc/pki/key.pem'}
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::memcached')
+        is_expected.to contain_class('memcached').with(
+          :use_tls        => true,
+          :tls_cert_chain => '/etc/pki/cert.crt',
+          :tls_key        => '/etc/pki/key.pem'
+        )
       }
     end
   end
