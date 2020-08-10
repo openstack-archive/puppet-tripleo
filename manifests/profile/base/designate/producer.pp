@@ -18,16 +18,40 @@
 #
 # === Parameters
 #
+# [*designate_redis_password*]
+#  (Required) Password for the neutron redis user for the coordination url
+#   Defaults to hiera('designate_redis_password'),
+#
+# [*redis_vip*]
+#  (Required) Redis ip address for the coordination url
+#   Defaults to hiera('redis_vip'),
+#
+# [*enable_internal_tls*]
+#   (Optional) Whether TLS in the internal network is enabled or not.
+#   Defaults to hiera('enable_internal_tls', false)
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::designate::producer (
-  $step = Integer(hiera('step')),
+  $designate_redis_password = hiera('designate_redis_password'),
+  $redis_vip                = hiera('redis_vip'),
+  $enable_internal_tls      = hiera('enable_internal_tls', false),
+  $step                     = Integer(hiera('step')),
 ) {
   include tripleo::profile::base::designate
+
+  if $enable_internal_tls {
+    $tls_query_param = '?ssl=true'
+  } else {
+    $tls_query_param = ''
+  }
+
   if $step >= 4 {
-    include designate::producer
+    class { 'designate::producer':
+      backend_url => join(['redis://:', $designate_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param])
+    }
   }
 }
