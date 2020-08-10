@@ -92,6 +92,11 @@
 #   it will create.
 #   Defaults to hiera('tripleo::profile::base::database::mysql::certificate_specs', {}).
 #
+# [*memcached_certificate_specs*]
+#   (Optional) The specifications to give to certmonger for the certificate(s)
+#   it will create.
+#   Defaults to hiera('tripleo::profile::base::memcached::certificate_specs', {}).
+#
 # [*rabbitmq_certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -187,6 +192,7 @@ class tripleo::profile::base::certmonger_user (
   $qemu_postsave_cmd                  = undef,
   $qdr_certificate_specs              = hiera('tripleo::profile::base::metrics::qdr::certificate_specs', {}),
   $mysql_certificate_specs            = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
+  $memcached_certificate_specs        = hiera('tripleo::profile::base::memcached::certificate_specs', {}),
   $rabbitmq_certificate_specs         = hiera('tripleo::profile::base::rabbitmq::certificate_specs', {}),
   $redis_certificate_specs            = hiera('redis_certificate_specs', {}),
   $etcd_certificate_specs             = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
@@ -265,6 +271,9 @@ class tripleo::profile::base::certmonger_user (
     }
     unless empty($qdr_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::metrics_qdr', $qdr_certificate_specs)
+    }
+    unless empty($memcached_certificate_specs) {
+      ensure_resource('class', 'tripleo::certmonger::memcached', $memcached_certificate_specs)
     }
     unless empty($mysql_certificate_specs) {
       ensure_resource('class', 'tripleo::certmonger::mysql', $mysql_certificate_specs)
