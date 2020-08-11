@@ -1,0 +1,5 @@
+---
+deprecations:
+  - Resource tripleo::profile::base::cinder::volume::dellemc_vxflexos
+    will be removed in W-Release. Use the new resource
+    tripleo::profile::base::cinder::volume::dellemc_powerflex._
