@@ -31,7 +31,9 @@ eos
 
     context 'with step less than 4' do
       let(:params) { {
-        :step => 1,
+        :designate_redis_password => 'password',
+        :redis_vip                => '127.0.0.1',
+        :step                     => 1,
       } }
 
       it {
@@ -43,7 +45,9 @@ eos
 
     context 'with step 4' do
       let(:params) { {
-        :step           => 4,
+        :designate_redis_password => 'password',
+        :redis_vip                => '127.0.0.1',
+        :step                     => 4,
       } }
 
       it {
