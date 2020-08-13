@@ -44,7 +44,7 @@ class tripleo::profile::base::cinder::volume::dellemc_powerstore (
       'CinderPowerStoreAvailabilityZone' => hiera('cinder::backend::dellemc_powerstore::backend_availability_zone', undef),
       'CinderPowerStoreSanIp'            => hiera('cinder::backend::dellemc_powerstore::san_ip', undef),
       'CinderPowerStoreSanLogin'         => hiera('cinder::backend::dellemc_powerstore::san_login', undef),
-      'CinderPowerStoreSanPassword'      => hiera('cinder::backend::dellemc_powerstore::san password', undef),
+      'CinderPowerStoreSanPassword'      => hiera('cinder::backend::dellemc_powerstore::san_password', undef),
       'CinderPowerStoreStorageProtocol'  => hiera('cinder::backend::dellemc_powerstore::storage_protocol', undef),
       'CinderPowerStoreAppliances'       => hiera('cinder::backend::dellemc_powerstore::powerstore_appliances', undef),
       'CinderPowerStorePorts'            => hiera('cinder::backend::dellemc_powerstore::powerstore_ports', undef),

@@ -44,7 +44,7 @@ class tripleo::profile::base::cinder::volume::dellemc_powermax (
       'CinderPowermaxAvailabilityZone' => hiera('cinder::backend::dellemc_powermax::backend_availability_zone', undef),
       'CinderPowermaxSanIp'            => hiera('cinder::backend::dellemc_powermax::san_ip', undef),
       'CinderPowermaxSanLogin'         => hiera('cinder::backend::dellemc_powermax::san_login', undef),
-      'CinderPowermaxSanPassword'      => hiera('cinder::backend::dellemc_powermax::san password', undef),
+      'CinderPowermaxSanPassword'      => hiera('cinder::backend::dellemc_powermax::san_password', undef),
       'CinderPowermaxStorageProtocol'  => hiera('cinder::backend::dellemc_powermax::powermax_storage_protocol', undef),
       'CinderPowermaxArray'            => hiera('cinder::backend::dellemc_powermax::powermax_array', undef),
       'CinderPowermaxSrp'              => hiera('cinder::backend::dellemc_powermax::powermax_srp', undef),
