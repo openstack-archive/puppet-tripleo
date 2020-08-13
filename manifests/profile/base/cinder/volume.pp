@@ -39,7 +39,7 @@
 #   Defaults to false
 #
 # [*cinder_enable_dellemc_xtremio_iscsi_backend*]
-#   (Optional) Whether to enable the extremio iscsi backend
+#   (Optional) Whether to enable the xtremio iscsi backend
 #   Defaults to false
 #
 # [*cinder_enable_hpelefthand_backend*]
@@ -155,7 +155,7 @@ class tripleo::profile::base::cinder::volume (
 
     if $cinder_enable_dellemc_xtremio_iscsi_backend {
       include ::tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi
-      $cinder_dellemc_xtreamio_iscsi_backend_name = hiera('cinder::backend::dellemc_extremio_iscsi::volume_backend_name',
+      $cinder_dellemc_xtremio_iscsi_backend_name = hiera('cinder::backend::dellemc_xtremio_iscsi::volume_backend_name',
           'tripleo_dellemc_xtremio_iscsi')
     } else {
       $cinder_dellemc_xtremio_iscsi_backend_name = undef

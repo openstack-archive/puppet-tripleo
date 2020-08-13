@@ -28,7 +28,7 @@ describe 'tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi' do
         is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi')
         is_expected.to contain_class('tripleo::profile::base::cinder::volume')
         is_expected.to contain_class('tripleo::profile::base::cinder')
-        is_expected.to_not contain_cinder__backend__dellemc_xtreamio_iscsi('tripleo_dellemc_xtremio_iscsi')
+        is_expected.to_not contain_cinder__backend__dellemc_xtremio_iscsi('tripleo_dellemc_xtremio_iscsi')
       end
     end
 
