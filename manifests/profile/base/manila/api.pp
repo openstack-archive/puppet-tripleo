@@ -75,7 +75,11 @@
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
-
+#
+# [*manila_enable_db_purge*]
+#   (Optional) Whether to enable db purging
+#   Defaults to true
+#
 class tripleo::profile::base::manila::api (
   $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
@@ -89,6 +93,7 @@ class tripleo::profile::base::manila::api (
   $manila_api_network      = hiera('manila_api_network', undef),
   $enable_internal_tls     = hiera('enable_internal_tls', false),
   $step                    = Integer(hiera('step')),
+  $manila_enable_db_purge  = true,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -131,6 +136,12 @@ class tripleo::profile::base::manila::api (
     class { 'manila::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
+    }
+  }
+
+  if $step >= 5 {
+    if $manila_enable_db_purge {
+      include manila::cron::db_purge
     }
   }
 }

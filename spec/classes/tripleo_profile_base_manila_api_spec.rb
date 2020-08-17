@@ -47,6 +47,7 @@ eos
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('manila::api')
         is_expected.to_not contain_class('manila::wsgi::apache')
+        is_expected.to_not contain_class('manila::cron::db_purge')
       }
     end
 
@@ -67,6 +68,7 @@ eos
           :enabled_share_protocols => 'NFS,CIFS'
         )
         is_expected.to contain_class('manila::wsgi::apache')
+        is_expected.to_not contain_class('manila::cron::db_purge')
       }
     end
 
@@ -84,6 +86,7 @@ eos
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('manila::api')
         is_expected.to_not contain_class('manila::wsgi::apache')
+        is_expected.to_not contain_class('manila::cron::db_purge')
       }
     end
 
@@ -105,6 +108,7 @@ eos
         )
         is_expected.to contain_class('manila::wsgi::apache')
         is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to_not contain_class('manila::cron::db_purge')
       }
     end
 
@@ -127,6 +131,52 @@ eos
         )
         is_expected.to contain_class('manila::wsgi::apache')
         is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to_not contain_class('manila::cron::db_purge')
+      }
+    end
+
+    context 'with step 5' do
+      let(:params) { {
+        :step                    => 5,
+        :bootstrap_node          => 'other.example.com',
+        :backend_generic_enabled => true
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to contain_class('tripleo::profile::base::manila')
+        is_expected.to contain_class('tripleo::profile::base::manila::authtoken')
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to contain_class('tripleo::profile::base::apache')
+        is_expected.to contain_class('manila::api').with(
+          :enabled_share_protocols => 'NFS,CIFS'
+        )
+        is_expected.to contain_class('manila::wsgi::apache')
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to contain_class('manila::cron::db_purge')
+      }
+    end
+
+    context 'with step 5 without db_purge' do
+      let(:params) { {
+        :step                    => 5,
+        :bootstrap_node          => 'other.example.com',
+        :backend_generic_enabled => true,
+        :manila_enable_db_purge  => false,
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to contain_class('tripleo::profile::base::manila')
+        is_expected.to contain_class('tripleo::profile::base::manila::authtoken')
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to contain_class('tripleo::profile::base::apache')
+        is_expected.to contain_class('manila::api').with(
+          :enabled_share_protocols => 'NFS,CIFS'
+        )
+        is_expected.to contain_class('manila::wsgi::apache')
+        is_expected.to contain_class('tripleo::profile::base::manila::api')
+        is_expected.to_not contain_class('manila::cron::db_purge')
       }
     end
   end
