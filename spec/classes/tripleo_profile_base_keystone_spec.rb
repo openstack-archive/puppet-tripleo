@@ -61,10 +61,12 @@ describe 'tripleo::profile::base::keystone' do
       end
 
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('keystone::cache').with(
+          :memcache_servers => [ '192.168.0.3:11211', '192.168.0.4:11211', '192.168.0.5:11211' ],
+        )
         is_expected.to contain_class('keystone').with(
           :default_transport_url => 'rabbit://keystone1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://keystone2:baa@192.168.0.2:5678/?ssl=0',
-          :cache_memcache_servers => [ '192.168.0.3:11211', '192.168.0.4:11211', '192.168.0.5:11211' ],
         )
         is_expected.to contain_class('keystone::config')
         is_expected.to contain_class('keystone::logging')
@@ -108,10 +110,12 @@ describe 'tripleo::profile::base::keystone' do
       end
 
       it 'should trigger keystone configuration' do
+        is_expected.to contain_class('keystone::cache').with(
+          :memcache_servers => [ '192.168.0.3:11211', '192.168.0.4:11211', '192.168.0.5:11211' ],
+        )
         is_expected.to contain_class('keystone').with(
           :default_transport_url => 'rabbit://keystone1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://keystone2:baa@192.168.0.2:5678/?ssl=0',
-          :cache_memcache_servers => [ '192.168.0.3:11211', '192.168.0.4:11211', '192.168.0.5:11211' ],
         )
         is_expected.to contain_class('keystone::config')
         is_expected.to contain_class('keystone::logging')
@@ -135,10 +139,12 @@ describe 'tripleo::profile::base::keystone' do
       end
 
       it 'should trigger keystone configuration' do
+        is_expected.to contain_class('keystone::cache').with(
+          :memcache_servers => [ '192.168.0.3:11211', '192.168.0.4:11211', '192.168.0.5:11211' ],
+        )
         is_expected.to contain_class('keystone').with(
           :default_transport_url => 'rabbit://keystone1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://keystone2:baa@192.168.0.2:5678/?ssl=0',
-          :cache_memcache_servers => [ '192.168.0.3:11211', '192.168.0.4:11211', '192.168.0.5:11211' ],
         )
         is_expected.to contain_class('keystone::config')
         is_expected.to contain_class('keystone::logging')
