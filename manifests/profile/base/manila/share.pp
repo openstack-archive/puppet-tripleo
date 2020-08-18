@@ -175,7 +175,7 @@ class tripleo::profile::base::manila::share (
         netapp_lif_name_template             => hiera('manila::backend::netapp::netapp_lif_name_template'),
         netapp_aggregate_name_search_pattern => hiera('manila::backend::netapp::netapp_aggregate_name_search_pattern'),
         netapp_root_volume_aggregate         => hiera('manila::backend::netapp::netapp_root_volume_aggregate'),
-        netapp_root_volume_name              => hiera('manila::backend::netapp::netapp_root_volume'),
+        netapp_root_volume                   => hiera('manila::backend::netapp::netapp_root_volume'),
         netapp_port_name_search_pattern      => hiera('manila::backend::netapp::netapp_port_name_search_pattern'),
         netapp_trace_flags                   => hiera('manila::backend::netapp::netapp_trace_flags'),
       }
