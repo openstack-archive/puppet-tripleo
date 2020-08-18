@@ -47,6 +47,8 @@ eos
         is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::wsgi::apache_api')
+        is_expected.to_not contain_class('nova::cron::archive_deleted_rows')
+        is_expected.to_not contain_class('nova::cron::purge_shadow_tables')
       }
     end
 
@@ -69,6 +71,8 @@ eos
         is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::wsgi::apache_api')
+        is_expected.to_not contain_class('nova::cron::archive_deleted_rows')
+        is_expected.to_not contain_class('nova::cron::purge_shadow_tables')
       }
     end
 
@@ -89,6 +93,8 @@ eos
         is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('nova::network::neutron')
         is_expected.to_not contain_class('nova::wsgi::apache_api')
+        is_expected.to_not contain_class('nova::cron::archive_deleted_rows')
+        is_expected.to_not contain_class('nova::cron::purge_shadow_tables')
       }
     end
 
@@ -111,6 +117,8 @@ eos
         is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('nova::network::neutron')
         is_expected.to contain_class('nova::wsgi::apache_api')
+        is_expected.to_not contain_class('nova::cron::archive_deleted_rows')
+        is_expected.to_not contain_class('nova::cron::purge_shadow_tables')
       }
     end
 
@@ -122,6 +130,33 @@ eos
 
       it {
         is_expected.to contain_class('nova::cron::archive_deleted_rows')
+        is_expected.to contain_class('nova::cron::purge_shadow_tables')
+      }
+    end
+
+    context 'with step 5 and db_purge disabled' do
+      let(:params) { {
+        :step                 => 5,
+        :bootstrap_node       => 'other.example.com',
+        :nova_enable_db_purge => false,
+      } }
+
+      it {
+        is_expected.to contain_class('nova::cron::archive_deleted_rows')
+        is_expected.to_not contain_class('nova::cron::purge_shadow_tables')
+      }
+    end
+
+    context 'with step 5 and db archive disabled' do
+      let(:params) { {
+        :step                   => 5,
+        :bootstrap_node         => 'other.example.com',
+        :nova_enable_db_archive => false,
+      } }
+
+      it {
+        is_expected.to_not contain_class('nova::cron::archive_deleted_rows')
+        is_expected.to_not contain_class('nova::cron::purge_shadow_tables')
       }
     end
 
