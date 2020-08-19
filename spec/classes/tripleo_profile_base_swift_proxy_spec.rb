@@ -17,11 +17,10 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::swift::proxy' do
 
-  let :params do
-    { }
-  end
-
   shared_examples_for 'tripleo::profile::base::swift::proxy' do
+    before :each do
+      facts.merge!({ :step => params[:step] })
+    end
 
     let :pre_condition do
       "class { 'swift':
@@ -36,12 +35,10 @@ describe 'tripleo::profile::base::swift::proxy' do
     end
 
     context 'with ipv4 memcache servers' do
-      before :each do
-        params.merge!(
-          :step             => 4,
-          :memcache_servers => ['192.168.0.1', '192.168.0.2'],
-        )
-      end
+      let(:params) { {
+        :step             => 4,
+        :memcache_servers => ['192.168.0.1', '192.168.0.2'],
+      } }
 
       it 'configure swift proxy cache with ipv4 ips' do
         is_expected.to contain_class('swift::proxy::cache').with({
@@ -51,12 +48,10 @@ describe 'tripleo::profile::base::swift::proxy' do
     end
 
     context 'with ipv6 memcache servers' do
-      before :each do
-        params.merge!(
+      let(:params) { {
           :step             => 4,
           :memcache_servers => ['::1', '::2'],
-        )
-      end
+      } }
 
       it 'configure swift proxy cache with ipv6 ips' do
         is_expected.to contain_class('swift::proxy::cache').with({
@@ -66,12 +61,10 @@ describe 'tripleo::profile::base::swift::proxy' do
     end
 
     context 'with ipv4, ipv6 and fqdn memcache servers' do
-      before :each do
-        params.merge!(
+      let(:params) { {
           :step             => 4,
           :memcache_servers => ['192.168.0.1', '::2', 'myserver.com'],
-        )
-      end
+      } }
 
       it 'configure swift proxy cache with ips and fqdn' do
         is_expected.to contain_class('swift::proxy::cache').with({

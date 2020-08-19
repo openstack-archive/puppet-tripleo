@@ -42,6 +42,7 @@ class tripleo::profile::base::swift::storage (
   $use_local_dir        = true,
   $local_dir            = '/srv/node/d1',
 ) {
+  include tripleo::profile::base::swift
   if $step >= 4 {
     if $enable_swift_storage {
       include swift
