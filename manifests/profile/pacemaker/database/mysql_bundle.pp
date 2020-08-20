@@ -484,6 +484,7 @@ MYSQL_HOST=localhost\n",
         storage_maps      => merge($storage_maps, $storage_maps_tls),
         container_backend => $container_backend,
         tries             => $pcs_tries,
+        before            => Exec['galera-ready'],
       }
 
       pacemaker::resource::ocf { 'galera':
@@ -499,10 +500,24 @@ MYSQL_HOST=localhost\n",
           expression         => ['galera-role eq true'],
         },
         bundle          => 'galera-bundle',
-        require         => [Class['::mysql::server'],
-                            Pacemaker::Resource::Bundle['galera-bundle']],
+        require         => [Class['::mysql::server']],
         before          => Exec['galera-ready'],
         force           => $force_ocf,
+      }
+
+      # Resource relation: we normally want the bundle resource to
+      # be run before the OCF one, as the latter depends on the former
+      # at creation time.
+      # However during scale up, both resources change, and the bundle
+      # one shouldn't be updated prior to the OCF one, otherwise
+      # pacemaker could spawn additional replicas before the necessary
+      # info is updated in the OCF resource, which would confuse the
+      # galera resource agent and cause spurious errors.
+      $replicas=pacemaker_bundle_replicas('galera-bundle')
+      if ($replicas > 0) and ($galera_nodes_count > $replicas) {
+        Pacemaker::Resource::Ocf['galera'] -> Pacemaker::Resource::Bundle['galera-bundle']
+      } else {
+        Pacemaker::Resource::Bundle['galera-bundle'] -> Pacemaker::Resource::Ocf['galera']
       }
 
       exec { 'galera-ready' :
