@@ -200,10 +200,6 @@
 #  (optional) Enable or not Manila API binding
 #  Defaults to hiera('manila_api_enabled', false)
 #
-# [*sahara*]
-#  (optional) Enable or not Sahara API binding
-#  defaults to hiera('sahara_api_enabled', false)
-#
 # [*glance_api*]
 #  (optional) Enable or not Glance API binding
 #  Defaults to hiera('glance_api_enabled', false)
@@ -471,10 +467,6 @@
 #  (optional) Specify the network ovn_dbs is running on.
 #  Defaults to hiera('ovn_dbs_network', undef)
 #
-# [*sahara_network*]
-#  (optional) Specify the network sahara is running on.
-#  Defaults to hiera('sahara_api_network', undef)
-#
 # [*swift_proxy_server_network*]
 #  (optional) Specify the network swift_proxy_server is running on.
 #  Defaults to hiera('swift_proxy_network', undef)
@@ -533,8 +525,6 @@
 #    'ovn_nbdb_ssl_port' (Defaults to 13641)
 #    'ovn_sbdb_port' (Defaults to 6642)
 #    'ovn_sbdb_ssl_port' (Defaults to 13642)
-#    'sahara_api_port' (Defaults to 8386)
-#    'sahara_api_ssl_port' (Defaults to 13386)
 #    'swift_proxy_port' (Defaults to 8080)
 #    'swift_proxy_ssl_port' (Defaults to 13808)
 #    'zaqar_api_port' (Defaults to 8888)
@@ -589,7 +579,6 @@ class tripleo::haproxy (
   $neutron                     = hiera('neutron_api_enabled', false),
   $cinder                      = hiera('cinder_api_enabled', false),
   $manila                      = hiera('manila_api_enabled', false),
-  $sahara                      = hiera('sahara_api_enabled', false),
   $glance_api                  = hiera('glance_api_enabled', false),
   $nova_osapi                  = hiera('nova_api_enabled', false),
   $placement                   = hiera('placement_enabled', false),
@@ -655,7 +644,6 @@ class tripleo::haproxy (
   $octavia_network             = hiera('octavia_api_network', undef),
   $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
   $etcd_network                = hiera('etcd_network', undef),
-  $sahara_network              = hiera('sahara_api_network', undef),
   $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
   $zaqar_api_network           = hiera('zaqar_api_network', undef),
   $zaqar_ws_timeout_tunnel     = hiera('zaqar_ws_timeout_tunnel', '14400'),
@@ -708,8 +696,6 @@ class tripleo::haproxy (
     ovn_nbdb_ssl_port => 13641,
     ovn_sbdb_port => 6642,
     ovn_sbdb_ssl_port => 13642,
-    sahara_api_port => 8386,
-    sahara_api_ssl_port => 13386,
     swift_proxy_port => 8080,
     swift_proxy_ssl_port => 13808,
     zaqar_api_port => 8888,
@@ -918,19 +904,6 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[manila_api_ssl_port],
       service_network   => $manila_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
-    }
-  }
-
-  if $sahara {
-    ::tripleo::haproxy::endpoint { 'sahara':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('sahara_api_vip', $controller_virtual_ip),
-      service_port      => $ports[sahara_api_port],
-      ip_addresses      => hiera('sahara_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('sahara_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      public_ssl_port   => $ports[sahara_api_ssl_port],
-      service_network   => $sahara_network,
     }
   }
 
