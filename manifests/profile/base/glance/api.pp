@@ -123,6 +123,10 @@
 #   enable_internal_tls is set.
 #   defaults to 9292
 #
+# [*glance_enable_db_purge*]
+#   (optional) Whether to enable db purging
+#   defaults to true
+#
 # DEPRECATED PARAMETERS
 #
 # [*glance_rbd_client_name*]
@@ -153,6 +157,7 @@ class tripleo::profile::base::glance::api (
   $tls_proxy_bind_ip       = undef,
   $tls_proxy_fqdn          = undef,
   $tls_proxy_port          = 9292,
+  $glance_enable_db_purge  = true,
   # DEPRECATED PARAMETERS
   $glance_rbd_client_name  = undef,
 ) {
@@ -246,6 +251,12 @@ class tripleo::profile::base::glance::api (
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
+    }
+  }
+
+  if $step >= 5 {
+    if $glance_enable_db_purge {
+      include glance::cron::db_purge
     }
   }
 
