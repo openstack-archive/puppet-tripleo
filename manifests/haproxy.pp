@@ -609,7 +609,7 @@
 #    'ceph_dashboard_port' (Defaults to 8444)
 #    'ceph_dashboard_ssl_port' (Defaults to 8444)
 #    'zaqar_ws_port' (Defaults to 9000)
-#    'zaqar_ws_ssl_port' (Defaults to 9000)
+#    'zaqar_ws_ssl_port' (Defaults to 3000)
 #  * Note that for zaqar's websockets we don't support having a different
 #  port for SSL, because it ignores the handshake.
 #  Defaults to {}
@@ -810,7 +810,7 @@ class tripleo::haproxy (
     ceph_rgw_port => 8080,
     ceph_rgw_ssl_port => 13808,
     zaqar_ws_port => 9000,
-    zaqar_ws_ssl_port => 9000,
+    zaqar_ws_ssl_port => 3000,
     ceph_grafana_port => 3100,
     ceph_grafana_ssl_port => 3100,
     ceph_dashboard_port => 8444,
@@ -1697,7 +1697,8 @@ class tripleo::haproxy (
         # timeouts get overridden by others at certain times of the connection.
         # The following values were taken from the following site:
         # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
-        'timeout' => ['connect 5s', 'client 25s', 'server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
+        'timeout'      => ['connect 5s', 'client 25s', 'server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
+        'http-request' => [join(['set-header Host %[dst]:', $ports[zaqar_ws_port]])],
       },
       public_ssl_port           => $ports[zaqar_ws_ssl_port],
       service_network           => $zaqar_api_network,
