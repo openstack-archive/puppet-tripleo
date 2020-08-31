@@ -30,6 +30,7 @@ describe 'tripleo::profile::base::gnocchi' do
 
       it {
         is_expected.to_not contain_class('gnocchi')
+        is_expected.to_not contain_class('gnocchi::db')
         is_expected.to_not contain_class('gnocchi::config')
         is_expected.to_not contain_class('gnocchi::cors')
         is_expected.to_not contain_class('gnocchi::client')
@@ -49,6 +50,7 @@ describe 'tripleo::profile::base::gnocchi' do
         is_expected.to contain_class('gnocchi').with(
           :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
+        is_expected.to contain_class('gnocchi::db')
         is_expected.to contain_class('gnocchi::config')
         is_expected.to contain_class('gnocchi::cors')
         is_expected.to contain_class('gnocchi::client')
@@ -64,6 +66,7 @@ describe 'tripleo::profile::base::gnocchi' do
 
       it {
         is_expected.to_not contain_class('gnocchi')
+        is_expected.to_not contain_class('gnocchi::db')
         is_expected.to_not contain_class('gnocchi::config')
         is_expected.to_not contain_class('gnocchi::cors')
         is_expected.to_not contain_class('gnocchi::client')
@@ -82,6 +85,7 @@ describe 'tripleo::profile::base::gnocchi' do
         is_expected.to contain_class('gnocchi').with(
           :coordination_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
+        is_expected.to contain_class('gnocchi::db')
         is_expected.to contain_class('gnocchi::config')
         is_expected.to contain_class('gnocchi::cors')
         is_expected.to contain_class('gnocchi::client')
