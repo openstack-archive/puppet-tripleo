@@ -1535,18 +1535,20 @@ class tripleo::haproxy (
     } else {
       $redis_tcp_check_password_options = []
     }
-    $redis_tcp_check_options = union($redis_tcp_check_ssl_options, $redis_tcp_check_password_options)
+    $redis_tcp_check_connect_options = union($redis_tcp_check_ssl_options, $redis_tcp_check_password_options)
+    $redis_tcp_check_common_options = ['send PING\r\n',
+                                        'expect string +PONG',
+                                        'send info\ replication\r\n',
+                                        'expect string role:master',
+                                        'send QUIT\r\n',
+                                        'expect string +OK']
+    $redis_tcp_check_options = $redis_tcp_check_connect_options + $redis_tcp_check_common_options
     haproxy::listen { 'redis':
       bind             => $redis_bind_opts,
       options          => {
         'balance'   => 'first',
         'option'    => [ 'tcp-check', 'tcplog', ],
-        'tcp-check' => union($redis_tcp_check_options, ['send PING\r\n',
-                                                        'expect string +PONG',
-                                                        'send info\ replication\r\n',
-                                                        'expect string role:master',
-                                                        'send QUIT\r\n',
-                                                        'expect string +OK']),
+        'tcp-check' => $redis_tcp_check_options,
       },
       collect_exported => false,
     }
