@@ -12,9 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# == Class: tripleo::certmonger::ceph_grafana
+# == Class: tripleo::certmonger::ceph_dashboard
 #
-# Request a certificate for RabbitMQ and do the necessary setup.
+# Request a certificate for Ceph Dashboard and do the necessary setup.
 #
 # === Parameters
 #
