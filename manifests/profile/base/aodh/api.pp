@@ -48,13 +48,17 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-
+# [*enable_aodh_expirer*]
+#   (Optional) Whether aodh expirer should be configured
+#   Defaults to hiera('enable_aodh_expirer', true)
+#
 class tripleo::profile::base::aodh::api (
   $aodh_network                  = hiera('aodh_api_network', undef),
   $bootstrap_node                = hiera('aodh_api_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $step                          = Integer(hiera('step')),
+  $enable_aodh_expirer           = true,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -76,7 +80,6 @@ class tripleo::profile::base::aodh::api (
     $tls_keyfile = undef
   }
 
-
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     warning('Service aodh is deprecated. Please take in mind, that it is going to be removed in T release.')
     include aodh::api
@@ -84,6 +87,12 @@ class tripleo::profile::base::aodh::api (
     class { 'aodh::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
+    }
+  }
+
+  if $step >= 5 {
+    if $enable_aodh_expirer {
+      include aodh::expirer
     }
   }
 }

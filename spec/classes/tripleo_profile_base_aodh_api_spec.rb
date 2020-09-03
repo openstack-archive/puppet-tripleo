@@ -35,6 +35,7 @@ describe 'tripleo::profile::base::aodh::api' do
         is_expected.to contain_class('tripleo::profile::base::aodh')
         is_expected.to_not contain_class('aodh::api')
         is_expected.to_not contain_class('aodh::wsgi::apache')
+        is_expected.to_not contain_class('aodh::expirer')
       end
     end
 
@@ -44,8 +45,9 @@ describe 'tripleo::profile::base::aodh::api' do
       } }
 
       it 'should trigger complete configuration' do
-        is_expected.not_to contain_class('aodh::api')
-        is_expected.not_to contain_class('aodh::wsgi::apache')
+        is_expected.to_not contain_class('aodh::api')
+        is_expected.to_not contain_class('aodh::wsgi::apache')
+        is_expected.to_not contain_class('aodh::expirer')
       end
     end
 
@@ -58,6 +60,7 @@ describe 'tripleo::profile::base::aodh::api' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh::api')
         is_expected.to contain_class('aodh::wsgi::apache')
+        is_expected.to_not contain_class('aodh::expirer')
       end
     end
 
@@ -69,6 +72,32 @@ describe 'tripleo::profile::base::aodh::api' do
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh::api')
         is_expected.to contain_class('aodh::wsgi::apache')
+        is_expected.to_not contain_class('aodh::expirer')
+      end
+    end
+
+    context 'with step 5' do
+      let(:params) { {
+        :step => 5,
+      } }
+
+      it 'should trigger complete configuration' do
+        is_expected.to contain_class('aodh::api')
+        is_expected.to contain_class('aodh::wsgi::apache')
+        is_expected.to contain_class('aodh::expirer')
+      end
+    end
+
+    context 'with step 5 without expirer' do
+      let(:params) { {
+        :step                => 5,
+        :enable_aodh_expirer => false
+      } }
+
+      it 'should trigger complete configuration' do
+        is_expected.to contain_class('aodh::api')
+        is_expected.to contain_class('aodh::wsgi::apache')
+        is_expected.to_not contain_class('aodh::expirer')
       end
     end
   end
