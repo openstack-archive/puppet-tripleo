@@ -82,4 +82,4 @@ mod 'redis',
 # NOTE(aschultz): in puppet 6 this was extracted out
 mod 'selinux_core',
   :git => 'https://github.com/puppetlabs/puppetlabs-selinux_core',
-  :ref => 'master'
+  :ref => 'main'
