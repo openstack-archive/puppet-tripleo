@@ -29,6 +29,10 @@
 #   (Optional) Location where dist images are stored when the backend type is file.
 #   Defaults to hiera('glance::backend::file::filesystem_store_datadir', undef).
 #
+# [*filesystem_thin_provisioning*]
+#   (Optional) Boolean describing if thin provisioning is enabled or not
+#   Defaults to hiera('glance::backend::file::filesystem_thin_provisioning', undef).
+#
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
@@ -41,10 +45,11 @@
 #
 class tripleo::profile::base::glance::backend::file (
   $backend_names,
-  $multistore_config           = {},
-  $filesystem_store_datadir    = hiera('glance::backend::file::filesystem_store_datadir', undef),
-  $store_description           = hiera('tripleo::profile::base::glance::api::glance_store_description', 'File store'),
-  $step                        = Integer(hiera('step')),
+  $multistore_config            = {},
+  $filesystem_store_datadir     = hiera('glance::backend::file::filesystem_store_datadir', undef),
+  $filesystem_thin_provisioning = hiera('glance::backend::file::filesystem_thin_provisioning', undef),
+  $store_description            = hiera('tripleo::profile::base::glance::api::glance_store_description', 'File store'),
+  $step                         = Integer(hiera('step')),
 ) {
 
   if $backend_names.length() > 1 {
@@ -58,8 +63,9 @@ class tripleo::profile::base::glance::backend::file (
     $store_description_real = pick($multistore_description, $store_description)
 
     glance::backend::multistore::file { $backend_name:
-      filesystem_store_datadir => $filesystem_store_datadir,
-      store_description        => $store_description_real,
+      filesystem_store_datadir     => $filesystem_store_datadir,
+      filesystem_thin_provisioning => $filesystem_thin_provisioning,
+      store_description            => $store_description_real,
     }
   }
 }

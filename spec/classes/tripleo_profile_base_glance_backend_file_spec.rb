@@ -49,6 +49,22 @@ describe 'tripleo::profile::base::glance::backend::file' do
         )
       end
 
+      context 'with parameters overridden' do
+        before :each do
+          params.merge!({
+            :filesystem_thin_provisioning => true
+          })
+
+          it 'should configure the backend with the specified parameters' do
+            is_expected.to contain_glance__backend__multistore__file('my_file').with(
+              :filesystem_store_datadir     => '/path/to/datadir',
+              :filesystem_thin_provisioning => true,
+              :store_description            => 'File store',
+            )
+          end
+        end
+      end
+
       context 'with store description in multistore_config' do
         before :each do
           params.merge!({

@@ -37,8 +37,8 @@ describe 'tripleo::profile::base::glance::backend::rbd' do
 
     context 'with step 4' do
       let(:params) { {
-        :backend_names            => ['my_rbd'],
-        :step                     => 4,
+        :backend_names => ['my_rbd'],
+        :step          => 4,
       } }
 
       it 'should configure the backend' do
@@ -54,6 +54,28 @@ describe 'tripleo::profile::base::glance::backend::rbd' do
         is_expected.to contain_exec('exec-setfacl-ceph-openstack-glance-mask').with_command(
           'setfacl -m m::r /etc/ceph/ceph.client.openstack.keyring'
         )
+      end
+
+      context 'with parameters overridden' do
+        before :each do
+          params.merge!({
+            :rbd_store_chunk_size  => 512,
+            :rbd_thin_provisioning => true,
+            :rados_connect_timeout => 10,
+          })
+
+          it 'should configure the backend with the specified parameters' do
+            is_expected.to contain_glance__backend__multistore__rbd('my_rbd').with(
+              :rbd_store_ceph_conf   => '/etc/ceph/ceph.conf',
+              :rbd_store_user        => 'openstack',
+              :rbd_store_pool        => 'images',
+              :rbd_store_chunk_size  => 512,
+              :rbd_thin_provisioning => true,
+              :rados_connect_timeout => 10,
+              :store_description     => 'RBD store',
+            )
+          end
+        end
       end
 
       context 'with store description in multistore_config' do

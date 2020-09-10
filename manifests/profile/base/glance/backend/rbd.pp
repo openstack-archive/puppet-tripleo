@@ -41,6 +41,10 @@
 #   (Optional) RBD chunk size.
 #   Defaults to hiera('glance::backend::rbd::rbd_store_chunk_size', undef).
 #
+# [*rbd_thin_provisioning*]
+#   (Optional) Boolean describing if thin provisioning is enabled or not
+#   Defaults to hiera('glance::backend::rbd::rbd_thin_provisioning', undef).
+#
 # [*rados_connect_timeout*]
 #   (Optional) RADOS connection timeout.
 #   Defaults to hiera('glance::backend::rbd::rados_connect_timeout', undef).
@@ -62,6 +66,7 @@ class tripleo::profile::base::glance::backend::rbd (
   $rbd_store_user        = hiera('glance::backend::rbd::rbd_store_user', 'openstack'),
   $rbd_store_pool        = hiera('glance::backend::rbd::rbd_store_pool', 'images'),
   $rbd_store_chunk_size  = hiera('glance::backend::rbd::rbd_store_chunk_size', undef),
+  $rbd_thin_provisioning = hiera('glance::backend::rbd::rbd_thin_provisioning', undef),
   $rados_connect_timeout = hiera('glance::backend::rbd::rados_connect_timeout', undef),
   $store_description     = hiera('tripleo::profile::base::glance::api::glance_store_description', 'RBD store'),
   $step                  = Integer(hiera('step')),
@@ -102,6 +107,7 @@ class tripleo::profile::base::glance::backend::rbd (
         rbd_store_user        => $rbd_store_user_real,
         rbd_store_pool        => $rbd_store_pool_real,
         rbd_store_chunk_size  => $rbd_store_chunk_size,
+        rbd_thin_provisioning => $rbd_thin_provisioning,
         rados_connect_timeout => $rados_connect_timeout,
         store_description     => $store_description_real,
       }
