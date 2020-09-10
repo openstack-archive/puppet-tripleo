@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::certmonger::ceph_grafana
 #
-# Request a certificate for RabbitMQ and do the necessary setup.
+# Request a certificate for Ceph Grafana and do the necessary setup.
 #
 # === Parameters
 #
