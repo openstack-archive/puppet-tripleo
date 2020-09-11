@@ -253,14 +253,8 @@ class tripleo::profile::base::pacemaker (
     }
   }
 
-  if $enable_instanceha {
-    if $pacemaker_master {
-      include tripleo::profile::base::pacemaker::instance_ha
-    }
-    # Until https://bugzilla.redhat.com/show_bug.cgi?id=1857247 is fixed we
-    # need to make sure the package is installed on the host.
-    ensure_resource('package', 'python3-novaclient', { ensure => 'installed' })
-    Package<| name == 'python3-novaclient' |> -> Pcmk_stonith<| title == 'fence-nova' |>
+  if $enable_instanceha and $pacemaker_master {
+    include tripleo::profile::base::pacemaker::instance_ha
   }
 
   if ($step >= 2 and $pacemaker_master) {
