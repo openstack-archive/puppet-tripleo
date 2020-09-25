@@ -137,9 +137,13 @@ class tripleo::fencing(
     $rhev_devices = local_fence_devices('fence_rhevm', $all_devices)
     create_resources('pacemaker::stonith::fence_rhevm', $rhev_devices, $common_params)
 
+    $ucs_devices = local_fence_devices('fence_cisco_ucs', $all_devices)
+    create_resources('pacemaker::stonith::fence_cisco_ucs', $ucs_devices, $common_params)
+
     $data = {
       'xvm' => $xvm_devices, 'ironic' => $ironic_devices, 'redfish' => $redfish_devices,
-      'ipmilan' => $ipmilan_devices, 'kdump' => $kdump_devices, 'rhevm' => $rhev_devices
+      'ipmilan' => $ipmilan_devices, 'kdump' => $kdump_devices, 'rhevm' => $rhev_devices,
+      'cisco_ucs' => $ucs_devices
     }
 
     $data.each |$items| {
