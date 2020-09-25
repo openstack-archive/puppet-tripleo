@@ -55,11 +55,6 @@
 #  (Optional) Integer. Interval in seconds for sending keepalive messages to Sensu server side (By default 20).
 #  Defaults to undef.
 #
-# [*tmp_base_dir*]
-#  (Optional) String. Path to temporary directory which is used for creation of check scripts
-#  (by default /var/tmp/collectd-sensubility-checks).
-#  Defaults to undef.
-#
 # [*shell_path*]
 #  (Optional) String. Path to shell used for executing check scripts (by default /usr/bin/sh).
 #  Defaults to undef.
@@ -117,6 +112,26 @@
 # [*transport*]
 #  String. Bus type for message transport. Options are 'sensu' (rabbitmq) or 'amqp1'
 #  Defaults to 'sensu'
+#
+# [*workdir*]
+#  (Optional) String. Working directory for sensubility. This directory will contain
+#  temporary check scripts (in checks subdirectory) and downloaded scripts (in scripts subdirectory).
+#  Defaults to '/var/lib/collectd-sensubility'
+#
+# [*scripts*]
+#  (Optional) Hash. Should contain information about what scripts should be downloaded. The item format is following:
+#  { "script-name" =>
+#      "source"          => "http://uri.from.where.to.download/script-name",
+#      "checksum"        => "checksum-of-the-script",
+#      "create_bin_link" => true/false  # whether to create link to /usr/bin
+#  }
+#  Defaults to {}
+#
+# DEPRECATED PARAMETERS
+#
+# [*tmp_base_dir*]
+#  (Optional) String. DEPRECATED, use "workdir" parameter instead.
+#
 class tripleo::profile::base::metrics::collectd::sensubility (
   $ensure             = 'present',
   $config_path        = '/etc/collectd-sensubility.conf',
@@ -127,7 +142,6 @@ class tripleo::profile::base::metrics::collectd::sensubility (
   $client_name        = undef,
   $client_address     = undef,
   $keepalive_interval = undef,
-  $tmp_base_dir       = undef,
   $shell_path         = undef,
   $worker_count       = undef,
   $checks             = undef,
@@ -140,13 +154,32 @@ class tripleo::profile::base::metrics::collectd::sensubility (
   $exec_sudo_rule     = undef,
   $results_format     = 'smartgateway',
   $results_channel    = undef,
-  $transport          = 'sensu'
+  $transport          = 'sensu',
+  $workdir            = '/var/lib/collectd-sensubility',
+  $scripts            = {},
+  # DEPRECATED
+  $tmp_base_dir       = undef,
 ) {
   include collectd
   include collectd::plugin::exec
 
   package { 'collectd-sensubility':
     ensure => $ensure,
+  }
+
+  if $tmp_base_dir {
+    warning('The "tmp_base_dir" parameter is deprecated and might be ignored in future releases. Use "workdir" instead.')
+    $checkdir = $tmp_base_dir
+  } else {
+    $checkdir = "${workdir}/checks"
+  }
+  $scriptsdir = "${workdir}/scripts"
+
+  file { [$workdir, $checkdir, $scriptsdir]:
+    ensure => 'directory',
+    mode   => '0700',
+    owner  => $exec_user,
+    group  => $exec_group
   }
 
   file { $config_path:
@@ -160,7 +193,7 @@ class tripleo::profile::base::metrics::collectd::sensubility (
       client_name        => $client_name,
       client_address     => $client_address,
       keepalive_interval => $keepalive_interval,
-      tmp_base_dir       => $tmp_base_dir,
+      tmp_base_dir       => $checkdir,
       shell_path         => $shell_path,
       worker_count       => $worker_count,
       checks             => inline_template('<%= @checks.to_json %>'),
@@ -193,6 +226,20 @@ class tripleo::profile::base::metrics::collectd::sensubility (
       path        => ['/usr/sbin/', '/usr/bin/'],
       command     => "visudo -c -f '${sudoers_path}' || (rm -f '${sudoers_path}' && exit 1)",
       refreshonly => true,
+    }
+  }
+
+  $scripts.each |$name, $data| {
+    tripleo::profile::base::metrics::collectd::sensubility_script { $name:
+      checksum        => $data['checksum'],
+      source          => $data['source'],
+      user            => $exec_user,
+      group           => $exec_group,
+      scriptsdir      => $scriptsdir,
+      create_bin_link => has_key($data, 'create_bin_link') ? {
+        true    => $data['create_bin_link'],
+        default => true
+      }
     }
   }
 
