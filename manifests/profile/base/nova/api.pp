@@ -107,6 +107,7 @@ class tripleo::profile::base::nova::api (
       nova_metadata_wsgi_enabled => true
     }
     include nova::cors
+    include nova::quota
     include nova::network::neutron
     include nova::pci
     include nova::vendordata

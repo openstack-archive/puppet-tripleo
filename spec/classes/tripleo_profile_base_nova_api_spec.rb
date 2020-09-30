@@ -42,6 +42,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
         is_expected.to_not contain_class('nova::api')
+        is_expected.to_not contain_class('nova::quota')
         is_expected.to_not contain_class('nova::cors')
         is_expected.to_not contain_class('nova::pci')
         is_expected.to_not contain_class('nova::vendordata')
@@ -67,6 +68,7 @@ eos
           :nova_metadata_wsgi_enabled => true
         )
         is_expected.to contain_class('nova::cors')
+        is_expected.to contain_class('nova::quota')
         is_expected.to contain_class('nova::pci')
         is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('nova::network::neutron')
@@ -89,6 +91,7 @@ eos
         is_expected.to_not contain_class('nova::cell_v2::simple_setup')
         is_expected.to_not contain_class('nova::api')
         is_expected.to_not contain_class('nova::cors')
+        is_expected.to_not contain_class('nova::quota')
         is_expected.to_not contain_class('nova::pci')
         is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('nova::network::neutron')
@@ -113,6 +116,7 @@ eos
           :nova_metadata_wsgi_enabled => true
         )
         is_expected.to contain_class('nova::cors')
+        is_expected.to contain_class('nova::quota')
         is_expected.to contain_class('nova::pci')
         is_expected.to contain_class('nova::vendordata')
         is_expected.to contain_class('nova::network::neutron')
