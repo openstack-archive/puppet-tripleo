@@ -370,7 +370,7 @@
 #
 # [*ceph_dashboard_network*]
 #  (optional) Specify the network ceph_dashboard is running on.
-#  Defaults to hiera('ceph_mgr', undef)
+#  Defaults to hiera('ceph_dashboard_network', undef)
 #
 # [*cinder_network*]
 #  (optional) Specify the network cinder is running on.
@@ -981,6 +981,11 @@ class tripleo::haproxy (
   }
 
   if $ceph_dashboard {
+    if $enable_internal_tls {
+      $ceph_dashboard_tls_member_options = ['ssl check verify none']
+    } else {
+      $ceph_dashboard_tls_member_options = []
+    }
     ::tripleo::haproxy::endpoint { 'ceph_dashboard':
       internal_ip     => hiera('ceph_dashboard_vip', $controller_virtual_ip),
       service_port    => $ports[ceph_dashboard_port],
@@ -994,7 +999,7 @@ class tripleo::haproxy (
         'http-check' => 'expect rstatus 2[0-9][0-9]',
       }),
       service_network => $ceph_dashboard_network,
-      member_options  => union($haproxy_member_options, $internal_tls_member_options),
+      member_options  => union($haproxy_member_options, $ceph_dashboard_tls_member_options),
     }
   }
 
