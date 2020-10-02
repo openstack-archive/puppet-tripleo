@@ -52,7 +52,7 @@ define tripleo::profile::base::database::mysql::user (
 
   ::openstacklib::db::mysql { $title :
     user          => $user,
-    password_hash => mysql::password($password),
+    password      => $password,
     dbname        => $dbname,
     host          => $host,
     charset       => $charset,
