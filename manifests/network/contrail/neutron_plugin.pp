@@ -57,14 +57,6 @@
 #  String value.
 #  Defaults to hiera('contrail::service_certificate',false)
 #
-# [*api_server_ip*]
-#   IP address of the API Server
-#   Defaults to $::os_service_default
-#
-# [*api_server_port*]
-#   Port of the API Server.
-#   Defaults to $::os_service_default
-#
 # [*contrail_extensions*]
 #   Array of OpenContrail extensions to be supported
 #   Defaults to $::os_service_default
@@ -73,26 +65,6 @@
 #     class {'neutron::plugins::opencontrail' :
 #       contrail_extensions => ['ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam']
 #     }
-#
-# [*keystone_auth_url*]
-#   Url of the keystone auth server
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_user*]
-#   Admin user name
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_tenant_name*]
-#   Admin_tenant_name
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_password*]
-#   Admin password
-#   Defaults to $::os_service_default
-#
-# [*keystone_admin_token*]
-#   Admin token
-#   Defaults to $::os_service_default
 #
 # [*package_ensure*]
 #   (optional) Ensure state for package.

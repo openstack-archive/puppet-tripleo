@@ -16,10 +16,6 @@
 #   (required) Tenant network's ip of the compute node
 #   Defaults to  hiera('tenant')
 #
-# [*tenant_network_type*]
-#   (required) Type of tenant networks to be configured
-#   Defaults to hiera('neutron::plugins::ml2::tenant_network_types')
-#
 # [*vf_nums*]
 #   (required) Number of VFs to be created on the node
 #

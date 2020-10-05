@@ -19,10 +19,6 @@
 #
 # == Parameters:
 #
-# [*host_ip*]
-#  (required) host IP address of Control
-#  String (IPv4) value.
-#
 # [*admin_password*]
 #  (optional) admin password
 #  String value.

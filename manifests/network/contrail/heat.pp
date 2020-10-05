@@ -24,11 +24,6 @@
 #  String value.
 #  Defaults to hiera('contrail::admin_password')
 #
-# [*admin_tenant_name*]
-#  (optional) admin tenant name.
-#  String value.
-#  Defaults to hiera('contrail::admin_tenant_name')
-#
 # [*admin_token*]
 #  (optional) admin token
 #  String value.

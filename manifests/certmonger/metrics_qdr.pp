@@ -31,12 +31,6 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
-# [*dnsnames*]
-#   (Optional) The DNS names that will be added for the SubjectAltNames entry
-#   in the certificate. If left unset, the value will be set to the $hostname.
-#   This parameter can take both a string or an array of strings.
-#   Defaults to $hostname
-#
 # [*postsave_cmd*]
 #   (Optional) Specifies the command to execute after requesting a certificate.
 #   If nothing is given, it will default to: "systemctl restart ${service name}"

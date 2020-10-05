@@ -145,11 +145,6 @@
 #  (optional) Listen port for config-api
 #  Defaults to hiera('contrail::api_port')
 #
-# [*linklocal_service_name*]
-#  (optional) name of link local service
-#  String value
-#  Defaults to metadata
-#
 # [*linklocal_service_port*]
 #  (optional) port of link local service
 #  String value
