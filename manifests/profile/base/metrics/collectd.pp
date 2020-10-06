@@ -201,6 +201,11 @@
 #  as the send-to address for communications over the messaging link.
 #  Defaults to {}.
 #
+# [*amqp_send_queue_limit*]
+#  (Optional) Number. Number of data sets to be kept in memory, older sets
+#  will be discarded; if set to undef, this feature is disabled.
+#  Defaults to undef
+#
 # [*qdr_mode*]
 #  (Optional) String. Mode in which the QDR service, to which collectd
 #  should be connected, is running.
@@ -254,6 +259,7 @@ class tripleo::profile::base::metrics::collectd (
   $amqp_instances = {},
   $amqp_retry_delay = undef,
   $amqp_interval = undef,
+  $amqp_send_queue_limit = undef,
   $qdr_mode = hiera('tripleo::profile::base::metrics::qdr::router_mode', 'edge'),
   $service_names = hiera('service_names', []),
   $collectd_manage_repo = false,
@@ -326,17 +332,18 @@ class tripleo::profile::base::metrics::collectd (
       }
     } elsif !empty($amqp_host) {
       class { 'collectd::plugin::amqp1':
-        ensure         => 'present',
-        manage_package => true,
-        transport      => $amqp_transport_name,
-        host           => $amqp_host,
-        port           => $amqp_port,
-        user           => $amqp_user,
-        password       => $amqp_password,
-        address        => $amqp_address,
-        instances      => $amqp_instances,
-        retry_delay    => $amqp_retry_delay,
-        interval       => $amqp_interval,
+        ensure           => 'present',
+        manage_package   => true,
+        transport        => $amqp_transport_name,
+        host             => $amqp_host,
+        port             => $amqp_port,
+        user             => $amqp_user,
+        password         => $amqp_password,
+        address          => $amqp_address,
+        instances        => $amqp_instances,
+        retry_delay      => $amqp_retry_delay,
+        interval         => $amqp_interval,
+        send_queue_limit => $amqp_send_queue_limit,
       }
     } elsif !empty($gnocchi_server) or !empty($gnocchi_keystone_auth_url) {
       if !empty($gnocchi_server) {

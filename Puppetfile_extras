@@ -65,10 +65,9 @@ mod 'pacemaker',
   :git => 'https://github.com/openstack/puppet-pacemaker',
   :ref => 'master'
 
-# NOTE(tkajinam): Pinnned due to LP#1862434
 mod 'collectd',
   :git => 'https://github.com/voxpupuli/puppet-collectd',
-  :ref => '25904923910c6e3316d762a1817fc10313b9ca21'
+  :ref => '20494e44a90073273a18fce71f4a602d5b5d0690'
 
 # see https://github.com/rdo-packages/puppet-keepalived-distgit/blob/rpm-master/puppet-keepalived.spec
 mod 'keepalived',
