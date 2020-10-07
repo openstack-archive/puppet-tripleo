@@ -2,14 +2,32 @@
     templates:
       - puppet-openstack-check-jobs
       - puppet-openstack-module-unit-jobs
-      - tripleo-undercloud-jobs
-      - tripleo-multinode-container-minimal
+      - tripleo-undercloud-jobs-pipeline
+      - tripleo-multinode-container-minimal-pipeline
       - release-notes-jobs-python3
-      - tripleo-standalone-scenarios-full
+      - tripleo-standalone-scenarios-pipeline
       - tripleo-standalone-multinode-ipa
     check:
       jobs:
+        - tripleo-ci-centos-8-content-provider
         - tripleo-ci-centos-8-scenario007-multinode-oooq-container:
+            vars: &multi_consumer_vars
+              consumer_job: true
+              build_container_images: false
+              tags:
+                - undercloud-setup
+                - undercloud-scripts
+                - undercloud-install
+                - undercloud-post-install
+                - tripleo-validations
+                - overcloud-scripts
+                - overcloud-prep-config
+                - overcloud-prep-containers
+                - overcloud-deploy
+                - overcloud-post-deploy
+                - overcloud-validate
+            dependencies: &deps_cprovider
+                - tripleo-ci-centos-8-content-provider
             files:
               - ^manifests/profile/pacemaker/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
