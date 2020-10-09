@@ -48,6 +48,10 @@
 #   The post-save-command that certmonger will use once it renews the
 #   certificate.
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 define tripleo::certmonger::haproxy (
   $service_pem,
   $service_certificate,
@@ -57,6 +61,7 @@ define tripleo::certmonger::haproxy (
   $dnsnames      = undef,
   $principal     = undef,
   $postsave_cmd  = undef,
+  $key_size      = 2048,
 ){
     include certmonger
     include haproxy::params
@@ -103,6 +108,7 @@ define tripleo::certmonger::haproxy (
       keyfile      => $service_key,
       postsave_cmd => $postsave_cmd,
       principal    => $principal_real,
+      key_size     => $key_size,
       eku          => ['id-kp-clientAuth', 'id-kp-serverAuth'],
       wait         => true,
       tag          => 'haproxy-cert',
