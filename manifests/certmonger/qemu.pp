@@ -47,6 +47,10 @@
 #   (Optional) Specifies that path to write the CA cerftificate to.
 #   Defaults to undef
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 define tripleo::certmonger::qemu (
   $hostname,
   $service_certificate,
@@ -55,6 +59,7 @@ define tripleo::certmonger::qemu (
   $cacertfile    = undef,
   $postsave_cmd  = undef,
   $principal     = undef,
+  $key_size      = 2048,
 ) {
   include certmonger
   include nova::params
@@ -68,6 +73,7 @@ define tripleo::certmonger::qemu (
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     cacertfile   => $cacertfile,
     wait         => true,
     tag          => 'qemu-cert',

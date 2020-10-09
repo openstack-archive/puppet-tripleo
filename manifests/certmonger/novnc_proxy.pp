@@ -45,6 +45,9 @@
 # [*notify_service*]
 #   (Optional) Service to reload when certificate is created/renewed
 #   Defaults to $::nova::params::libvirt_service_name
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
 #
 class tripleo::certmonger::novnc_proxy (
   $hostname,
@@ -53,6 +56,7 @@ class tripleo::certmonger::novnc_proxy (
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $notify_service   = undef,
   $postsave_cmd  = undef,
+  $key_size      = 2048,
   $principal     = undef,
 ) {
   include certmonger
@@ -76,6 +80,7 @@ class tripleo::certmonger::novnc_proxy (
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     wait         => true,
     tag          => 'novnc-proxy',
     require      => Class['::certmonger'],

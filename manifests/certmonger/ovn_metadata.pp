@@ -38,6 +38,10 @@
 #   (Optional) The haproxy service principal that is set for neutron in kerberos.
 #   Defaults to undef
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 class tripleo::certmonger::ovn_metadata (
   $hostname,
   $service_certificate,
@@ -45,6 +49,7 @@ class tripleo::certmonger::ovn_metadata (
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $postsave_cmd  = undef,
   $principal     = undef,
+  $key_size      = 2048,
 ) {
   include certmonger
 
@@ -57,6 +62,7 @@ class tripleo::certmonger::ovn_metadata (
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
   }
