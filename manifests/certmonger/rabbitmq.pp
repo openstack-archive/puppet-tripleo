@@ -39,6 +39,10 @@
 #   (Optional) The service principal that is set for the service in kerberos.
 #   Defaults to undef
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 class tripleo::certmonger::rabbitmq (
   $hostname,
   $service_certificate,
@@ -46,6 +50,7 @@ class tripleo::certmonger::rabbitmq (
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $postsave_cmd  = undef,
   $principal     = undef,
+  $key_size      = 2048,
 ) {
   include certmonger
 
@@ -65,6 +70,7 @@ class tripleo::certmonger::rabbitmq (
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
   }
