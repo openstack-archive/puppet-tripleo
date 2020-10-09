@@ -41,7 +41,7 @@ mod 'fluentd',
 
 mod 'certmonger',
   :git => 'https://github.com/saltedsignal/puppet-certmonger',
-  :ref => 'v1.1.1'
+  :ref => 'v2.6.0'
 
 mod 'ptp',
   :git => 'https://github.com/redhat-nfvpe/ptp',

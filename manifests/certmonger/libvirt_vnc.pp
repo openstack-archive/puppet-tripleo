@@ -48,6 +48,10 @@
 #   (Optional) Service to reload when certificate is created/renewed
 #   Defaults to $::nova::params::libvirt_service_name
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 define tripleo::certmonger::libvirt_vnc (
   $hostname,
   $service_certificate,
@@ -57,6 +61,7 @@ define tripleo::certmonger::libvirt_vnc (
   $principal        = undef,
   $cacertfile       = undef,
   $notify_service   = undef,
+  $key_size      = 2048,
 ) {
   include ::certmonger
   include ::nova::params
@@ -74,6 +79,7 @@ define tripleo::certmonger::libvirt_vnc (
     principal    => $principal,
     postsave_cmd => $postsave_cmd_real,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     cacertfile   => $cacertfile,
     wait         => true,
     tag          => 'libvirt-cert',

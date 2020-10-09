@@ -44,6 +44,10 @@
 # [*principal*]
 #   The haproxy service principal that is set for HAProxy in kerberos.
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 define tripleo::certmonger::httpd (
   $hostname,
   $service_certificate,
@@ -52,6 +56,7 @@ define tripleo::certmonger::httpd (
   $dnsnames      = undef,
   $postsave_cmd  = undef,
   $principal     = undef,
+  $key_size      = 2048,
 ) {
   include ::certmonger
   include ::apache::params
@@ -71,6 +76,7 @@ define tripleo::certmonger::httpd (
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     wait         => true,
     tag          => 'apache-cert',
     require      => Class['::certmonger'],

@@ -42,6 +42,10 @@
 #   (Optional) The service principal that is set for the service in kerberos.
 #   Defaults to undef
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 class tripleo::certmonger::ceph_rgw (
   $hostname,
   $service_certificate,
@@ -50,6 +54,7 @@ class tripleo::certmonger::ceph_rgw (
   $postsave_cmd = undef,
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $principal     = undef,
+  $key_size      = 2048,
 ) {
 
   ensure_resource('file', '/usr/bin/certmonger-rgw-refresh.sh', {
@@ -68,6 +73,7 @@ class tripleo::certmonger::ceph_rgw (
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
   }

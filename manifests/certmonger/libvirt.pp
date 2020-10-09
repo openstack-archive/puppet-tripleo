@@ -44,6 +44,10 @@
 #   (Optional) The service principal that is set for the service in kerberos.
 #   Defaults to undef
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 define tripleo::certmonger::libvirt (
   $hostname,
   $service_certificate,
@@ -51,6 +55,7 @@ define tripleo::certmonger::libvirt (
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $postsave_cmd  = undef,
   $principal     = undef,
+  $key_size      = 2048,
 ) {
   include ::certmonger
   include ::nova::params
@@ -65,6 +70,7 @@ define tripleo::certmonger::libvirt (
     principal    => $principal,
     postsave_cmd => $postsave_cmd_real,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     wait         => true,
     tag          => 'libvirt-cert',
     require      => Class['::certmonger'],

@@ -46,6 +46,10 @@
 #   (Optional) The haproxy service principal that is set for metrics_qdr in kerberos.
 #   Defaults to undef
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 class tripleo::certmonger::metrics_qdr (
   $hostname,
   $service_certificate,
@@ -53,6 +57,7 @@ class tripleo::certmonger::metrics_qdr (
   $certmonger_ca = hiera('certmonger_ca', 'local'),
   $postsave_cmd  = undef,
   $principal     = undef,
+  $key_size      = 2048,
 ) {
   include ::certmonger
   include ::qdr::params
@@ -73,6 +78,7 @@ class tripleo::certmonger::metrics_qdr (
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
     ca           => $certmonger_ca,
+    key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
   }
