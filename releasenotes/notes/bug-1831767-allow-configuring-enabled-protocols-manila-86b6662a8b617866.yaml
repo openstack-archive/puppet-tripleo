@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    It is now possible to override the ``enabled_share_protocols``
+    configuration for the Shared File Systems service (manila) with the
+    hiera parameter ``manila_enabled_share_protocols``.
