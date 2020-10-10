@@ -1,3 +1,4 @@
+
 #
 # Copyright (C) 2017 Red Hat, Inc.
 #
@@ -26,6 +27,15 @@ checks={\"standalone_check\":{\"command\":\"echo 'foobar'\",\"interval\":5}}
 
 [amqp1]
 "
+
+libpodstats_typesdb = '/usr/share/collectd/types.db.libpodstats'
+
+libpodstats_conf = '
+LoadPlugin libpodstats
+<Plugin "libpodstats">
+</Plugin>
+'
+
 exec_cmd = <<-EOS
   Exec \"collectd:collectd\" \"collectd-sensubility\"
 EOS
@@ -114,6 +124,46 @@ describe 'tripleo::profile::base::metrics::collectd' do
           :content => exec_cmd,
         })
         is_expected.to contain_file('/etc/collectd-sensubility.conf').with_content(sensubility_conf)
+      end
+    end
+
+    context 'with defaults and enabled libpodstats' do
+      let(:params) do
+        { :step => 3,
+          :enable_libpodstats => true }
+      end
+      it '' do
+        is_expected.to compile.with_all_deps
+        is_expected.to contain_package('collectd-libpod-stats').with(:ensure => 'present')
+        is_expected.to contain_class('collectd').with({
+          :typesdb => [
+            '/usr/share/collectd/types.db',
+            libpodstats_typesdb,
+          ],
+        })
+        is_expected.to contain_collectd__type('pod_memory').with({
+          :target => libpodstats_typesdb,
+          :ds_type => 'GAUGE',
+          :min     => 0,
+          :max     => 281474976710656,
+          :ds_name => 'value',
+        })
+        is_expected.to contain_collectd__type('pod_cpu').with({
+          :target => libpodstats_typesdb,
+          :types  => [{
+                'ds_type' => 'GAUGE',
+                'min'     => 0,
+                'max'     => 100.1,
+                'ds_name' => 'percent',
+            },
+            {
+                'ds_type' => 'DERIVE',
+                'min'     => 0,
+                'max'     => 'U',
+                'ds_name' => 'time',
+            },
+          ],
+        })
       end
     end
   end
