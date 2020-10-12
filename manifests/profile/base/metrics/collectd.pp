@@ -214,6 +214,11 @@
 #  (Optional) Boolean. Set to true if sensubility should be executed by exec plugin.
 #  Defaults to false.
 #
+# [*enable_libpodstats*]
+#  (Optional) Boolean. Set to true if the collectd libpodstats plugin should be
+#  loaded
+#  Defaults to false.
+#
 class tripleo::profile::base::metrics::collectd (
   $step = Integer(hiera('step')),
   $enable_file_logging = false,
@@ -259,10 +264,20 @@ class tripleo::profile::base::metrics::collectd (
   $collectd_manage_repo = false,
   $python_read_plugins = [],
   $enable_sensubility = false,
+  $enable_libpodstats = false,
 ) {
+
   if $step >= 3 {
-    class {'::collectd':
-      manage_repo => $collectd_manage_repo
+    if $enable_libpodstats {
+        $typesdb = ['/usr/share/collectd/types.db', '/usr/share/collectd/types.db.libpodstats']
+        include tripleo::profile::base::metrics::collectd::libpodstats
+    } else {
+        $typesdb = ['/usr/share/collectd/types.db']
+    }
+
+    class {'collectd':
+      manage_repo => $collectd_manage_repo,
+      typesdb     => $typesdb,
     }
 
     class { 'collectd::plugin::python':
