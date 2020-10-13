@@ -503,7 +503,7 @@ describe 'tripleo::profile::base::cinder::volume' do
   end
 
   on_supported_os.each do |os, facts|
-    context 'on #{os}' do
+    context "on #{os}" do
       let(:facts) do
         facts.merge({ :hostname => 'node.example.com' })
       end
