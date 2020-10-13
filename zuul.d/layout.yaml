@@ -17,10 +17,10 @@
     templates:
       - puppet-openstack-check-jobs
       - puppet-tripleo-module-unit-jobs
-      - tripleo-undercloud-jobs
-      - tripleo-multinode-container-minimal
+      - tripleo-undercloud-jobs-pipeline
+      - tripleo-multinode-container-minimal-pipeline
       - release-notes-jobs-python3
-      - tripleo-standalone-scenarios-full
+      - tripleo-standalone-scenarios-pipeline
     check:
       jobs:
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
