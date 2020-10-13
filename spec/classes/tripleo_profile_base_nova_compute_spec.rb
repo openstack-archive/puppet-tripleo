@@ -33,6 +33,7 @@ describe 'tripleo::profile::base::nova::compute' do
 
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::cinder')
+        is_expected.to_not contain_class('nova::compute::image_cache')
         is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('nova::compute')
         is_expected.to_not contain_class('nova::network::neutron')
@@ -65,6 +66,7 @@ eos
           )
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::cinder')
+          is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
           is_expected.to contain_class('nova::compute').with(
             :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
@@ -94,6 +96,7 @@ eos
           is_expected.to contain_class('tripleo::profile::base::nova::compute')
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::cinder')
+          is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
           is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')
@@ -108,6 +111,7 @@ eos
           is_expected.to contain_class('tripleo::profile::base::nova::compute')
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::cinder')
+          is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
           is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')

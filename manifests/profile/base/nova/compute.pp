@@ -58,6 +58,7 @@ class tripleo::profile::base::nova::compute (
     # deploy basic bits for nova
     include tripleo::profile::base::nova
     include nova::cinder
+    include nova::compute::image_cache
     include nova::vendordata
 
     if $keymgr_api_class {
