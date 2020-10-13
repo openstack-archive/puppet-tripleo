@@ -31,10 +31,6 @@
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').
 #
-# [*file_owner*]
-#   (Optional) The user which the certificate and key files belong to.
-#   Defaults to 'root'
-#
 # [*postsave_cmd*]
 #   (Optional) Specifies the command to execute after requesting a certificate.
 #   If nothing is given, it will default to: "systemctl reload ${service name}"

@@ -26,15 +26,6 @@
 #   Password for the qdrouter daemon
 #   Defaults to undef
 #
-# [*listen_on_external*]
-#   (optional) Whether QDR should listen for connections
-#   on external_listener_addr rather than listener_addr.
-#   Defaults to false
-#
-# [*external_listener_addr*]
-#   (optional) Bind address for external connections (CloudForms for example)
-#   Defaults to 'localhost'
-#
 # [*listener_addr*]
 #   (optional) Service host name
 #   Defaults to 'localhost'

@@ -24,10 +24,6 @@
 #   unspecified, it won't be created.
 #   Defaults to undef
 #
-# [*certificate_dir*]
-#   (Optional) Directory where libvirt's certificates will be stored.
-#   Defaults to undef
-#
 # [*key_dir*]
 #   (Optional) Directory where libvirt's keys will be stored.
 #   Defaults to undef

@@ -18,15 +18,6 @@
 #
 # === Parameters
 #
-# [*bootstrap_node*]
-#   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('barbican_api_bootstrap_node_name')
-#
-# [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templates
-#   for more details.
-#   Defaults to hiera('step')
-#
 # [*simple_crypto_backend_enabled*]
 #   (Optional) Whether the simple crypto backend is enabled or not. This is
 #   dynamically set via t-h-t.

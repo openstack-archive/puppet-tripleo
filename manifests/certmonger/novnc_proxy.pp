@@ -27,9 +27,6 @@
 # [*service_key*]
 #   The path to the key that will be used for TLS in this service.
 #
-# [*service_pem*]
-#   The file in PEM format that the HAProxy service will use as a certificate.
-#
 # [*certmonger_ca*]
 #   (Optional) The CA that certmonger will use to generate the certificates.
 #   Defaults to hiera('certmonger_ca', 'local').

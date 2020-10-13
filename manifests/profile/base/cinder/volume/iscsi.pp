@@ -37,10 +37,6 @@
 #   (Optional) The iscsi protocol to use
 #   Defaults to 'iscsi'
 #
-# [*cinder_lvm_loop_device_size*]
-#   (Optional) The size (in MB) of the LVM loopback volume
-#   Defaults to '10280'
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
