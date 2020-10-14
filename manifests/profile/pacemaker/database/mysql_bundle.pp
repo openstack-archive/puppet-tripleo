@@ -96,6 +96,11 @@
 #   parameters to be passed to socat for tunneling SST connections.
 #   Defaults to undef
 #
+# [*two_node_mode*]
+#   (Optional) Whether to configure the resource agent in special
+#   2-node cluster mode, to allow recovering from a network partition.
+#   Defaults to false
+#
 # [*ipv6*]
 #   (Optional) Whether to deploy MySQL on IPv6 network.
 #   Defaults to str2bool(hiera('mysql_ipv6', false))
@@ -173,6 +178,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
   $mysql_server_options           = hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}),
   $mysql_auth_ed25519             = hiera('mysql_auth_ed25519', false),
+  $two_node_mode                  = false,
   $container_backend              = 'docker',
   $log_driver                     = undef,
   $log_file                       = '/var/log/containers/stdouts/galera-bundle.log',
@@ -465,6 +471,11 @@ MYSQL_HOST=localhost\n",
       } else {
         $tls_priorities_real = ''
       }
+      if $two_node_mode == true {
+        $two_node_mode_opt = ' two_node_mode=true'
+      } else {
+        $two_node_mode_opt = ''
+      }
 
       pacemaker::resource::bundle { 'galera-bundle':
         image             => $mysql_docker_image,
@@ -491,7 +502,7 @@ MYSQL_HOST=localhost\n",
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true container-attribute-target=host",
         op_params       => "promote timeout=${promote_timeout}s on-fail=block",
-        resource_params => "log='/var/log/mysql/mysqld.log' additional_parameters='--open-files-limit=${open_files_limit}' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map_string}'",
+        resource_params => "log='/var/log/mysql/mysqld.log' additional_parameters='--open-files-limit=${open_files_limit}' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map_string}'${two_node_mode_opt}",
         tries           => $pcs_tries,
         location_rule   => {
           resource_discovery => 'exclusive',
