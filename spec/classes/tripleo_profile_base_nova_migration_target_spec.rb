@@ -125,6 +125,7 @@ eos
           :type  => 'User',
           :name  => 'nova_migration',
           :options => {
+            'AllowUsers'             => 'nova_migration',
             'ForceCommand'           => '/bin/nova-migration-wrapper',
             'PasswordAuthentication' => 'no',
             'AllowTcpForwarding'     => 'no',
@@ -170,6 +171,7 @@ eos
           :type  => 'LocalAddress 127.0.0.1,127.0.0.2 User',
           :name  => 'nova_migration',
           :options => {
+            'AllowUsers'             => 'nova_migration',
             'ForceCommand'           => '/bin/nova-migration-wrapper',
             'PasswordAuthentication' => 'no',
             'AllowTcpForwarding'     => 'no',
@@ -221,6 +223,7 @@ eos
           :type  => 'LocalAddress 127.0.0.1 User',
           :name  => 'nova_migration',
           :options => {
+            'AllowUsers'             => 'nova_migration',
             'ForceCommand'           => '/bin/nova-migration-wrapper',
             'PasswordAuthentication' => 'no',
             'AllowTcpForwarding'     => 'no',
@@ -294,6 +297,7 @@ eos
           :type  => 'User',
           :name  => 'nova_migration',
           :options => {
+            'AllowUsers'             => 'nova_migration',
             'ForceCommand'           => '/bin/true',
             'PasswordAuthentication' => 'no',
             'AllowTcpForwarding'     => 'no',

@@ -90,6 +90,7 @@ class tripleo::profile::base::nova::migration::target (
           type    => $allow_type,
           order   => 1,
           options => {
+            'AllowUsers'             => $allow_name,
             'ForceCommand'           => $wrapper_command,
             'PasswordAuthentication' => 'no',
             'AllowTcpForwarding'     => 'no',
