@@ -104,6 +104,19 @@
 #  (Optional) String. Rule which will be saved in /etc/sudoers.d for user specified
 #  by parameter exec_user.
 #  Defaults to undef
+#
+# [*results_format*]
+#  (Optional) String. Set message format compatability. Options are
+#  [smartgateway,sensu]
+#  Defaults to smartgateway
+#
+# [*results_channel*]
+#  String. Target AMQP1 channel address to which messages should be sent
+#  Defaults to undef
+#
+# [*transport*]
+#  String. Bus type for message transport. Options are 'sensu' (rabbitmq) or 'amqp1'
+#  Defaults to 'sensu'
 class tripleo::profile::base::metrics::collectd::sensubility (
   $ensure             = 'present',
   $config_path        = '/etc/collectd-sensubility.conf',
@@ -124,7 +137,10 @@ class tripleo::profile::base::metrics::collectd::sensubility (
   $amqp_password      = undef,
   $exec_user          = 'collectd',
   $exec_group         = 'collectd',
-  $exec_sudo_rule     = undef
+  $exec_sudo_rule     = undef,
+  $results_format     = 'smartgateway',
+  $results_channel    = undef,
+  $transport          = 'sensu'
 ) {
   include ::collectd
   include ::collectd::plugin::exec
@@ -151,7 +167,10 @@ class tripleo::profile::base::metrics::collectd::sensubility (
       amqp_host          => $amqp_host,
       amqp_port          => $amqp_port,
       amqp_user          => $amqp_user,
-      amqp_password      => $amqp_password
+      amqp_password      => $amqp_password,
+      results_format     => $results_format,
+      results_channel    => $results_channel,
+      transport          => $transport
     })
   }
 
