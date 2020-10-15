@@ -18,6 +18,10 @@
 #
 # === Parameters
 #
+# [*enabled_share_protocols*]
+#   (Optional) Share protocols enabled on the manila API service.
+#   Defaults to hiera('manila_enabled_share_protocols', undef)
+#
 # [*backend_generic_enabled*]
 #   (Optional) Whether or not the generic backend is enabled
 #   Defaults to hiera('manila_backend_generic_enabled', false)
@@ -77,6 +81,7 @@
 #   Defaults to hiera('step')
 
 class tripleo::profile::base::manila::api (
+  $enabled_share_protocols = hiera('manila_enabled_share_protocols', undef),
   $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
   $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
@@ -112,21 +117,31 @@ class tripleo::profile::base::manila::api (
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include tripleo::profile::base::apache
-    if $backend_generic_enabled or $backend_netapp_enabled or $backend_vmax_enabled or
-      $backend_isilon_enabled or $backend_unity_enabled or $backend_vnx_enabled {
-        $nfs_protocol = 'NFS'
-        $cifs_protocol = 'CIFS'
+
+    unless empty($enabled_share_protocols) {
+      $enabled_share_protocols_real = join(any2array($enabled_share_protocols), ',')
     } else {
-      $nfs_protocol = undef
-      $cifs_protocol = undef
-    }
-    if $backend_cephfs_enabled {
-      $cephfs_protocol = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', 'CEPHFS')
-    } else {
-      $cephfs_protocol = undef
+      if $backend_generic_enabled or $backend_netapp_enabled
+        or $backend_vmax_enabled or $backend_isilon_enabled
+        or $backend_unity_enabled or $backend_vnx_enabled {
+          $nfs_protocol = 'NFS'
+          $cifs_protocol = 'CIFS'
+      } else {
+          $nfs_protocol = undef
+          $cifs_protocol = undef
+      }
+      if $backend_cephfs_enabled {
+        $cephfs_protocol = hiera(
+          'manila::backend::cephfs::cephfs_protocol_helper_type', 'CEPHFS')
+      } else {
+        $cephfs_protocol = undef
+      }
+
+      $enabled_share_protocols_real = join(delete_undef_values([$nfs_protocol,$cifs_protocol,$cephfs_protocol]), ',')
+
     }
     class { 'manila::api' :
-      enabled_share_protocols => join(delete_undef_values([$nfs_protocol,$cifs_protocol,$cephfs_protocol]), ',')
+      enabled_share_protocols => $enabled_share_protocols_real
     }
     class { 'manila::wsgi::apache':
       ssl_cert => $tls_certfile,
