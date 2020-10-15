@@ -10,9 +10,12 @@
       Optional[Integer] $worker_count,
       Optional[String]  $checks,
       Optional[String]  $amqp_host,
-      Optional[String]  $amqp_port,
+      Optional[Integer]  $amqp_port,
       Optional[String]  $amqp_user,
-      Optional[String]  $amqp_password
+      Optional[String]  $amqp_password,
+      Optional[String]  $results_format,
+      Optional[String]  $results_channel,
+      Variant[Enum['sensu','amqp1']]  $transport
 | -%>
 
 [default]
@@ -24,6 +27,7 @@ log_level=<%=$log_level%>
 <%- } -%>
 
 [sensu]
+<% if $transport == 'sensu' { -%>
 <% unless $connection =~ Undef { -%>
 connection=<%=$connection%>
 <%- } -%>
@@ -35,6 +39,7 @@ client_name=<%=$client_name%>
 <%- } -%>
 <% unless $client_address =~ Undef { -%>
 client_address=<%=$client_address%>
+<%- } -%>
 <%- } -%>
 <% unless $keepalive_interval =~ Undef { -%>
 keepalive_interval=<%=$keepalive_interval%>
@@ -53,15 +58,17 @@ checks=<%=$checks%>
 <%- } -%>
 
 [amqp1]
-<% unless $amqp_host =~ Undef { -%>
-host=<%=$amqp_host%>
+<% if $transport == 'amqp1' { -%>
+<% unless $client_address =~ Undef and $amqp_port =~ Undef { -%>
+connection=amqp://<%=$client_address%>:<%=$amqp_port%>
 <%- } -%>
-<% unless $amqp_port =~ Undef { -%>
-port=<%=$amqp_port%>
+<% unless $results_channel =~ Undef { -%>
+results_channel=<%=$results_channel%>
 <%- } -%>
-<% unless $amqp_user =~ Undef { -%>
-user=<%=$amqp_user%>
+<% unless $client_name =~ Undef { -%>
+client_name=<%=$client_name%>
 <%- } -%>
-<% unless $amqp_password =~ Undef { -%>
-password=<%=$amqp_password%>
+<% unless $results_format =~ Undef { -%>
+results_format=<%=$results_format%>
+<%- } -%>
 <%- } -%>
