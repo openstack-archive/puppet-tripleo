@@ -87,6 +87,10 @@
 #   (Optional) Maximum number of connections to MySQL.
 #   Defaults to hiera('mysql_max_connections', undef)
 #
+# [*mysql_nproc_limit*]
+#   (Optional) Maximum nproc limit in PAM for mysqld.
+#   Defaults to undef
+#
 # [*remove_default_accounts*]
 #   (Optional) Whether or not remove default MySQL accounts.
 #   Defaults to true
@@ -112,6 +116,7 @@ class tripleo::profile::base::database::mysql (
   $manage_resources              = true,
   $mysql_server_options          = {},
   $mysql_max_connections         = hiera('mysql_max_connections', undef),
+  $mysql_nproc_limit             = undef,
   $remove_default_accounts       = true,
   $step                          = Integer(hiera('step')),
 ) {
@@ -136,6 +141,15 @@ class tripleo::profile::base::database::mysql (
     $tls_certfile = undef
     $tls_keyfile = undef
     $tls_cipher_list = undef
+  }
+
+  if $mysql_nproc_limit {
+    file { '/etc/security/limits.d/99-mysqld.conf':
+      content => template('tripleo/mysql/limits.conf'),
+      owner   => '0',
+      group   => '0',
+      mode    => '0644',
+    }
   }
 
   # non-ha scenario
