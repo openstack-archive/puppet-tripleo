@@ -1033,6 +1033,10 @@ class tripleo::haproxy (
       mode            => 'http',
       service_network => $nova_metadata_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
+      listen_options  => merge($default_listen_options, {
+        'balance'   => 'source',
+        'hash-type' => 'consistent',
+      }),
     }
   }
 

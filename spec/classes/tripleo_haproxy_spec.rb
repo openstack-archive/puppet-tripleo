@@ -210,17 +210,18 @@ describe 'tripleo::haproxy' do
       end
     end
 
-    describe "source-based sticky sessions w/o use of consistent hashing" do
+    describe "source-based sticky sessions" do
       before :each do
         params.merge!({
           :etcd            => true,
           :ceph_grafana    => true,
           :ceph_dashboard  => true,
           :nova_novncproxy => true,
+          :nova_metadata   => true,
         })
       end
 
-      %w(etcd ceph_grafana ceph_dashboard nova_novncproxy).each do |svc|
+      %w(etcd ceph_grafana ceph_dashboard nova_novncproxy nova_metadata).each do |svc|
         it 'should configure haproxy ' + svc + ' endpoint' do
           is_expected.to contain_haproxy__listen(svc)
           p = catalogue.resource('tripleo::haproxy::endpoint', svc).send(:parameters)
