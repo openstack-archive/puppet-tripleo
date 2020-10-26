@@ -1,0 +1,10 @@
+---
+upgrade:
+  - |
+    The following deprecated parameters in
+    the ``tripleo::profile::base::nova::api`` class have been removed.
+
+    - ``nova_metadata_network``
+    - ``metadata_tls_proxy_bind_ip``
+    - ``metadata_tls_proxy_fqdn``
+    - ``metadata_tls_proxy_port``
