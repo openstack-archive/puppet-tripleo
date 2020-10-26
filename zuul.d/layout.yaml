@@ -21,7 +21,15 @@
       - tripleo-standalone-scenarios-pipeline
     check:
       jobs:
+        - tripleo-ci-centos-7-content-provider
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
+            vars:
+              consumer_job: true
+              build_container_images: false
+              remove_tags:
+                - build
+            dependencies:
+              - tripleo-ci-centos-7-content-provider
             files:
               - ^manifests/profile/pacemaker/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
