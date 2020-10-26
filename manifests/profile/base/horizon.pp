@@ -104,8 +104,8 @@ class tripleo::profile::base::horizon (
     class { 'horizon':
       cache_server_ip => $horizon_memcached_servers,
       neutron_options => $neutron_options_real,
-      ssl_cert        => $tls_certfile,
-      ssl_key         => $tls_keyfile,
+      horizon_cert    => $tls_certfile,
+      horizon_key     => $tls_keyfile,
     }
   }
 }
