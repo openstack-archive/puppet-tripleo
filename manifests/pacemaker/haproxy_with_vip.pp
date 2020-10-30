@@ -70,15 +70,11 @@ define tripleo::pacemaker::haproxy_with_vip(
     if !is_ip_addresses($ip_address) {
       fail("Haproxy VIP: ${ip_address} is not a proper IP address.")
     }
-    # NB: Until the IPaddr2 RA has a fix for https://bugzilla.redhat.com/show_bug.cgi?id=1445628
-    # we need to specify the nic when creating the ipv6 vip.
     if is_ipv6_address($ip_address) {
       $netmask        = '128'
-      $nic            = interface_for_ip($ip_address)
       $ipv6_addrlabel = '99'
     } else {
       $netmask        = '32'
-      $nic            = ''
       $ipv6_addrlabel = ''
     }
 
@@ -91,7 +87,6 @@ define tripleo::pacemaker::haproxy_with_vip(
     pacemaker::resource::ip { "${vip_name}_vip":
       ip_address     => $ip_address,
       cidr_netmask   => $netmask,
-      nic            => $nic,
       ipv6_addrlabel => $ipv6_addrlabel,
       meta_params    => "resource-stickiness=INFINITY ${meta_params}",
       location_rule  => $location_rule,
