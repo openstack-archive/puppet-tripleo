@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    This change introduces two hiera keys that allow an operator to specify
+    which NIC (or NICs) the VIPs will be bound to. One hiera key has global effect
+    (tripleo::pacemaker::force_nic) and forces all VIPs to listen to that NIC.
+    There is also the possibility to override that for specific VIPs with the
+    force_vip_nic_overrides hiera hash.
+    This change is only useful for deployments where BGP is used to advertise
+    IP addresses from the host across multiple L3 networks.
