@@ -93,6 +93,9 @@
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
 #   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
 #
+# [*cluster_properties*]
+#   (optional) Cluster-wide properties that can be set by an operator via hiera
+#   Defaults to {}
 
 class tripleo::profile::base::pacemaker (
   $step                      = Integer(hiera('step')),
@@ -112,11 +115,13 @@ class tripleo::profile::base::pacemaker (
   $enable_instanceha         = hiera('tripleo::instanceha', false),
   $pcsd_bind_addr            = undef,
   $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $cluster_properties        = {},
 ) {
 
   if count($remote_short_node_names) != count($remote_node_ips) {
     fail("Count of ${remote_short_node_names} is not equal to count of ${remote_node_ips}")
   }
+  validate_legacy(Hash, 'validate_hash', $cluster_properties)
 
   if $pcs_password == undef {
     fail('The $pcs_password param is undefined, did you forget to include ::tripleo::profile::base::pacemaker in your role?')
@@ -285,6 +290,8 @@ class tripleo::profile::base::pacemaker (
   }
 
   if ($step >= 2 and $pacemaker_master) {
+    create_resources('pacemaker::property', $cluster_properties)
+
     if ! $enable_instanceha {
       include ::pacemaker::resource_defaults
     }
