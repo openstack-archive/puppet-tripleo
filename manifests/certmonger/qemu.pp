@@ -70,6 +70,26 @@ define tripleo::certmonger::qemu (
     require      => Class['::certmonger'],
   }
 
+  if $cacertfile {
+    # Sometimes certmonger returns before creating the cacert file. This has
+    # been reported in: https://bugzilla.redhat.com/show_bug.cgi?id=1759281
+    # Until this is fixed, add this workaround.
+    exec { $cacertfile :
+      require   => Certmonger_certificate[$name],
+      command   => "test -f ${cacertfile}",
+      unless    => "test -f ${cacertfile}",
+      tries     => 60,
+      try_sleep => 1,
+      timeout   => 60,
+      path      => '/usr/bin:/bin',
+    }
+
+    file { $cacertfile :
+      require => Exec[$cacertfile],
+      mode    => '0644'
+    }
+  }
+
   file { $service_certificate :
     require => Certmonger_certificate[$name],
     mode    => '0644'
