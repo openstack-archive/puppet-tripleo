@@ -78,11 +78,6 @@ class tripleo::profile::base::nova::compute (
 
     # deploy bits to connect nova compute to neutron
     include nova::network::neutron
-
-    # we need to set nova::metadata::dhcp_domain which sets
-    # [api]/dhcp_domain as this is used by the virt driver
-    # to generate the config drive
-    include nova::metadata
   }
 
   # If NFS is used as a Cinder or Nova backend
