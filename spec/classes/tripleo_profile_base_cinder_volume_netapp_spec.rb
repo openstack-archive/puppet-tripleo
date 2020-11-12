@@ -42,6 +42,29 @@ describe 'tripleo::profile::base::cinder::volume::netapp' do
         # TODO(aschultz): check parameters via hiera
         is_expected.to contain_cinder__backend__netapp('tripleo_netapp')
       end
+
+      context 'with multiple backends' do
+        let(:params) { {
+          :backend_name => ['tripleo_netapp_1', 'tripleo_netapp_2'],
+          :multi_config => { 'tripleo_netapp_1' => {
+                               'CinderNetappStorageProtocol' => 'iscsi',
+                             },
+                             'tripleo_netapp_2' => {
+                               'CinderNetappNfsSharesConfig' => '/etc/cinder/shares_2.conf',
+                             },
+                           },
+          :step         => 4,
+        } }
+
+        it 'should configure each backend' do
+          is_expected.to contain_cinder__backend__netapp('tripleo_netapp_1')
+          is_expected.to contain_cinder_config('tripleo_netapp_1/netapp_storage_protocol').with_value('iscsi')
+          is_expected.to contain_cinder_config('tripleo_netapp_1/nfs_shares_config').with_value('/etc/cinder/shares.conf')
+          is_expected.to contain_cinder__backend__netapp('tripleo_netapp_2')
+          is_expected.to contain_cinder_config('tripleo_netapp_2/netapp_storage_protocol').with_value('nfs')
+          is_expected.to contain_cinder_config('tripleo_netapp_2/nfs_shares_config').with_value('/etc/cinder/shares_2.conf')
+        end
+      end
     end
   end
 
