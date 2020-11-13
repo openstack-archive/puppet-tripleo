@@ -104,6 +104,13 @@
 # [*force_ocf*]
 #   (optional) Use --force when creating the ocf resource via pcs
 #   Defaults to false
+#
+# [*force_nic*]
+#   (optional) Force a specific nic interface name when creating all the VIPs
+#   The listening nic can be customized on a per-VIP basis by creating a hiera
+#   dict called: force_vip_nic_overrides[<vip/network name>] = 'dummy'
+#   Defaults to hiera('tripleo::pacemaker::force_nic', undef)
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image     = undef,
@@ -126,6 +133,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $dbs_timeout              = 60,
   $listen_on_master_ip_only = 'yes',
   $force_ocf                = false,
+  $force_nic                = hiera('tripleo::pacemaker::force_nic', undef),
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -148,6 +156,8 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   } else {
     $log_file_real = ''
   }
+  $force_vip_nic_overrides = hiera('force_vip_nic_overrides', {})
+  validate_legacy(Hash, 'validate_hash',  $force_vip_nic_overrides)
   if $step >= 3 {
 
     if $pacemaker_master {
@@ -295,11 +305,18 @@ monitor interval=30s role=Slave timeout=${dbs_timeout}s",
           $old_vip = $net_vip_map[$ovn_dbs_network]['ip_address']
           if $old_vip != $ovn_dbs_vip {
             $ovn_separate_vip = true
+            if has_key($force_vip_nic_overrides, 'ovn_dbs_vip') {
+              $ovn_dbs_vip_nic = $force_vip_nic_overrides['ovn_dbs_vip']
+            } else {
+              $ovn_dbs_vip_nic = $force_nic
+            }
           } else {
             $ovn_separate_vip = false
+            $ovn_dbs_vip_nic  = $force_nic
           }
         } else {
             $ovn_separate_vip = false
+            $ovn_dbs_vip_nic  = $force_nic
         }
 
         # We create a separate VIP only in case OVN has been configured so via THT
@@ -307,18 +324,16 @@ monitor interval=30s role=Slave timeout=${dbs_timeout}s",
         if $ovn_separate_vip {
           if is_ipv6_address($ovn_dbs_vip) {
             $netmask        = '128'
-            $nic            = interface_for_ip($ovn_dbs_vip)
             $ipv6_addrlabel = '99'
           } else {
             $netmask        = '32'
-            $nic            = ''
             $ipv6_addrlabel = ''
           }
 
           pacemaker::resource::ip { "${ovndb_vip_resource_name}":
             ip_address     => $ovn_dbs_vip,
             cidr_netmask   => $netmask,
-            nic            => $nic,
+            nic            => $ovn_dbs_vip_nic,
             ipv6_addrlabel => $ipv6_addrlabel,
             location_rule  => $ovn_dbs_location_rule,
             meta_params    => "resource-stickiness=INFINITY ${meta_params}",

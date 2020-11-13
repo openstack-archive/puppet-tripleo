@@ -98,6 +98,12 @@
 #   (optional) Set the --user= switch to be passed to pcmk
 #   Defaults to 'root'
 #
+# [*force_nic*]
+#   (optional) Force a specific nic interface name when creating all the VIPs
+#   The listening nic can be customized on a per-VIP basis by creating a hiera
+#   dict called: force_vip_nic_overrides[<vip/network name>] = 'dummy'
+#   Defaults to hiera('tripleo::pacemaker::force_nic', undef)
+#
 class tripleo::profile::pacemaker::haproxy_bundle (
   $haproxy_docker_image     = hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef),
   $bootstrap_node           = hiera('haproxy_short_bootstrap_node_name'),
@@ -113,6 +119,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   $container_backend        = 'docker',
   $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user              = 'root',
+  $force_nic                = hiera('tripleo::pacemaker::force_nic', undef),
   $log_driver               = undef,
   $log_file                 = '/var/log/containers/stdouts/haproxy-bundle.log',
   $step                     = Integer(hiera('step')),
@@ -140,6 +147,8 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   } else {
     $log_file_real = ''
   }
+  $force_vip_nic_overrides = hiera('force_vip_nic_overrides', {})
+  validate_legacy(Hash, 'validate_hash',  $force_vip_nic_overrides)
 
   if $step >= 2 and $enable_load_balancer {
     if $pacemaker_master {
@@ -296,16 +305,27 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         tries             => $pcs_tries,
       }
       $control_vip = hiera('controller_virtual_ip')
+      if has_key($force_vip_nic_overrides, 'controller_virtual_ip') {
+        $control_vip_nic = $force_vip_nic_overrides['controller_virtual_ip']
+      } else {
+        $control_vip_nic = $force_nic
+      }
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_control_vip':
         vip_name      => 'control',
         ip_address    => $control_vip,
         location_rule => $haproxy_location_rule,
         meta_params   => $meta_params,
         op_params     => $op_params,
+        nic           => $control_vip_nic,
         pcs_tries     => $pcs_tries,
       }
 
       $public_vip = hiera('public_virtual_ip')
+      if has_key($force_vip_nic_overrides, 'public_virtual_ip') {
+        $public_vip_nic = $force_vip_nic_overrides['public_virtual_ip']
+      } else {
+        $public_vip_nic = $force_nic
+      }
       tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_public_vip':
         ensure        => $public_vip and $public_vip != $control_vip,
         vip_name      => 'public',
@@ -313,12 +333,18 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         location_rule => $haproxy_location_rule,
         meta_params   => $meta_params,
         op_params     => $op_params,
+        nic           => $public_vip_nic,
         pcs_tries     => $pcs_tries,
       }
 
       $redis = hiera('redis_enabled', false)
       if $redis {
         $redis_vip = hiera('redis_vip')
+        if has_key($force_vip_nic_overrides, 'redis_vip') {
+          $redis_vip_nic = $force_vip_nic_overrides['redis_vip']
+        } else {
+          $redis_vip_nic = $force_nic
+        }
         tripleo::pacemaker::haproxy_with_vip { 'haproxy_and_redis_vip':
           ensure        => $redis_vip and $redis_vip != $control_vip,
           vip_name      => 'redis',
@@ -326,6 +352,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
           location_rule => $haproxy_location_rule,
           meta_params   => $meta_params,
           op_params     => $op_params,
+          nic           => $redis_vip_nic,
           pcs_tries     => $pcs_tries,
         }
       }
@@ -334,6 +361,11 @@ class tripleo::profile::pacemaker::haproxy_bundle (
       $network_vips = hiera('network_virtual_ips', {})
       $network_vips.each |String $net_name, $vip_info| {
         $virtual_ip = $vip_info[ip_address]
+        if has_key($force_vip_nic_overrides, $net_name) {
+          $vip_nic = $force_vip_nic_overrides[$net_name]
+        } else {
+          $vip_nic = $force_nic
+        }
         tripleo::pacemaker::haproxy_with_vip {"haproxy_and_${net_name}_vip":
           ensure        => $virtual_ip and $virtual_ip != $control_vip,
           vip_name      => $net_name,
@@ -341,6 +373,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
           location_rule => $haproxy_location_rule,
           meta_params   => $meta_params,
           op_params     => $op_params,
+          nic           => $vip_nic,
           pcs_tries     => $pcs_tries,
         }
       }
