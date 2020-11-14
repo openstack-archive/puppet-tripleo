@@ -55,6 +55,14 @@ class tripleo::profile::base::neutron::plugins::ml2 (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     include neutron::plugins::ml2
 
+    if 'openvswitch' in $mechanism_drivers {
+      include neutron::plugins::ml2::ovs_driver
+    }
+
+    if 'sriovnicswitch' in $mechanism_drivers {
+      include neutron::plugins::ml2::sriov_driver
+    }
+
     if 'cisco_n1kv' in $mechanism_drivers {
       include tripleo::profile::base::neutron::n1k
     }
