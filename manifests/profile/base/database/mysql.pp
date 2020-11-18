@@ -171,6 +171,7 @@ class tripleo::profile::base::database::mysql (
         'innodb_file_per_table'   => 'ON',
         'innodb_log_file_size'    => $innodb_log_file_size,
         'innodb_lock_wait_timeout'    => $innodb_lock_wait_timeout,
+        'log_warnings'            => '1',
         'table_open_cache'        => $table_open_cache,
         'innodb_flush_method'     => $innodb_flush_method,
         'query_cache_size'        => '0',
