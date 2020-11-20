@@ -47,6 +47,10 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*ceph_conf_path*]
+#   (optional) The path where the Ceph Cluster config files are stored on the host
+#   Defaults to '/etc/ceph'
+#
 # [*log_driver*]
 #   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
 #   when container_cli is set to podman and 'journald' when it is set to docker.
@@ -73,6 +77,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
   $pcs_tries                  = hiera('pcs_tries', 20),
   $step                       = Integer(hiera('step')),
   $container_backend          = 'docker',
+  $ceph_conf_path             = '/etc/ceph',
   $log_driver                 = undef,
   $log_file                   = '/var/log/containers/stdouts/openstack-cinder-volume.log',
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
@@ -207,7 +212,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
             'options'    => 'rw',
           },
           'cinder-volume-ceph-cfg-dir'            => {
-            'source-dir' => '/etc/ceph',
+            'source-dir' => $ceph_conf_path,
             'target-dir' => '/var/lib/kolla/config_files/src-ceph/',
             'options'    => 'ro',
           },

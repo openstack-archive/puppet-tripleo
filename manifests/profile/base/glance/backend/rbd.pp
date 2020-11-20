@@ -25,6 +25,10 @@
 #   (Optional) Hash containing multistore data for configuring multiple backends.
 #   Defaults to {}
 #
+# [*glance_rbd_ceph_conf_path*]
+#   (Optional) The path where the Ceph Cluster config files are stored on the host.
+#   Defaults to '/etc/ceph'
+#
 # [*rbd_store_ceph_conf*]
 #   (Optional) Ceph cluster config file.
 #   Defaults to hiera('glance::backend::rbd::rbd_store_ceph_conf', '/etc/ceph/ceph.conf').
@@ -61,15 +65,16 @@
 #
 class tripleo::profile::base::glance::backend::rbd (
   $backend_names,
-  $multistore_config     = {},
-  $rbd_store_ceph_conf   = hiera('glance::backend::rbd::rbd_store_ceph_conf', '/etc/ceph/ceph.conf'),
-  $rbd_store_user        = hiera('glance::backend::rbd::rbd_store_user', 'openstack'),
-  $rbd_store_pool        = hiera('glance::backend::rbd::rbd_store_pool', 'images'),
-  $rbd_store_chunk_size  = hiera('glance::backend::rbd::rbd_store_chunk_size', undef),
-  $rbd_thin_provisioning = hiera('glance::backend::rbd::rbd_thin_provisioning', undef),
-  $rados_connect_timeout = hiera('glance::backend::rbd::rados_connect_timeout', undef),
-  $store_description     = hiera('tripleo::profile::base::glance::api::glance_store_description', 'RBD store'),
-  $step                  = Integer(hiera('step')),
+  $multistore_config         = {},
+  $glance_rbd_ceph_conf_path = '/etc/ceph',
+  $rbd_store_ceph_conf       = hiera('glance::backend::rbd::rbd_store_ceph_conf', '/etc/ceph/ceph.conf'),
+  $rbd_store_user            = hiera('glance::backend::rbd::rbd_store_user', 'openstack'),
+  $rbd_store_pool            = hiera('glance::backend::rbd::rbd_store_pool', 'images'),
+  $rbd_store_chunk_size      = hiera('glance::backend::rbd::rbd_store_chunk_size', undef),
+  $rbd_thin_provisioning     = hiera('glance::backend::rbd::rbd_thin_provisioning', undef),
+  $rados_connect_timeout     = hiera('glance::backend::rbd::rados_connect_timeout', undef),
+  $store_description         = hiera('tripleo::profile::base::glance::api::glance_store_description', 'RBD store'),
+  $step                      = Integer(hiera('step')),
 ) {
 
   if $step >= 4 {
@@ -81,15 +86,16 @@ class tripleo::profile::base::glance::backend::rbd (
       $store_description_real = pick($backend_config['GlanceStoreDescription'], $store_description)
 
       $ceph_cluster_name = $backend_config['CephClusterName']
+
       if $ceph_cluster_name {
         $ceph_cluster_name_real = $ceph_cluster_name
         $rbd_store_ceph_conf_real = "/etc/ceph/${ceph_cluster_name}.conf"
       } else {
-        $ceph_cluster_name_real = $rbd_store_ceph_conf.match(/(\/etc\/ceph\/)(\w+)(\.conf$)/)[2]
+        $ceph_cluster_name_real = $rbd_store_ceph_conf.match(/(\w+)(\.conf$)/)[1]
         $rbd_store_ceph_conf_real = $rbd_store_ceph_conf
       }
 
-      $ceph_client_keyring = "/etc/ceph/${ceph_cluster_name_real}.client.${rbd_store_user_real}.keyring"
+      $ceph_client_keyring = "${glance_rbd_ceph_conf_path}/${ceph_cluster_name_real}.client.${rbd_store_user_real}.keyring"
 
       exec { "exec-setfacl-${ceph_cluster_name_real}-${rbd_store_user_real}-glance":
         path    => ['/bin', '/usr/bin'],

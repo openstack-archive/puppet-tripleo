@@ -51,6 +51,10 @@
 #   (optional) Container backend to use when creating the bundle
 #   Defaults to 'docker'
 #
+# [*ceph_conf_path*]
+#   (optional) The path where the Ceph Cluster config files are stored on the host
+#   Defaults to '/etc/ceph'
+#
 # [*log_driver*]
 #   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
 #   when container_cli is set to podman and 'journald' when it is set to docker.
@@ -76,6 +80,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
   $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
   $ceph_nfs_enabled           = hiera('ceph_nfs_enabled', false),
   $container_backend          = 'docker',
+  $ceph_conf_path             = '/etc/ceph',
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user                = 'root',
   $log_driver                 = undef,
@@ -208,7 +213,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
             'options'    => 'rw',
           },
           'manila-share-ceph-cfg-dir'            => {
-            'source-dir' => '/etc/ceph',
+            'source-dir' => $ceph_conf_path,
             'target-dir' => '/etc/ceph',
             'options'    => 'ro',
           },

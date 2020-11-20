@@ -106,6 +106,10 @@
 #   (Optional) Name of RBD client
 #   Defaults to hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name')
 #
+# [*cinder_rbd_ceph_conf_path*]
+#   (Optional) The path where the Ceph Cluster config files are stored on the host
+#   Defaults to '/etc/ceph'
+#
 # [*cinder_volume_cluster*]
 #   (Optional) Name of the cluster when running in active-active mode
 #   Defaults to hiera('tripleo::profile::base::cinder::volume::cinder_volume_cluster')
@@ -157,6 +161,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_vrts_hs_backend               = false,
   $cinder_enable_nvmeof_backend                = false,
   $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
+  $cinder_rbd_ceph_conf_path                   = '/etc/ceph',
   $cinder_rbd_client_name                      = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name','openstack'),
   $cinder_volume_cluster                       = hiera('tripleo::profile::base::cinder::volume::cinder_volume_cluster', ''),
   $enable_internal_tls                         = hiera('enable_internal_tls', false),
@@ -325,13 +330,13 @@ class tripleo::profile::base::cinder::volume (
 
       exec{ "exec-setfacl-${cinder_rbd_client_name}-cinder":
         path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m u:cinder:r-- /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring",
-        unless  => "getfacl /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring | grep -q user:cinder:r--",
+        command => "setfacl -m u:cinder:r-- ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring",
+        unless  => "getfacl ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring | grep -q user:cinder:r--",
       }
       -> exec{ "exec-setfacl-${cinder_rbd_client_name}-cinder-mask":
         path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m m::r /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring",
-        unless  => "getfacl /etc/ceph/ceph.client.${cinder_rbd_client_name}.keyring | grep -q mask::r",
+        command => "setfacl -m m::r ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring",
+        unless  => "getfacl ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring | grep -q mask::r",
       }
 
       $cinder_rbd_extra_pools = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef)

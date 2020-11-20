@@ -65,12 +65,17 @@
 #   (optional) Set the --user= switch to be passed to pcmk
 #   Defaults to 'root'
 #
+# [*ceph_conf_path*]
+#   (optional) The path where the Ceph Cluster config files are stored on the host
+#   Defaults to '/etc/ceph'
+#
 class tripleo::profile::pacemaker::cinder::backup_bundle (
   $bootstrap_node             = hiera('cinder_backup_short_bootstrap_node_name'),
   $cinder_backup_docker_image = undef,
   $docker_volumes             = [],
   $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
   $container_backend          = 'docker',
+  $ceph_conf_path             = '/etc/ceph',
   $log_driver                 = undef,
   $log_file                   = '/var/log/containers/stdouts/openstack-cinder-backup.log',
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
@@ -206,7 +211,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
             'options'    => 'rw',
           },
           'cinder-backup-ceph-cfg-dir'            => {
-            'source-dir' => '/etc/ceph',
+            'source-dir' => $ceph_conf_path,
             'target-dir' => '/var/lib/kolla/config_files/src-ceph',
             'options'    => 'ro',
           },

@@ -106,6 +106,7 @@ class tripleo::profile::base::manila::share (
       $cephfs_ganesha_server_ip = hiera('manila::backend::cephfs::cephfs_ganesha_server_ip', undef)
       $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', false)
       $manila_cephfs_pool_name = hiera('manila::backend::cephfs::pool_name', 'manila_data')
+      $manila_cephfs_ceph_conf_path = hiera('manila_cephfs_ceph_conf_path', '/etc/ceph')
 
       if $cephfs_ganesha_server_ip == undef {
         $cephfs_ganesha_server_ip_real = hiera('ganesha_vip', undef)
@@ -146,15 +147,16 @@ class tripleo::profile::base::manila::share (
         "client.${cephfs_auth_id}/client mount gid": value => 0;
       }
 
+      $keyring_local_path = "${manila_cephfs_ceph_conf_path}/ceph.client.${cephfs_auth_id}.keyring"
       exec{ "exec-setfacl-${cephfs_auth_id}":
         path    => ['/bin', '/usr/bin' ],
-        command => "setfacl -m u:manila:r-- ${keyring_path}",
-        unless  => "getfacl ${keyring_path} | grep -q user:manila:r--",
+        command => "setfacl -m u:manila:r-- ${keyring_local_path}",
+        unless  => "getfacl ${keyring_local_path} | grep -q user:manila:r--",
       }
       -> exec{ "exec-setfacl-${cephfs_auth_id}-mask":
         path    => ['/bin', '/usr/bin' ],
-        command => "setfacl -m m::r ${keyring_path}",
-        unless  => "getfacl ${keyring_path} | grep -q mask::r",
+        command => "setfacl -m m::r ${keyring_local_path}",
+        unless  => "getfacl ${keyring_local_path} | grep -q mask::r",
       }
     }
 

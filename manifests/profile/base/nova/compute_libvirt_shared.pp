@@ -22,14 +22,19 @@
 #   (optional) name of RBD client
 #   defaults to hiera('nova::compute::rbd::libvirt_rbd_user')
 #
+# [*nova_rbd_ceph_conf_path*]
+#   (Optional) The path where the Ceph Cluster config files are stored on the host
+#   defaults to '/etc/ceph'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::nova::compute_libvirt_shared (
-  $nova_rbd_client_name = hiera('nova::compute::rbd::libvirt_rbd_user','openstack'),
-  $step                 = Integer(hiera('step')),
+  $nova_rbd_client_name    = hiera('nova::compute::rbd::libvirt_rbd_user','openstack'),
+  $nova_rbd_ceph_conf_path = '/etc/ceph',
+  $step                    = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     # Ceph + Libvirt
@@ -39,13 +44,13 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
       include nova::compute::rbd
       exec{ "exec-setfacl-${nova_rbd_client_name}-nova":
         path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m u:nova:r-- /etc/ceph/ceph.client.${nova_rbd_client_name}.keyring",
-        unless  => "getfacl /etc/ceph/ceph.client.${nova_rbd_client_name}.keyring | grep -q user:nova:r--",
+        command => "setfacl -m u:nova:r-- ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring",
+        unless  => "getfacl ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring | grep -q user:nova:r--",
       }
       -> exec{ "exec-setfacl-${nova_rbd_client_name}-nova-mask":
         path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m m::r /etc/ceph/ceph.client.${nova_rbd_client_name}.keyring",
-        unless  => "getfacl /etc/ceph/ceph.client.${nova_rbd_client_name}.keyring | grep -q mask::r",
+        command => "setfacl -m m::r ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring",
+        unless  => "getfacl ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring | grep -q mask::r",
       }
     }
 

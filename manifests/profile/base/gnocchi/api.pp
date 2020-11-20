@@ -59,6 +59,10 @@
 #   (Optional) RBD Client username.
 #   Defaults to hiera('gnocchi::storage::ceph::ceph_username')
 #
+# [*gnocchi_rbd_ceph_conf_path*]
+#   (Optional) The path where the Ceph Cluster config files are stored on the host
+#   Defaults to '/etc/ceph'
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -77,6 +81,7 @@ class tripleo::profile::base::gnocchi::api (
   $gnocchi_redis_password        = hiera('gnocchi_redis_password'),
   $redis_vip                     = hiera('redis_vip'),
   $gnocchi_rbd_client_name       = hiera('gnocchi::storage::ceph::ceph_username','openstack'),
+  $gnocchi_rbd_ceph_conf_path    = '/etc/ceph',
   $step                          = Integer(hiera('step')),
   $incoming_storage_driver       = hiera('incoming_storage_driver', undef),
 ) {
@@ -145,13 +150,13 @@ class tripleo::profile::base::gnocchi::api (
         include gnocchi::storage::ceph
         exec{ "exec-setfacl-${gnocchi_rbd_client_name}-gnocchi":
           path    => ['/bin', '/usr/bin'],
-          command => "setfacl -m u:gnocchi:r-- /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring",
-          unless  => "getfacl /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q user:gnocchi:r--",
+          command => "setfacl -m u:gnocchi:r-- ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring",
+          unless  => "getfacl ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q user:gnocchi:r--",
         }
         -> exec{ "exec-setfacl-${gnocchi_rbd_client_name}-gnocchi-mask":
           path    => ['/bin', '/usr/bin'],
-          command => "setfacl -m m::r /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring",
-          unless  => "getfacl /etc/ceph/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q mask::r",
+          command => "setfacl -m m::r ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring",
+          unless  => "getfacl ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q mask::r",
         }
       }
       's3': { include gnocchi::storage::s3 }
