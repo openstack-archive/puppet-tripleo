@@ -296,6 +296,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
       'query_cache_size'               => '0',
       'query_cache_type'               => '0',
       'bind-address'                   => $bind_address,
+      'log_warnings'                   => '1',
       'max_connections'                => hiera('mysql_max_connections'),
       'open_files_limit'               => '65536',
       'wsrep_on'                       => 'ON',
