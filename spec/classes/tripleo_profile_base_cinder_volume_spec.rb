@@ -279,7 +279,16 @@ describe 'tripleo::profile::base::cinder::volume' do
             :enabled_backends => ['tripleo_netapp']
           )
         end
-      end
+        context 'with multiple netapp backends' do
+          # Step 5's hiera specifies two netapp backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_netapp_1', 'tripleo_netapp_2']
+            )
+          end
+        end
+       end
 
       context 'with only veritas hyperscale' do
         before :each do

@@ -18,3 +18,9 @@ cinder::backend::dellemc_sc::volume_backend_name:
 cinder::backend::dellemc_xtremio::volume_backend_name:
   - 'tripleo_dellemc_xtremio_1'
   - 'tripleo_dellemc_xtremio_2'
+cinder::backend::netapp::volume_backend_name:
+  - 'tripleo_netapp_1'
+  - 'tripleo_netapp_2'
+tripleo::profile::base::cinder::volume::netapp::multi_config:
+  tripleo_netapp_2:
+    CinderNetappNfsSharesConfig: '/etc/cinder/shares_2.conf'
