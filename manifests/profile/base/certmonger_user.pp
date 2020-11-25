@@ -219,7 +219,11 @@ class tripleo::profile::base::certmonger_user (
     if $certmonger_ca == 'local' {
         include tripleo::certmonger::ca::local
     }
-    unless empty($haproxy_certificates_specs) {
+
+    # Remove haproxy_certificates_specs where hostname is empty.
+    # Workaround bug: https://bugs.launchpad.net/tripleo/+bug/1905604
+    $haproxy_certificates_specs_filtered = $haproxy_certificates_specs.filter | $specs, $keys | { ! empty($keys[hostname]) }
+    unless empty($haproxy_certificates_specs_filtered) {
       $reload_haproxy = ['systemctl reload tripleo_haproxy']
       Class['::tripleo::certmonger::ca::crl'] ~> Haproxy::Balancermember<||>
       if defined(Class['::haproxy']) {
@@ -258,9 +262,9 @@ class tripleo::profile::base::certmonger_user (
       ensure_resources('tripleo::certmonger::qemu', $qemu_certificates_specs,
                         {'postsave_cmd' => $qemu_postsave_cmd})
     }
-    unless empty($haproxy_certificates_specs) {
+    unless empty($haproxy_certificates_specs_filtered) {
       include tripleo::certmonger::haproxy_dirs
-      ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs)
+      ensure_resources('tripleo::certmonger::haproxy', $haproxy_certificates_specs_filtered)
       # The haproxy fronends (or listen resources) depend on the certificate
       # existing and need to be refreshed if it changed.
       Tripleo::Certmonger::Haproxy<||> ~> Haproxy::Listen<||>
