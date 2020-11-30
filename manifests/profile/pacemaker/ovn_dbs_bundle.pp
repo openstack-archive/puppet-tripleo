@@ -324,16 +324,24 @@ monitor interval=30s role=Slave timeout=${dbs_timeout}s",
         if $ovn_separate_vip {
           if is_ipv6_address($ovn_dbs_vip) {
             $netmask        = '128'
+            $vip_nic        = interface_for_ip($ovn_dbs_vip)
             $ipv6_addrlabel = '99'
           } else {
             $netmask        = '32'
+            $vip_nic        = ''
             $ipv6_addrlabel = ''
+          }
+
+          if $ovn_dbs_vip_nic != undef {
+            $nic_real = $ovn_dbs_vip_nic
+          } else {
+            $nic_real = $vip_nic
           }
 
           pacemaker::resource::ip { "${ovndb_vip_resource_name}":
             ip_address     => $ovn_dbs_vip,
             cidr_netmask   => $netmask,
-            nic            => $ovn_dbs_vip_nic,
+            nic            => $nic_real,
             ipv6_addrlabel => $ipv6_addrlabel,
             location_rule  => $ovn_dbs_location_rule,
             meta_params    => "resource-stickiness=INFINITY ${meta_params}",

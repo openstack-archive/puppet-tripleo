@@ -75,17 +75,19 @@ define tripleo::pacemaker::haproxy_with_vip(
     if !is_ip_addresses($ip_address) {
       fail("Haproxy VIP: ${ip_address} is not a proper IP address.")
     }
-    if $nic != undef {
-      $nic_real = $nic
-    } else {
-      $nic_real = ''
-    }
     if is_ipv6_address($ip_address) {
       $netmask        = '128'
+      $vip_nic        = interface_for_ip($ip_address)
       $ipv6_addrlabel = '99'
     } else {
       $netmask        = '32'
+      $vip_nic        = ''
       $ipv6_addrlabel = ''
+    }
+    if $nic != undef {
+      $nic_real = $nic
+    } else {
+      $nic_real = $vip_nic
     }
 
     $haproxy_in_container = hiera('haproxy_docker', false)
