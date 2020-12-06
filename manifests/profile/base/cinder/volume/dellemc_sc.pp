@@ -44,7 +44,7 @@ class tripleo::profile::base::cinder::volume::dellemc_sc (
       'CinderSCAvailabilityZone'         => hiera('cinder::backend::dellemc_sc::backend_availability_zone', undef),
       'CinderSCSanIp'                    => hiera('cinder::backend::dellemc_sc::san_ip', undef),
       'CinderSCSanLogin'                 => hiera('cinder::backend::dellemc_sc::san_login', undef),
-      'CinderSCSanPassword'              => hiera('cinder::backend::dellemc_sc::san password', undef),
+      'CinderSCSanPassword'              => hiera('cinder::backend::dellemc_sc::san_password', undef),
       'CinderSCStorageProtocol'          => hiera('cinder::backend::dellemc_sc::sc_storage_protocol', undef),
       'CinderSCSSN'                      => hiera('cinder::backend::dellemc_sc::dell_sc_ssn', undef),
       'CinderSCTargetIpAddress'          => hiera('cinder::backend::dellemc_sc::iscsi_ip_address', undef),
