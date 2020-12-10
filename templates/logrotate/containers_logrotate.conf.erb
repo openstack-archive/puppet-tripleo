@@ -1,4 +1,4 @@
-/var/log/containers/*/*log /var/log/containers/*/*/*log /var/log/containers/*/*err {
+/var/log/containers/*/*[!healthcheck].log /var/log/containers/*/*/*log /var/log/containers/*/*err {
   <%= @rotation %>
   rotate <%= @rotate %>
   maxage <%= @purge_after_days %>
