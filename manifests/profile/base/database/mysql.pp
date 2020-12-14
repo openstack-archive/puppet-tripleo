@@ -69,6 +69,13 @@
 #   When this occurs, the statement (not transaction) is rolled back.
 #   Defaults to undef.
 #
+# [*innodb_strict_mode*]
+#   (Optional) InnoDB strict mode enforcement. When set to 'ON', InnoDB
+#   performs validity checks on DDL statements such as table creation,
+#   or table row size. When set to 'OFF', the same checks only return
+#   warnings rather than error.
+#   Defaults to hiera('innodb_strict_mode', 'OFF')
+#
 # [*table_open_cache*]
 #   (Optional) Configure the number of open tables for all threads.
 #   Increasing this value increases the number of file descriptors that mysqld requires.
@@ -112,6 +119,7 @@ class tripleo::profile::base::database::mysql (
   $innodb_buffer_pool_size       = hiera('innodb_buffer_pool_size', undef),
   $innodb_log_file_size          = undef,
   $innodb_lock_wait_timeout      = hiera('innodb_lock_wait_timeout', undef),
+  $innodb_strict_mode            = hiera('innodb_strict_mode', 'OFF'),
   $table_open_cache              = undef,
   $innodb_flush_method           = undef,
   $manage_resources              = true,
@@ -164,24 +172,25 @@ class tripleo::profile::base::database::mysql (
     # MysqlNetwork and ControllerHostnameResolveNetwork in ServiceNetMap
     $mysql_server_default = {
       'mysqld' => {
-        'bind-address'            => $bind_address,
-        'max_connections'         => $mysql_max_connections,
-        'open_files_limit'        => '65536',
-        'innodb_buffer_pool_size' => $innodb_buffer_pool_size,
-        'innodb_file_per_table'   => 'ON',
-        'innodb_log_file_size'    => $innodb_log_file_size,
-        'innodb_lock_wait_timeout'    => $innodb_lock_wait_timeout,
-        'log_warnings'            => '1',
-        'table_open_cache'        => $table_open_cache,
-        'innodb_flush_method'     => $innodb_flush_method,
-        'query_cache_size'        => '0',
-        'query_cache_type'        => '0',
-        'ssl'                     => $enable_internal_tls,
-        'ssl-key'                 => $tls_keyfile,
-        'ssl-cert'                => $tls_certfile,
-        'ssl-cipher'              => $tls_cipher_list,
-        'ssl-ca'                  => undef,
-        'plugin_load_add'         => 'auth_ed25519',
+        'bind-address'             => $bind_address,
+        'max_connections'          => $mysql_max_connections,
+        'open_files_limit'         => '65536',
+        'innodb_buffer_pool_size'  => $innodb_buffer_pool_size,
+        'innodb_file_per_table'    => 'ON',
+        'innodb_log_file_size'     => $innodb_log_file_size,
+        'innodb_lock_wait_timeout' => $innodb_lock_wait_timeout,
+        'innodb_strict_mode'       => $innodb_strict_mode,
+        'log_warnings'             => '1',
+        'table_open_cache'         => $table_open_cache,
+        'innodb_flush_method'      => $innodb_flush_method,
+        'query_cache_size'         => '0',
+        'query_cache_type'         => '0',
+        'ssl'                      => $enable_internal_tls,
+        'ssl-key'                  => $tls_keyfile,
+        'ssl-cert'                 => $tls_certfile,
+        'ssl-cipher'               => $tls_cipher_list,
+        'ssl-ca'                   => undef,
+        'plugin_load_add'          => 'auth_ed25519',
       }
     }
     $mysql_server_options_real = deep_merge($mysql_server_default, $mysql_server_options)
