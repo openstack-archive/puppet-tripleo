@@ -37,7 +37,6 @@ describe 'tripleo::profile::base::glance::backend::cinder' do
 
     context 'with step 4' do
       let(:params) { {
-        :backend_names               => ['my_cinder'],
         :cinder_ca_certificates_file => '/path/to/certificates_file',
         :cinder_api_insecure         => true,
         :cinder_catalog_info         => 'volume:cinder:internalURL',
@@ -50,6 +49,9 @@ describe 'tripleo::profile::base::glance::backend::cinder' do
         :cinder_enforce_multipath    => true,
         :cinder_use_multipath        => true,
         :cinder_mount_point_base     => '/var/lib/glance/mnt/nfs',
+        :cinder_volume_type          => 'glance-my_cinder',
+        :store_description           => 'Cinder store',
+        :backend_names               => ['my_cinder'],
         :step                        => 4,
       } }
 
@@ -67,34 +69,56 @@ describe 'tripleo::profile::base::glance::backend::cinder' do
           :cinder_enforce_multipath    => true,
           :cinder_use_multipath        => true,
           :cinder_mount_point_base     => '/var/lib/glance/mnt/nfs',
+          :cinder_volume_type          => 'glance-my_cinder',
           :store_description           => 'Cinder store',
         )
       end
 
-      context 'with store description in multistore_config' do
-        before :each do
-          params.merge!({
-            :multistore_config => {
-              'my_cinder' => {
-                'GlanceStoreDescription' => 'My multistore cinder backend',
-              },
-            },
-          })
-        end
-        it 'should use the multistore_config description' do
-          is_expected.to contain_glance__backend__multistore__cinder('my_cinder').with(
-            :store_description => 'My multistore cinder backend',
-          )
-        end
-      end
 
-      context 'with multiple backend_names' do
+     context 'with store description and volume type in multistore_config' do
+       before :each do
+         params.merge!({
+          :multistore_config => {
+            'my_cinder' => {
+              'GlanceCinderVolumeType' => 'glance-cinder',
+              'GlanceStoreDescription' => 'My multistore cinder backend',
+             },
+           },
+         })
+       end
+       it 'should use the multistore_config description and volume type' do
+         is_expected.to contain_glance__backend__multistore__cinder('my_cinder').with(
+           :cinder_volume_type => 'glance-cinder',
+           :store_description => 'My multistore cinder backend',
+         )
+       end
+     end
+
+     context 'with multiple backend_names' do
         before :each do
           params.merge!({
             :backend_names => ['cinder1', 'cinder2'],
+            :multistore_config => {
+              'cinder2' => {
+                'GlanceCinderVolumeType' => 'glance-cinder2',
+                'GlanceStoreDescription' => 'cinder2 backend',
+              },
+            },
+            :cinder_volume_type => 'glance-cinder1',
+            :store_description => 'cinder1 backend',
           })
         end
-        it_raises 'a Puppet::Error', /Multiple cinder backends are not supported./
+
+        it 'should configure multiple backends' do
+          is_expected.to contain_glance__backend__multistore__cinder('cinder1').with(
+            :cinder_volume_type  => 'glance-cinder1',
+            :store_description   => 'cinder1 backend',
+          )
+          is_expected.to contain_glance__backend__multistore__cinder('cinder2').with(
+            :cinder_volume_type  => 'glance-cinder2',
+            :store_description   => 'cinder2 backend',
+          )
+        end
       end
     end
   end

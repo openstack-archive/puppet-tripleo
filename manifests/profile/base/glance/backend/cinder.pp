@@ -73,6 +73,10 @@
 #   (Optional) Directory where the NFS volume is mounted on the glance node.
 #   Defaults to hiera('glance::backend::cinder::cinder_mount_point_base', undef)
 #
+# [*cinder_volume_type*]
+#  (Optional) The volume type to be used to create image volumes in cinder.
+#   Defaults to hiera('glance::backend::cinder::cinder_volume_type', undef)
+#
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
@@ -98,34 +102,39 @@ class tripleo::profile::base::glance::backend::cinder (
   $cinder_enforce_multipath    = hiera('glance::backend::cinder::cinder_enforce_multipath', undef),
   $cinder_use_multipath        = hiera('glance::backend::cinder::cinder_use_multipath', undef),
   $cinder_mount_point_base     = hiera('glance::backend::cinder::cinder_mount_point_base', undef),
+  $cinder_volume_type          = hiera('glance::backend::cinder::cinder_volume_type', undef),
   $store_description           = hiera('tripleo::profile::base::glance::api::glance_store_description', 'Cinder store'),
   $step                        = Integer(hiera('step')),
 ) {
 
-  if $backend_names.length() > 1 {
-    fail('Multiple cinder backends are not supported.')
-  }
 
   if $step >= 4 {
-    $backend_name = $backend_names[0]
+    $backend_names.each |String $backend_name| {
+      $backend_config = pick($multistore_config[$backend_name], {})
+      $store_description_real = pick($backend_config['GlanceStoreDescription'], $store_description)
 
-    $multistore_description = pick($multistore_config[$backend_name], {})['GlanceStoreDescription']
-    $store_description_real = pick($multistore_description, $store_description)
+      if $backend_config['GlanceCinderVolumeType'] {
+        $cinder_volume_type_real = $backend_config['GlanceCinderVolumeType']
+      } else {
+        $cinder_volume_type_real = $cinder_volume_type
+      }
 
-    glance::backend::multistore::cinder { $backend_name:
-      cinder_api_insecure         => $cinder_api_insecure,
-      cinder_catalog_info         => $cinder_catalog_info,
-      cinder_http_retries         => $cinder_http_retries,
-      cinder_endpoint_template    => $cinder_endpoint_template,
-      cinder_ca_certificates_file => $cinder_ca_certificates_file,
-      cinder_store_auth_address   => $cinder_store_auth_address,
-      cinder_store_project_name   => $cinder_store_project_name,
-      cinder_store_user_name      => $cinder_store_user_name,
-      cinder_store_password       => $cinder_store_password,
-      cinder_enforce_multipath    => $cinder_enforce_multipath,
-      cinder_use_multipath        => $cinder_use_multipath,
-      cinder_mount_point_base     => $cinder_mount_point_base,
-      store_description           => $store_description_real,
+      glance::backend::multistore::cinder { $backend_name:
+        cinder_api_insecure         => $cinder_api_insecure,
+        cinder_catalog_info         => $cinder_catalog_info,
+        cinder_http_retries         => $cinder_http_retries,
+        cinder_endpoint_template    => $cinder_endpoint_template,
+        cinder_ca_certificates_file => $cinder_ca_certificates_file,
+        cinder_store_auth_address   => $cinder_store_auth_address,
+        cinder_store_project_name   => $cinder_store_project_name,
+        cinder_store_user_name      => $cinder_store_user_name,
+        cinder_store_password       => $cinder_store_password,
+        cinder_enforce_multipath    => $cinder_enforce_multipath,
+        cinder_use_multipath        => $cinder_use_multipath,
+        cinder_mount_point_base     => $cinder_mount_point_base,
+        cinder_volume_type          => $cinder_volume_type_real,
+        store_description           => $store_description_real,
+      }
     }
   }
 }
