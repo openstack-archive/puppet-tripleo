@@ -52,6 +52,10 @@
 #   (Optional) The number of times pcs commands should be retried.
 #   Defaults to 1
 #
+# [*nic*]
+#   (Optional) Specifies the nic interface on which the VIP should be added
+#   Defaults to undef
+#
 # [*ensure*]
 #  (Boolean) Create the all the resources only if true.  False won't
 #  destroy the resource, it will just not create them.
@@ -64,22 +68,26 @@ define tripleo::pacemaker::haproxy_with_vip(
   $meta_params   = '',
   $op_params     = '',
   $pcs_tries     = 1,
+  $nic           = undef,
   $ensure        = true)
 {
   if($ensure) {
     if !is_ip_addresses($ip_address) {
       fail("Haproxy VIP: ${ip_address} is not a proper IP address.")
     }
-    # NB: Until the IPaddr2 RA has a fix for https://bugzilla.redhat.com/show_bug.cgi?id=1445628
-    # we need to specify the nic when creating the ipv6 vip.
     if is_ipv6_address($ip_address) {
       $netmask        = '128'
-      $nic            = interface_for_ip($ip_address)
+      $vip_nic        = interface_for_ip($ip_address)
       $ipv6_addrlabel = '99'
     } else {
       $netmask        = '32'
-      $nic            = ''
+      $vip_nic        = ''
       $ipv6_addrlabel = ''
+    }
+    if $nic != undef {
+      $nic_real = $nic
+    } else {
+      $nic_real = $vip_nic
     }
 
     $haproxy_in_container = hiera('haproxy_docker', false)
@@ -91,7 +99,7 @@ define tripleo::pacemaker::haproxy_with_vip(
     pacemaker::resource::ip { "${vip_name}_vip":
       ip_address     => $ip_address,
       cidr_netmask   => $netmask,
-      nic            => $nic,
+      nic            => $nic_real,
       ipv6_addrlabel => $ipv6_addrlabel,
       meta_params    => "resource-stickiness=INFINITY ${meta_params}",
       location_rule  => $location_rule,
