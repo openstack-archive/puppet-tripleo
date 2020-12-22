@@ -76,10 +76,6 @@
 #    (Optional) Swift store region.
 #    Defaults to hiera('glance::backend::swift::swift_store_region', undef).
 #
-#  [*swift_store_config_file*]
-#    (Optional)
-#    Defaults to /etc/glance/glance-swift.conf.
-#
 #  [*default_swift_reference*]
 #    (Optional) The reference to the default swift
 #    account/backing store parameters to use for adding
@@ -96,6 +92,12 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# DEPRECATED PARAMETERS
+#
+#  [*swift_store_config_file*]
+#    (Optional)
+#    Defaults to undef.
+#
 class tripleo::profile::base::glance::backend::swift (
   $backend_names,
   $multistore_config                   = {},
@@ -111,14 +113,19 @@ class tripleo::profile::base::glance::backend::swift (
   $swift_store_create_container_on_put = hiera('glance::backend::swift::swift_store_create_container_on_put', undef),
   $swift_store_endpoint_type           = hiera('glance::backend::swift::swift_store_endpoint_type', undef),
   $swift_store_region                  = hiera('glance::backend::swift::swift_store_region', undef),
-  $swift_store_config_file             = '/etc/glance/glance-swift.conf',
   $default_swift_reference             = 'ref1',
   $store_description                   = hiera('tripleo::profile::base::glance::api::glance_store_description', 'Swift store'),
   $step                                = Integer(hiera('step')),
+  # DEPRECATED PARAMETERS
+  $swift_store_config_file             = undef,
 ) {
 
   if $backend_names.length() > 1 {
     fail('Multiple swift backends are not supported.')
+  }
+
+  if $swift_store_config_file != undef {
+    warning('The swift_store_config_file parameter has been deprecated and has no effect')
   }
 
   if $step >= 4 {
@@ -140,7 +147,6 @@ class tripleo::profile::base::glance::backend::swift (
       swift_store_create_container_on_put => $swift_store_create_container_on_put,
       swift_store_endpoint_type           => $swift_store_endpoint_type,
       swift_store_region                  => $swift_store_region,
-      swift_store_config_file             => $swift_store_config_file,
       default_swift_reference             => $default_swift_reference,
       store_description                   => $store_description_real,
     }
