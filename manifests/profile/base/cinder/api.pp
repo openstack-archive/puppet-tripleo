@@ -58,12 +58,6 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*keystone_resources_managed*]
-#   (Optional) Enable the management of Keystone resources with Puppet.
-#   Can be disabled if Ansible manages these resources instead of Puppet.
-#   The resources are cinder types.
-#   Defaults to hiera('keystone_resources_managed', true)
-#
 class tripleo::profile::base::cinder::api (
   $bootstrap_node                = hiera('cinder_api_short_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -72,14 +66,11 @@ class tripleo::profile::base::cinder::api (
   $keymgr_backend                = hiera('cinder::api::keymgr_backend', 'cinder.keymgr.conf_key_mgr.ConfKeyManager'),
   $default_volume_type           = hiera('cinder::api::default_volume_type', ''),
   $step                          = Integer(hiera('step')),
-  $keystone_resources_managed    = hiera('keystone_resources_managed', true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
-    $manage_type = $keystone_resources_managed
   } else {
     $sync_db = false
-    $manage_type = false
   }
 
   include tripleo::profile::base::cinder
@@ -107,9 +98,4 @@ class tripleo::profile::base::cinder::api (
       ssl_key  => $tls_keyfile,
     }
   }
-
-  if $step == 4 and $manage_type and $default_volume_type != '' {
-    cinder::type { $default_volume_type : }
-  }
-
 }
