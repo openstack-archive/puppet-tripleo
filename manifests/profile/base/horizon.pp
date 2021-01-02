@@ -87,13 +87,6 @@ class tripleo::profile::base::horizon (
     include tripleo::profile::base::apache
     include apache::mod::remoteip
 
-    if 'cisco_n1kv' in hiera('neutron::plugins::ml2::mechanism_drivers', undef) {
-      $_profile_support = 'cisco'
-    } else {
-      $_profile_support = 'None'
-    }
-    $neutron_options_real = merge({'profile_support' => $_profile_support }, $neutron_options)
-
     if is_ipv6_address($memcached_ips[0]) {
         $horizon_memcached_servers = prefix(any2array(normalize_ip_for_uri($memcached_ips)), 'inet6:')
 
@@ -103,7 +96,7 @@ class tripleo::profile::base::horizon (
 
     class { 'horizon':
       cache_server_ip => $horizon_memcached_servers,
-      neutron_options => $neutron_options_real,
+      neutron_options => $neutron_options,
       ssl_cert        => $tls_certfile,
       ssl_key         => $tls_keyfile,
     }
