@@ -63,10 +63,6 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include neutron::plugins::ml2::sriov_driver
     }
 
-    if 'cisco_n1kv' in $mechanism_drivers {
-      include tripleo::profile::base::neutron::n1k
-    }
-
     if 'cisco_ucsm' in $mechanism_drivers {
       include neutron::plugins::ml2::cisco::ucsm
     }
