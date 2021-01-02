@@ -63,15 +63,6 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include neutron::plugins::ml2::sriov_driver
     }
 
-    if 'cisco_ucsm' in $mechanism_drivers {
-      include neutron::plugins::ml2::cisco::ucsm
-    }
-
-    if 'cisco_nexus'  in $mechanism_drivers {
-      include neutron::plugins::ml2::cisco::nexus
-      include neutron::plugins::ml2::cisco::type_nexus_vxlan
-    }
-
     if 'bsn_ml2' in $mechanism_drivers {
       include neutron::plugins::ml2::bigswitch::restproxy
     }
