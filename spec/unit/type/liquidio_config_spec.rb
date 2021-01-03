@@ -29,12 +29,12 @@ describe 'Puppet::Type.type(:liquidio_config)' do
 
   it 'should accept a valid value' do
     @liquidio_config[:value] = 'bar'
-    expect(@liquidio_config[:value]).to eq(['bar'])
+    expect(@liquidio_config[:value]).to eq('bar')
   end
 
   it 'should not accept a value with whitespace' do
     @liquidio_config[:value] = 'b ar'
-    expect(@liquidio_config[:value]).to eq(['b ar'])
+    expect(@liquidio_config[:value]).to eq('b ar')
   end
 
   it 'should accept valid ensure values' do
