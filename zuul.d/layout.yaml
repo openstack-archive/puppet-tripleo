@@ -19,6 +19,7 @@
       - tripleo-multinode-container-minimal-pipeline
       - release-notes-jobs-python3
       - tripleo-standalone-scenarios-pipeline
+      - tripleo-upgrades-train-pipeline
     check:
       jobs:
         - tripleo-ci-centos-7-content-provider
