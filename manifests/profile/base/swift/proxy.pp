@@ -67,8 +67,8 @@
 #   Defaults to hiera('enable_internal_tls', false)
 #
 # [*memcache_port*]
-#   (Optional) memcache port
-#   Defaults to 11211
+#   (Optional) Memcached port to use.
+#   Defaults to hiera('memcached_port', 11211)
 #
 # [*memcache_servers*]
 #   (Optional) List of memcache servers
@@ -110,7 +110,7 @@ class tripleo::profile::base::swift::proxy (
   $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
   $certificates_specs   = hiera('apache_certificates_specs', {}),
   $enable_internal_tls  = hiera('enable_internal_tls', false),
-  $memcache_port        = 11211,
+  $memcache_port        = hiera('memcached_port', 11211),
   $memcache_servers     = hiera('memcached_node_ips', []),
   $step                 = Integer(hiera('step')),
   $swift_proxy_network  = hiera('swift_proxy_network', undef),

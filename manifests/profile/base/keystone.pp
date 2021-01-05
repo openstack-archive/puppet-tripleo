@@ -158,6 +158,10 @@
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
 #   Defaults to hiera('memcached_node_ips', [])
 #
+# [*memcached_port*]
+#   (Optional) Memcached port to use.
+#   Defaults to hiera('memcached_port', 11211)
+#
 # [*keystone_resources_managed*]
 #   (Optional) Enable the management of Keystone resources with Puppet.
 #   Can be disabled if Ansible manages these resources instead of Puppet.
@@ -199,6 +203,7 @@ class tripleo::profile::base::keystone (
   $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
   $memcached_ips                  = hiera('memcached_node_ips', []),
+  $memcached_port                 = hiera('memcached_port', 11211),
   $keystone_resources_managed     = hiera('keystone_resources_managed', undef),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -225,7 +230,7 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
 
     class { 'keystone':
       sync_db                    => $sync_db,
