@@ -44,6 +44,10 @@
 #   (Optional) The haproxy service principal that is set for etcd in kerberos.
 #   Defaults to undef
 #
+# [*key_size*]
+#   (Optional) Specifies the private key size used when creating the certificate.
+#   Defaults to 2048bits.
+#
 class tripleo::certmonger::etcd (
   $hostname,
   $service_certificate,
@@ -52,6 +56,7 @@ class tripleo::certmonger::etcd (
   $dnsnames      = $hostname,
   $postsave_cmd  = undef,
   $principal     = undef,
+  $key_size      = 2048,
 ) {
   include certmonger
 
@@ -70,6 +75,7 @@ class tripleo::certmonger::etcd (
     dnsname      => $dnsnames,
     principal    => $principal,
     postsave_cmd => $postsave_cmd,
+    key_size     => $key_size,
     ca           => $certmonger_ca,
     wait         => true,
     require      => Class['::certmonger'],
