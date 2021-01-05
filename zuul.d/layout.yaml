@@ -7,6 +7,7 @@
       - release-notes-jobs-python3
       - tripleo-standalone-scenarios-pipeline
       - tripleo-standalone-multinode-ipa
+      - tripleo-upgrades-victoria-pipeline
     check:
       jobs:
         - tripleo-ci-centos-8-content-provider
