@@ -29,10 +29,21 @@
 #   (Optional) Memcached port to use.
 #   Defaults to hiera('memcached_authtoken_port', 11211)
 #
+# [*security_strategy*]
+#   (Optional) Memcached (authtoken) security strategy.
+#   Defaults to hiera('memcached_authtoken_security_strategy', undef)
+#
+# [*secret_key*]
+#   (Optional) Memcached (authtoken) secret key, used with security_strategy.
+#   The key is hashed with a salt, to isolate services.
+#   Defaults to hiera('memcached_authtoken_secret_key', undef)
+#
 class tripleo::profile::base::ironic::authtoken (
   $step                = Integer(hiera('step')),
   $memcached_ips       = hiera('memcached_node_ips', []),
   $memcached_port      = hiera('memcached_authtoken_port', 11211),
+  $security_strategy   = hiera('memcached_authtoken_security_strategy', undef),
+  $secret_key          = hiera('memcached_authtoken_secret_key', undef),
 ) {
 
   if $step >= 3 {
@@ -42,8 +53,16 @@ class tripleo::profile::base::ironic::authtoken (
       $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
     }
 
+    if $secret_key {
+      $hashed_secret_key = sha256("${secret_key}+ironic")
+    } else {
+      $hashed_secret_key = undef
+    }
+
     class { 'ironic::api::authtoken':
-      memcached_servers => $memcache_servers
+      memcached_servers          => $memcache_servers,
+      memcache_security_strategy => $security_strategy,
+      memcache_secret_key        => $hashed_secret_key,
     }
   }
 }
