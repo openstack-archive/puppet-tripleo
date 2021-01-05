@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add ability to specify memcached port for all services. The port defaults
+    to hiera('memcached_authtoken_port', 11211) for authtoken middleware and
+    hiera('memcached_port', 11211) for other uses.

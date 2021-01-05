@@ -24,8 +24,8 @@
 #   Defaults to hiera('step')
 #
 # [*memcache_port*]
-#   (Optional) memcache port
-#   Defaults to 11211
+#   (Optional) Memcached port to use.
+#   Defaults to hiera('memcached_port', 11211)
 #
 # [*memcache_servers*]
 #   (Optional) List of memcache servers
@@ -33,7 +33,7 @@
 #
 class tripleo::profile::base::swift (
   $step                 = Integer(hiera('step')),
-  $memcache_port        = 11211,
+  $memcache_port        = hiera('memcached_port', 11211),
   $memcache_servers     = hiera('memcached_node_ips', []),
 ) {
   if $step >= 4 {
