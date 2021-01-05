@@ -48,9 +48,9 @@ class tripleo::profile::base::placement::authtoken (
 
   if $step >= 3 {
     if is_ipv6_address($memcached_ips[0]) {
-      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211'), 'inet6:')
+      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}"), 'inet6:')
     } else {
-      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
     }
 
     if $secret_key {

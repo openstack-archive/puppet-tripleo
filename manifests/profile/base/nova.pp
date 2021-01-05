@@ -78,6 +78,10 @@
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
 #   Defaults to hiera('memcached_node_ips')
 #
+# [*memcached_port*]
+#   (Optional) Memcached port to use.
+#   Defaults to hiera('memcached_port', 11211)
+#
 # [*enable_cache*]
 #   (Optional) Enable the use of cache. Note that it is unsupported
 #   to disable this key. It is only useful for debugging purposes.
@@ -98,7 +102,8 @@ class tripleo::profile::base::nova (
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $step                    = Integer(hiera('step')),
-  $memcached_ips           = hiera('memcached_node_ips'),
+  $memcached_ips           = hiera('memcached_node_ips', []),
+  $memcached_port          = hiera('memcached_port', 11211),
   $enable_cache            = true,
 ) {
 
@@ -109,9 +114,9 @@ class tripleo::profile::base::nova (
   }
 
   if is_ipv6_address($memcached_ips[0]) {
-    $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211'), 'inet6:')
+    $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}"), 'inet6:')
   } else {
-    $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+    $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
