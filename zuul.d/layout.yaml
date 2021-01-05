@@ -21,6 +21,7 @@
       - tripleo-multinode-container-minimal-pipeline
       - release-notes-jobs-python3
       - tripleo-standalone-scenarios-pipeline
+      - tripleo-upgrades-ussuri-pipeline
     check:
       jobs:
         - tripleo-ci-centos-7-scenario007-multinode-oooq-container:
