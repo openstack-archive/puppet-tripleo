@@ -43,10 +43,6 @@ eos
         is_expected.to_not contain_class('designate::db')
         is_expected.to_not contain_class('designate::central')
         is_expected.to_not contain_class('designate::quota')
-        is_expected.to contain_file('designate pools').with(
-          :path    => '/etc/designate/pools.yaml',
-        )
-        is_expected.to_not contain_exec('pool update')
       }
     end
 
@@ -62,8 +58,6 @@ eos
         is_expected.to contain_class('designate::db').with(:sync_db => true)
         is_expected.to contain_class('designate::central')
         is_expected.to contain_class('designate::quota')
-        is_expected.to contain_file('designate pools')
-        is_expected.to_not contain_exec('pool update')
       }
     end
 
@@ -79,8 +73,6 @@ eos
         is_expected.to_not contain_class('designate::db')
         is_expected.to_not contain_class('designate::central')
         is_expected.to_not contain_class('designate::quota')
-        is_expected.to contain_file('designate pools')
-        is_expected.to_not contain_exec('pool update')
       }
     end
 
@@ -98,35 +90,9 @@ eos
         )
         is_expected.to contain_class('designate::central')
         is_expected.to contain_class('designate::quota')
-        is_expected.to contain_file('designate pools')
-        is_expected.to_not contain_exec('pool update')
       }
     end
 
-    context 'with step 5 on bootstrap node' do
-      let(:params) { {
-        :step           => 5,
-        :bootstrap_node => 'node.example.com',
-      } }
-
-      it {
-        is_expected.to contain_exec('pool update').with(
-          :command => '/bin/designate-manage pool update',
-          :user    => 'designate'
-        )
-      }
-    end
-
-    context 'with step 5 not on bootstrap node' do
-      let(:params) { {
-        :step           => 5,
-        :bootstrap_node => 'other.example.com',
-      } }
-
-      it {
-        is_expected.to_not contain_exec('pool update')
-      }
-    end
   end
 
 

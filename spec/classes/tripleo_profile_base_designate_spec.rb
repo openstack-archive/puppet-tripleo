@@ -31,7 +31,6 @@ describe 'tripleo::profile::base::designate' do
         is_expected.to_not contain_class('designate')
         is_expected.to_not contain_class('designate::config')
         is_expected.to_not contain_class('designate::logging')
-        is_expected.to_not contain_class('designate::backend::bind9')
       }
     end
 
@@ -50,7 +49,6 @@ describe 'tripleo::profile::base::designate' do
         )
         is_expected.to contain_class('designate::config')
         is_expected.to contain_class('designate::logging')
-        is_expected.to contain_class('designate::backend::bind9')
       }
     end
 
