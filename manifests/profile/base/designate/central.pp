@@ -27,6 +27,8 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# DEPRECATED PARAMETERS
+#
 # [*pools_file_content*]
 #   (Optional) The content of /etc/designate/pools.yaml
 #   Defaults to the content of templates/designate/pools.yaml.erb
@@ -34,6 +36,7 @@
 class tripleo::profile::base::designate::central (
   $bootstrap_node = hiera('designate_central_short_bootstrap_node_name', undef),
   $step = Integer(hiera('step')),
+  # DEPRECATED PARAMETERS
   $pools_file_content = undef,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -43,13 +46,7 @@ class tripleo::profile::base::designate::central (
   }
 
   if $pools_file_content {
-    $pools_file_content_real = $pools_file_content
-  } else {
-    $pools_file_content_real = template('tripleo/designate/pools.yaml.erb')
-  }
-  file { 'designate pools':
-    path    => '/etc/designate/pools.yaml',
-    content => $pools_file_content_real,
+    warning('pool file content is no longer manually configurable')
   }
   include tripleo::profile::base::designate
   if ($step >= 4 or ($step >= 3 and $sync_db)) {
@@ -58,11 +55,5 @@ class tripleo::profile::base::designate::central (
     }
     include designate::central
     include designate::quota
-  }
-  if ($step == 5 and $sync_db) {
-    exec { 'pool update':
-      command => '/bin/designate-manage pool update',
-      user    => 'designate',
-    }
   }
 }

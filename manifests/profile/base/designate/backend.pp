@@ -33,9 +33,11 @@ class tripleo::profile::base::designate::backend (
 ) {
   if $step >= 4 {
     if $backend == 'bind9' {
-      include designate::backend::bind9
+      class{ 'designate::backend::bind9':
+        configure_bind => false
+      }
     } else {
-      fail("${backend} is not supported by designate")
+      fail('${backend} is not supported by designate')
     }
   }
 }

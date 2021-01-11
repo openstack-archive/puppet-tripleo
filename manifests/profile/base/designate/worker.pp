@@ -23,22 +23,22 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# DEPRECATED PARAMETERS
+#
 # [*rndc_key*]
 #   (Optional) The base64-encoded key secret for /etc/rndc.key.
 #   Defaults to hiera('designate_rndc_key')
 #
 class tripleo::profile::base::designate::worker (
   $step = Integer(hiera('step')),
+  # DEPRECATED PARAMETERS
   $rndc_key = hiera('designate_rndc_key', false),
 ) {
   include tripleo::profile::base::designate
 
   if $step >= 4 {
     if $rndc_key {
-      file { 'designate rndc key':
-        path    => '/etc/rndc.key',
-        content => template('tripleo/designate/rndc.key.erb')
-      }
+      warning('Configuring rndc keys through puppet has been deprecated')
     }
     include designate::worker
   }
