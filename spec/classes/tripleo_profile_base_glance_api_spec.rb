@@ -36,6 +36,8 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to_not contain_class('glance::api')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
         is_expected.to_not contain_class('glance::cron::db_purge')
+        is_expected.to_not contain_class('glance::cache::cleaner')
+        is_expected.to_not contain_class('glance::cache::pruner')
       end
     end
 
@@ -64,6 +66,8 @@ describe 'tripleo::profile::base::glance::api' do
           :notification_transport_url => 'rabbit://glance2:baa@192.168.0.2:5678/?ssl=0',
         )
         is_expected.to_not contain_class('glance::cron::db_purge')
+        is_expected.to_not contain_class('glance::cache::cleaner')
+        is_expected.to_not contain_class('glance::cache::pruner')
       end
     end
 
@@ -81,6 +85,8 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to_not contain_class('glance::api')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
         is_expected.to_not contain_class('glance::cron::db_purge')
+        is_expected.to_not contain_class('glance::cache::cleaner')
+        is_expected.to_not contain_class('glance::cache::pruner')
       end
     end
 
@@ -118,6 +124,8 @@ describe 'tripleo::profile::base::glance::api' do
           :notification_transport_url => 'rabbit://glance2:baa@192.168.0.2:5678/?ssl=0',
         )
         is_expected.to_not contain_class('glance::cron::db_purge')
+        is_expected.to_not contain_class('glance::cache::cleaner')
+        is_expected.to_not contain_class('glance::cache::pruner')
       end
 
       context 'with multistore_config' do
@@ -195,6 +203,11 @@ describe 'tripleo::profile::base::glance::api' do
       it 'should configure db_purge' do
         is_expected.to contain_class('glance::cron::db_purge')
       end
+
+      it 'should not configure cache' do
+        is_expected.to_not contain_class('glance::cache::cleaner')
+        is_expected.to_not contain_class('glance::cache::pruner')
+      end
     end
 
     context 'with step 5 without db_purge' do
@@ -206,6 +219,19 @@ describe 'tripleo::profile::base::glance::api' do
 
       it 'should configure db_purge' do
         is_expected.to_not contain_class('glance::cron::db_purge')
+      end
+    end
+
+    context 'with step 5 with cache' do
+      let(:params) { {
+        :step                => 5,
+        :bootstrap_node      => 'node.example.com',
+        :glance_enable_cache => true,
+      } }
+
+      it 'should configure cache' do
+        is_expected.to contain_class('glance::cache::cleaner')
+        is_expected.to contain_class('glance::cache::pruner')
       end
     end
   end

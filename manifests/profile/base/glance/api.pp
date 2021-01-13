@@ -127,6 +127,10 @@
 #   (optional) Whether to enable db purging
 #   defaults to true
 #
+# [*glance_enable_cache*]
+#   (optional) Whether to enable caching
+#   defaults to false
+#
 # DEPRECATED PARAMETERS
 #
 # [*glance_rbd_client_name*]
@@ -158,6 +162,7 @@ class tripleo::profile::base::glance::api (
   $tls_proxy_fqdn          = undef,
   $tls_proxy_port          = 9292,
   $glance_enable_db_purge  = true,
+  $glance_enable_cache     = false,
   # DEPRECATED PARAMETERS
   $glance_rbd_client_name  = undef,
 ) {
@@ -257,6 +262,10 @@ class tripleo::profile::base::glance::api (
   if $step >= 5 {
     if $glance_enable_db_purge {
       include glance::cron::db_purge
+    }
+    if $glance_enable_cache {
+      include glance::cache::cleaner
+      include glance::cache::pruner
     }
   }
 
