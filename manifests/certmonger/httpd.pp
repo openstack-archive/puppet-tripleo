@@ -80,6 +80,10 @@ define tripleo::certmonger::httpd (
     wait         => true,
     tag          => 'apache-cert',
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
+  }
+  file { $service_key:
+    audit => [content],
   }
 
   Certmonger_certificate[$name] ~> Service<| title == $::apache::params::service_name |>

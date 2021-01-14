@@ -74,5 +74,9 @@ class tripleo::certmonger::mysql (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
+  }
+  file { $service_key :
+    audit => [content],
   }
 }

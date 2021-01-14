@@ -84,6 +84,7 @@ class tripleo::certmonger::novnc_proxy (
     wait         => true,
     tag          => 'novnc-proxy',
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   file { $service_certificate :
@@ -91,8 +92,8 @@ class tripleo::certmonger::novnc_proxy (
     mode    => '0644'
   }
   file { $service_key :
-    require => Certmonger_certificate['novnc-proxy'],
-    mode    => '0640'
+    mode  => '0640',
+    audit => [content],
   }
 
   File[$service_certificate] ~> Service<| title == $notify_service_real |>

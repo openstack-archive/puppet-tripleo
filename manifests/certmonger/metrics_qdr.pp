@@ -81,13 +81,14 @@ class tripleo::certmonger::metrics_qdr (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   file { $service_certificate :
     require => Certmonger_certificate['metrics_qdr'],
   }
   file { $service_key :
-    require => Certmonger_certificate['metrics_qdr'],
+    audit   => [content],
   }
 
   File[$service_certificate] ~> Service<| title == $::qdr::params::service_name |>

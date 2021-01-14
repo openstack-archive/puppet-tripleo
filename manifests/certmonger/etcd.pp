@@ -79,12 +79,13 @@ class tripleo::certmonger::etcd (
     ca           => $certmonger_ca,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
   file { $service_certificate :
     require => Certmonger_certificate['etcd'],
   }
   file { $service_key :
-    require => Certmonger_certificate['etcd'],
+    audit   => [content],
   }
 
   File[$service_certificate] ~> Service<| title == 'etcd' |>

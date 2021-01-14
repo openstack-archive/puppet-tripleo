@@ -76,6 +76,11 @@ class tripleo::certmonger::ceph_rgw (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
+  }
+
+  file { $service_key:
+    audit => [content],
   }
 
   concat { $service_pem :

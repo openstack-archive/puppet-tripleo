@@ -65,12 +65,13 @@ class tripleo::certmonger::ovn_octavia (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
   file { $service_certificate :
     require => Certmonger_certificate['ovn_octavia']
   }
   file { $service_key :
-    require => Certmonger_certificate['ovn_octavia']
+    audit   => [content],
   }
 
 }

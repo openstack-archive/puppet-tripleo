@@ -65,11 +65,12 @@ class tripleo::certmonger::ovn_dbs (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
   file { $service_certificate :
     require => Certmonger_certificate['ovn_dbs']
   }
   file { $service_key :
-    require => Certmonger_certificate['ovn_dbs']
+    audit   => [content],
   }
 }

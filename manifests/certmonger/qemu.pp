@@ -78,6 +78,7 @@ define tripleo::certmonger::qemu (
     wait         => true,
     tag          => 'qemu-cert',
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   if $cacertfile {
@@ -105,8 +106,8 @@ define tripleo::certmonger::qemu (
     mode    => '0644'
   }
   file { $service_key :
-    require => Certmonger_certificate[$name],
-    group   => 'qemu',
-    mode    => '0640'
+    group => 'qemu',
+    mode  => '0640',
+    audit => [content],
   }
 }

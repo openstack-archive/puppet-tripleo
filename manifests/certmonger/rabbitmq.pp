@@ -73,12 +73,13 @@ class tripleo::certmonger::rabbitmq (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   file { $service_certificate :
     require => Certmonger_certificate['rabbitmq'],
   }
   file { $service_key :
-    require => Certmonger_certificate['rabbitmq'],
+    audit   => [content],
   }
 }

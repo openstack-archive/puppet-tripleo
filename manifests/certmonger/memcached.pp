@@ -68,12 +68,13 @@ class tripleo::certmonger::memcached (
     ca           => $certmonger_ca,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   file { $service_certificate :
     require => Certmonger_certificate['memcached'],
   }
   file { $service_key :
-    require => Certmonger_certificate['memcached'],
+    audit   => [content],
   }
 }

@@ -80,12 +80,13 @@ class tripleo::certmonger::redis (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   file { $service_certificate :
     require => Certmonger_certificate['redis'],
   }
   file { $service_key :
-    require => Certmonger_certificate['redis'],
+    audit   => [content],
   }
 }
