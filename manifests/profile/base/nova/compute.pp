@@ -59,6 +59,7 @@ class tripleo::profile::base::nova::compute (
     include tripleo::profile::base::nova
     include nova::cinder
     include nova::vendordata
+    include nova::glance
 
     if $keymgr_api_class {
       warning('The keymgr_api_class parameter is deprecated, use keymgr_backend')
