@@ -43,12 +43,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*keymgr_backend*]
-#   (Optional) The encryption key manager backend. The default value
-#   ensures Cinder's legacy key manager is enabled when no hiera value is
-#   specified.
-#   Defaults to hiera('cinder::api::keymgr_backend', 'cinder.keymgr.conf_key_mgr.ConfKeyManager')
-#
 # [*default_volume_type*]
 #   (Optional) The name of the default volume type.
 #   Defaults to hiera('cinder::api::default_volume_type', '')
@@ -58,14 +52,23 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# DEPRECATED PARAMETERS
+#
+# [*keymgr_backend*]
+#   (Optional) The encryption key manager backend. The default value
+#   ensures Cinder's legacy key manager is enabled when no hiera value is
+#   specified.
+#   Defaults to undef
+#
 class tripleo::profile::base::cinder::api (
   $bootstrap_node                = hiera('cinder_api_short_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $cinder_api_network            = hiera('cinder_api_network', undef),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $keymgr_backend                = hiera('cinder::api::keymgr_backend', 'cinder.keymgr.conf_key_mgr.ConfKeyManager'),
   $default_volume_type           = hiera('cinder::api::default_volume_type', ''),
   $step                          = Integer(hiera('step')),
+  # DEPRECATED PARAMETERS
+  $keymgr_backend                = undef,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -88,9 +91,16 @@ class tripleo::profile::base::cinder::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    class { 'cinder::api':
-      sync_db        => $sync_db,
-      keymgr_backend => $keymgr_backend,
+    if keymgr_backend != undef {
+      warning('The keymgr_backend parameter has been deprecated')
+      class { 'cinder::api':
+        sync_db        => $sync_db,
+        keymgr_backend => $keymgr_backend,
+      }
+    } else {
+      class { 'cinder::api':
+        sync_db => $sync_db,
+      }
     }
     include tripleo::profile::base::apache
     class { 'cinder::wsgi::apache':
