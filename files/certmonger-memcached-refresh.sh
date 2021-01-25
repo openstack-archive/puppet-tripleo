@@ -14,5 +14,7 @@ $container_cli exec "$container_name" cp "/var/lib/kolla/config_files/src-tls$se
 $container_cli exec "$container_name" chown memcached:memcached "$service_certificate"
 $container_cli exec "$container_name" chown memcached:memcached "$service_key"
 
-# Trigger a container restart to read the new certificates
-$container_cli restart $container_name
+# Send refresh_certs command to memcached
+memcached_ip="$(hiera -c /etc/puppet/hiera.yaml memcached::listen.0 127.0.0.1)"
+memcached_port="$(hiera -c /etc/puppet/hiera.yaml memcached::tcp_port 11211)"
+echo refresh_certs | openssl s_client -connect $memcached_ip:$memcached_port
