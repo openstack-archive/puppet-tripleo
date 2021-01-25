@@ -1,0 +1,6 @@
+---
+deprecations:
+  - |
+    Remove support for puppet_certmonger. All certificates are now managed by
+    the linux-system-roles.certificate ansible role configured from each
+    service's heat template. ::tripleo::certmonger puppet files are removed.
