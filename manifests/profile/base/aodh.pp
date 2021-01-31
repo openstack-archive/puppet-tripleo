@@ -119,7 +119,7 @@ class tripleo::profile::base::aodh (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    include aodh::auth
+    include aodh::service_credentials
     include aodh::config
     include aodh::client
     include aodh::db::sync

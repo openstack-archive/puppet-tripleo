@@ -23,7 +23,7 @@ describe 'tripleo::profile::base::aodh' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::aodh')
         is_expected.to_not contain_class('aodh')
-        is_expected.to_not contain_class('aodh::auth')
+        is_expected.to_not contain_class('aodh::service_credentials')
         is_expected.to_not contain_class('aodh::config')
         is_expected.to_not contain_class('aodh::client')
         is_expected.to_not contain_class('aodh::db::sync')
@@ -43,7 +43,7 @@ describe 'tripleo::profile::base::aodh' do
         is_expected.to contain_class('aodh').with(
           :default_transport_url => 'rabbit://aodh:foo@127.0.0.1:5672/?ssl=0'
         )
-        is_expected.to contain_class('aodh::auth')
+        is_expected.to contain_class('aodh::service_credentials')
         is_expected.to contain_class('aodh::config')
         is_expected.to contain_class('aodh::client')
         is_expected.to contain_class('aodh::db::sync')
@@ -58,7 +58,7 @@ describe 'tripleo::profile::base::aodh' do
 
       it 'should not trigger any configuration' do
         is_expected.to_not contain_class('aodh')
-        is_expected.to_not contain_class('aodh::auth')
+        is_expected.to_not contain_class('aodh::service_credentials')
         is_expected.to_not contain_class('aodh::config')
         is_expected.to_not contain_class('aodh::client')
         is_expected.to_not contain_class('aodh::db::sync')
@@ -78,7 +78,7 @@ describe 'tripleo::profile::base::aodh' do
         is_expected.to contain_class('aodh').with(
           :default_transport_url => 'rabbit://aodh:foo@127.0.0.1:5672/?ssl=0'
         )
-        is_expected.to contain_class('aodh::auth')
+        is_expected.to contain_class('aodh::service_credentials')
         is_expected.to contain_class('aodh::config')
         is_expected.to contain_class('aodh::client')
         is_expected.to contain_class('aodh::db::sync')
