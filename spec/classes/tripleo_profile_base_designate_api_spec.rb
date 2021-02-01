@@ -42,6 +42,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::designate')
         is_expected.to contain_class('tripleo::profile::base::designate::authtoken')
         is_expected.to_not contain_class('designate::api')
+        is_expected.to_not contain_class('designate::healthcheck')
       }
     end
 
@@ -57,6 +58,7 @@ eos
         is_expected.to contain_class('designate::api').with(
           :listen => '0.0.0.0:9001'
         )
+        is_expected.to contain_class('designate::healthcheck')
       }
     end
 

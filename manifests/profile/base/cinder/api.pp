@@ -98,6 +98,7 @@ class tripleo::profile::base::cinder::api (
     class { 'cinder::api':
       sync_db => $sync_db,
     }
+    include cinder::healthcheck
     include tripleo::profile::base::apache
     class { 'cinder::wsgi::apache':
       ssl_cert => $tls_certfile,

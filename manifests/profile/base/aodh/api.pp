@@ -83,6 +83,7 @@ class tripleo::profile::base::aodh::api (
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     warning('Service aodh is deprecated. Please take in mind, that it is going to be removed in T release.')
     include aodh::api
+    include aodh::healthcheck
     include tripleo::profile::base::apache
     class { 'aodh::wsgi::apache':
       ssl_cert => $tls_certfile,

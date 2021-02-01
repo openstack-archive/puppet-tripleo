@@ -156,6 +156,7 @@ class tripleo::profile::base::neutron::server (
       l3_ha   => $l3_ha,
     }
     include neutron::db
+    include neutron::healthcheck
     include neutron::quota
   }
 }

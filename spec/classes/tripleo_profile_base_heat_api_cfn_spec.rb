@@ -41,6 +41,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::api_cfn')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to_not contain_class('heat::api_cfn')
+        is_expected.to_not contain_class('heat::healthcheck')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('heat::wsgi::apache_api_cfn')
       }
@@ -56,6 +57,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::api_cfn')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to contain_class('heat::api_cfn')
+        is_expected.to contain_class('heat::healthcheck')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('heat::wsgi::apache_api_cfn')
       }
@@ -71,6 +73,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::api_cfn')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to_not contain_class('heat::api_cfn')
+        is_expected.to_not contain_class('heat::healthcheck')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('heat::wsgi::apache_api_cfn')
       }
@@ -86,6 +89,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::api_cfn')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to contain_class('heat::api_cfn')
+        is_expected.to contain_class('heat::healthcheck')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('heat::wsgi::apache_api_cfn')
       }

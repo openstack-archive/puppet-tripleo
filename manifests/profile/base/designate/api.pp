@@ -45,5 +45,6 @@ class tripleo::profile::base::designate::api (
     class { 'designate::api':
       listen => "${listen_uri}:${listen_port}",
     }
+    include designate::healthcheck
   }
 }

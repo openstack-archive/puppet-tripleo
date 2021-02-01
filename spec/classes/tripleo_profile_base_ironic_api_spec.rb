@@ -46,6 +46,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::ironic')
         is_expected.to_not contain_class('ironic::api')
         is_expected.to_not contain_class('ironic::cors')
+        is_expected.to_not contain_class('ironic::healthcheck')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('ironic::wsgi::apache')
       }
@@ -63,6 +64,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::ironic')
         is_expected.to contain_class('ironic::api')
         is_expected.to contain_class('ironic::cors')
+        is_expected.to contain_class('ironic::healthcheck')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('ironic::wsgi::apache')
       }
@@ -80,6 +82,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::ironic')
         is_expected.to_not contain_class('ironic::api')
         is_expected.to_not contain_class('ironic::cors')
+        is_expected.to_not contain_class('ironic::healthcheck')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
         is_expected.to_not contain_class('ironic::wsgi::apache')
       }
@@ -97,6 +100,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::ironic')
         is_expected.to contain_class('ironic::api')
         is_expected.to contain_class('ironic::cors')
+        is_expected.to contain_class('ironic::healthcheck')
         is_expected.to contain_class('tripleo::profile::base::apache')
         is_expected.to contain_class('ironic::wsgi::apache')
       }
