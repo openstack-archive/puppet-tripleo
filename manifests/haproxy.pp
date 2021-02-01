@@ -846,7 +846,7 @@ class tripleo::haproxy (
     'option' => [ 'httplog' ]
   }
   $keystone_backend_opts = {
-    'option' => [ 'httpchk GET /v3' ]
+    'option' => [ 'httpchk GET /healthcheck' ]
   }
   $keystone_listen_opts = merge_hash_values($keystone_frontend_opts,
                                               $keystone_backend_opts)
@@ -894,7 +894,7 @@ class tripleo::haproxy (
     }
     $neutron_backend_opts = {
       'balance' => $haproxy_lb_mode_longrunning,
-      'option'  => [ 'httpchk' ]
+      'option'  => [ 'httpchk GET /healthcheck' ]
     }
     $neutron_listen_opts = merge_hash_values($neutron_frontend_opts,
                                                 $neutron_backend_opts)
@@ -919,7 +919,7 @@ class tripleo::haproxy (
       'option'  => [ 'httplog' ],
     }
     $cinder_backend_opts = {
-      'option'  => [ 'httpchk' ],
+      'option'  => [ 'httpchk GET /healthcheck' ],
       'balance' => $haproxy_lb_mode_longrunning,
     }
     $cinder_listen_opts = merge_hash_values($cinder_frontend_opts,
@@ -1080,6 +1080,7 @@ class tripleo::haproxy (
 
   $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
   if $nova_osapi {
+    # NOTE(tkajinam): Nova doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'nova_osapi':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $nova_api_vip,
@@ -1095,6 +1096,7 @@ class tripleo::haproxy (
 
   $placement_vip = hiera('placement_vip', $controller_virtual_ip)
   if $placement {
+    # NOTE(tkajinam): Placement doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'placement':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $placement_vip,
@@ -1109,6 +1111,7 @@ class tripleo::haproxy (
   }
 
   if $nova_metadata {
+    # NOTE(tkajinam): Nova doesn't provide healthcheck API
     if hiera('nova_is_additional_cell', undef) {
       $nova_metadata_server_names_real = hiera('nova_metadata_cell_node_names', $controller_hosts_names_real)
     } else {
@@ -1136,6 +1139,7 @@ class tripleo::haproxy (
 
   $nova_vnc_proxy_vip = hiera('nova_vnc_proxy_vip', $controller_virtual_ip)
   if $nova_novncproxy {
+    # NOTE(tkajinam): Nova-VNCProxy doesn't provide healthcheck API
     if $enable_internal_tls {
       # we need to make sure we use ssl for checks.
       $haproxy_member_options_real   = delete($haproxy_member_options, 'check')
@@ -1226,6 +1230,7 @@ class tripleo::haproxy (
   }
 
   if $gnocchi {
+    # NOTE(tkajinam): Gnocchi doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'gnocchi':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('gnocchi_api_vip', $controller_virtual_ip),

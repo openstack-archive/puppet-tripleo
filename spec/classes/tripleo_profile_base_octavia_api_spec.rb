@@ -53,6 +53,7 @@ eos
 
       it 'should not do anything' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::healthcheck')
       end
     end
 
@@ -63,6 +64,7 @@ eos
 
       it 'should not do anything' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::healthcheck')
       end
     end
 
@@ -76,6 +78,7 @@ eos
 
       it 'should should start configurating database' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::healthcheck')
       end
     end
 
@@ -86,6 +89,7 @@ eos
 
       it 'should do nothing' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::healthcheck')
       end
     end
 
@@ -99,6 +103,7 @@ eos
 
       it 'should should sync database' do
         is_expected.to contain_class('octavia::api').with(:sync_db => true)
+        is_expected.to contain_class('octavia::healthcheck')
       end
     end
 
@@ -109,6 +114,7 @@ eos
 
       it 'should do nothing' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::healthcheck')
       end
     end
 
@@ -119,6 +125,7 @@ eos
 
       it 'should do nothing' do
         is_expected.to contain_class('octavia::api').with(:sync_db => false)
+        is_expected.to contain_class('octavia::healthcheck')
       end
     end
 
@@ -140,6 +147,7 @@ eos
       end
       it {
         is_expected.to contain_class('octavia::api')
+        is_expected.to contain_class('octavia::healthcheck')
       }
     end
   end

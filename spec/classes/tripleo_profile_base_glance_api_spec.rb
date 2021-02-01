@@ -32,6 +32,7 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to_not contain_class('glance')
         is_expected.to_not contain_class('glance::config')
+        is_expected.to_not contain_class('glance::healthcheck')
         is_expected.to_not contain_class('glance::api::logging')
         is_expected.to_not contain_class('glance::api')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
@@ -59,6 +60,7 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to contain_class('glance')
         is_expected.to contain_class('glance::config')
+        is_expected.to contain_class('glance::healthcheck')
         is_expected.to contain_class('glance::api::logging')
         is_expected.to contain_class('glance::api')
         is_expected.to contain_class('glance::notify::rabbitmq').with(
@@ -81,6 +83,7 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to_not contain_class('glance')
         is_expected.to_not contain_class('glance::config')
+        is_expected.to_not contain_class('glance::healthcheck')
         is_expected.to_not contain_class('glance::api::logging')
         is_expected.to_not contain_class('glance::api')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
@@ -108,6 +111,7 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to contain_class('tripleo::profile::base::glance::api')
         is_expected.to contain_class('glance')
         is_expected.to contain_class('glance::config')
+        is_expected.to contain_class('glance::healthcheck')
         is_expected.to contain_class('glance::api::logging')
         is_expected.to contain_class('glance::api').with(
           :enabled_backends => ['default_backend:swift'],

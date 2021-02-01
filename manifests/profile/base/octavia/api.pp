@@ -106,6 +106,7 @@ Use tripleo::profile::base::octavia::provider::ovn.')
     class { 'octavia::api':
       sync_db           => $sync_db,
     }
+    include octavia::healthcheck
     include tripleo::profile::base::apache
     class { 'octavia::wsgi::apache':
       ssl_cert => $tls_certfile,

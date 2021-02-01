@@ -148,6 +148,7 @@ class tripleo::profile::base::manila::api (
     class { 'manila::api' :
       enabled_share_protocols => $enabled_share_protocols_real
     }
+    include manila::healthcheck
     class { 'manila::wsgi::apache':
       ssl_cert => $tls_certfile,
       ssl_key  => $tls_keyfile,
