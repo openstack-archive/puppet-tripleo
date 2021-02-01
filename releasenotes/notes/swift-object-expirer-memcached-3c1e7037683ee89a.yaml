@@ -1,8 +1,0 @@
----
-fixes:
-  - |
-    The memcached IP for the Swift object expirer is not properly set in case
-    of separate storage nodes.  Until now, these were only set if the Swift
-    proxy node was also configured on the same node; however, this is not the
-    case with separate storage nodes. The service would still run, but was not
-    able to use any cache and logging errors therefore.
