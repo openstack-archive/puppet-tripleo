@@ -49,9 +49,7 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to contain_class('cinder::api').with(
-          :sync_db        => true,
-          # Verify legacy key manager is enabled when none is set in hiera.
-          :keymgr_backend => 'cinder.keymgr.conf_key_mgr.ConfKeyManager',
+          :sync_db => true,
         )
         is_expected.to contain_class('tripleo::profile::base::apache')
       end
@@ -83,8 +81,7 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to contain_class('cinder::api').with(
-          :sync_db        => true,
-          :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
+          :sync_db => true,
         )
         is_expected.to contain_class('tripleo::profile::base::apache')
       end
@@ -101,10 +98,24 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to contain_class('cinder::api').with(
-          :sync_db        => false,
-          :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
+          :sync_db => false,
         )
         is_expected.to contain_class('tripleo::profile::base::apache')
+      end
+    end
+
+    context 'with step 4 and deprecated keymgr parameters' do
+      let(:params) { {
+        :step           => 4,
+        :bootstrap_node => 'other.example.com',
+        :keymgr_backend => 'some.other.key_manager',
+      } }
+
+      it 'should set keymgr_backend' do
+        is_expected.to contain_class('cinder::api').with(
+          :sync_db        => false,
+          :keymgr_backend => 'some.other.key_manager',
+        )
       end
     end
   end

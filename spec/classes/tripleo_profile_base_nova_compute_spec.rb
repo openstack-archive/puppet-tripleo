@@ -26,11 +26,7 @@ describe 'tripleo::profile::base::nova::compute' do
       let(:params) { { :step => 1, } }
 
       it {
-        is_expected.to contain_class('tripleo::profile::base::nova::compute').with(
-          # Verify legacy key manager is enabled when none is set in hiera.
-          :keymgr_backend => 'nova.keymgr.conf_key_mgr.ConfKeyManager',
-        )
-
+        is_expected.to contain_class('tripleo::profile::base::nova::compute')
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::cinder')
         is_expected.to_not contain_class('nova::vendordata')
@@ -59,16 +55,11 @@ eos
         let(:params) { { :step => 4, } }
 
         it {
-          is_expected.to contain_class('tripleo::profile::base::nova::compute').with(
-            # Verify proper key manager is enabled when value is set in hiera.
-            :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
-          )
+          is_expected.to contain_class('tripleo::profile::base::nova::compute')
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::cinder')
           is_expected.to contain_class('nova::vendordata')
-          is_expected.to contain_class('nova::compute').with(
-            :keymgr_backend => 'castellan.key_manager.barbican_key_manager.BarbicanKeyManager',
-          )
+          is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')
           is_expected.to_not contain_package('nfs-utils')
         }
@@ -76,8 +67,8 @@ eos
 
       context 'with deprecated keymgr parameters' do
         let(:params) { {
-          :step             => 4,
-          :keymgr_api_class => 'some.other.key_manager',
+          :step           => 4,
+          :keymgr_backend => 'some.other.key_manager',
         } }
 
         it 'should use deprecated keymgr parameters' do

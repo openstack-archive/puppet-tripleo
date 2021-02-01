@@ -31,16 +31,10 @@
 #   (Optional) Whether or not Nova is backed by NFS.
 #   Defaults to false
 #
-# [*keymgr_backend*]
-#   (Optional) The encryption key manager backend. The default value
-#   ensures Nova's legacy key manager is enabled when no hiera value is
-#   specified.
-#   Defaults to hiera('nova::compute::keymgr_backend', 'nova.keymgr.conf_key_mgr.ConfKeyManager')
-#
 # DEPRECATED PARAMETERS
 #
-# [*keymgr_api_class*]
-#   (Optional) Deprecated. The encryption key manager API class. The default value
+# [*keymgr_backend*]
+#   (Optional) The encryption key manager backend. The default value
 #   ensures Nova's legacy key manager is enabled when no hiera value is
 #   specified.
 #   Defaults to undef.
@@ -49,9 +43,8 @@ class tripleo::profile::base::nova::compute (
   $step               = Integer(hiera('step')),
   $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
   $nova_nfs_enabled   = hiera('nova_nfs_enabled', false),
-  $keymgr_backend     = hiera('nova::compute::keymgr_backend', 'nova.keymgr.conf_key_mgr.ConfKeyManager'),
   # DEPRECATED PARAMETERS
-  $keymgr_api_class   = undef,
+  $keymgr_backend     = undef
 ) {
 
   if $step >= 4 {
@@ -61,17 +54,16 @@ class tripleo::profile::base::nova::compute (
     include nova::vendordata
     include nova::glance
 
-    if $keymgr_api_class {
-      warning('The keymgr_api_class parameter is deprecated, use keymgr_backend')
-      $keymgr_backend_real = $keymgr_api_class
+    # deploy basic bits for nova-compute
+    if keymgr_backend != undef {
+      warning('The keymgr_backend parameter has been deprecated')
+      class { 'nova::compute':
+        keymgr_backend => $keymgr_backend
+      }
     } else {
-      $keymgr_backend_real = $keymgr_backend
+      class { 'nova::compute': }
     }
 
-    # deploy basic bits for nova-compute
-    class { 'nova::compute':
-      keymgr_backend => $keymgr_backend_real,
-    }
     include nova::compute::pci
     # If Service['nova-conductor'] is in catalog, make sure we start it
     # before nova-compute.
