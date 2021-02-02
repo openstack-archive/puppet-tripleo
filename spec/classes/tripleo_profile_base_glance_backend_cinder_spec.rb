@@ -49,6 +49,7 @@ describe 'tripleo::profile::base::glance::backend::cinder' do
         :cinder_store_password       => 'glance_password',
         :cinder_enforce_multipath    => true,
         :cinder_use_multipath        => true,
+        :cinder_mount_point_base     => '/var/lib/glance/mnt/nfs',
         :step                        => 4,
       } }
 
@@ -65,6 +66,7 @@ describe 'tripleo::profile::base::glance::backend::cinder' do
           :cinder_store_password       => 'glance_password',
           :cinder_enforce_multipath    => true,
           :cinder_use_multipath        => true,
+          :cinder_mount_point_base     => '/var/lib/glance/mnt/nfs',
           :store_description           => 'Cinder store',
         )
       end
