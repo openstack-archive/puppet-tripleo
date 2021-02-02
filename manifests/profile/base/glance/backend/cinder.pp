@@ -61,6 +61,14 @@
 #   (Optional) A valid password for the user specified by `cinder_store_user_name'
 #   Defaults to hiera('glance::backend::cinder::cinder_store_password', undef)
 #
+# [*cinder_enforce_multipath*]
+#   (Optional) Set to True when multipathd is enabled
+#   Defaults to hiera('glance::backend::cinder::cinder_enforce_multipath', undef)
+#
+# [*cinder_use_multipath*]
+#   (Optional) Set to True when multipathd is enabled
+#   Defaults to hiera('glance::backend::cinder::cinder_use_multipath', undef)
+#
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
@@ -83,6 +91,8 @@ class tripleo::profile::base::glance::backend::cinder (
   $cinder_store_project_name   = hiera('glance::backend::cinder::cinder_store_project_name', undef),
   $cinder_store_user_name      = hiera('glance::backend::cinder::cinder_store_user_name', undef),
   $cinder_store_password       = hiera('glance::backend::cinder::cinder_store_password', undef),
+  $cinder_enforce_multipath    = hiera('glance::backend::cinder::cinder_enforce_multipath', undef),
+  $cinder_use_multipath        = hiera('glance::backend::cinder::cinder_use_multipath', undef),
   $store_description           = hiera('tripleo::profile::base::glance::api::glance_store_description', 'Cinder store'),
   $step                        = Integer(hiera('step')),
 ) {
@@ -107,6 +117,8 @@ class tripleo::profile::base::glance::backend::cinder (
       cinder_store_project_name   => $cinder_store_project_name,
       cinder_store_user_name      => $cinder_store_user_name,
       cinder_store_password       => $cinder_store_password,
+      cinder_enforce_multipath    => $cinder_enforce_multipath,
+      cinder_use_multipath        => $cinder_use_multipath,
       store_description           => $store_description_real,
     }
   }
