@@ -47,6 +47,8 @@ describe 'tripleo::profile::base::glance::backend::cinder' do
         :cinder_store_project_name   => 'services',
         :cinder_store_user_name      => 'glance',
         :cinder_store_password       => 'glance_password',
+        :cinder_enforce_multipath    => true,
+        :cinder_use_multipath        => true,
         :step                        => 4,
       } }
 
@@ -61,6 +63,8 @@ describe 'tripleo::profile::base::glance::backend::cinder' do
           :cinder_store_project_name   => 'services',
           :cinder_store_user_name      => 'glance',
           :cinder_store_password       => 'glance_password',
+          :cinder_enforce_multipath    => true,
+          :cinder_use_multipath        => true,
           :store_description           => 'Cinder store',
         )
       end
