@@ -46,6 +46,7 @@ class tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi (
       xtremio_array_busy_retry_count    => hiera('cinder::backend::dellemc_xtremio_iscsi::xtremio_array_busy_retry_count', undef),
       xtremio_array_busy_retry_interval => hiera('cinder::backend::dellemc_xtremio_iscsi::xtremio_array_busy_retry_interval', undef),
       xtremio_volumes_per_glance_cache  => hiera('cinder::backend::dellemc_xtremio_iscsi::xtremio_volumes_per_glance_cache', undef),
+      xtremio_ports                     => hiera('cinder::backend::dellemc_xtremio_iscsi::xtremio_ports', undef),
     }
   }
 

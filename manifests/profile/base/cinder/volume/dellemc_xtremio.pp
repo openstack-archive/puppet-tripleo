@@ -50,6 +50,7 @@ class tripleo::profile::base::cinder::volume::dellemc_xtremio (
       'CinderXtremioArrayBusyRetryCount'   => hiera('cinder::backend::dellemc_xtremio::xtremio_array_busy_retry_count', undef),
       'CinderXtremioArrayBusyRetryInterval'=> hiera('cinder::backend::dellemc_xtremio::xtremio_array_busy_retry_interval', undef),
       'CinderXtremioVolumesPerGlanceCache' => hiera('cinder::backend::dellemc_xtremio::xtremio_volumes_per_glance_cache', undef),
+      'CinderXtremioPorts'                 => hiera('cinder::backend::dellemc_xtremio::xtremio_ports', undef),
     }
 
     any2array($backend_name).each |String $backend| {
@@ -65,6 +66,7 @@ class tripleo::profile::base::cinder::volume::dellemc_xtremio (
         xtremio_array_busy_retry_count    => $backend_config['CinderXtremioArrayBusyRetryCount'],
         xtremio_array_busy_retry_interval => $backend_config['CinderXtremioArrayBusyRetryInterval'],
         xtremio_volumes_per_glance_cache  => $backend_config['CinderXtremioVolumesPerGlanceCache'],
+        xtremio_ports                     => $backend_config['CinderXtremioPorts'],
       }
     }
   }
