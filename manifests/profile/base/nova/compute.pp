@@ -54,6 +54,7 @@ class tripleo::profile::base::nova::compute (
     include nova::compute::image_cache
     include nova::vendordata
     include nova::glance
+    include nova::compute::provider
 
     # deploy basic bits for nova-compute
     if keymgr_backend != undef {
