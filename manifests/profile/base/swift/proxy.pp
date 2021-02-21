@@ -148,19 +148,29 @@ class tripleo::profile::base::swift::proxy (
     include swift
     include swift::config
     include swift::proxy
-    include swift::proxy::proxy_logging
+    include swift::proxy::catch_errors
+    include swift::proxy::gatekeeper
     include swift::proxy::healthcheck
+    include swift::proxy::proxy_logging
     class { 'swift::proxy::cache':
       memcache_servers => $swift_memcache_servers
     }
-    include swift::proxy::keystone
-    include swift::proxy::authtoken
-    include swift::proxy::staticweb
+    include swift::proxy::listing_formats
     include swift::proxy::ratelimit
-    include swift::proxy::catch_errors
+    include swift::proxy::bulk
     include swift::proxy::tempurl
     include swift::proxy::formpost
-    include swift::proxy::bulk
+    include swift::proxy::authtoken
+    include swift::proxy::s3api
+    include swift::proxy::s3token
+    include swift::proxy::keystone
+    include swift::proxy::staticweb
+    include swift::proxy::copy
+    include swift::proxy::container_quotas
+    include swift::proxy::account_quotas
+    include swift::proxy::slo
+    include swift::proxy::dlo
+    include swift::proxy::versioned_writes
     if $ceilometer_enabled {
       $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
       class { 'swift::proxy::ceilometer':
@@ -174,16 +184,8 @@ class tripleo::profile::base::swift::proxy (
         }),
       }
     }
-    include swift::proxy::versioned_writes
-    include swift::proxy::slo
-    include swift::proxy::dlo
-    include swift::proxy::copy
-    include swift::proxy::container_quotas
-    include swift::proxy::account_quotas
-    include swift::proxy::encryption
     include swift::proxy::kms_keymaster
+    include swift::proxy::encryption
     include swift::keymaster
-    include swift::proxy::s3api
-    include swift::proxy::s3token
   }
 }
