@@ -92,7 +92,10 @@ class tripleo::profile::pacemaker::ceph_nfs (
     }
   }
 
-  if $step >= 5 and $pacemaker_master {
+  # When we create manila-share resource at step 5 we need the ceph-nfs pcmk resource up
+  # and running. But since we moved to pcs commands invoked on host, manila-share at step5
+  # gets created *before* ceph-nfs (as it is invoked via step_config vs docker_config)
+  if $step >= 4 and $pacemaker_master {
     pacemaker::resource::service { 'ceph-nfs' :
       service_name  => 'ceph-nfs@pacemaker',
       op_params     => 'start timeout=200s stop timeout=200s',
