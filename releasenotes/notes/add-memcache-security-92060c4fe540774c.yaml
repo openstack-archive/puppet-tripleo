@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Add ability to specify the memcache_security_strategy and
+    memcache_secret_key for keystone authtoken middleware. The keys
+    used by individual services are hashed with a salt (the service
+    name), to isolate them.
