@@ -69,6 +69,10 @@
 #   (Optional) Set to True when multipathd is enabled
 #   Defaults to hiera('glance::backend::cinder::cinder_use_multipath', undef)
 #
+# [*cinder_mount_point_base*]
+#   (Optional) Directory where the NFS volume is mounted on the glance node.
+#   Defaults to hiera('glance::backend::cinder::cinder_mount_point_base', undef)
+#
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
@@ -93,6 +97,7 @@ class tripleo::profile::base::glance::backend::cinder (
   $cinder_store_password       = hiera('glance::backend::cinder::cinder_store_password', undef),
   $cinder_enforce_multipath    = hiera('glance::backend::cinder::cinder_enforce_multipath', undef),
   $cinder_use_multipath        = hiera('glance::backend::cinder::cinder_use_multipath', undef),
+  $cinder_mount_point_base     = hiera('glance::backend::cinder::cinder_mount_point_base', undef),
   $store_description           = hiera('tripleo::profile::base::glance::api::glance_store_description', 'Cinder store'),
   $step                        = Integer(hiera('step')),
 ) {
@@ -119,6 +124,7 @@ class tripleo::profile::base::glance::backend::cinder (
       cinder_store_password       => $cinder_store_password,
       cinder_enforce_multipath    => $cinder_enforce_multipath,
       cinder_use_multipath        => $cinder_use_multipath,
+      cinder_mount_point_base     => $cinder_mount_point_base,
       store_description           => $store_description_real,
     }
   }
