@@ -19,7 +19,8 @@
 # === Parameters
 #
 # [*ovn_db_host*]
-#   The IP-Address where OVN DBs are listening.
+#   The IP-Address where OVN DBs are listening. If passed a list it will construct
+#   a comma separated string like protocol:ip1:port,protocol:ip2:port.
 #   Defaults to hiera('ovn_dbs_vip')
 #
 # [*ovn_sb_port*]
@@ -65,8 +66,15 @@ class tripleo::profile::base::neutron::ovn_metadata (
 ) {
   if $step >= 4 {
     include tripleo::profile::base::neutron
+
+    if is_string($ovn_db_host) {
+      $ovn_sb_connection_real = join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':')
+    } elsif is_array($ovn_db_host) {
+      $ovn_sb_connection_real = join($ovn_db_host.map |$i| { "${protocol}:${normalize_ip_for_uri($i)}:${ovn_sb_port}" }, ',')
+    }
+
     class { 'neutron::agents::ovn_metadata':
-        ovn_sb_connection         => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
+        ovn_sb_connection         => $ovn_sb_connection_real,
         ovn_sb_private_key        => $ovn_sb_private_key,
         ovn_sb_certificate        => $ovn_sb_certificate,
         ovn_sb_ca_cert            => $ovn_sb_ca_cert,

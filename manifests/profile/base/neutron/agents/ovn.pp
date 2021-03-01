@@ -17,7 +17,9 @@
 # OVN Neutron agent profile for tripleo
 #
 # [*ovn_db_host*]
-#   (Optional) The IP-Address where OVN DBs are listening.
+#   (Optional) The IP-Address where OVN DBs are listening. If passed a list it
+#   will construct a comma separated string like
+#   protocol:ip1:port,protocol:ip2:port.
 #   Defaults to hiera('ovn_dbs_vip')
 #
 # [*ovn_sbdb_port*]
@@ -51,8 +53,14 @@ class tripleo::profile::base::neutron::agents::ovn (
   $ovn_chassis_mac_map  = hiera('ovn_chassis_mac_map', undef),
 ) {
   if $step >= 4 {
+    if is_string($ovn_db_host) {
+      $ovn_remote_real = join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sbdb_port}"], ':')
+    } elsif is_array($ovn_db_host) {
+      $ovn_remote_real = join($ovn_db_host.map |$i| { "${protocol}:${normalize_ip_for_uri($i)}:${ovn_sbdb_port}" }, ',')
+    }
+
     class { 'ovn::controller':
-      ovn_remote              => join([$protocol, normalize_ip_for_uri($ovn_db_host), "${ovn_sbdb_port}"], ':'),
+      ovn_remote              => $ovn_remote_real,
       enable_ovn_match_northd => true,
       ovn_chassis_mac_map     => $ovn_chassis_mac_map,
     }
