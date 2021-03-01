@@ -41,6 +41,16 @@ action(type="omelasticsearch"
     tls.myprivkey="/etc/rsyslog.d/es-client-key.pem"
   )
 EOS
+amqp1_conf = <<-EOS
+# amqp1
+action(type="omamqp1"
+    name="amqp1"
+    host="localhost:5666"
+    target="rsyslog/logs"
+    username="bm"
+    password="whubbaLubba"
+  )
+EOS
 
 describe 'tripleo::profile::base::logging::rsyslog' do
   shared_examples_for 'tripleo::profile::base::logging::rsyslog' do
@@ -48,9 +58,10 @@ describe 'tripleo::profile::base::logging::rsyslog' do
       facts.merge!({ :step => params[:step] })
     end
 
-    context 'on step 2' do
+    context 'on step 2 with elasticsearch output' do
       let(:params) do
         { :step => 2,
+          :elasticsearch => {},
           :elasticsearch_tls_ca_cert => 'cacert',
           :elasticsearch_tls_client_cert => 'clientcert',
           :elasticsearch_tls_client_key => 'clientkey',
@@ -89,6 +100,42 @@ describe 'tripleo::profile::base::logging::rsyslog' do
         should contain_file('elasticsearch_client_key').with({
           :path => '/etc/rsyslog.d/es-client-key.pem',
           :content => 'clientkey',
+        })
+      end
+    end
+
+    context 'on step 2 with amqp1 output' do
+      let(:params) do
+        { :step => 2,
+          :amqp1 => {
+            "host" => "localhost:5666",
+            "target" => "rsyslog/logs",
+            "username" => "bm",
+            "password" => "whubbaLubba",
+          },
+        }
+      end
+
+      it 'should generate a rsyslog config file for horizon from hieradata and AMQP1 output connection' do
+        should contain_concat__fragment('rsyslog::component::module::imfile').with({
+          :target => '/etc/rsyslog.d/50_openstack_logs.conf',
+          :content => "module(load=\"imfile\")\n",
+        })
+        should contain_concat__fragment('rsyslog::component::module::omamqp1').with({
+          :target => '/etc/rsyslog.d/50_openstack_logs.conf',
+          :content => "module(load=\"omamqp1\")\n",
+        })
+        should contain_concat__fragment('rsyslog::component::input::horizon_openstack.horizon.access').with({
+          :target => '/etc/rsyslog.d/50_openstack_logs.conf',
+          :content => horizon_access_log_conf,
+        })
+        should contain_concat__fragment('rsyslog::component::input::horizon_openstack.horizon.test').with({
+          :target => '/etc/rsyslog.d/50_openstack_logs.conf',
+          :content => horizon_test_log_conf,
+        })
+        should contain_concat__fragment('rsyslog::component::action::amqp1').with({
+          :target => '/etc/rsyslog.d/50_openstack_logs.conf',
+          :content => amqp1_conf,
         })
       end
     end
