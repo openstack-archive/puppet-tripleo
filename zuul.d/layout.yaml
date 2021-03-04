@@ -6,7 +6,7 @@
       - tripleo-multinode-container-minimal-pipeline
       - release-notes-jobs-python3
       - tripleo-standalone-scenarios-pipeline
-      - tripleo-standalone-multinode-ipa
+      - tripleo-standalone-multinode-ipa-pipeline
       - tripleo-upgrades-victoria-pipeline
     check:
       jobs:
