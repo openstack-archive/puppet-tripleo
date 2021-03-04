@@ -111,6 +111,14 @@
 #   dict called: force_vip_nic_overrides[<vip/network name>] = 'dummy'
 #   Defaults to hiera('tripleo::pacemaker::force_nic', undef)
 #
+# [*monitor_interval_master*]
+#   (Optional) monitor interval for ovn dbs resource
+#   Defaults to 10
+#
+# [*monitor_interval_slave*]
+#   (Optional) monitor interval for ovn dbs resource
+#   Defaults to 30
+#
 
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image     = undef,
@@ -134,6 +142,9 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $listen_on_master_ip_only = 'yes',
   $force_ocf                = false,
   $force_nic                = hiera('tripleo::pacemaker::force_nic', undef),
+  $monitor_interval_master  = 10,
+  $monitor_interval_slave   = 30,
+
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -287,8 +298,8 @@ nb_master_protocol=ssl sb_master_protocol=ssl"
       pacemaker::resource::ocf { "${ovndb_servers_resource_name}":
         ocf_agent_name  => "${ovndb_servers_ocf_name}",
         master_params   => '',
-        op_params       => "start timeout=200s stop timeout=200s monitor interval=10s role=Master timeout=${dbs_timeout}s \
-monitor interval=30s role=Slave timeout=${dbs_timeout}s",
+        op_params       => "start timeout=200s stop timeout=200s monitor interval=${monitor_interval_master}s role=Master timeout=${dbs_timeout}s \
+monitor interval=${monitor_interval_slave}s role=Slave timeout=${dbs_timeout}s",
         resource_params => $resource_map,
         tries           => $pcs_tries,
         location_rule   => $ovn_dbs_location_rule,
