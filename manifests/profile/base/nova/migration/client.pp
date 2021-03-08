@@ -70,7 +70,10 @@ class tripleo::profile::base::nova::migration::client (
         configure_libvirt  => $libvirt_enabled,
         configure_nova     => $nova_compute_enabled,
         client_user        => 'nova_migration',
-        client_extraparams => {'keyfile' => '/etc/nova/migration/identity'},
+        client_extraparams => {
+          'keyfile' => '/etc/nova/migration/identity',
+          'proxy'   => 'netcat',
+        },
         client_port        => $ssh_port
       }
     }
