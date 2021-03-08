@@ -1,0 +1,15 @@
+---
+fixes:
+  - |
+    libvirt 6.8.0 introduces virt-ssh-helper which prepends the libvirt
+    ssh command with a "which virt-ssh-helper". libvirt used to first
+    check for `nc` (netcat). But these two libvirt commits[1][2] have now
+    changed it to first look for `virt-ssh-helper`, if it not available,
+    then fall back to `nc`. This trips up the 'nova-migration-wrapper' as
+    it does not support virt-ssh-helper atm.
+    Until this is implemented, this change force to use "netcat" (`nc`) by
+    appending to the migration URI: "&proxy=netcat"
+    [1] https://libvirt.org/git/?p=libvirt.git;a=commit;h=f8ec7c842d (rpc:
+    use new virt-ssh-helper binary for remote tunnelling, 2020-07-08)
+    [2] https://libvirt.org/git/?p=libvirt.git;a=commit;h=7d959c302d (rpc:
+    Fix virt-ssh-helper detection, 2020-10-27)
