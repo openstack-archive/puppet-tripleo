@@ -29,11 +29,11 @@
 # [*qdr_listener_port*]
 #   Port for the listener (note that we do not use qdr::listener_port
 #   directly because it requires a string and we have a number.
-#   Defaults to hiera('tripleo::profile::base::qdr::qdr_listener_port', 5672)
+#   Defaults to 5672
 #
 # [*qdr_log_enable*]
 #   Log level for the qdrouterd module
-#   Defaults to hiera('tripleo::profile::base::qdr::qdr_log_enable', 'info+')
+#   Defaults to 'info+'
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
@@ -47,8 +47,8 @@
 class tripleo::profile::base::qdr (
   $qdr_username      = undef,
   $qdr_password      = undef,
-  $qdr_listener_port = hiera('tripleo::profile::base::qdr::qdr_listener_port', 5672),
-  $qdr_log_enable    = hiera('tripleo::profile::base::qdr::qdr_log_enable', 'info+'),
+  $qdr_listener_port = 5672,
+  $qdr_log_enable    = 'info+',
   $oslomsg_rpc_hosts = hiera('oslo_messaging_rpc_node_names', undef),
   $step              = Integer(hiera('step')),
 ) {

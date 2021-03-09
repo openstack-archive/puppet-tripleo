@@ -112,7 +112,7 @@
 #
 # [*cinder_volume_cluster*]
 #   (Optional) Name of the cluster when running in active-active mode
-#   Defaults to hiera('tripleo::profile::base::cinder::volume::cinder_volume_cluster')
+#   Defaults to ''
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not
@@ -163,7 +163,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
   $cinder_rbd_ceph_conf_path                   = '/etc/ceph',
   $cinder_rbd_client_name                      = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name','openstack'),
-  $cinder_volume_cluster                       = hiera('tripleo::profile::base::cinder::volume::cinder_volume_cluster', ''),
+  $cinder_volume_cluster                       = '',
   $enable_internal_tls                         = hiera('enable_internal_tls', false),
   $etcd_certificate_specs                      = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
   $etcd_enabled                                = hiera('etcd_enabled', false),
