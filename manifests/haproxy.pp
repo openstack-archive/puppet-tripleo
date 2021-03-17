@@ -445,7 +445,7 @@
 #
 # [*nova_novncproxy_network*]
 #  (optional) Specify the network nova_novncproxy is running on.
-#  Defaults to hiera('nova_vncproxy_network', undef)
+#  Defaults to hiera('nova_vnc_proxy_network', hiera('nova_libvirt_network', undef))
 #
 # [*nova_osapi_network*]
 #  (optional) Specify the network nova_osapi is running on.
@@ -638,7 +638,7 @@ class tripleo::haproxy (
   $mistral_network             = hiera('mistral_api_network', undef),
   $neutron_network             = hiera('neutron_api_network', undef),
   $nova_metadata_network       = hiera('nova_metadata_network', undef),
-  $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', undef),
+  $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', hiera('nova_libvirt_network', undef)),
   $nova_osapi_network          = hiera('nova_api_network', undef),
   $placement_network           = hiera('placement_network', undef),
   $octavia_network             = hiera('octavia_api_network', undef),
