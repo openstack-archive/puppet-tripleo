@@ -53,7 +53,6 @@ class tripleo::profile::base::nova::compute (
     include nova::cinder
     include nova::compute::image_cache
     include nova::vendordata
-    include nova::glance
     include nova::compute::provider
 
     # deploy basic bits for nova-compute
