@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    New ``tripleo::profile::base::cinder::backup::gcs`` and
+    ``tripleo::profile::base::cinder::backup::s3`` classes add support for
+    configuring the cinder backup service's GCS (Google Cloud service) and
+    Amazon S3 backends.
