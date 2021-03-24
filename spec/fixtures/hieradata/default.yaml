@@ -36,6 +36,9 @@ cinder_volume_short_node_names:
  - 'node.example.com'
  - 'c-vol-2'
 cinder::backup::nfs::backup_share: '/mnt/backup'
+cinder::backup::s3::backup_s3_endpoint_url: 'http://my.s3.server'
+cinder::backup::s3::backup_s3_store_access_key: 1234
+cinder::backup::s3::backup_s3_store_secret_key: 5678
 cinder::rabbit_password: 'password'
 cinder::keystone::authtoken::password: 'password'
 # designate related items
