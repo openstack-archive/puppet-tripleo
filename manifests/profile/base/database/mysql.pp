@@ -130,7 +130,7 @@ class tripleo::profile::base::database::mysql (
   $step                          = Integer(hiera('step')),
 ) {
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

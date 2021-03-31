@@ -88,7 +88,7 @@ class tripleo::profile::base::nova::api (
   $metadata_tls_proxy_fqdn       = undef,
   $metadata_tls_proxy_port       = 8775,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

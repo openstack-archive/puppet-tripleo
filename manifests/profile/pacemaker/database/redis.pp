@@ -111,7 +111,7 @@ class tripleo::profile::pacemaker::database::redis (
   $tls_proxy_fqdn        = undef,
   $tls_proxy_port        = 6379,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

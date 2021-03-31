@@ -43,7 +43,7 @@ class tripleo::profile::pacemaker::cinder::volume (
     stop       => '/bin/true',
   }
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

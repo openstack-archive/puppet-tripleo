@@ -42,7 +42,7 @@ class tripleo::profile::base::ironic::conductor (
 ) {
   include ::tripleo::profile::base::ironic
   # Database is accessed by both API and conductor, hence it's here.
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

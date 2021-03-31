@@ -44,7 +44,7 @@ class tripleo::profile::base::neutron::plugins::ml2 (
   $service_names     = hiera('service_names'),
   $step              = Integer(hiera('step')),
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false

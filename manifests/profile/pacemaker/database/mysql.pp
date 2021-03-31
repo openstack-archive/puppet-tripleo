@@ -120,7 +120,7 @@ class tripleo::profile::pacemaker::database::mysql (
   $open_files_limit               = 16384,
   $promote_timeout                = 300,
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

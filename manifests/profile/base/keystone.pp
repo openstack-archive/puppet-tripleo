@@ -205,7 +205,7 @@ class tripleo::profile::base::keystone (
   $memcached_port                 = hiera('memcached_port', 11211),
   $keystone_resources_managed     = hiera('keystone_resources_managed', true),
 ) {
-  if $::hostname == downcase($bootstrap_node) and $keystone_resources_managed {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) and $keystone_resources_managed {
     $sync_db = true
     $manage_roles = true
     $manage_endpoint = true

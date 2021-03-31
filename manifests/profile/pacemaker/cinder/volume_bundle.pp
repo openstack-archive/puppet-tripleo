@@ -78,7 +78,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user                = 'root',
 ) {
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false

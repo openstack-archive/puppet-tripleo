@@ -34,7 +34,7 @@ class tripleo::profile::base::nova::conductor (
   include ::tripleo::profile::base::nova
   include ::nova::db
 
-  if $::hostname == downcase($bootstrap_node) {
+  if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
     $sync_db = false
