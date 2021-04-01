@@ -94,6 +94,66 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
           )
         end
       end
+
+      context 'with multiple backends' do
+        before :each do
+          params.merge!({
+            :backend_name              => ['rbd1', 'rbd2'],
+            :backend_availability_zone => 'zone1',
+            :multi_config              => {
+              'rbd2' => {
+                'CinderRbdAvailabilityZone'          => 'zone2',
+                'CephClusterName'                    => 'ceph2',
+                'CinderRbdPoolName'                  => 'pool2a',
+                'CinderRbdExtraPools'                => ['pool2b', 'pool2c'],
+                'CephClusterFSID'                    => 'secretuuid',
+                'CephClientUserName'                 => 'kcatsnepo',
+                'CinderRbdFlattenVolumeFromSnapshot' => true,
+              },
+            },
+          })
+        end
+        it 'should configure each backend' do
+          is_expected.to contain_cinder__backend__rbd('rbd1').with(
+            :backend_host                     => 'node.example.com',
+            :backend_availability_zone        => 'zone1',
+            :rbd_ceph_conf                    => '/etc/ceph/ceph.conf',
+            :rbd_pool                         => 'volumes',
+            :rbd_user                         => 'openstack',
+            :rbd_flatten_volume_from_snapshot => '<SERVICE DEFAULT>',
+          )
+
+          is_expected.to contain_cinder__backend__rbd('rbd2').with(
+            :backend_host                     => 'node.example.com',
+            :backend_availability_zone        => 'zone2',
+            :rbd_ceph_conf                    => '/etc/ceph/ceph2.conf',
+            :rbd_pool                         => 'pool2a',
+            :rbd_user                         => 'kcatsnepo',
+            :rbd_secret_uuid                  => 'secretuuid',
+            :rbd_flatten_volume_from_snapshot => true,
+          )
+
+          is_expected.to contain_cinder__backend__rbd('rbd2_pool2b').with(
+            :backend_host                     => 'node.example.com',
+            :backend_availability_zone        => 'zone2',
+            :rbd_ceph_conf                    => '/etc/ceph/ceph2.conf',
+            :rbd_pool                         => 'pool2b',
+            :rbd_user                         => 'kcatsnepo',
+            :rbd_secret_uuid                  => 'secretuuid',
+            :rbd_flatten_volume_from_snapshot => true,
+          )
+
+          is_expected.to contain_cinder__backend__rbd('rbd2_pool2c').with(
+            :backend_host                     => 'node.example.com',
+            :backend_availability_zone        => 'zone2',
+            :rbd_ceph_conf                    => '/etc/ceph/ceph2.conf',
+            :rbd_pool                         => 'pool2c',
+            :rbd_user                         => 'kcatsnepo',
+            :rbd_secret_uuid                  => 'secretuuid',
+            :rbd_flatten_volume_from_snapshot => true,
+          )
+        end
+      end
     end
   end
 

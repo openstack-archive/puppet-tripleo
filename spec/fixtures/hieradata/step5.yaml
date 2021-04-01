@@ -1,8 +1,15 @@
 ---
 step: 5
+tripleo::profile::base::cinder::volume::rbd::backend_name:
+  - 'tripleo_ceph_1'
+  - 'tripleo_ceph_2'
 tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools:
   - 'foo'
   - 'bar'
+tripleo::profile::base::cinder::volume::rbd::multi_config:
+  tripleo_ceph_2:
+    CinderRbdExtraPools:
+      - 'zap'
 cinder::backend::pure::volume_backend_name:
   - 'tripleo_pure_1'
   - 'tripleo_pure_2'

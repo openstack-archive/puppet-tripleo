@@ -333,7 +333,6 @@ describe 'tripleo::profile::base::cinder::volume' do
           params.merge!({
             :cinder_enable_rbd_backend   => true,
             :cinder_enable_iscsi_backend => false,
-            :cinder_rbd_client_name      => 'openstack'
           })
         end
         it 'should configure only ceph' do
@@ -345,18 +344,15 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('cinder::backends').with(
             :enabled_backends => ['tripleo_ceph']
           )
-          is_expected.to contain_exec('exec-setfacl-openstack-cinder')
-          is_expected.to contain_exec('exec-setfacl-openstack-cinder-mask')
         end
-        context 'additional rbd pools' do
-          # The list of additional rbd pools is not an input, but instead comes
-          # from hiera. Step 4's hiera data doesn't define additional RBD pools,
-          # so test the feature by defining extra pools in step 5 (see
-          # ../fixtures/hieradata/step5.yaml).
+        context 'additional rbd pools and an additional rbd backend' do
+          # Step 5's hiera specifies two rbd backends, each with additional rbd pools
           let(:params) { { :step => 5 } }
           it 'should configure additional rbd backends' do
             is_expected.to contain_class('cinder::backends').with(
-              :enabled_backends => ['tripleo_ceph', 'tripleo_ceph_foo', 'tripleo_ceph_bar']
+              :enabled_backends => [
+                'tripleo_ceph_1', 'tripleo_ceph_2', 'tripleo_ceph_1_foo', 'tripleo_ceph_1_bar', 'tripleo_ceph_2_zap',
+              ]
             )
           end
         end

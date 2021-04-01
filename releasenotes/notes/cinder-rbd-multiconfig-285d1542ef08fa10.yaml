@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add support for configuring multiple cinder RBD backends, each associated
+    with a different ceph cluster.
+    
