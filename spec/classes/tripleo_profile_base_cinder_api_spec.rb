@@ -103,21 +103,6 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('tripleo::profile::base::apache')
       end
     end
-
-    context 'with step 4 and deprecated keymgr parameters' do
-      let(:params) { {
-        :step           => 4,
-        :bootstrap_node => 'other.example.com',
-        :keymgr_backend => 'some.other.key_manager',
-      } }
-
-      it 'should set keymgr_backend' do
-        is_expected.to contain_class('cinder::api').with(
-          :sync_db        => false,
-          :keymgr_backend => 'some.other.key_manager',
-        )
-      end
-    end
   end
 
   on_supported_os.each do |os, facts|
