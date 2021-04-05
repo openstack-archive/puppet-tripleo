@@ -33,9 +33,7 @@ describe 'tripleo::certmonger::ca::local' do
     end
 
     it 'should extract CA cert' do
-      is_expected.to contain_exec('extract-and-trust-ca').with(
-        :unless => "test -e #{params[:ca_pem]} && openssl x509 -checkend 0 -noout -in #{params[:ca_pem]}",
-      )
+      is_expected.to contain_exec('extract-and-trust-ca')
     end
 
     it 'set the correct permissions for the CA certificate file' do
