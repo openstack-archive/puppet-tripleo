@@ -146,19 +146,7 @@ class tripleo::profile::base::gnocchi::api (
         }
       }
       'file': { include gnocchi::storage::file }
-      'rbd': {
-        include gnocchi::storage::ceph
-        exec{ "exec-setfacl-${gnocchi_rbd_client_name}-gnocchi":
-          path    => ['/bin', '/usr/bin'],
-          command => "setfacl -m u:gnocchi:r-- ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring",
-          unless  => "getfacl ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q user:gnocchi:r--",
-        }
-        -> exec{ "exec-setfacl-${gnocchi_rbd_client_name}-gnocchi-mask":
-          path    => ['/bin', '/usr/bin'],
-          command => "setfacl -m m::r ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring",
-          unless  => "getfacl ${gnocchi_rbd_ceph_conf_path}/ceph.client.${gnocchi_rbd_client_name}.keyring | grep -q mask::r",
-        }
-      }
+      'rbd': { include gnocchi::storage::ceph }
       's3': { include gnocchi::storage::s3 }
       default: { fail('Unrecognized gnocchi_backend parameter.') }
     }
