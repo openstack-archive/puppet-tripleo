@@ -69,7 +69,7 @@ class tripleo::profile::base::ceilometer::agent::notification (
   include tripleo::profile::base::ceilometer::upgrade
 
   if $step >= 4 {
-    include ceilometer::agent::auth
+    include ceilometer::agent::service_credentials
 
     if $pipeline_publishers {
       $other_publishers = Array($pipeline_publishers, true)

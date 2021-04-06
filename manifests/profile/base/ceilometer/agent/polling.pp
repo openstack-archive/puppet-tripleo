@@ -67,7 +67,7 @@ class tripleo::profile::base::ceilometer::agent::polling (
   }
 
   if $step >= 4 {
-    include ceilometer::agent::auth
+    include ceilometer::agent::service_credentials
     class { 'ceilometer::agent::polling':
       central_namespace => $central_namespace,
       compute_namespace => $compute_namespace,
