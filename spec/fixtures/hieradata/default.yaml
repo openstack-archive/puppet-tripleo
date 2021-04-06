@@ -17,6 +17,7 @@ barbican::db::mysql::password: 'password'
 barbican::keystone::authtoken::password: 'password'
 # ceilometer related items
 ceilometer::rabbit_password: 'password'
+ceilometer::agent::service_credentials::password: 'password'
 # ceph related items
 # NOTE(gfidente): we want to use keystone v3 API for RGW so the following are
 # needed to comply with the if condition:
