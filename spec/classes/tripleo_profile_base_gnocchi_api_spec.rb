@@ -135,8 +135,6 @@ eos
           :redis_url => 'redis://:gnocchi@127.0.0.1:6379/'
         )
         is_expected.to contain_class('gnocchi::storage::ceph')
-        is_expected.to contain_exec('exec-setfacl-openstack-gnocchi')
-        is_expected.to contain_exec('exec-setfacl-openstack-gnocchi-mask')
       }
     end
 
