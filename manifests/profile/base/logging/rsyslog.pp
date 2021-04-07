@@ -45,6 +45,11 @@
 #   (Optional) String. Contains content of the private key corresponding to
 #   the cert elasticsearch_tls_client_cert.
 #   Defaults to undef
+#
+# [*amqp1*]
+#   (Optional) Hash. Configuration for output plugin omamqp1.
+#   Defaults to undef
+#
 class tripleo::profile::base::logging::rsyslog (
   $step                          = Integer(hiera('step')),
   $service_names                 = hiera('service_names', []),
@@ -52,65 +57,89 @@ class tripleo::profile::base::logging::rsyslog (
   $elasticsearch_tls_ca_cert     = undef,
   $elasticsearch_tls_client_cert = undef,
   $elasticsearch_tls_client_key  = undef,
+  $amqp1                         = undef,
 ) {
   if $step >= 2 {
     # NOTE: puppet-rsyslog does not have params manifest, so we don't have any
     #       other choice than using hiera currently.
     $rsyslog_confdir = hiera('rsyslog::confdir', '/etc/rsyslog.d')
 
-    if $elasticsearch_tls_ca_cert {
-      $cacert_path = "${rsyslog_confdir}/es-ca-cert.crt"
-      $cacert_conf = {'tls.cacert' => $cacert_path}
+    if $elasticsearch != undef {
+      if $elasticsearch_tls_ca_cert {
+        $cacert_path = "${rsyslog_confdir}/es-ca-cert.crt"
+        $cacert_conf = {'tls.cacert' => $cacert_path}
 
-      file { 'elasticsearch_ca_cert':
-        ensure  => 'present',
-        path    => $cacert_path,
-        content => $elasticsearch_tls_ca_cert
+        file { 'elasticsearch_ca_cert':
+          ensure  => 'present',
+          path    => $cacert_path,
+          content => $elasticsearch_tls_ca_cert
+        }
+        $esconf1 = merge($elasticsearch, $cacert_conf)
+      } else {
+        $esconf1 = $elasticsearch
       }
-      $esconf1 = merge($elasticsearch, $cacert_conf)
+
+      if $elasticsearch_tls_client_cert {
+        $clientcert_path = "${rsyslog_confdir}/es-client-cert.pem"
+        $clientcert_conf = {'tls.mycert' => $clientcert_path}
+
+        file { 'elasticsearch_client_cert':
+          ensure  => 'present',
+          path    => $clientcert_path,
+          content => $elasticsearch_tls_client_cert
+        }
+        $esconf2 = merge($esconf1, $clientcert_conf)
+      } else {
+        $esconf2 = $esconf1
+      }
+
+      if $elasticsearch_tls_client_key {
+        $clientkey_path = "${rsyslog_confdir}/es-client-key.pem"
+        $clientkey_conf = {'tls.myprivkey' => $clientkey_path}
+
+        file { 'elasticsearch_client_key':
+          ensure  => 'present',
+          path    => $clientkey_path,
+          content => $elasticsearch_tls_client_key
+        }
+        $esconf = merge($esconf2, $clientkey_conf)
+      } else {
+        $esconf = $esconf2
+      }
+
+      $modules_es = {
+        'imfile'          => {},
+        'omelasticsearch' => {},
+      }
+      $actions_es = {
+        'elasticsearch' => {
+          'type'   => 'omelasticsearch',
+          'config' => $esconf,
+        }
+      }
     } else {
-      $esconf1 = $elasticsearch
+      $modules_es = {}
+      $actions_es = {}
     }
 
-    if $elasticsearch_tls_client_cert {
-      $clientcert_path = "${rsyslog_confdir}/es-client-cert.pem"
-      $clientcert_conf = {'tls.mycert' => $clientcert_path}
-
-      file { 'elasticsearch_client_cert':
-        ensure  => 'present',
-        path    => $clientcert_path,
-        content => $elasticsearch_tls_client_cert
+    if $amqp1 != undef {
+      $modules_qdr = {
+        'imfile'  => {},
+        'omamqp1' => {},
       }
-      $esconf2 = merge($esconf1, $clientcert_conf)
+      $actions_qdr = {
+        'amqp1' => {
+          'type'   => 'omamqp1',
+          'config' => $amqp1,
+        }
+      }
     } else {
-      $esconf2 = $esconf1
+      $modules_qdr = {}
+      $actions_qdr = {}
     }
 
-    if $elasticsearch_tls_client_key {
-      $clientkey_path = "${rsyslog_confdir}/es-client-key.pem"
-      $clientkey_conf = {'tls.myprivkey' => $clientkey_path}
-
-      file { 'elasticsearch_client_key':
-        ensure  => 'present',
-        path    => $clientkey_path,
-        content => $elasticsearch_tls_client_key
-      }
-      $esconf = merge($esconf2, $clientkey_conf)
-    } else {
-      $esconf = $esconf2
-    }
-
-    $modules = {
-      'imfile'          => {},
-      'omelasticsearch' => {},
-    }
-    $actions = {
-      'elasticsearch' => {
-        'type'   => 'omelasticsearch',
-        'config' => $esconf,
-      }
-    }
-
+    $modules = $modules_es + $modules_qdr
+    $actions = $actions_es + $actions_qdr
     class { 'rsyslog::server':
       modules => $modules,
       actions => $actions
