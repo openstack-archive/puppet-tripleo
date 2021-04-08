@@ -70,6 +70,10 @@ class tripleo::profile::base::cinder::api (
   # DEPRECATED PARAMETERS
   $keymgr_backend                = undef,
 ) {
+  if keymgr_backend != undef {
+    warning('The keymgr_backend parameter has been deprecated and has no effect.')
+  }
+
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
   } else {
@@ -91,16 +95,8 @@ class tripleo::profile::base::cinder::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    if keymgr_backend != undef {
-      warning('The keymgr_backend parameter has been deprecated')
-      class { 'cinder::api':
-        sync_db        => $sync_db,
-        keymgr_backend => $keymgr_backend,
-      }
-    } else {
-      class { 'cinder::api':
-        sync_db => $sync_db,
-      }
+    class { 'cinder::api':
+      sync_db => $sync_db,
     }
     include tripleo::profile::base::apache
     class { 'cinder::wsgi::apache':
