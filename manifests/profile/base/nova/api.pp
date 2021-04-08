@@ -41,11 +41,6 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('nova_api_network', undef)
 #
-# [*nova_metadata_network*]
-#   DEPRECATED: (Optional) The network name where the nova metadata endpoint is listening on.
-#   This is set by t-h-t.
-#   Defaults to hiera('nova_metadata_network', undef)
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -59,33 +54,14 @@
 #   (Optional) Wheter to enable db purging
 #   Defaults to hiera('nova_enable_db_purge', true)
 #
-# [*metadata_tls_proxy_bind_ip*]
-#   DEPRECATED: IP on which the TLS proxy will listen on. Required only if
-#   enable_internal_tls is set.
-#   Defaults to undef
-#
-# [*metadata_tls_proxy_fqdn*]
-#   DEPRECATED: fqdn on which the tls proxy will listen on. required only used if
-#   enable_internal_tls is set.
-#   defaults to undef
-#
-# [*metadata_tls_proxy_port*]
-#   DEPRECATED: port on which the tls proxy will listen on. Only used if
-#   enable_internal_tls is set.
-#   defaults to 8080
-#
 class tripleo::profile::base::nova::api (
   $bootstrap_node             = hiera('nova_api_short_bootstrap_node_name', undef),
   $certificates_specs         = hiera('apache_certificates_specs', {}),
   $enable_internal_tls        = hiera('enable_internal_tls', false),
   $nova_api_network           = hiera('nova_api_network', undef),
-  $nova_metadata_network      = hiera('nova_metadata_network', undef),
   $step                       = Integer(hiera('step')),
   $nova_enable_db_archive     = hiera('nova_enable_db_archive', true),
   $nova_enable_db_purge       = hiera('nova_enable_db_purge', true),
-  $metadata_tls_proxy_bind_ip = undef,
-  $metadata_tls_proxy_fqdn    = undef,
-  $metadata_tls_proxy_port    = 8775,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
