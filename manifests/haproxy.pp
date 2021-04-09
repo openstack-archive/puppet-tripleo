@@ -706,6 +706,10 @@ class tripleo::haproxy (
     zaqar_ws_ssl_port => 3000,
     ceph_grafana_port => 3100,
     ceph_grafana_ssl_port => 3100,
+    ceph_prometheus_port => 9092,
+    ceph_prometheus_ssl_port => 9092,
+    ceph_alertmanager_port => 9093,
+    ceph_alertmanager_ssl_port => 9093,
     ceph_dashboard_port => 8444,
     ceph_dashboard_ssl_port => 8444,
   }
@@ -936,6 +940,34 @@ class tripleo::haproxy (
       }),
       service_network => $ceph_grafana_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
+    }
+    ::tripleo::haproxy::endpoint { 'ceph_prometheus':
+      internal_ip     => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      service_port    => $ports[ceph_prometheus_port],
+      ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      mode            => 'http',
+      public_ssl_port => $ports[ceph_prometheus_ssl_port],
+      listen_options  => merge($default_listen_options, {
+        'option'  => [ 'httpchk GET /metrics' ],
+        'balance' => 'source',
+      }),
+      service_network => $ceph_grafana_network,
+      member_options  => $haproxy_member_options,
+    }
+    ::tripleo::haproxy::endpoint { 'ceph_alertmanager':
+      internal_ip     => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      service_port    => $ports[ceph_alertmanager_port],
+      ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      mode            => 'http',
+      public_ssl_port => $ports[ceph_alertmanager_ssl_port],
+      listen_options  => merge($default_listen_options, {
+        'option'  => [ 'httpchk GET /' ],
+        'balance' => 'source',
+      }),
+      service_network => $ceph_grafana_network,
+      member_options  => $haproxy_member_options,
     }
   }
 
