@@ -37,7 +37,6 @@ class tripleo::certmonger::ca::local(
   exec { 'extract-and-trust-ca':
     command   => "${extract_cmd} && ${trust_ca_cmd}",
     path      => '/usr/bin',
-    unless    => "test -e ${ca_pem} && openssl x509 -checkend 0 -noout -in ${ca_pem}",
     tries     => 5,
     try_sleep => 1,
     notify    => File[$ca_pem]
