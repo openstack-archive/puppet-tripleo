@@ -31,6 +31,5 @@ class tripleo::profile::base::barbican (
   if $step >= 3 {
     include barbican
     include barbican::config
-    include barbican::client
   }
 }
