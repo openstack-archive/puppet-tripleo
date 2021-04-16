@@ -24,9 +24,10 @@ describe 'tripleo::profile::base::mistral' do
         is_expected.to contain_class('tripleo::profile::base::mistral')
         is_expected.to_not contain_class('mistral')
         is_expected.to_not contain_class('mistral::config')
-        is_expected.to_not contain_class('mistral::logging')
-        is_expected.to_not contain_class('mistral::db::sync')
         is_expected.to_not contain_class('mistral::cors')
+        is_expected.to_not contain_class('mistral::db')
+        is_expected.to_not contain_class('mistral::db::sync')
+        is_expected.to_not contain_class('mistral::logging')
       end
     end
 
@@ -45,14 +46,16 @@ describe 'tripleo::profile::base::mistral' do
       } }
 
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('tripleo::profile::base::mistral')
         is_expected.to contain_class('mistral').with(
           :default_transport_url      => 'rabbit://mistral1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://mistral2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('mistral::config')
-        is_expected.to contain_class('mistral::logging')
-        is_expected.to contain_class('mistral::db::sync')
         is_expected.to contain_class('mistral::cors')
+        is_expected.to contain_class('mistral::db')
+        is_expected.to contain_class('mistral::db::sync')
+        is_expected.to contain_class('mistral::logging')
       end
     end
 
@@ -66,9 +69,10 @@ describe 'tripleo::profile::base::mistral' do
         is_expected.to contain_class('tripleo::profile::base::mistral')
         is_expected.to_not contain_class('mistral')
         is_expected.to_not contain_class('mistral::config')
-        is_expected.to_not contain_class('mistral::logging')
-        is_expected.to_not contain_class('mistral::db::sync')
         is_expected.to_not contain_class('mistral::cors')
+        is_expected.to_not contain_class('mistral::db')
+        is_expected.to_not contain_class('mistral::db::sync')
+        is_expected.to_not contain_class('mistral::logging')
       end
     end
 
@@ -87,14 +91,16 @@ describe 'tripleo::profile::base::mistral' do
       } }
 
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('tripleo::profile::base::mistral')
         is_expected.to contain_class('mistral').with(
           :default_transport_url      => 'rabbit://mistral1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://mistral2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('mistral::config')
-        is_expected.to contain_class('mistral::logging')
-        is_expected.to contain_class('mistral::db::sync')
         is_expected.to contain_class('mistral::cors')
+        is_expected.to contain_class('mistral::db')
+        is_expected.to contain_class('mistral::db::sync')
+        is_expected.to contain_class('mistral::logging')
       end
     end
 

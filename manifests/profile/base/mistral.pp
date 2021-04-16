@@ -119,8 +119,9 @@ class tripleo::profile::base::mistral (
       }),
     }
     include mistral::config
-    include mistral::logging
-    include mistral::db::sync
     include mistral::cors
+    include mistral::db
+    include mistral::db::sync
+    include mistral::logging
   }
 }

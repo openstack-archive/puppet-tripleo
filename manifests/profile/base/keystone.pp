@@ -261,6 +261,7 @@ class tripleo::profile::base::keystone (
     }
 
     include keystone::config
+    include keystone::db
     include keystone::logging
     include tripleo::profile::base::apache
     class { 'keystone::wsgi::apache':

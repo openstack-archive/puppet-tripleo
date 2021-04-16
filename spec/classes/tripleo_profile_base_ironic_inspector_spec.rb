@@ -32,6 +32,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
       it {
         is_expected.to contain_class('tripleo::profile::base::ironic_inspector')
         is_expected.to_not contain_class('ironic::inspector')
+        is_expected.to_not contain_class('ironic::inspector::db')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter::dnsmasq')
         is_expected.to_not contain_class('ironic::config')
@@ -51,6 +52,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
         is_expected.to contain_class('ironic::inspector').with(
           :dnsmasq_ip_subnets => ['192.168.24.0/24']
         )
+        is_expected.to contain_class('ironic::inspector::db')
         is_expected.to contain_class('ironic::inspector::pxe_filter')
         is_expected.to contain_class('ironic::inspector::pxe_filter::dnsmasq')
         is_expected.to contain_class('ironic::config')
@@ -67,6 +69,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
       it {
         is_expected.to contain_class('tripleo::profile::base::ironic_inspector')
         is_expected.to_not contain_class('ironic::inspector')
+        is_expected.to_not contain_class('ironic::inspector::db')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter::dnsmasq')
         is_expected.to_not contain_class('ironic::config')
@@ -86,6 +89,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
         is_expected.to contain_class('ironic::inspector').with(
           :dnsmasq_ip_subnets => ['192.168.24.0/24']
         )
+        is_expected.to contain_class('ironic::inspector::db')
         is_expected.to contain_class('ironic::inspector::pxe_filter')
         is_expected.to contain_class('ironic::inspector::pxe_filter::dnsmasq')
         is_expected.to contain_class('ironic::config')

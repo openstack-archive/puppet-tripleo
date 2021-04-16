@@ -91,9 +91,9 @@ class tripleo::profile::base::gnocchi (
     class { 'gnocchi':
       coordination_url => join(['redis://:', $gnocchi_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
     }
-    include gnocchi::db
     include gnocchi::config
     include gnocchi::cors
+    include gnocchi::db
     include gnocchi::logging
   }
 }

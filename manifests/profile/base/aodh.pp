@@ -121,6 +121,7 @@ class tripleo::profile::base::aodh (
     }
     include aodh::service_credentials
     include aodh::config
+    include aodh::db
     include aodh::db::sync
     include aodh::logging
   }
