@@ -25,7 +25,6 @@ describe 'tripleo::profile::base::mistral' do
         is_expected.to_not contain_class('mistral')
         is_expected.to_not contain_class('mistral::config')
         is_expected.to_not contain_class('mistral::logging')
-        is_expected.to_not contain_class('mistral::client')
         is_expected.to_not contain_class('mistral::db::sync')
         is_expected.to_not contain_class('mistral::cors')
       end
@@ -52,7 +51,6 @@ describe 'tripleo::profile::base::mistral' do
         )
         is_expected.to contain_class('mistral::config')
         is_expected.to contain_class('mistral::logging')
-        is_expected.to contain_class('mistral::client')
         is_expected.to contain_class('mistral::db::sync')
         is_expected.to contain_class('mistral::cors')
       end
@@ -69,7 +67,6 @@ describe 'tripleo::profile::base::mistral' do
         is_expected.to_not contain_class('mistral')
         is_expected.to_not contain_class('mistral::config')
         is_expected.to_not contain_class('mistral::logging')
-        is_expected.to_not contain_class('mistral::client')
         is_expected.to_not contain_class('mistral::db::sync')
         is_expected.to_not contain_class('mistral::cors')
       end
@@ -96,7 +93,6 @@ describe 'tripleo::profile::base::mistral' do
         )
         is_expected.to contain_class('mistral::config')
         is_expected.to contain_class('mistral::logging')
-        is_expected.to contain_class('mistral::client')
         is_expected.to contain_class('mistral::db::sync')
         is_expected.to contain_class('mistral::cors')
       end

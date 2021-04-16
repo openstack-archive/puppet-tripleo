@@ -94,7 +94,6 @@ class tripleo::profile::base::gnocchi (
     include gnocchi::db
     include gnocchi::config
     include gnocchi::cors
-    include gnocchi::client
     include gnocchi::logging
   }
 }

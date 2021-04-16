@@ -25,7 +25,6 @@ describe 'tripleo::profile::base::aodh' do
         is_expected.to_not contain_class('aodh')
         is_expected.to_not contain_class('aodh::auth')
         is_expected.to_not contain_class('aodh::config')
-        is_expected.to_not contain_class('aodh::client')
         is_expected.to_not contain_class('aodh::db::sync')
       end
     end
@@ -45,7 +44,6 @@ describe 'tripleo::profile::base::aodh' do
         )
         is_expected.to contain_class('aodh::auth')
         is_expected.to contain_class('aodh::config')
-        is_expected.to contain_class('aodh::client')
         is_expected.to contain_class('aodh::db::sync')
       end
     end
@@ -60,7 +58,6 @@ describe 'tripleo::profile::base::aodh' do
         is_expected.to_not contain_class('aodh')
         is_expected.to_not contain_class('aodh::auth')
         is_expected.to_not contain_class('aodh::config')
-        is_expected.to_not contain_class('aodh::client')
         is_expected.to_not contain_class('aodh::db::sync')
       end
     end
@@ -80,7 +77,6 @@ describe 'tripleo::profile::base::aodh' do
         )
         is_expected.to contain_class('aodh::auth')
         is_expected.to contain_class('aodh::config')
-        is_expected.to contain_class('aodh::client')
         is_expected.to contain_class('aodh::db::sync')
       end
     end

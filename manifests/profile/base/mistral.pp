@@ -120,7 +120,6 @@ class tripleo::profile::base::mistral (
     }
     include mistral::config
     include mistral::logging
-    include mistral::client
     include mistral::db::sync
     include mistral::cors
   }

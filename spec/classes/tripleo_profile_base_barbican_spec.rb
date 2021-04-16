@@ -24,7 +24,6 @@ describe 'tripleo::profile::base::barbican' do
         is_expected.to contain_class('tripleo::profile::base::barbican')
         is_expected.to_not contain_class('barbican')
         is_expected.to_not contain_class('barbican::config')
-        is_expected.to_not contain_class('barbican::client')
       end
     end
 
@@ -39,7 +38,6 @@ describe 'tripleo::profile::base::barbican' do
         )
         is_expected.to contain_class('barbican')
         is_expected.to contain_class('barbican::config')
-        is_expected.to contain_class('barbican::client')
       end
     end
   end
