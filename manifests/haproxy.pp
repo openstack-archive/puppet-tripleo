@@ -1351,7 +1351,7 @@ class tripleo::haproxy (
       'option' => [ 'httplog' ],
     }
     $ironic_backend_opts = {
-      'option' => [ 'httpchk' ],
+      'option' => [ 'httpchk GET /healthcheck' ],
     }
     $ironic_listen_opts = merge_hash_values($ironic_frontend_opts,
                                             $ironic_backend_opts)
@@ -1732,7 +1732,7 @@ class tripleo::haproxy (
     }
     $octavia_backend_opts = {
       'hash-type' => 'consistent',
-      'option'    => [ 'httpchk HEAD /' ],
+      'option'    => [ 'httpchk GET /healthcheck' ],
       'balance'   => 'source',
     }
     $octavia_listen_opts = merge_hash_values($octavia_frontend_opts,
