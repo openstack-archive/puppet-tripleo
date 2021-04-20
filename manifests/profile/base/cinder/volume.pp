@@ -62,10 +62,6 @@
 #   (Optional) Whether to enable the xtremio backend
 #   Defaults to false
 #
-# [*cinder_enable_dellemc_xtremio_iscsi_backend*]
-#   (Optional) Whether to enable the xtremio iscsi backend
-#   Defaults to false
-#
 # [*cinder_enable_hpelefthand_backend*]
 #   (Optional) Whether to enable the hpelefthand backend
 #   Defaults to false
@@ -151,7 +147,6 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_dellemc_vnx_backend           = false,
   $cinder_enable_dellemc_vxflexos_backend      = false,
   $cinder_enable_dellemc_xtremio_backend       = false,
-  $cinder_enable_dellemc_xtremio_iscsi_backend = false,
   $cinder_enable_hpelefthand_backend           = false,
   $cinder_enable_iscsi_backend                 = true,
   $cinder_enable_netapp_backend                = false,
@@ -288,14 +283,6 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellemc_xtremio_backend_name = undef
     }
 
-    if $cinder_enable_dellemc_xtremio_iscsi_backend {
-      include tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi
-      $cinder_dellemc_xtremio_iscsi_backend_name = hiera('cinder::backend::dellemc_xtremio_iscsi::volume_backend_name',
-          'tripleo_dellemc_xtremio_iscsi')
-    } else {
-      $cinder_dellemc_xtremio_iscsi_backend_name = undef
-    }
-
     if $cinder_enable_hpelefthand_backend {
       include tripleo::profile::base::cinder::volume::hpelefthand
       $cinder_hpelefthand_backend_name = hiera('cinder::backend::hpelefthand_iscsi::volume_backend_name', 'tripleo_hpelefthand')
@@ -386,7 +373,6 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_dellemc_vnx_backend_name,
                                       $cinder_dellemc_vxflexos_backend_name,
                                       $cinder_dellemc_xtremio_backend_name,
-                                      $cinder_dellemc_xtremio_iscsi_backend_name,
                                       $cinder_hpelefthand_backend_name,
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
