@@ -1250,7 +1250,9 @@ class tripleo::haproxy (
   }
 
   if $ironic {
-    # TODO(tkajina): Switch to /healthcheck after enabling the healthcheck api
+    $ironic_listen_opts = {
+      'option' => [ 'httpchk GET /healthcheck', 'httplog' ],
+    }
     ::tripleo::haproxy::endpoint { 'ironic':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('ironic_api_vip', $controller_virtual_ip),
@@ -1258,6 +1260,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ironic_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $ironic_listen_opts),
       public_ssl_port   => $ports[ironic_api_ssl_port],
       service_network   => $ironic_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1517,10 +1520,9 @@ class tripleo::haproxy (
   }
 
   if $octavia {
-    # TODO(tkajina): Switch to /healthcheck after enabling the healthcheck api
     $octavia_listen_opts = {
       'hash-type' => 'consistent',
-      'option'    => [ 'httpchk HEAD /', 'httplog' ],
+      'option'    => [ 'httpchk GET /healthcheck', 'httplog' ],
       'balance'   => 'source',
     }
     ::tripleo::haproxy::endpoint { 'octavia':
