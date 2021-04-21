@@ -98,14 +98,6 @@
 #   (Optional) List of additional backend stanzas to activate
 #   Defaults to hiera('cinder_user_enabled_backends')
 #
-# [*cinder_rbd_client_name*]
-#   (Optional) Name of RBD client
-#   Defaults to hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name')
-#
-# [*cinder_rbd_ceph_conf_path*]
-#   (Optional) The path where the Ceph Cluster config files are stored on the host
-#   Defaults to '/etc/ceph'
-#
 # [*cinder_volume_cluster*]
 #   (Optional) Name of the cluster when running in active-active mode
 #   Defaults to ''
@@ -135,6 +127,16 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# DEPRECATED PARAMETERS
+#
+# [*cinder_rbd_client_name*]
+#   (Optional) Name of RBD client
+#   Defaults to undef
+#
+# [*cinder_rbd_ceph_conf_path*]
+#   (Optional) The path where the Ceph Cluster config files are stored on the host
+#   Defaults to undef
+#
 class tripleo::profile::base::cinder::volume (
   $cinder_enable_pure_backend                  = false,
   $cinder_enable_dellsc_backend                = false,
@@ -156,8 +158,6 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_vrts_hs_backend               = false,
   $cinder_enable_nvmeof_backend                = false,
   $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
-  $cinder_rbd_ceph_conf_path                   = '/etc/ceph',
-  $cinder_rbd_client_name                      = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_user_name','openstack'),
   $cinder_volume_cluster                       = '',
   $enable_internal_tls                         = hiera('enable_internal_tls', false),
   $etcd_certificate_specs                      = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
@@ -165,6 +165,9 @@ class tripleo::profile::base::cinder::volume (
   $etcd_host                                   = hiera('etcd_vip', undef),
   $etcd_port                                   = hiera('tripleo::profile::base::etcd::client_port', '2379'),
   $step                                        = Integer(hiera('step')),
+  # DEPRECATED PARAMETERS
+  $cinder_rbd_ceph_conf_path                   = undef,
+  $cinder_rbd_client_name                      = undef,
 ) {
   include tripleo::profile::base::cinder
 
@@ -313,26 +316,27 @@ class tripleo::profile::base::cinder::volume (
 
     if $cinder_enable_rbd_backend {
       include tripleo::profile::base::cinder::volume::rbd
-      $cinder_rbd_backend_name = hiera('cinder::backend::rbd::volume_backend_name', 'tripleo_ceph')
+      $cinder_rbd_backend_name = hiera('tripleo::profile::base::cinder::volume::rbd::backend_name',
+                                        ['tripleo_ceph'])
 
-      exec{ "exec-setfacl-${cinder_rbd_client_name}-cinder":
-        path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m u:cinder:r-- ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring",
-        unless  => "getfacl ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring | grep -q user:cinder:r--",
-      }
-      -> exec{ "exec-setfacl-${cinder_rbd_client_name}-cinder-mask":
-        path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m m::r ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring",
-        unless  => "getfacl ${cinder_rbd_ceph_conf_path}/ceph.client.${cinder_rbd_client_name}.keyring | grep -q mask::r",
-      }
-
-      $cinder_rbd_extra_pools = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef)
-      if $cinder_rbd_extra_pools {
-          $base_name = $cinder_rbd_backend_name
-          $cinder_rbd_extra_backend_names = $cinder_rbd_extra_pools.map |$pool_name| { "${base_name}_${pool_name}" }
+      $extra_pools = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef)
+      if empty($extra_pools) {
+        $extra_backend_names = []
       } else {
-          $cinder_rbd_extra_backend_names = undef
+        # These $extra_pools are associated with the first backend
+        $base_name = any2array($cinder_rbd_backend_name)[0]
+        $extra_backend_names = any2array($extra_pools).map |$pool_name| { "${base_name}_${pool_name}" }
       }
+
+      # Each $multi_config backend can specify its own list of extra pools. The
+      # backend names are the $multi_config hash keys.
+      $multi_config = hiera('tripleo::profile::base::cinder::volume::rbd::multi_config', {})
+      $extra_multiconfig_backend_names = $multi_config.map |$base_name, $backend_config| {
+        $backend_extra_pools = $backend_config['CinderRbdExtraPools']
+        any2array($backend_extra_pools).map |$pool_name| { "${base_name}_${pool_name}" }
+      }
+
+      $cinder_rbd_extra_backend_names = flatten($extra_backend_names, $extra_multiconfig_backend_names)
     } else {
       $cinder_rbd_backend_name = undef
       $cinder_rbd_extra_backend_names = undef
