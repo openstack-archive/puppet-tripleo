@@ -144,6 +144,7 @@ class tripleo::profile::base::nova (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
+    include nova::cinder
     include nova::glance
     include nova::placement
     include nova::keystone::service_user

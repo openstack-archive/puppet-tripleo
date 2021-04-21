@@ -28,7 +28,6 @@ describe 'tripleo::profile::base::nova::compute' do
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::compute')
         is_expected.to_not contain_class('tripleo::profile::base::nova')
-        is_expected.to_not contain_class('nova::cinder')
         is_expected.to_not contain_class('nova::compute::image_cache')
         is_expected.to_not contain_class('nova::vendordata')
         is_expected.to_not contain_class('nova::compute')
@@ -58,7 +57,6 @@ eos
         it {
           is_expected.to contain_class('tripleo::profile::base::nova::compute')
           is_expected.to contain_class('tripleo::profile::base::nova')
-          is_expected.to contain_class('nova::cinder')
           is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
           is_expected.to contain_class('nova::compute')
@@ -86,7 +84,6 @@ eos
         it {
           is_expected.to contain_class('tripleo::profile::base::nova::compute')
           is_expected.to contain_class('tripleo::profile::base::nova')
-          is_expected.to contain_class('nova::cinder')
           is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
           is_expected.to contain_class('nova::compute')
@@ -101,7 +98,6 @@ eos
         it {
           is_expected.to contain_class('tripleo::profile::base::nova::compute')
           is_expected.to contain_class('tripleo::profile::base::nova')
-          is_expected.to contain_class('nova::cinder')
           is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
           is_expected.to contain_class('nova::compute')
