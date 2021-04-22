@@ -7,7 +7,7 @@ mod 'stdlib',
 
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
-  :ref => 'master'
+  :ref => '2.1.0'
 
 mod 'tomcat',
   :git => 'https://github.com/puppetlabs/puppetlabs-tomcat',
