@@ -33,10 +33,6 @@ mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
   :ref => 'master'
 
-mod 'certmonger',
-  :git => 'https://github.com/saltedsignal/puppet-certmonger',
-  :ref => 'v2.6.0'
-
 mod 'ptp',
   :git => 'https://github.com/redhat-nfvpe/ptp',
   :ref => 'master'
