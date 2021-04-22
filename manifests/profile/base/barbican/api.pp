@@ -161,7 +161,6 @@ class tripleo::profile::base::barbican::api (
       multiple_secret_stores_enabled => true,
       enabled_secret_stores          => $::tripleo::profile::base::barbican::backends::enabled_secret_stores,
     }
-    include barbican::keystone::authtoken
     include barbican::api::logging
     include barbican::keystone::notification
     include barbican::quota
