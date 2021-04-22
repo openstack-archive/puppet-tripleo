@@ -3,7 +3,7 @@
 
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
-  :ref => 'df96ffc5276ee316be925f9423612e9190055d8f'
+  :ref => 'v4.1.0'
 
 mod 'tomcat',
   :git => 'https://github.com/puppetlabs/puppetlabs-tomcat',
