@@ -36,11 +36,19 @@ cat "$service_certificate" "$ca_path" "$service_key" > "$service_pem"
 haproxy_container_name=$($container_cli ps --format="{{.Names}}" | grep -w -E 'haproxy(-bundle-.*-[0-9]+)?')
 
 if [ "$ACTION" == "reload" ]; then
-    # Refresh the cert at the mount-point
-    $container_cli cp $service_pem "$haproxy_container_name:/var/lib/kolla/config_files/src-tls/$service_pem"
-
-    # Copy the new cert from the mount-point to the real path
-    $container_cli exec "$haproxy_container_name" cp "/var/lib/kolla/config_files/src-tls$service_pem" "$service_pem"
+    # Inject the new certificate into the running container
+    if echo "$haproxy_container_name" | grep -q "^haproxy-bundle"; then
+        # lp#1917868: Do not use podman cp with HA containers as they get
+        # frozen temporarily and that can make pacemaker operation fail.
+        tar -c "$service_pem" | $container_cli exec -i "$haproxy_container_name" tar -C / -xv
+        # no need to update the mount point, because pacemaker
+        # recreates the container when it's restarted
+    else
+        # Refresh the pem at the mount-point
+        $container_cli cp $service_pem "$haproxy_container_name:/var/lib/kolla/config_files/src-tls${service_pem}"
+        # Copy the new pem from the mount-point to the real path
+        $container_cli exec "$haproxy_container_name" cp "/var/lib/kolla/config_files/src-tls${service_pem}" "$service_pem"
+    fi
 
     # Set appropriate permissions
     $container_cli exec "$haproxy_container_name" chown haproxy:haproxy "$service_pem"
