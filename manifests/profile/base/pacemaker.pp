@@ -146,7 +146,14 @@ class tripleo::profile::base::pacemaker (
     $pacemaker_master = false
   }
 
+  # enable_fencing guides the enablement of the stonith-enabled cluster-wide property
+  # enable_stonith_resources drives the creation of the stonith resources themselves and happens at
+  # step2. The reason for step2 is the following:
+  # During step1 the cluster is created (and also the pcmk remote resources in case of IHA)
+  # Since stonith resources are created on each node separately we need to have the guarantee that
+  # all cluster nodes + remote exist before creating stonith resources for them
   $enable_fencing = str2bool(hiera('enable_fencing', false)) and $step >= 5
+  $enable_stonith_resources = str2bool(hiera('enable_fencing', false)) and $step >= 2
 
   if $step >= 1 {
     include ::pacemaker::params
@@ -233,7 +240,7 @@ class tripleo::profile::base::pacemaker (
       }
       Class['pacemaker::stonith'] -> Exec<|tag == 'pacemaker-scaleup'|>
     }
-    if $enable_fencing {
+    if $enable_stonith_resources {
       include tripleo::fencing
 
       # enable stonith after all Pacemaker resources have been created
