@@ -267,9 +267,6 @@ class tripleo::profile::base::rabbitmq (
         admin    => true,
       }
     }
-    if hiera('veritas_hyperscale_controller_enabled', false) {
-      include veritas_hyperscale::hs_rabbitmq
-    }
   }
 
 }

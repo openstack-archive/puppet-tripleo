@@ -299,9 +299,6 @@ class tripleo::profile::base::database::mysql (
       # NOTE: by default zaqar uses sqlalchemy
       tripleo::profile::base::database::mysql::include_and_check_auth{'zaqar::db::mysql':}
     }
-    if hiera('veritas_hyperscale_controller_enabled', false) {
-      tripleo::profile::base::database::mysql::include_and_check_auth{'veritas_hyperscale::db::mysql':}
-    }
   }
 
 }

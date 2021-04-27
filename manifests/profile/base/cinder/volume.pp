@@ -86,10 +86,6 @@
 #   (Optional) Whether to enable the scaleio backend
 #   Defaults to false
 #
-#[*cinder_enable_vrts_hs_backend*]
-#   (Optional) Whether to enable the Veritas HyperScale backend
-#   Defaults to false
-#
 #[*cinder_enable_nvmeof_backend*]
 #   (Optional) Whether to enable the NVMeOF backend
 #   Defaults to false
@@ -155,7 +151,6 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_nfs_backend                   = false,
   $cinder_enable_rbd_backend                   = false,
   $cinder_enable_scaleio_backend               = false,
-  $cinder_enable_vrts_hs_backend               = false,
   $cinder_enable_nvmeof_backend                = false,
   $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
   $cinder_volume_cluster                       = '',
@@ -349,13 +344,6 @@ class tripleo::profile::base::cinder::volume (
       $cinder_scaleio_backend_name = undef
     }
 
-    if $cinder_enable_vrts_hs_backend {
-      include tripleo::profile::base::cinder::volume::veritas_hyperscale
-      $cinder_veritas_hyperscale_backend_name = 'Veritas_HyperScale'
-    } else {
-      $cinder_veritas_hyperscale_backend_name = undef
-    }
-
     if $cinder_enable_nvmeof_backend {
       include tripleo::profile::base::cinder::volume::nvmeof
       $cinder_nvmeof_backend_name = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof')
@@ -381,7 +369,6 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
                                       $cinder_scaleio_backend_name,
-                                      $cinder_veritas_hyperscale_backend_name,
                                       $cinder_user_enabled_backends,
                                       $cinder_nvmeof_backend_name))
     # NOTE(aschultz): during testing it was found that puppet 3 may incorrectly
