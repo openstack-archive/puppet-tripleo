@@ -1,0 +1,52 @@
+<%- | String  $image_name    = '',
+      Boolean $debug
+| -%>
+#!/bin/bash
+<%- if $debug { -%>set -x<%- } -%>
+ARGS="$@"
+NAME=nova_virtlogd
+CMD='/usr/sbin/virtlogd --config /etc/libvirt/virtlogd.conf'
+CLI="nsenter --preserve-credentials -m -t 1 podman"
+LOGGING="--log-driver k8s-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
+VIRTLOGD_CONTAINER=$(${CLI} ps -a --filter name="^${NAME}$" --format '{{.ID}}:{{.Status}}')
+
+CONTAINER_ID=$(echo $VIRTLOGD_CONTAINER | awk -F: '{print $1}')
+CONTAINER_STATUS=$(echo $VIRTLOGD_CONTAINER | awk -F: '{print $2}')
+CONTAINER_STATUS_SHORT=$(echo $CONTAINER_STATUS | awk '{print $1}')
+
+case ${CONTAINER_STATUS_SHORT} in
+    Up | up | UP)
+        echo "Container ${NAME} with id ${CONTAINER_ID} is already running!"
+        ;;
+    Exited| exited| EXITED)
+        echo "Removing orphaned ${NAME} container ${CONTAINER_ID}"
+        $CLI stop ${CONTAINER_ID} || true
+        $CLI rm -f ${CONTAINER_ID} || true
+        ;&
+    *)
+        echo "Starting a new child container ${NAME}"
+        $CLI run --rm --detach ${LOGGING} \
+            -v /etc/hosts:/etc/hosts:ro \
+            -v /etc/localtime:/etc/localtime:ro \
+            -v /var/lib/config-data/nova_libvirt/etc/libvirt:/etc/libvirt:ro \
+            -v /lib/modules:/lib/modules:ro \
+            -v /dev/log:/dev/log \
+            -v /run:/run \
+            -v /sys/fs/cgroup:/sys/fs/cgroup \
+            -v /var/run/libvirt:/var/run/libvirt:shared \
+            -v /var/lib/libvirt:/var/lib/libvirt \
+            -v /var/log/containers/libvirt:/var/log/libvirt \
+            -v /var/log/libvirt/qemu:/var/log/libvirt/qemu \
+            -v /var/lib/nova:/var/lib/nova:shared \
+            --net host \
+            --pid host \
+            --privileged \
+            -u root \
+            --name $NAME \
+            <%=$image_name%> \
+            $CMD $ARGS
+        ;;
+
+esac
+
+sleep infinity
