@@ -50,7 +50,6 @@ class tripleo::profile::base::nova::compute (
   if $step >= 4 {
     # deploy basic bits for nova
     include tripleo::profile::base::nova
-    include nova::cinder
     include nova::compute::image_cache
     include nova::vendordata
     include nova::compute::provider
