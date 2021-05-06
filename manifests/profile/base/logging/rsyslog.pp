@@ -45,6 +45,12 @@
 #   (Optional) String. Contains content of the private key corresponding to
 #   the cert elasticsearch_tls_client_cert.
 #   Defaults to undef
+#
+# [*reopen_on_truncate*]
+#   (Optional) String. Set all rsyslog imfile reopenOnTruncate parameters
+#   unless it is already specified in hiera
+#   Defaults to undef
+#
 class tripleo::profile::base::logging::rsyslog (
   $step                          = Integer(hiera('step')),
   $service_names                 = hiera('service_names', []),
@@ -52,6 +58,7 @@ class tripleo::profile::base::logging::rsyslog (
   $elasticsearch_tls_ca_cert     = undef,
   $elasticsearch_tls_client_cert = undef,
   $elasticsearch_tls_client_key  = undef,
+  $reopen_on_truncate            = undef,
 ) {
   if $step >= 2 {
     # NOTE: puppet-rsyslog does not have params manifest, so we don't have any
@@ -115,6 +122,8 @@ class tripleo::profile::base::logging::rsyslog (
       modules => $modules,
       actions => $actions
     }
-    tripleo::profile::base::logging::rsyslog::file_input{$service_names: }
+    tripleo::profile::base::logging::rsyslog::file_input{$service_names:
+      reopen_on_truncate => $reopen_on_truncate
+    }
   }
 }
