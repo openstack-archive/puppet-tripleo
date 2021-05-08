@@ -134,9 +134,9 @@ class tripleo::profile::base::manila::share (
       # nfs-ganesha depending whether 'cephfs_protocol_helper_type' is
       # set to 'CEPHFS' or 'NFS'
       if $manila_cephfs_protocol_helper_type == 'NFS' {
-        manila_config {
-          "${manila_cephfs_backend}/ganesha_rados_store_enable":    value => true;
-          "${manila_cephfs_backend}/ganesha_rados_store_pool_name": value => $manila_cephfs_pool_name;
+        manila::backend::ganesha { $manila_cephfs_backend :
+          ganesha_rados_store_enable    => true,
+          ganesha_rados_store_pool_name => $manila_cephfs_pool_name,
         }
       }
 
