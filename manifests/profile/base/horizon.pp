@@ -66,6 +66,10 @@
 #   (Optional) Indicate whether Heat is available in the deployment.
 #   Defaults to hiera('heat_api_enabled') or false
 #
+# [*octavia_api_enabled*]
+#   (Optional) Indicate whether Octavia is available in the deployment.
+#   Defaults to hiera('octavia_api_enabled') or false
+#
 class tripleo::profile::base::horizon (
   $step                = Integer(hiera('step')),
   $bootstrap_node      = hiera('horizon_short_bootstrap_node_name', undef),
@@ -75,6 +79,7 @@ class tripleo::profile::base::horizon (
   $neutron_options     = hiera('horizon::neutron_options', {}),
   $memcached_hosts     = hiera('memcached_node_names', []),
   $heat_api_enabled    = hiera('heat_api_enabled', false),
+  $octavia_api_enabled = hiera('octavia_api_enabled', false),
   # DEPRECATED PARAMETERS
   $memcached_ips       = undef
 ) {
@@ -124,6 +129,10 @@ class tripleo::profile::base::horizon (
 
     if $heat_api_enabled {
       include ::horizon::dashboards::heat
+    }
+
+    if $octavia_api_enabled {
+      include ::horizon::dashboards::octavia
     }
   }
 }
