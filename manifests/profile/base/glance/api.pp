@@ -188,13 +188,13 @@ class tripleo::profile::base::glance::api (
       $tls_certfile = $certificates_specs["httpd-${glance_network}"]['service_certificate']
       $tls_keyfile = $certificates_specs["httpd-${glance_network}"]['service_key']
 
-      ::tripleo::tls_proxy { 'glance-api':
+      tripleo::tls_proxy { 'glance-api':
         servername => $tls_proxy_fqdn,
         ip         => $tls_proxy_bind_ip,
         port       => $tls_proxy_port,
         tls_cert   => $tls_certfile,
         tls_key    => $tls_keyfile,
-        notify     => Class['::glance::api'],
+        notify     => Class['glance::api'],
       }
       include tripleo::profile::base::apache
     }
