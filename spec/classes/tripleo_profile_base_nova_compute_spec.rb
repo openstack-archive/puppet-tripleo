@@ -22,7 +22,7 @@ describe 'tripleo::profile::base::nova::compute' do
       facts.merge!({ :step => params[:step] })
     end
 
-    context 'with step less than 5' do
+    context 'with step less than 4' do
       let(:params) { { :step => 1, } }
 
       it {
@@ -30,12 +30,14 @@ describe 'tripleo::profile::base::nova::compute' do
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::compute::image_cache')
         is_expected.to_not contain_class('nova::vendordata')
+        is_expected.to_not contain_class('nova::key_manager')
+        is_expected.to_not contain_class('nova::key_manager::barbican')
         is_expected.to_not contain_class('nova::compute')
         is_expected.to_not contain_class('nova::network::neutron')
       }
     end
 
-    context 'with step 5' do
+    context 'with step 4' do
       let(:pre_condition) do
         <<-eos
         class { 'tripleo::profile::base::nova':
@@ -59,23 +61,12 @@ eos
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
+          is_expected.to contain_class('nova::key_manager')
+          is_expected.to contain_class('nova::key_manager::barbican')
           is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')
           is_expected.to_not contain_package('nfs-utils')
         }
-      end
-
-      context 'with deprecated keymgr parameters' do
-        let(:params) { {
-          :step           => 4,
-          :keymgr_backend => 'some.other.key_manager',
-        } }
-
-        it 'should use deprecated keymgr parameters' do
-          is_expected.to contain_class('nova::compute').with(
-            :keymgr_backend => 'some.other.key_manager',
-          )
-        end
       end
 
       context 'cinder nfs backend' do
@@ -86,6 +77,8 @@ eos
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
+          is_expected.to contain_class('nova::key_manager')
+          is_expected.to contain_class('nova::key_manager::barbican')
           is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')
           is_expected.to contain_package('nfs-utils')
@@ -100,6 +93,8 @@ eos
           is_expected.to contain_class('tripleo::profile::base::nova')
           is_expected.to contain_class('nova::compute::image_cache')
           is_expected.to contain_class('nova::vendordata')
+          is_expected.to contain_class('nova::key_manager')
+          is_expected.to contain_class('nova::key_manager::barbican')
           is_expected.to contain_class('nova::compute')
           is_expected.to contain_class('nova::network::neutron')
           is_expected.to contain_package('nfs-utils')
