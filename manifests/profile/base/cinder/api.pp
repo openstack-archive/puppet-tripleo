@@ -52,14 +52,6 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# DEPRECATED PARAMETERS
-#
-# [*keymgr_backend*]
-#   (Optional) The encryption key manager backend. The default value
-#   ensures Cinder's legacy key manager is enabled when no hiera value is
-#   specified.
-#   Defaults to undef
-#
 class tripleo::profile::base::cinder::api (
   $bootstrap_node                = hiera('cinder_api_short_bootstrap_node_name', undef),
   $certificates_specs            = hiera('apache_certificates_specs', {}),
@@ -67,12 +59,7 @@ class tripleo::profile::base::cinder::api (
   $enable_internal_tls           = hiera('enable_internal_tls', false),
   $default_volume_type           = hiera('cinder::api::default_volume_type', ''),
   $step                          = Integer(hiera('step')),
-  # DEPRECATED PARAMETERS
-  $keymgr_backend                = undef,
 ) {
-  if keymgr_backend != undef {
-    warning('The keymgr_backend parameter has been deprecated and has no effect.')
-  }
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true

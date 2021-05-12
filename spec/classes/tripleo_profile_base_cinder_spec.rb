@@ -28,6 +28,8 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::logging')
         is_expected.to_not contain_class('cinder::keystone::service_user')
+        is_expected.to_not contain_class('cinder::key_manager')
+        is_expected.to_not contain_class('cinder::key_manager::barbican')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -56,6 +58,8 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
         is_expected.to contain_class('cinder::keystone::service_user')
+        is_expected.to contain_class('cinder::key_manager')
+        is_expected.to contain_class('cinder::key_manager::barbican')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end
@@ -73,6 +77,8 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::logging')
         is_expected.to_not contain_class('cinder::keystone::service_user')
+        is_expected.to_not contain_class('cinder::key_manager')
+        is_expected.to_not contain_class('cinder::key_manager::barbican')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -101,6 +107,8 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
         is_expected.to contain_class('cinder::keystone::service_user')
+        is_expected.to contain_class('cinder::key_manager')
+        is_expected.to contain_class('cinder::key_manager::barbican')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
     end
@@ -123,6 +131,8 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
         is_expected.to contain_class('cinder::keystone::service_user')
+        is_expected.to contain_class('cinder::key_manager')
+        is_expected.to contain_class('cinder::key_manager::barbican')
         is_expected.to contain_class('cinder::cron::db_purge')
       end
     end
@@ -146,6 +156,8 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
         is_expected.to contain_class('cinder::keystone::service_user')
+        is_expected.to contain_class('cinder::key_manager')
+        is_expected.to contain_class('cinder::key_manager::barbican')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
     end

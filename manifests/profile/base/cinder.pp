@@ -127,6 +127,8 @@ class tripleo::profile::base::cinder (
     include cinder::nova
     include cinder::logging
     include cinder::keystone::service_user
+    include cinder::key_manager
+    include cinder::key_manager::barbican
   }
 
   if $step >= 5 {
