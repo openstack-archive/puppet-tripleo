@@ -269,7 +269,7 @@ class tripleo::profile::pacemaker::database::mysql (
           score              => 0,
           expression         => ['galera-role eq true'],
         },
-        require         => [Class['::mysql::server'],
+        require         => [Class['mysql::server'],
                             Pacemaker::Property['galera-role-node-property']],
         notify          => Exec['galera-ready'],
       }

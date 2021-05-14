@@ -101,7 +101,7 @@ class tripleo::profile::pacemaker::rabbitmq (
     mode    => '0400',
     content => $erlang_cookie,
     replace => true,
-    require => Class['::rabbitmq'],
+    require => Class['rabbitmq'],
   }
 
   if $step >= 1 and $pacemaker_master and hiera('stack_action') == 'UPDATE' {
@@ -142,7 +142,7 @@ class tripleo::profile::pacemaker::rabbitmq (
           score              => 0,
           expression         => ['rabbitmq-role eq true'],
         },
-        require         => [Class['::rabbitmq'],
+        require         => [Class['rabbitmq'],
                             Pacemaker::Property['rabbitmq-role-node-property']],
         notify          => Exec['rabbitmq-ready'],
       }

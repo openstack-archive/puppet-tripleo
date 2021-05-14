@@ -67,7 +67,7 @@ class tripleo::profile::base::haproxy (
           path        => ['/usr/bin', '/usr/sbin'],
           refreshonly => true,
           onlyif      => 'systemctl is-active haproxy | grep -q active',
-          subscribe   => Class['::haproxy']
+          subscribe   => Class['haproxy']
         }
         Haproxy::Listen<||> ~> Exec['haproxy-reload']
         Haproxy::Balancermember<||> ~> Exec['haproxy-reload']

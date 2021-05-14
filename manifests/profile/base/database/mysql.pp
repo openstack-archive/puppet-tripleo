@@ -221,7 +221,7 @@ class tripleo::profile::base::database::mysql (
   }
 
   if $step >= 2 and $sync_db {
-    Class['::mysql::server'] -> Mysql_database<||>
+    Class['mysql::server'] -> Mysql_database<||>
     if ($manage_resources) {
       # the mysql module handles password for user 'root@localhost', but it
       # doesn't modify 'root@%'. So make sure this user password is managed

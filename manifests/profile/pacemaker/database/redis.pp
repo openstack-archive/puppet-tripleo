@@ -147,20 +147,20 @@ class tripleo::profile::pacemaker::database::redis (
       include tripleo::stunnel
 
       # encrypted endpoint for incoming redis service
-      ::tripleo::stunnel::service_proxy { 'redis':
+      tripleo::stunnel::service_proxy { 'redis':
         accept_host  => $tls_proxy_bind_ip,
         accept_port  => $tls_proxy_port,
         connect_host => $tls_tunnel_local_name,
         connect_port => $tls_proxy_port,
         certificate  => $tls_certfile,
         key          => $tls_keyfile,
-        notify       => Class['::redis'],
+        notify       => Class['redis'],
       }
 
       # encrypted endpoints for outgoing redis replication traffic
       $redis_peers = $replication_tuples.filter |$tuple| {$tuple[1] != $tls_proxy_bind_ip}
       $redis_peers.each |$tuple| {
-        ::tripleo::stunnel::service_proxy { "redis_peer_${tuple[2]}":
+        tripleo::stunnel::service_proxy { "redis_peer_${tuple[2]}":
           client       => 'yes',
           accept_host  => $tls_tunnel_local_name,
           accept_port  => $tuple[2],
@@ -168,7 +168,7 @@ class tripleo::profile::pacemaker::database::redis (
           connect_port => $tls_proxy_port,
           certificate  => $tls_certfile,
           key          => $tls_keyfile,
-          notify       => Class['::redis'],
+          notify       => Class['redis'],
         }
       }
 
@@ -241,7 +241,7 @@ slave-announce-port ${local_tuple[0][2]}
           score              => 0,
           expression         => ['redis-role eq true'],
         },
-        require         => [Class['::redis'],
+        require         => [Class['redis'],
                             Pacemaker::Property['redis-role-node-property']],
       }
     }

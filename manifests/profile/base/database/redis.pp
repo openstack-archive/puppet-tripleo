@@ -93,13 +93,13 @@ class tripleo::profile::base::database::redis (
 
       include tripleo::stunnel
 
-      ::tripleo::stunnel::service_proxy { 'redis':
+      tripleo::stunnel::service_proxy { 'redis':
         accept_host  => $tls_proxy_bind_ip,
         accept_port  => $tls_proxy_port,
         connect_port => $tls_proxy_port,
         certificate  => $tls_certfile,
         key          => $tls_keyfile,
-        notify       => Class['::redis'],
+        notify       => Class['redis'],
       }
     }
     if downcase($redis_short_bootstrap_node_name) == $::hostname {
@@ -112,7 +112,7 @@ class tripleo::profile::base::database::redis (
     }
 
     if count($redis_node_ips) > 1 {
-      Class['::tripleo::redis_notification'] -> Service['redis-sentinel']
+      Class['tripleo::redis_notification'] -> Service['redis-sentinel']
       include redis::sentinel
       include tripleo::redis_notification
     }

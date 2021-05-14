@@ -512,7 +512,7 @@ MYSQL_HOST=localhost\n",
           expression         => ['galera-role eq true'],
         },
         bundle          => 'galera-bundle',
-        require         => [Class['::mysql::server']],
+        require         => [Class['mysql::server']],
         before          => Exec['galera-ready'],
         force           => $force_ocf,
       }

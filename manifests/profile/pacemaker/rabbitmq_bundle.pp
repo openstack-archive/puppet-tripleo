@@ -175,7 +175,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
     mode    => '0400',
     content => $erlang_cookie,
     replace => true,
-    require => Class['::rabbitmq'],
+    require => Class['rabbitmq'],
   }
 
   file_line { 'rabbitmq-pamd-systemd':
@@ -339,7 +339,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           expression         => ['rabbitmq-role eq true'],
         },
         bundle          => 'rabbitmq-bundle',
-        require         => [Class['::rabbitmq'],
+        require         => [Class['rabbitmq'],
                             Pacemaker::Resource::Bundle['rabbitmq-bundle']],
         before          => Exec['rabbitmq-ready'],
         force           => $force_ocf,

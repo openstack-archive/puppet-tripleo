@@ -8,10 +8,6 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
-# [*controller_node_ip*]
-#   (Optional)  controller node ip, contains either ovn or openstack controller
-#   ip.
-#
 # [*tenant_subnet*]
 #   (required) Tenant network's ip of the compute node
 #   Defaults to  hiera('tenant')
