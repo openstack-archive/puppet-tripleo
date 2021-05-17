@@ -34,6 +34,8 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to_not contain_class('glance::config')
         is_expected.to_not contain_class('glance::api::logging')
         is_expected.to_not contain_class('glance::api')
+        is_expected.to_not contain_class('glance::key_manager')
+        is_expected.to_not contain_class('glance::key_manager::barbican')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
         is_expected.to_not contain_class('glance::cron::db_purge')
         is_expected.to_not contain_class('glance::cache::cleaner')
@@ -61,6 +63,8 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to contain_class('glance::config')
         is_expected.to contain_class('glance::api::logging')
         is_expected.to contain_class('glance::api')
+        is_expected.to contain_class('glance::key_manager')
+        is_expected.to contain_class('glance::key_manager::barbican')
         is_expected.to contain_class('glance::notify::rabbitmq').with(
           :default_transport_url      => 'rabbit://glance1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://glance2:baa@192.168.0.2:5678/?ssl=0',
@@ -83,6 +87,8 @@ describe 'tripleo::profile::base::glance::api' do
         is_expected.to_not contain_class('glance::config')
         is_expected.to_not contain_class('glance::api::logging')
         is_expected.to_not contain_class('glance::api')
+        is_expected.to_not contain_class('glance::key_manager')
+        is_expected.to_not contain_class('glance::key_manager::barbican')
         is_expected.to_not contain_class('glance::notify::rabbitmq')
         is_expected.to_not contain_class('glance::cron::db_purge')
         is_expected.to_not contain_class('glance::cache::cleaner')
@@ -113,6 +119,8 @@ describe 'tripleo::profile::base::glance::api' do
           :enabled_backends => ['default_backend:swift'],
           :default_backend  => 'default_backend',
         )
+        is_expected.to contain_class('glance::key_manager')
+        is_expected.to contain_class('glance::key_manager::barbican')
         is_expected.to_not contain_class('tripleo::profile::base::glance::backend::cinder')
         is_expected.to_not contain_class('tripleo::profile::base::glance::backend::file')
         is_expected.to_not contain_class('tripleo::profile::base::glance::backend::rbd')

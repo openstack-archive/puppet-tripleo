@@ -216,6 +216,8 @@ class tripleo::profile::base::glance::api (
       default_backend  => $glance_backend_id,
       sync_db          => $sync_db,
     }
+    include glance::key_manager
+    include glance::key_manager::barbican
 
     ['cinder', 'file', 'rbd', 'swift'].each |String $backend_type| {
 
