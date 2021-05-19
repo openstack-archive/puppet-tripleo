@@ -56,8 +56,8 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
 
     if $rbd_ephemeral_storage {
       class { 'nova::compute::libvirt':
-        libvirt_disk_cachemodes => ['network=writeback'],
-        libvirt_hw_disk_discard => 'unmap',
+        disk_cachemodes => ['network=writeback'],
+        hw_disk_discard => 'unmap',
       }
     } else {
       include nova::compute::libvirt
