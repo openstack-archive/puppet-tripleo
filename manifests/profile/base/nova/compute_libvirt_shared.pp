@@ -38,8 +38,9 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
 ) {
   if $step >= 4 {
     # Ceph + Libvirt
-    $rbd_ephemeral_storage = hiera('nova::compute::rbd::ephemeral_storage', false)
+    $rbd_ephemeral_storage  = hiera('nova::compute::rbd::ephemeral_storage', false)
     $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
+    $rbd_disk_cachemodes    = hiera('rbd_disk_cachemodes', ['network=writeback'])
     if $rbd_ephemeral_storage or $rbd_persistent_storage {
       include nova::compute::rbd
       exec{ "exec-setfacl-${nova_rbd_client_name}-nova":
@@ -56,8 +57,8 @@ class tripleo::profile::base::nova::compute_libvirt_shared (
 
     if $rbd_ephemeral_storage {
       class { 'nova::compute::libvirt':
-        libvirt_disk_cachemodes => ['network=writeback'],
-        libvirt_hw_disk_discard => 'unmap',
+        disk_cachemodes => $rbd_disk_cachemodes,
+        hw_disk_discard => 'unmap',
       }
     } else {
       include nova::compute::libvirt
