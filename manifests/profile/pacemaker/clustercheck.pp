@@ -43,6 +43,14 @@ class tripleo::profile::pacemaker::clustercheck (
 ) {
 
   if $step >= 1 {
+    # configuration used by the galera resource agent,
+    # and by the clustercheck service when it is configured
+    # to listen via socat
+    if is_ipv6_address($bind_address) {
+      $socat_listen_type = 'tcp6-listen'
+    } else {
+      $socat_listen_type = 'tcp4-listen'
+    }
     file { '/etc/sysconfig/clustercheck' :
       ensure  => file,
       mode    => '0600',
@@ -50,10 +58,11 @@ class tripleo::profile::pacemaker::clustercheck (
       group   => 'mysql',
       content => "MYSQL_USERNAME=${clustercheck_user}\n
 MYSQL_PASSWORD='${clustercheck_password}'\n
-MYSQL_HOST=localhost\n",
+MYSQL_HOST=localhost\n
+TRIPLEO_SOCAT_BIND='${socat_listen_type}:9200,bind=\"${bind_address}\",reuseaddr,fork'\n",
     }
 
-    # the clustercheck service is run via xinet in the container
+    # configuration used when clustercheck is run via xinet
     xinetd::service { 'galera-monitor' :
       bind           => $bind_address,
       port           => '9200',
