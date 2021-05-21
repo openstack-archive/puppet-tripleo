@@ -45,5 +45,6 @@ class tripleo::profile::base::nova::conductor (
   }
   if $step >= 4 {
     include ::nova::conductor
+    include ::nova::network::neutron
   }
 }

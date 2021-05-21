@@ -34,6 +34,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::conductor')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::conductor')
+        is_expected.to_not contain_class('nova::network::neutron')
       }
     end
 
@@ -44,6 +45,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::conductor')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('nova::conductor')
+        is_expected.to contain_class('nova::network::neutron')
       }
     end
   end
