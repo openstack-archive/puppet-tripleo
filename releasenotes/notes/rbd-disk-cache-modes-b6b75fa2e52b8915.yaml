@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    New hiera setting `rbd_disk_cachemodes` allows to override
+    the disk cache modes for RBD. Defaults to ['network=writeback'].
