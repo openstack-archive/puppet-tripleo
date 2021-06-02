@@ -30,6 +30,7 @@ describe 'tripleo::profile::base::horizon' do
         is_expected.to_not contain_class('horizon')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
+        is_expected.to_not contain_class('horizon::dashboards::manila')
       end
     end
 
@@ -42,6 +43,7 @@ describe 'tripleo::profile::base::horizon' do
         is_expected.to_not contain_class('horizon')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
+        is_expected.to_not contain_class('horizon::dashboards::manila')
         is_expected.to_not contain_class('apache::mod::remoteip')
         is_expected.to_not contain_class('apache::mod::status')
       end
@@ -57,6 +59,7 @@ describe 'tripleo::profile::base::horizon' do
         is_expected.to contain_class('horizon')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
+        is_expected.to_not contain_class('horizon::dashboards::manila')
         is_expected.to contain_class('apache::mod::remoteip')
         is_expected.to contain_class('apache::mod::status')
       end
@@ -72,6 +75,7 @@ describe 'tripleo::profile::base::horizon' do
         is_expected.to contain_class('horizon')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
+        is_expected.to_not contain_class('horizon::dashboards::manila')
         is_expected.to contain_class('apache::mod::remoteip')
         is_expected.to contain_class('apache::mod::status')
       end
@@ -88,6 +92,7 @@ describe 'tripleo::profile::base::horizon' do
         is_expected.to contain_class('horizon')
         is_expected.to contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
+        is_expected.to_not contain_class('horizon::dashboards::manila')
         is_expected.to contain_class('apache::mod::remoteip')
         is_expected.to contain_class('apache::mod::status')
       end
@@ -104,6 +109,24 @@ describe 'tripleo::profile::base::horizon' do
         is_expected.to contain_class('horizon')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to contain_class('horizon::dashboards::octavia')
+        is_expected.to_not contain_class('horizon::dashboards::manila')
+        is_expected.to contain_class('apache::mod::remoteip')
+        is_expected.to contain_class('apache::mod::status')
+      end
+    end
+
+    context 'with step 4 and manila enabled' do
+      let(:params) { {
+        :step               => 4,
+        :bootstrap_node     => 'node.example.com',
+        :manila_api_enabled => true,
+      } }
+
+      it 'should trigger complete configuration with heat dashboard' do
+        is_expected.to contain_class('horizon')
+        is_expected.to_not contain_class('horizon::dashboards::heat')
+        is_expected.to_not contain_class('horizon::dashboards::octavia')
+        is_expected.to contain_class('horizon::dashboards::manila')
         is_expected.to contain_class('apache::mod::remoteip')
         is_expected.to contain_class('apache::mod::status')
       end
