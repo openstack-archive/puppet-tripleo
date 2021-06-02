@@ -1161,7 +1161,7 @@ class tripleo::haproxy (
     'timeout server' => '10m',
   }
   $heat_durability_options = {
-    'option'         => [ 'tcpka' ],
+    'option'         => [ 'tcpka', 'httpchk' ],
     'balance'        => $haproxy_lb_mode_longrunning,
   }
   if $service_certificate {
