@@ -235,7 +235,7 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
 
     class { '::keystone':
       sync_db                    => $sync_db,
