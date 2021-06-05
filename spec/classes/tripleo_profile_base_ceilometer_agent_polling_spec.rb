@@ -31,16 +31,12 @@ describe 'tripleo::profile::base::ceilometer::agent::polling' do
 
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer::agent::polling')
+        is_expected.to_not contain_class('ceilometer::agent::service_credentials')
         is_expected.to_not contain_class('ceilometer::agent::polling')
       end
     end
 
     context 'with step 4 on polling agent' do
-
-      let(:pre_condition) do
-        "class { 'ceilometer::agent::auth': auth_password => 'password' }"
-      end
-
       let(:params) { {
         :step                      => 4,
         :ceilometer_redis_password => 'password',
@@ -49,6 +45,7 @@ describe 'tripleo::profile::base::ceilometer::agent::polling' do
       } }
 
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('ceilometer::agent::service_credentials')
         is_expected.to contain_class('ceilometer::agent::polling').with(
           :central_namespace => true,
           :compute_namespace => false,

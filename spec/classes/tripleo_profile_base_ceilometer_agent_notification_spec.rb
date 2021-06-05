@@ -29,15 +29,13 @@ describe 'tripleo::profile::base::ceilometer::agent::notification' do
 
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer::agent::notification')
+        is_expected.to contain_class('tripleo::profile::base::ceilometer::upgrade')
+        is_expected.to_not contain_class('ceilometer::agent::service_credentials')
         is_expected.to_not contain_class('ceilometer::agent::notification')
       end
     end
 
     context 'with step 4 and notifier configured' do
-      let(:pre_condition) do
-        "class { 'ceilometer::agent::auth': auth_password => 'password' }"
-      end
-
       let(:params) do
         { :step                      => 4,
           :notifier_enabled          => false,
@@ -47,6 +45,9 @@ describe 'tripleo::profile::base::ceilometer::agent::notification' do
       end
 
       it 'should trigger complete configuration' do
+        is_expected.to contain_class('tripleo::profile::base::ceilometer::agent::notification')
+        is_expected.to contain_class('tripleo::profile::base::ceilometer::upgrade')
+        is_expected.to contain_class('ceilometer::agent::service_credentials')
         is_expected.to contain_class('ceilometer::agent::notification').with(
           :event_pipeline_publishers => ["notifier://127.0.0.1:5666/?driver=amqp&topic=ceilometer/event.sample"],
           :pipeline_publishers => []
