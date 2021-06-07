@@ -17,8 +17,7 @@
 # OVN Neutron ML2 profile for tripleo
 #
 # [*ovn_db_host*]
-#   The IP-Address where OVN DBs are listening. If passed a list it will construct
-#   a comma separated string like protocol:ip1:port,protocol:ip2:port.
+#   The IP-Address where OVN DBs are listening.
 #   Defaults to hiera('ovn_dbs_vip')
 #
 # [*ovn_nb_port*]
@@ -80,16 +79,9 @@ class tripleo::profile::base::neutron::plugins::ml2::ovn (
   $step                     = Integer(hiera('step'))
 ) {
   if $step >= 4 {
-    if is_string($ovn_db_host) {
-      $ovn_nb_connection_real = join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':')
-      $ovn_sb_connection_real = join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':')
-    } elsif is_array($ovn_db_host) {
-      $ovn_nb_connection_real = join($ovn_db_host.map |$i| { "${protocol}:${normalize_ip_for_uri($i)}:${ovn_nb_port}" }, ',')
-      $ovn_sb_connection_real = join($ovn_db_host.map |$i| { "${protocol}:${normalize_ip_for_uri($i)}:${ovn_sb_port}" }, ',')
-    }
     class { 'neutron::plugins::ml2::ovn':
-      ovn_nb_connection  => $ovn_nb_connection_real,
-      ovn_sb_connection  => $ovn_sb_connection_real,
+      ovn_nb_connection  => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_nb_port}"], ':'),
+      ovn_sb_connection  => join(["${protocol}", normalize_ip_for_uri($ovn_db_host), "${ovn_sb_port}"], ':'),
       ovn_nb_private_key => $ovn_nb_private_key,
       ovn_nb_certificate => $ovn_nb_certificate,
       ovn_nb_ca_cert     => $ovn_nb_ca_cert,
