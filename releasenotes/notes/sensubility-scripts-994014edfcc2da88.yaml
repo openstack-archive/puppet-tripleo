@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added "scripts" parameters for class tripleo::profile::base::metrics::collectd::sensubility
+    enabling download of various scripts for usage within sensubility check definitions.
+    Supported transfer method is HTTP only currently.
