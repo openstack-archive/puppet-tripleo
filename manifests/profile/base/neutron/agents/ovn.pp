@@ -20,6 +20,15 @@
 #   (Optional) The IP-Address where OVN DBs are listening.
 #   Defaults to hiera('ovn_dbs_vip')
 #
+# [*ovn_db_node_ips*]
+#   (Optional) The OVN DBs node ip addresses are listening.
+#   Defaults to hiera('ovn_dbs_node_ips')
+#
+# [*ovn_db_clustered*]
+#   (Optional) Boolean indicating if we're running with ovn db clustering
+#   or pacemaker. Defaults to false for backwards compatibility
+#   Defaults to hiera('ovn_db_clustered', false)
+#
 # [*ovn_sbdb_port*]
 #   (Optional) Port number on which southbound database is listening
 #   Defaults to hiera('ovn::southbound::port')
@@ -44,15 +53,23 @@
 #  Defaults to hiera('ovn_chassis_mac_map')
 #
 class tripleo::profile::base::neutron::agents::ovn (
-  $ovn_db_host          = hiera('ovn_dbs_vip'),
+  $ovn_db_host          = hiera('ovn_dbs_vip', undef),
+  $ovn_db_node_ips      = hiera('ovn_dbs_node_ips', undef),
+  $ovn_db_clustered     = hiera('ovn_db_clustered', false),
   $ovn_sbdb_port        = hiera('ovn::southbound::port'),
   $protocol             = 'tcp',
   $step                 = Integer(hiera('step')),
   $ovn_chassis_mac_map  = hiera('ovn_chassis_mac_map', undef),
 ) {
   if $step >= 4 {
+    if $ovn_db_clustered {
+      $db_hosts = any2array($ovn_db_node_ips)
+    } else {
+      $db_hosts = any2array($ovn_db_host)
+    }
+    $sb_conn = $db_hosts.map |$h| { join([$protocol, normalize_ip_for_uri($h), "${ovn_sbdb_port}"], ':') }
     class { 'ovn::controller':
-      ovn_remote              => join([$protocol, normalize_ip_for_uri($ovn_db_host), "${ovn_sbdb_port}"], ':'),
+      ovn_remote              => join(any2array($sb_conn), ','),
       enable_ovn_match_northd => true,
       ovn_chassis_mac_map     => $ovn_chassis_mac_map,
     }
