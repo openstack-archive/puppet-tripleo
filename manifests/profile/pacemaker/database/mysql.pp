@@ -97,10 +97,30 @@
 #   (Optional) Maximum value for open-files-limit
 #   Defaults to 16384
 #
+# [*start_timeout*]
+#   (Optional) Maximum time in second for initializing a galera server
+#   before pacemaker considers the operation timed out.
+#   Defaults to undef (use the default value in resource agent)
+#
 # [*promote_timeout*]
 #   (Optional) Maximum time in second for starting up a galera server
 #   before pacemaker considers the operation timed out.
 #   Defaults to 300
+#
+# [*monitor_timeout*]
+#   (Optional) Maximum time in second for monitoring a galera server
+#   before pacemaker considers the operation timed out.
+#   Defaults to undef (use the default value in resource agent)
+#
+# [*demote_timeout*]
+#   (Optional) Maximum time in second for stopping a galera server
+#   before pacemaker considers the operation timed out.
+#   Defaults to undef (use the default value in resource agent)
+#
+# [*stop_timeout*]
+#   (Optional) Maximum time in second for ensuring a galera server is stopped
+#   before pacemaker considers the operation timed out.
+#   Defaults to undef (use the default value in resource agent)
 #
 class tripleo::profile::pacemaker::database::mysql (
   $bootstrap_node                 = hiera('mysql_short_bootstrap_node_name'),
@@ -118,7 +138,11 @@ class tripleo::profile::pacemaker::database::mysql (
   $step                           = Integer(hiera('step')),
   $pcs_tries                      = hiera('pcs_tries', 20),
   $open_files_limit               = 16384,
+  $start_timeout                  = undef,
   $promote_timeout                = 300,
+  $monitor_timeout                = undef,
+  $demote_timeout                 = undef,
+  $stop_timeout                   = undef,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -257,9 +281,31 @@ class tripleo::profile::pacemaker::database::mysql (
       node     => $::hostname,
     }
     if $pacemaker_master {
+      $op_start_params = $start_timeout ? {
+        undef   => undef,
+        default => "start timeout=${start_timeout}s"
+      }
+      $op_promote_params = $promote_timeout ? {
+        undef   => 'promote on-fail=block',
+        default => "promote timeout=${promote_timeout}s on-fail=block"
+      }
+      $op_monitor_params = $monitor_timeout ? {
+        undef   => undef,
+        default => "monitor timeout=${monitor_timeout}s"
+      }
+      $op_demote_params = $demote_timeout ? {
+        undef   => undef,
+        default => "demote timeout=${demote_timeout}s"
+      }
+      $op_stop_params = $stop_timeout ? {
+        undef   => undef,
+        default => "stop timeout=${stop_timeout}s"
+      }
+      $op_params = join(delete_undef_values([$op_start_params, $op_promote_params, $op_monitor_params, $op_demote_params, $op_stop_params]), ' ')
+
       pacemaker::resource::ocf { 'galera' :
         ocf_agent_name  => 'heartbeat:galera',
-        op_params       => "promote timeout=${promote_timeout}s on-fail=block",
+        op_params       => $op_params,
         master_params   => '',
         meta_params     => "master-max=${galera_nodes_count} ordered=true",
         resource_params => "additional_parameters='--open-files-limit=${open_files_limit}' enable_creation=true wsrep_cluster_address='gcomm://${galera_nodes}' cluster_host_map='${cluster_host_map}'",
