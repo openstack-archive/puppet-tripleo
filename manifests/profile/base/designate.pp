@@ -70,17 +70,19 @@
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('oslo_messaging_notify_use_ssl', '0')
 #
+# [* DEPRECATED PARAMETERS *]
+#
 # [*rndc_host*]
 #   The address on which rndc should listen
 #   Defaults to undef
 #
 # [*rndc_port*]
 #   The port on which rndc should listen
-#   Defaults to 953
+#   Defaults undef
 #
 # [*rndc_keys*]
 #   A list of keys that rndc should accept
-#   Defaults to ['rndc-key']
+#   Defaults to undef
 #
 # [*rndc_allowed_addresses*]
 #   A list of addresses that are allowed to send rndc commands
@@ -100,9 +102,10 @@ class tripleo::profile::base::designate (
   $oslomsg_notify_port     = hiera('oslo_messaging_notify_port', '5672'),
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
+  # DEPRECATED PARAMETERS
   $rndc_host               = undef,
-  $rndc_port               = 953,
-  $rndc_keys               = ['rndc-key'],
+  $rndc_port               = undef,
+  $rndc_keys               = undef,
   $rndc_allowed_addresses  = undef,
 ) {
   if $step >= 3 {
@@ -126,18 +129,8 @@ class tripleo::profile::base::designate (
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
     }
-    if ($rndc_host and $rndc_allowed_addresses) {
-      class { 'designate::backend::bind9':
-        rndc_controls => {
-          $rndc_host => {
-            'port'              => $rndc_port,
-            'keys'              => $rndc_keys,
-            'allowed_addresses' => $rndc_allowed_addresses,
-          }
-        },
-      }
-    } else {
-      include designate::backend::bind9
+    if ($rndc_host or $rndc_allowed_addresses or $rndc_keys or $rndc_allowed_addresses) {
+      warning('rndc/named configuration through puppet is no longer supported.')
     }
     include designate::config
     include designate::logging
