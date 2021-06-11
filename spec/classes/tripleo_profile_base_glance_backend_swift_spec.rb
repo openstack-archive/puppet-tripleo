@@ -53,7 +53,6 @@ describe 'tripleo::profile::base::glance::backend::swift' do
           :swift_store_auth_address            => '127.0.0.2:8080/v3/',
           :swift_store_auth_version            => 3,
           :swift_store_create_container_on_put => true,
-          :swift_store_config_file             => '/etc/glance/glance-swift.conf',
           :default_swift_reference             => 'ref1',
           :store_description                   => 'Swift store',
         )
