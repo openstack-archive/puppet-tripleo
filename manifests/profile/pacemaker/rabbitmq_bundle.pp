@@ -104,6 +104,22 @@
 # [*force_ocf*]
 #   (optional) Use --force when creating the ocf resource via pcs
 #   Defaults to false
+#
+# [*start_timeout*]
+#   (Optional) Maximum time in second for starting up a rabbitmq server
+#   before pacemaker considers the operation timed out.
+#   Defaults to 200
+#
+# [*monitor_timeout*]
+#   (Optional) Maximum time in second for monitoring a rabbitmq server
+#   before pacemaker considers the operation timed out.
+#   Defaults to undef (use the default value in resource agent)
+#
+# [*stop_timeout*]
+#   (Optional) Maximum time in second for stopping a rabbitmq server
+#   before pacemaker considers the operation timed out.
+#   Defaults to 200
+#
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = undef,
   $rabbitmq_docker_control_port = 3122,
@@ -127,6 +143,9 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $tls_priorities               = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user                  = 'root',
   $force_ocf                    = false,
+  $start_timeout                = 200,
+  $monitor_timeout              = undef,
+  $stop_timeout                 = 200,
 ) {
   # is this an additional nova cell?
   if hiera('nova_is_additional_cell', undef) {
@@ -327,11 +346,25 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       $ha_policy = merge($ha_queues_policy, $rabbitmq_extra_policies)
       $ocf_params = "set_policy='ha-all ^(?!amq\\.).* ${to_json($ha_policy)}'"
 
+      $op_start_params = $start_timeout ? {
+        undef   => undef,
+        default => "start timeout=${start_timeout}s"
+      }
+      $op_monitor_params = $monitor_timeout ? {
+        undef   => undef,
+        default => "monitor timeout=${monitor_timeout}s"
+      }
+      $op_stop_params = $stop_timeout ? {
+        undef   => undef,
+        default => "stop timeout=${stop_timeout}s"
+      }
+      $op_params = join(delete_undef_values([$op_start_params, $op_monitor_params, $op_stop_params]), ' ')
+
       pacemaker::resource::ocf { 'rabbitmq':
         ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
         resource_params => $ocf_params,
         meta_params     => 'notify=true container-attribute-target=host',
-        op_params       => 'start timeout=200s stop timeout=200s',
+        op_params       => $op_params,
         tries           => $pcs_tries,
         location_rule   => {
           resource_discovery => 'exclusive',

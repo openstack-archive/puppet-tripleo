@@ -63,6 +63,21 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*start_timeout*]
+#   (Optional) Maximum time in second for starting up a rabbitmq server
+#   before pacemaker considers the operation timed out.
+#   Defaults to 200
+#
+# [*monitor_timeout*]
+#   (Optional) Maximum time in second for monitoring a rabbitmq server
+#   before pacemaker considers the operation timed out.
+#   Defaults to undef (use the default value in resource agent)
+#
+# [*stop_timeout*]
+#   (Optional) Maximum time in second for stopping a rabbitmq server
+#   before pacemaker considers the operation timed out.
+#   Defaults to 200
+#
 class tripleo::profile::pacemaker::rabbitmq (
   $erlang_cookie         = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues        = hiera('rabbitmq::nr_ha_queues', 0),
@@ -74,6 +89,9 @@ class tripleo::profile::pacemaker::rabbitmq (
   $notify_nodes          = hiera('oslo_messaging_notify_node_names', []),
   $pcs_tries             = hiera('pcs_tries', 20),
   $step                  = Integer(hiera('step')),
+  $start_timeout         = 200,
+  $monitor_timeout       = undef,
+  $stop_timeout          = 200,
 ) {
   if $rpc_scheme == 'rabbit' {
     $bootstrap_node = $rpc_bootstrap_node
@@ -130,12 +148,27 @@ class tripleo::profile::pacemaker::rabbitmq (
         $nr_ha_queues = $user_ha_queues
         $params = "set_policy='ha-all ^(?!amq\\.).* {\"ha-mode\":\"exactly\",\"ha-params\":${nr_ha_queues}}'"
       }
+
+      $op_start_params = $start_timeout ? {
+        undef   => undef,
+        default => "start timeout=${start_timeout}s"
+      }
+      $op_monitor_params = $monitor_timeout ? {
+        undef   => undef,
+        default => "monitor timeout=${monitor_timeout}s"
+      }
+      $op_stop_params = $stop_timeout ? {
+        undef   => undef,
+        default => "stop timeout=${stop_timeout}s"
+      }
+      $op_params = join(delete_undef_values([$op_start_params, $op_monitor_params, $op_stop_params]), ' ')
+
       pacemaker::resource::ocf { 'rabbitmq':
         ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
         resource_params => $params,
         clone_params    => 'ordered=true interleave=true',
         meta_params     => 'notify=true',
-        op_params       => 'start timeout=200s stop timeout=200s',
+        op_params       => $op_params,
         tries           => $pcs_tries,
         location_rule   => {
           resource_discovery => 'exclusive',
