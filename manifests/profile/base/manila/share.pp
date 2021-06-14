@@ -140,13 +140,6 @@ class tripleo::profile::base::manila::share (
         }
       }
 
-      $keyring_path = "/etc/ceph/ceph.client.${cephfs_auth_id}.keyring"
-      ceph_config {
-        "client.${cephfs_auth_id}/keyring": value => $keyring_path;
-        "client.${cephfs_auth_id}/client mount uid": value => 0;
-        "client.${cephfs_auth_id}/client mount gid": value => 0;
-      }
-
       $keyring_local_path = "${manila_cephfs_ceph_conf_path}/ceph.client.${cephfs_auth_id}.keyring"
       exec{ "exec-setfacl-${cephfs_auth_id}":
         path    => ['/bin', '/usr/bin' ],
