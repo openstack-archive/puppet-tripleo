@@ -30,7 +30,7 @@ describe 'tripleo::profile::base::keystone' do
       :oslomsg_notify_username => 'keystone2',
       :oslomsg_notify_password => 'baa',
       :oslomsg_notify_port     => '5678',
-      :memcached_ips           => [ '192.168.0.3', '192.168.0.4', '192.168.0.5' ],
+      :memcached_hosts         => [ '192.168.0.3', '192.168.0.4', '192.168.0.5' ],
     }
   end
 
