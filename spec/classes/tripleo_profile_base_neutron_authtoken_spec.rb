@@ -32,7 +32,7 @@ describe 'tripleo::profile::base::neutron::authtoken' do
     context 'with step 3' do
       let(:params) { {
         :step => 3,
-        :memcached_ips => '127.0.0.1',
+        :memcached_hosts => '127.0.0.1',
       } }
 
       it {
@@ -45,7 +45,7 @@ describe 'tripleo::profile::base::neutron::authtoken' do
     context 'with step 3 with ipv6' do
       let(:params) { {
         :step     => 3,
-        :memcached_ips => '::1',
+        :memcached_hosts => '::1',
       } }
 
       it {
