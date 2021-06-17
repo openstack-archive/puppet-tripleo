@@ -16,14 +16,16 @@
 #
 # Mistral authtoken profile for TripleO
 #
+# === Parameters
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*memcached_ips*]
-#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips', [])
+# [*memcached_hosts*]
+#   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_names', [])
 #
 # [*memcached_port*]
 #   (Optional) Memcached port to use.
@@ -38,19 +40,28 @@
 #   The key is hashed with a salt, to isolate services.
 #   Defaults to hiera('memcached_authtoken_secret_key', undef)
 #
+# DEPRECATED PARAMETERS
+#
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to undef
+#
 class tripleo::profile::base::mistral::authtoken (
   $step                = Integer(hiera('step')),
-  $memcached_ips       = hiera('memcached_node_ips', []),
+  $memcached_hosts     = hiera('memcached_node_names', []),
   $memcached_port      = hiera('memcached_authtoken_port', 11211),
   $security_strategy   = hiera('memcached_authtoken_security_strategy', undef),
   $secret_key          = hiera('memcached_authtoken_secret_key', undef),
+  # DEPRECATED PARAMETERS
+  $memcached_ips       = undef
 ) {
+  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
 
   if $step >= 3 {
-    if is_ipv6_address($memcached_ips[0]) {
-      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}"), 'inet6:')
+    if is_ipv6_address($memcached_hosts_real[0]) {
+      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}"), 'inet6:')
     } else {
-      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
     }
 
     if $secret_key {
