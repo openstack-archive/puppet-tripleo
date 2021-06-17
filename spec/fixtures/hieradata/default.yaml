@@ -101,10 +101,8 @@ placement_short_bootstrap_node_name: node
 placement::rabbit_password: 'password'
 placement::keystone::authtoken::password: 'password'
 # memcache related items
-memcached_node_ips_v6:
- - '::1'
-memcached_node_ips:
- - '127.0.0.1'
+memcached_node_names:
+ - 'controller-1'
 # octavia related items
 octavia::keystone::authtoken::password: 'password'
 # horizon related

@@ -29,12 +29,12 @@
 #
 # [*memcache_servers*]
 #   (Optional) List of memcache servers
-#   Defaults to hiera('memcached_node_ips', [])
+#   Defaults to hiera('memcached_node_names', [])
 #
 class tripleo::profile::base::swift (
   $step                 = Integer(hiera('step')),
   $memcache_port        = hiera('memcached_port', 11211),
-  $memcache_servers     = hiera('memcached_node_ips', []),
+  $memcache_servers     = hiera('memcached_node_names', []),
 ) {
   if $step >= 4 {
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
