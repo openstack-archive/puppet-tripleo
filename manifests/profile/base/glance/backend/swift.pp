@@ -134,21 +134,21 @@ class tripleo::profile::base::glance::backend::swift (
     $multistore_description = pick($multistore_config[$backend_name], {})['GlanceStoreDescription']
     $store_description_real = pick($multistore_description, $store_description)
 
-    glance::backend::multistore::swift { $backend_name:
-      swift_store_user                    => $swift_store_user,
-      swift_store_key                     => $swift_store_key,
-      swift_store_container               => $swift_store_container,
-      swift_store_auth_address            => $swift_store_auth_address,
-      swift_store_auth_version            => $swift_store_auth_version,
-      swift_store_auth_project_domain_id  => $swift_store_auth_project_domain_id,
-      swift_store_auth_user_domain_id     => $swift_store_auth_user_domain_id,
-      swift_store_large_object_size       => $swift_store_large_object_size,
-      swift_store_large_object_chunk_size => $swift_store_large_object_chunk_size,
-      swift_store_create_container_on_put => $swift_store_create_container_on_put,
-      swift_store_endpoint_type           => $swift_store_endpoint_type,
-      swift_store_region                  => $swift_store_region,
-      default_swift_reference             => $default_swift_reference,
-      store_description                   => $store_description_real,
-    }
+    create_resources('glance::backend::multistore::swift', { $backend_name => delete_undef_values({
+      'swift_store_user'                    => $swift_store_user,
+      'swift_store_key'                     => $swift_store_key,
+      'swift_store_container'               => $swift_store_container,
+      'swift_store_auth_address'            => $swift_store_auth_address,
+      'swift_store_auth_version'            => $swift_store_auth_version,
+      'swift_store_auth_project_domain_id'  => $swift_store_auth_project_domain_id,
+      'swift_store_auth_user_domain_id'     => $swift_store_auth_user_domain_id,
+      'swift_store_large_object_size'       => $swift_store_large_object_size,
+      'swift_store_large_object_chunk_size' => $swift_store_large_object_chunk_size,
+      'swift_store_create_container_on_put' => $swift_store_create_container_on_put,
+      'swift_store_endpoint_type'           => $swift_store_endpoint_type,
+      'swift_store_region'                  => $swift_store_region,
+      'default_swift_reference'             => $default_swift_reference,
+      'store_description'                   => $store_description_real,
+    })})
   }
 }
