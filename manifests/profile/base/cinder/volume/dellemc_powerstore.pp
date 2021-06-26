@@ -53,15 +53,15 @@ class tripleo::profile::base::cinder::volume::dellemc_powerstore (
     any2array($backend_name).each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
-      cinder::backend::dellemc_powerstore { $backend :
-        backend_availability_zone => $backend_config['CinderPowerStoreAvailabilityZone'],
-        san_ip                    => $backend_config['CinderPowerStoreSanIp'],
-        san_login                 => $backend_config['CinderPowerStoreSanLogin'],
-        san_password              => $backend_config['CinderPowerStoreSanPassword'],
-        storage_protocol          => $backend_config['CinderPowerStoreStorageProtocol'],
-        powerstore_appliances     => $backend_config['CinderPowerStoreAppliances'],
-        powerstore_ports          => $backend_config['CinderPowerStorePorts'],
-      }
+      create_resources('cinder::backend::dellemc_powerstore', { $backend => delete_undef_values({
+        'backend_availability_zone' => $backend_config['CinderPowerStoreAvailabilityZone'],
+        'san_ip'                    => $backend_config['CinderPowerStoreSanIp'],
+        'san_login'                 => $backend_config['CinderPowerStoreSanLogin'],
+        'san_password'              => $backend_config['CinderPowerStoreSanPassword'],
+        'storage_protocol'          => $backend_config['CinderPowerStoreStorageProtocol'],
+        'powerstore_appliances'     => $backend_config['CinderPowerStoreAppliances'],
+        'powerstore_ports'          => $backend_config['CinderPowerStorePorts'],
+      })})
     }
   }
 

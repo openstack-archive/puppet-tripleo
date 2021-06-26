@@ -63,25 +63,25 @@ class tripleo::profile::base::cinder::volume::dellemc_sc (
     any2array($backend_name).each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
-      cinder::backend::dellemc_sc { $backend :
-        backend_availability_zone    => $backend_config['CinderSCAvailabilityZone'],
-        san_ip                       => $backend_config['CinderSCSanIp'],
-        san_login                    => $backend_config['CinderSCSanLogin'],
-        san_password                 => $backend_config['CinderSCSanPassword'],
-        sc_storage_protocol          => $backend_config['CinderSCStorageProtocol'],
-        dell_sc_ssn                  => $backend_config['CinderSCSSN'],
-        target_ip_address            => $backend_config['CinderSCTargetIpAddress'],
-        target_port                  => $backend_config['CinderSCTargetPort'],
-        dell_sc_api_port             => $backend_config['CinderSCApiPort'],
-        dell_sc_server_folder        => $backend_config['CinderSCServerFolder'],
-        dell_sc_volume_folder        => $backend_config['CinderSCVolumeFolder'],
-        excluded_domain_ips          => $backend_config['CinderSCExcludedDomainIps'],
-        secondary_san_ip             => $backend_config['CinderSCSecondarySanIp'],
-        secondary_san_login          => $backend_config['CinderSCSecondarySanLogin'],
-        secondary_san_password       => $backend_config['CinderSCSecondarySanPassword'],
-        secondary_sc_api_port        => $backend_config['CinderSCSecondaryApiPort'],
-        use_multipath_for_image_xfer => $backend_config['CinderSCUseMultipathForImageXfer'],
-      }
+      create_resources('cinder::backend::dellemc_sc', { $backend => delete_undef_values({
+        'backend_availability_zone'    => $backend_config['CinderSCAvailabilityZone'],
+        'san_ip'                       => $backend_config['CinderSCSanIp'],
+        'san_login'                    => $backend_config['CinderSCSanLogin'],
+        'san_password'                 => $backend_config['CinderSCSanPassword'],
+        'sc_storage_protocol'          => $backend_config['CinderSCStorageProtocol'],
+        'dell_sc_ssn'                  => $backend_config['CinderSCSSN'],
+        'target_ip_address'            => $backend_config['CinderSCTargetIpAddress'],
+        'target_port'                  => $backend_config['CinderSCTargetPort'],
+        'dell_sc_api_port'             => $backend_config['CinderSCApiPort'],
+        'dell_sc_server_folder'        => $backend_config['CinderSCServerFolder'],
+        'dell_sc_volume_folder'        => $backend_config['CinderSCVolumeFolder'],
+        'excluded_domain_ips'          => $backend_config['CinderSCExcludedDomainIps'],
+        'secondary_san_ip'             => $backend_config['CinderSCSecondarySanIp'],
+        'secondary_san_login'          => $backend_config['CinderSCSecondarySanLogin'],
+        'secondary_san_password'       => $backend_config['CinderSCSecondarySanPassword'],
+        'secondary_sc_api_port'        => $backend_config['CinderSCSecondaryApiPort'],
+        'use_multipath_for_image_xfer' => $backend_config['CinderSCUseMultipathForImageXfer'],
+      })})
     }
   }
 }

@@ -39,20 +39,20 @@ class tripleo::profile::base::cinder::volume::dellemc_vnx (
                                         hiera('cinder::backend::emc_vnx::storage_vnx_pool_name',
                                         undef)))
 
-    cinder::backend::emc_vnx { $backend_name :
-      backend_availability_zone     => hiera('cinder::backend::emc_vnx::backend_availability_zone', undef),
-      san_ip                        => hiera('cinder::backend::emc_vnx::san_ip', undef),
-      san_login                     => hiera('cinder::backend::emc_vnx::san_login', undef),
-      san_password                  => hiera('cinder::backend::emc_vnx::san_password', undef),
-      storage_protocol              => hiera('cinder::backend::emc_vnx::storage_protocol', undef),
-      storage_vnx_pool_names        => hiera('cinder::backend::emc_vnx::storage_vnx_pool_names', undef),
-      default_timeout               => hiera('cinder::backend::emc_vnx::default_timeout', undef),
-      max_luns_per_storage_group    => hiera('cinder::backend::emc_vnx::max_luns_per_storage_group', undef),
-      initiator_auto_registration   => hiera('cinder::backend::emc_vnx::initiator_auto_registration', undef),
-      storage_vnx_auth_type         => hiera('cinder::backend::emc_vnx::storage_vnx_auth_type', undef),
-      storage_vnx_security_file_dir => hiera('cinder::backend::emc_vnx::storage_vnx_security_file_dir', undef),
-      naviseccli_path               => hiera('cinder::backend::emc_vnx::naviseccli_path', undef),
-    }
+    create_resources('cinder::backend::emc_vnx', { $backend_name => delete_undef_values({
+      'backend_availability_zone'     => hiera('cinder::backend::emc_vnx::backend_availability_zone', undef),
+      'san_ip'                        => hiera('cinder::backend::emc_vnx::san_ip', undef),
+      'san_login'                     => hiera('cinder::backend::emc_vnx::san_login', undef),
+      'san_password'                  => hiera('cinder::backend::emc_vnx::san_password', undef),
+      'storage_protocol'              => hiera('cinder::backend::emc_vnx::storage_protocol', undef),
+      'storage_vnx_pool_names'        => hiera('cinder::backend::emc_vnx::storage_vnx_pool_names', undef),
+      'default_timeout'               => hiera('cinder::backend::emc_vnx::default_timeout', undef),
+      'max_luns_per_storage_group'    => hiera('cinder::backend::emc_vnx::max_luns_per_storage_group', undef),
+      'initiator_auto_registration'   => hiera('cinder::backend::emc_vnx::initiator_auto_registration', undef),
+      'storage_vnx_auth_type'         => hiera('cinder::backend::emc_vnx::storage_vnx_auth_type', undef),
+      'storage_vnx_security_file_dir' => hiera('cinder::backend::emc_vnx::storage_vnx_security_file_dir', undef),
+      'naviseccli_path'               => hiera('cinder::backend::emc_vnx::naviseccli_path', undef),
+    })})
   }
 
 }

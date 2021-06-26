@@ -68,31 +68,31 @@ class tripleo::profile::base::cinder::volume::netapp (
     any2array($backend_name).each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
-      cinder::backend::netapp { $backend :
-        backend_availability_zone       => $backend_config['CinderNetappAvailabilityZone'],
-        netapp_login                    => $backend_config['CinderNetappLogin'],
-        netapp_password                 => $backend_config['CinderNetappPassword'],
-        netapp_server_hostname          => $backend_config['CinderNetappServerHostname'],
-        netapp_server_port              => $backend_config['CinderNetappServerPort'],
-        netapp_size_multiplier          => $backend_config['CinderNetappSizeMultiplier'],
-        netapp_storage_family           => $backend_config['CinderNetappStorageFamily'],
-        netapp_storage_protocol         => $backend_config['CinderNetappStorageProtocol'],
-        netapp_transport_type           => $backend_config['CinderNetappTransportType'],
-        netapp_vfiler                   => $backend_config['CinderNetappVfiler'],
-        netapp_vserver                  => $backend_config['CinderNetappVserver'],
-        netapp_partner_backend_name     => $backend_config['CinderNetappPartnerBackendName'],
-        nfs_shares                      => any2array($backend_config['CinderNetappNfsShares']),
-        nfs_shares_config               => $backend_config['CinderNetappNfsSharesConfig'],
-        nfs_mount_options               => $backend_config['CinderNetappNfsMountOptions'],
-        netapp_copyoffload_tool_path    => $backend_config['CinderNetappCopyOffloadToolPath'],
-        netapp_controller_ips           => $backend_config['CinderNetappControllerIps'],
-        netapp_sa_password              => $backend_config['CinderNetappSaPassword'],
-        netapp_host_type                => $backend_config['CinderNetappHostType'],
-        netapp_webservice_path          => $backend_config['CinderNetappWebservicePath'],
-        nas_secure_file_operations      => $backend_config['CinderNetappNasSecureFileOperations'],
-        nas_secure_file_permissions     => $backend_config['CinderNetappNasSecureFilePermissions'],
-        netapp_pool_name_search_pattern => $backend_config['CinderNetappPoolNameSearchPattern'],
-      }
+      create_resources('cinder::backend::netapp', { $backend => delete_undef_values({
+        'backend_availability_zone'       => $backend_config['CinderNetappAvailabilityZone'],
+        'netapp_login'                    => $backend_config['CinderNetappLogin'],
+        'netapp_password'                 => $backend_config['CinderNetappPassword'],
+        'netapp_server_hostname'          => $backend_config['CinderNetappServerHostname'],
+        'netapp_server_port'              => $backend_config['CinderNetappServerPort'],
+        'netapp_size_multiplier'          => $backend_config['CinderNetappSizeMultiplier'],
+        'netapp_storage_family'           => $backend_config['CinderNetappStorageFamily'],
+        'netapp_storage_protocol'         => $backend_config['CinderNetappStorageProtocol'],
+        'netapp_transport_type'           => $backend_config['CinderNetappTransportType'],
+        'netapp_vfiler'                   => $backend_config['CinderNetappVfiler'],
+        'netapp_vserver'                  => $backend_config['CinderNetappVserver'],
+        'netapp_partner_backend_name'     => $backend_config['CinderNetappPartnerBackendName'],
+        'nfs_shares'                      => any2array($backend_config['CinderNetappNfsShares']),
+        'nfs_shares_config'               => $backend_config['CinderNetappNfsSharesConfig'],
+        'nfs_mount_options'               => $backend_config['CinderNetappNfsMountOptions'],
+        'netapp_copyoffload_tool_path'    => $backend_config['CinderNetappCopyOffloadToolPath'],
+        'netapp_controller_ips'           => $backend_config['CinderNetappControllerIps'],
+        'netapp_sa_password'              => $backend_config['CinderNetappSaPassword'],
+        'netapp_host_type'                => $backend_config['CinderNetappHostType'],
+        'netapp_webservice_path'          => $backend_config['CinderNetappWebservicePath'],
+        'nas_secure_file_operations'      => $backend_config['CinderNetappNasSecureFileOperations'],
+        'nas_secure_file_permissions'     => $backend_config['CinderNetappNasSecureFilePermissions'],
+        'netapp_pool_name_search_pattern' => $backend_config['CinderNetappPoolNameSearchPattern'],
+      })})
     }
   }
 

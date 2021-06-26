@@ -73,15 +73,17 @@ class tripleo::profile::base::cinder::volume::nfs (
 
   if $step >= 4 {
     package {'nfs-utils': }
-    -> cinder::backend::nfs { $backend_name :
-      backend_availability_zone   => $backend_availability_zone,
-      nfs_servers                 => $cinder_nfs_servers,
-      nfs_mount_options           => $cinder_nfs_mount_options,
-      nfs_shares_config           => '/etc/cinder/shares-nfs.conf',
-      nfs_snapshot_support        => $cinder_nfs_snapshot_support,
-      nas_secure_file_operations  => $cinder_nas_secure_file_operations,
-      nas_secure_file_permissions => $cinder_nas_secure_file_permissions,
-    }
+
+    create_resources('cinder::backend::nfs', { $backend_name => delete_undef_values({
+      'backend_availability_zone'   => $backend_availability_zone,
+      'nfs_servers'                 => $cinder_nfs_servers,
+      'nfs_mount_options'           => $cinder_nfs_mount_options,
+      'nfs_shares_config'           => '/etc/cinder/shares-nfs.conf',
+      'nfs_snapshot_support'        => $cinder_nfs_snapshot_support,
+      'nas_secure_file_operations'  => $cinder_nas_secure_file_operations,
+      'nas_secure_file_permissions' => $cinder_nas_secure_file_permissions,
+    })})
+    Package['nfs-utils'] -> Cinder::Backend::Nfs[$backend_name]
 
     if str2bool($::selinux) {
       selboolean { 'virt_use_nfs':

@@ -34,25 +34,25 @@ class tripleo::profile::base::cinder::volume::dellemc_powerflex (
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    cinder::backend::dellemc_powerflex { $backend_name :
-      backend_availability_zone                => hiera('cinder::backend::dellemc_powerflex::backend_availability_zone', undef),
-      san_login                                => hiera('cinder::backend::dellemc_powerflex::san_login', undef),
-      san_password                             => hiera('cinder::backend::dellemc_powerflex::san_password', undef),
-      san_ip                                   => hiera('cinder::backend::dellemc_powerflex::san_ip', undef),
-      powerflex_storage_pools                  => hiera('cinder::backend::dellemc_powerflex::powerflex_storage_pools', undef),
-      powerflex_allow_migration_during_rebuild => hiera('cinder::backend::dellemc_powerflex::powerflex_allow_migration_during_rebuild',
-                                                        undef),
-      powerflex_allow_non_padded_volumes       => hiera('cinder::backend::dellemc_powerflex::powerflex_allow_non_padded_volumes', undef),
-      powerflex_max_over_subscription_ratio    => hiera('cinder::backend::dellemc_powerflex::powerflex_max_over_subscription_ratio',
-                                                        undef),
-      powerflex_rest_server_port               => hiera('cinder::backend::dellemc_powerflex::powerflex_rest_server_port', undef),
-      powerflex_round_volume_capacity          => hiera('cinder::backend::dellemc_powerflex::powerflex_round_volume_capacity', undef),
-      powerflex_server_api_version             => hiera('cinder::backend::dellemc_powerflex::powerflex_server_api_version', undef),
-      powerflex_unmap_volume_before_deletion   => hiera('cinder::backend::dellemc_powerflex::powerflex_unmap_volume_before_deletion',
-                                                        undef),
-      san_thin_provision                       => hiera('cinder::backend::dellemc_powerflex::san_thin_provision', undef),
-      driver_ssl_cert_verify                   => hiera('cinder::backend::dellemc_powerflex::driver_ssl_cert_verify', undef),
-      driver_ssl_cert_path                     => hiera('cinder::backend::dellemc_powerflex::driver_ssl_cert_path', undef)
-    }
+    create_resources('cinder::backend::dellemc_powerflex', { $backend_name => delete_undef_values({
+      'backend_availability_zone'                => hiera('cinder::backend::dellemc_powerflex::backend_availability_zone', undef),
+      'san_login'                                => hiera('cinder::backend::dellemc_powerflex::san_login', undef),
+      'san_password'                             => hiera('cinder::backend::dellemc_powerflex::san_password', undef),
+      'san_ip'                                   => hiera('cinder::backend::dellemc_powerflex::san_ip', undef),
+      'powerflex_storage_pools'                  => hiera('cinder::backend::dellemc_powerflex::powerflex_storage_pools', undef),
+      'powerflex_allow_migration_during_rebuild' => hiera('cinder::backend::dellemc_powerflex::powerflex_allow_migration_during_rebuild',
+                                                          undef),
+      'powerflex_allow_non_padded_volumes'       => hiera('cinder::backend::dellemc_powerflex::powerflex_allow_non_padded_volumes', undef),
+      'powerflex_max_over_subscription_ratio'    => hiera('cinder::backend::dellemc_powerflex::powerflex_max_over_subscription_ratio',
+                                                          undef),
+      'powerflex_rest_server_port'               => hiera('cinder::backend::dellemc_powerflex::powerflex_rest_server_port', undef),
+      'powerflex_round_volume_capacity'          => hiera('cinder::backend::dellemc_powerflex::powerflex_round_volume_capacity', undef),
+      'powerflex_server_api_version'             => hiera('cinder::backend::dellemc_powerflex::powerflex_server_api_version', undef),
+      'powerflex_unmap_volume_before_deletion'   => hiera('cinder::backend::dellemc_powerflex::powerflex_unmap_volume_before_deletion',
+                                                          undef),
+      'san_thin_provision'                       => hiera('cinder::backend::dellemc_powerflex::san_thin_provision', undef),
+      'driver_ssl_cert_verify'                   => hiera('cinder::backend::dellemc_powerflex::driver_ssl_cert_verify', undef),
+      'driver_ssl_cert_path'                     => hiera('cinder::backend::dellemc_powerflex::driver_ssl_cert_path', undef)
+    })})
   }
 }

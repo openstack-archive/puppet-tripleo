@@ -54,16 +54,16 @@ class tripleo::profile::base::cinder::volume::dellemc_powermax (
     any2array($backend_name).each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
-      cinder::backend::dellemc_powermax { $backend :
-        backend_availability_zone => $backend_config['CinderPowermaxAvailabilityZone'],
-        san_ip                    => $backend_config['CinderPowermaxSanIp'],
-        san_login                 => $backend_config['CinderPowermaxSanLogin'],
-        san_password              => $backend_config['CinderPowermaxSanPassword'],
-        powermax_storage_protocol => $backend_config['CinderPowermaxStorageProtocol'],
-        powermax_array            => $backend_config['CinderPowermaxArray'],
-        powermax_srp              => $backend_config['CinderPowermaxSrp'],
-        powermax_port_groups      => $backend_config['CinderPowermaxPortGroups'],
-      }
+      create_resources('cinder::backend::dellemc_powermax', { $backend => delete_undef_values({
+        'backend_availability_zone' => $backend_config['CinderPowermaxAvailabilityZone'],
+        'san_ip'                    => $backend_config['CinderPowermaxSanIp'],
+        'san_login'                 => $backend_config['CinderPowermaxSanLogin'],
+        'san_password'              => $backend_config['CinderPowermaxSanPassword'],
+        'powermax_storage_protocol' => $backend_config['CinderPowermaxStorageProtocol'],
+        'powermax_array'            => $backend_config['CinderPowermaxArray'],
+        'powermax_srp'              => $backend_config['CinderPowermaxSrp'],
+        'powermax_port_groups'      => $backend_config['CinderPowermaxPortGroups'],
+      })})
     }
   }
 

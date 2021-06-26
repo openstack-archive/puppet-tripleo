@@ -56,12 +56,12 @@ class tripleo::profile::base::cinder::volume::iscsi (
     # NOTE(gfidente): never emit in hieradata:
     # key: [ipv6]
     # as it will cause hiera parsing errors
-    cinder::backend::iscsi { $backend_name :
-      backend_availability_zone => $backend_availability_zone,
-      target_ip_address         => normalize_ip_for_uri($cinder_iscsi_address),
-      target_helper             => $cinder_iscsi_helper,
-      target_protocol           => $cinder_iscsi_protocol,
-    }
+    create_resources('cinder::backend::iscsi', { $backend_name => delete_undef_values({
+      'backend_availability_zone' => $backend_availability_zone,
+      'target_ip_address'         => normalize_ip_for_uri($cinder_iscsi_address),
+      'target_helper'             => $cinder_iscsi_helper,
+      'target_protocol'           => $cinder_iscsi_protocol,
+    })})
   }
 
 }

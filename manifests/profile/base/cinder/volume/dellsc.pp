@@ -42,24 +42,24 @@ class tripleo::profile::base::cinder::volume::dellsc (
     $excluded_domain_ips = hiera('cinder::backend::dellsc_iscsi::excluded_domain_ips', undef)
     $excluded_domain_ips_real = pick_default($excluded_domain_ips, $excluded_domain_ip, undef)
 
-    cinder::backend::dellsc_iscsi { $backend_name :
-      backend_availability_zone    => hiera('cinder::backend::dellsc_iscsi::backend_availability_zone', undef),
-      san_ip                       => hiera('cinder::backend::dellsc_iscsi::san_ip', undef),
-      san_login                    => hiera('cinder::backend::dellsc_iscsi::san_login', undef),
-      san_password                 => hiera('cinder::backend::dellsc_iscsi::san_password', undef),
-      dell_sc_ssn                  => hiera('cinder::backend::dellsc_iscsi::dell_sc_ssn', undef),
-      target_ip_address            => hiera('cinder::backend::dellsc_iscsi::iscsi_ip_address', undef),
-      target_port                  => hiera('cinder::backend::dellsc_iscsi::iscsi_port', undef),
-      dell_sc_api_port             => hiera('cinder::backend::dellsc_iscsi::dell_sc_api_port', undef),
-      dell_sc_server_folder        => hiera('cinder::backend::dellsc_iscsi::dell_sc_server_folder', undef),
-      dell_sc_volume_folder        => hiera('cinder::backend::dellsc_iscsi::dell_sc_volume_folder', undef),
-      excluded_domain_ips          => $excluded_domain_ips_real,
-      secondary_san_ip             => hiera('cinder::backend::dellsc_iscsi::secondary_san_ip', undef),
-      secondary_san_login          => hiera('cinder::backend::dellsc_iscsi::secondary_san_login', undef),
-      secondary_san_password       => hiera('cinder::backend::dellsc_iscsi::secondary_san_password', undef),
-      secondary_sc_api_port        => hiera('cinder::backend::dellsc_iscsi::secondary_sc_api_port', undef),
-      use_multipath_for_image_xfer => hiera('cinder::backend::dellsc_iscsi::use_multipath_for_image_xfer', undef),
-    }
+    create_resources('cinder::backend::dellsc_iscsi', { $backend_name => delete_undef_values({
+      'backend_availability_zone'    => hiera('cinder::backend::dellsc_iscsi::backend_availability_zone', undef),
+      'san_ip'                       => hiera('cinder::backend::dellsc_iscsi::san_ip', undef),
+      'san_login'                    => hiera('cinder::backend::dellsc_iscsi::san_login', undef),
+      'san_password'                 => hiera('cinder::backend::dellsc_iscsi::san_password', undef),
+      'dell_sc_ssn'                  => hiera('cinder::backend::dellsc_iscsi::dell_sc_ssn', undef),
+      'target_ip_address'            => hiera('cinder::backend::dellsc_iscsi::iscsi_ip_address', undef),
+      'target_port'                  => hiera('cinder::backend::dellsc_iscsi::iscsi_port', undef),
+      'dell_sc_api_port'             => hiera('cinder::backend::dellsc_iscsi::dell_sc_api_port', undef),
+      'dell_sc_server_folder'        => hiera('cinder::backend::dellsc_iscsi::dell_sc_server_folder', undef),
+      'dell_sc_volume_folder'        => hiera('cinder::backend::dellsc_iscsi::dell_sc_volume_folder', undef),
+      'excluded_domain_ips'          => $excluded_domain_ips_real,
+      'secondary_san_ip'             => hiera('cinder::backend::dellsc_iscsi::secondary_san_ip', undef),
+      'secondary_san_login'          => hiera('cinder::backend::dellsc_iscsi::secondary_san_login', undef),
+      'secondary_san_password'       => hiera('cinder::backend::dellsc_iscsi::secondary_san_password', undef),
+      'secondary_sc_api_port'        => hiera('cinder::backend::dellsc_iscsi::secondary_sc_api_port', undef),
+      'use_multipath_for_image_xfer' => hiera('cinder::backend::dellsc_iscsi::use_multipath_for_image_xfer', undef),
+    })})
   }
 
 }

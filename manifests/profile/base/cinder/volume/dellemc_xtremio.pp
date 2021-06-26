@@ -56,18 +56,18 @@ class tripleo::profile::base::cinder::volume::dellemc_xtremio (
     any2array($backend_name).each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
-      cinder::backend::dellemc_xtremio { $backend :
-        backend_availability_zone         => $backend_config['CinderXtremioAvailabilityZone'],
-        san_ip                            => $backend_config['CinderXtremioSanIp'],
-        san_login                         => $backend_config['CinderXtremioSanLogin'],
-        san_password                      => $backend_config['CinderXtremioSanPassword'],
-        xtremio_storage_protocol          => $backend_config['CinderXtremioStorageProtocol'],
-        xtremio_cluster_name              => $backend_config['CinderXtremioClusterName'],
-        xtremio_array_busy_retry_count    => $backend_config['CinderXtremioArrayBusyRetryCount'],
-        xtremio_array_busy_retry_interval => $backend_config['CinderXtremioArrayBusyRetryInterval'],
-        xtremio_volumes_per_glance_cache  => $backend_config['CinderXtremioVolumesPerGlanceCache'],
-        xtremio_ports                     => $backend_config['CinderXtremioPorts'],
-      }
+      create_resources('cinder::backend::dellemc_xtremio', { $backend => delete_undef_values({
+        'backend_availability_zone'         => $backend_config['CinderXtremioAvailabilityZone'],
+        'san_ip'                            => $backend_config['CinderXtremioSanIp'],
+        'san_login'                         => $backend_config['CinderXtremioSanLogin'],
+        'san_password'                      => $backend_config['CinderXtremioSanPassword'],
+        'xtremio_storage_protocol'          => $backend_config['CinderXtremioStorageProtocol'],
+        'xtremio_cluster_name'              => $backend_config['CinderXtremioClusterName'],
+        'xtremio_array_busy_retry_count'    => $backend_config['CinderXtremioArrayBusyRetryCount'],
+        'xtremio_array_busy_retry_interval' => $backend_config['CinderXtremioArrayBusyRetryInterval'],
+        'xtremio_volumes_per_glance_cache'  => $backend_config['CinderXtremioVolumesPerGlanceCache'],
+        'xtremio_ports'                     => $backend_config['CinderXtremioPorts'],
+      })})
     }
   }
 }
