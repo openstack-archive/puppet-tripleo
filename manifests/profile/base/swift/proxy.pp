@@ -99,6 +99,10 @@
 #   enable_internal_tls is set.
 #   defaults to 8080
 #
+# [*audit_enabled*]
+#   Whether the pycadf audit middleware is is enabled.
+#   Defaults to false
+#
 class tripleo::profile::base::swift::proxy (
   $bootstrap_node       = hiera('swift_proxy_short_bootstrap_node_name', undef),
   $ceilometer_enabled   = true,
@@ -117,6 +121,7 @@ class tripleo::profile::base::swift::proxy (
   $tls_proxy_bind_ip    = undef,
   $tls_proxy_fqdn       = undef,
   $tls_proxy_port       = 8080,
+  $audit_enabled        = false,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -187,5 +192,8 @@ class tripleo::profile::base::swift::proxy (
     include swift::proxy::kms_keymaster
     include swift::proxy::encryption
     include swift::keymaster
+    if $audit_enabled {
+      include swift::audit
+    }
   }
 }
