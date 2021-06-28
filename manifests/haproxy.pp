@@ -830,6 +830,9 @@ class tripleo::haproxy (
     }
   }
 
+  $keystone_listen_opts = {
+    'option' => [ 'httpchk GET /v3', 'httplog' ]
+  }
   if $keystone_admin {
     # NOTE(jaosorior): Given that the admin endpoint is in the same vhost
     # nowadays as the public/internal one. We can just loadbalance towards the
@@ -841,16 +844,13 @@ class tripleo::haproxy (
       ip_addresses    => hiera('keystone_public_api_node_ips', $controller_hosts_real),
       server_names    => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
       mode            => 'http',
-      listen_options  => merge($default_listen_options, { 'option' => [ 'httpchk GET /v3' ] }),
+      listen_options  => merge($default_listen_options, $keystone_listen_opts),
       service_network => $keystone_admin_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
   if $keystone_public {
-    $keystone_listen_opts = {
-      'option' => [ 'httpchk GET /v3', ],
-    }
     ::tripleo::haproxy::endpoint { 'keystone_public':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('keystone_public_api_vip', $controller_virtual_ip),
@@ -875,7 +875,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($default_listen_options, { 'balance' => $haproxy_lb_mode_longrunning }),
+      listen_options    => merge($default_listen_options, {
+        'balance' => $haproxy_lb_mode_longrunning
+      }),
       public_ssl_port   => $ports[neutron_api_ssl_port],
       service_network   => $neutron_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -890,7 +892,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
       server_names      => hiera('cinder_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($default_listen_options, { 'balance' => $haproxy_lb_mode_longrunning }),
+      listen_options    => merge($default_listen_options, {
+        'balance' => $haproxy_lb_mode_longrunning
+      }),
       public_ssl_port   => $ports[cinder_api_ssl_port],
       service_network   => $cinder_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -920,7 +924,9 @@ class tripleo::haproxy (
       server_names      => hiera('glance_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[glance_api_ssl_port],
       mode              => 'http',
-      listen_options    => merge($default_listen_options, { 'option' => [ 'httpchk GET /healthcheck', ]}),
+      listen_options    => merge($default_listen_options, {
+        'option' => [ 'httpchk GET /healthcheck', 'httplog' ]
+      }),
       service_network   => $glance_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -935,7 +941,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_grafana_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'  => [ 'httpchk HEAD /' ],
+        'option'  => [ 'httpchk HEAD /', 'httplog' ],
         'balance' => 'source',
       }),
       service_network => $ceph_grafana_network,
@@ -949,7 +955,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_prometheus_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'  => [ 'httpchk GET /metrics' ],
+        'option'  => [ 'httpchk GET /metrics', 'httplog' ],
         'balance' => 'source',
       }),
       service_network => $ceph_grafana_network,
@@ -963,7 +969,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_alertmanager_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'  => [ 'httpchk GET /' ],
+        'option'  => [ 'httpchk GET /', 'httplog' ],
         'balance' => 'source',
       }),
       service_network => $ceph_grafana_network,
@@ -985,7 +991,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_dashboard_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'     => [ 'httpchk HEAD /' ],
+        'option'     => [ 'httpchk HEAD /', 'httplog' ],
         'balance'    => 'source',
         'http-check' => 'expect rstatus 2[0-9][0-9]',
       }),
@@ -1135,7 +1141,7 @@ class tripleo::haproxy (
 
   if $swift_proxy_server {
     $swift_proxy_server_listen_options = {
-      'option'         => [ 'httpchk GET /healthcheck', ],
+      'option'         => [ 'httpchk GET /healthcheck', 'httplog' ],
       'balance'        => $haproxy_lb_mode_longrunning,
       'timeout client' => '2m',
       'timeout server' => '2m',
@@ -1161,7 +1167,7 @@ class tripleo::haproxy (
     'timeout server' => '10m',
   }
   $heat_durability_options = {
-    'option'         => [ 'tcpka', 'httpchk' ],
+    'option'         => [ 'tcpka', 'httpchk', 'httplog' ],
     'balance'        => $haproxy_lb_mode_longrunning,
   }
   if $service_certificate {
@@ -1244,7 +1250,9 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
       mode              => 'http',
-      listen_options    => merge($default_listen_options, { 'balance' => $haproxy_lb_mode_longrunning }),
+      listen_options    => merge($default_listen_options, {
+        'balance' => $haproxy_lb_mode_longrunning
+      }),
     }
   }
 
@@ -1469,10 +1477,8 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
-      listen_options    => merge(
-        $default_listen_options,
-        {
-          'option'  => [ 'httpchk GET /swift/healthcheck' ],
+      listen_options    => merge($default_listen_options, {
+          'option'  => [ 'httpchk GET /swift/healthcheck', 'httplog' ],
           'balance' => $haproxy_lb_mode_longrunning
         }
       ),
@@ -1493,7 +1499,7 @@ class tripleo::haproxy (
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
       listen_options    => merge($default_listen_options, {
         'hash-type' => 'consistent',
-        'option'    => [ 'httpchk HEAD /' ],
+        'option'    => [ 'httpchk HEAD /', 'httplog' ],
         'balance'   => 'source',
       }),
     }
