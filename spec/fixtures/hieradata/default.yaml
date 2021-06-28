@@ -7,7 +7,7 @@ bootstrap_nodeid: node
 aodh_api_bootstrap_node_name: node
 aodh::rabbit_password: 'password'
 aodh_redis_password: 'password'
-aodh::auth::auth_password: 'password'
+aodh::service_credentials::password: 'password'
 aodh::db::mysql::password: 'password'
 aodh::keystone::authtoken::password: 'password'
 # barbican profile required hieradata
