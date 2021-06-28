@@ -62,7 +62,7 @@ class tripleo::profile::base::cinder::volume::dellemc_powermax (
         powermax_storage_protocol => $backend_config['CinderPowermaxStorageProtocol'],
         powermax_array            => $backend_config['CinderPowermaxArray'],
         powermax_srp              => $backend_config['CinderPowermaxSrp'],
-        powermax_port_groups      => $backend_config['CinderPowermaPortGroups'],
+        powermax_port_groups      => $backend_config['CinderPowermaxPortGroups'],
       }
     }
   }
