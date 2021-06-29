@@ -34,6 +34,9 @@ describe 'tripleo::profile::base::octavia' do
       it 'should not do anything' do
         is_expected.to_not contain_class('octavia')
         is_expected.to_not contain_class('octavia::config')
+        is_expected.to_not contain_class('octavia::logging')
+        is_expected.to_not contain_class('octavia::service_auth')
+        is_expected.to_not contain_class('octavia::driver_agent')
       end
     end
 
@@ -47,12 +50,18 @@ describe 'tripleo::profile::base::octavia' do
           :default_transport_url => 'rabbit://guest:password@some.server.com:5672/?ssl=0'
         )
         is_expected.to contain_class('octavia::config')
+        is_expected.to contain_class('octavia::logging')
+        is_expected.to contain_class('octavia::service_auth')
+        is_expected.to_not contain_class('octavia::driver_agent')
       end
     end
 
     context 'with multiple hosts' do
       before do
-        params.merge!({ :oslomsg_rpc_hosts => ['some.server.com', 'someother.server.com'] })
+        params.merge!({
+          :step              => 3,
+          :oslomsg_rpc_hosts => ['some.server.com', 'someother.server.com']
+        })
       end
 
       it 'should construct a multihost URL' do
@@ -64,7 +73,10 @@ describe 'tripleo::profile::base::octavia' do
 
     context 'with username provided' do
       before do
-        params.merge!({ :oslomsg_rpc_username => 'bunny' })
+        params.merge!({
+            :step                 => 3,
+            :oslomsg_rpc_username => 'bunny'
+        })
       end
 
       it 'should construct URL with username' do
@@ -76,11 +88,11 @@ describe 'tripleo::profile::base::octavia' do
 
     context 'with username and password provided' do
       before do
-        params.merge!(
-          { :oslomsg_rpc_username  => 'bunny',
-            :oslomsg_rpc_password  => 'carrot'
-          }
-        )
+        params.merge!({
+          :step                  => 3,
+          :oslomsg_rpc_username  => 'bunny',
+          :oslomsg_rpc_password  => 'carrot'
+        })
       end
 
       it 'should construct URL with username and password' do
@@ -92,12 +104,12 @@ describe 'tripleo::profile::base::octavia' do
 
     context 'with multiple hosts and user info provided' do
       before do
-        params.merge!(
-          { :oslomsg_rpc_hosts     => ['some.server.com', 'someother.server.com'],
-            :oslomsg_rpc_username  => 'bunny',
-            :oslomsg_rpc_password  => 'carrot'
-          }
-        )
+        params.merge!({
+          :step                  => 3,
+          :oslomsg_rpc_hosts     => ['some.server.com', 'someother.server.com'],
+          :oslomsg_rpc_username  => 'bunny',
+          :oslomsg_rpc_password  => 'carrot'
+        })
       end
 
       it 'should distributed user info across hosts URL' do
@@ -106,6 +118,27 @@ describe 'tripleo::profile::base::octavia' do
         )
       end
     end
+
+    context 'with driver agent enabled' do
+      before do
+        params.merge!({
+          :step                => 3,
+          :enable_driver_agent => true
+        })
+      end
+
+      it 'should provide basic initialization' do
+        is_expected.to contain_class('octavia').with(
+          :default_transport_url => 'rabbit://guest:password@some.server.com:5672/?ssl=0'
+        )
+        is_expected.to contain_class('octavia::config')
+        is_expected.to contain_class('octavia::db')
+        is_expected.to contain_class('octavia::logging')
+        is_expected.to contain_class('octavia::service_auth')
+        is_expected.to contain_class('octavia::driver_agent')
+      end
+    end
+
   end
 
   on_supported_os.each do |os, facts|

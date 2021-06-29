@@ -45,7 +45,11 @@
 # [*oslomsg_rpc_use_ssl*]
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
-
+#
+# [*enable_driver_agent*]
+#   Enable the driver agent
+#   Defaults to false
+#
 class tripleo::profile::base::octavia (
   $step                 = Integer(hiera('step')),
   $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
@@ -54,6 +58,7 @@ class tripleo::profile::base::octavia (
   $oslomsg_rpc_port     = hiera('oslo_messaging_rpc_port', '5672'),
   $oslomsg_rpc_username = hiera('oslo_messaging_rpc_user_name', 'guest'),
   $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
+  $enable_driver_agent  = false
 ) {
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
@@ -70,5 +75,9 @@ class tripleo::profile::base::octavia (
     include octavia::config
     include octavia::logging
     include octavia::service_auth
+
+    if $enable_driver_agent {
+      include octavia::driver_agent
+    }
   }
 }
