@@ -23,6 +23,7 @@ sensubility_conf = "
 [sensu]
 connection=ampq://sensu:sensu@localhost:5672//sensu
 subscriptions=default,test
+tmp_base_dir=/var/lib/collectd-sensubility/checks
 checks={\"standalone_check\":{\"command\":\"echo 'foobar'\",\"interval\":5}}
 
 [amqp1]

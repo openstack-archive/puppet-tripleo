@@ -30,6 +30,39 @@ describe 'tripleo::profile::base::metrics::collectd::sensubility' do
         )
       end
     end
+
+    context 'with defaults and scripts for download defined' do
+      let(:params) do
+        { :workdir => '/some/path',
+          :scripts    => {
+            'scriptA' => {
+              'source'   => 'http://some.uri/scriptA',
+              'checksum' => '227e8f542d95e416462a7f17652da655',
+            },
+            'scriptB' => {
+              'source'          => 'http://some.other.uri/scriptB',
+              'checksum'        => '48a404e59d4a43239ce64dee3af038b9',
+              'create_bin_link' => false
+            }
+          }
+        }
+      end
+
+      it 'requests the scripts download' do
+        is_expected.to compile.with_all_deps
+        is_expected.to contain_file('/some/path/scripts/scriptA').with(
+          :source         => 'http://some.uri/scriptA',
+          :checksum_value => '227e8f542d95e416462a7f17652da655',
+        )
+        is_expected.to contain_file('/usr/bin/sensubility_scriptA')
+
+        is_expected.to contain_file('/some/path/scripts/scriptB').with(
+          :source         => 'http://some.other.uri/scriptB',
+          :checksum_value => '48a404e59d4a43239ce64dee3af038b9',
+        )
+        is_expected.not_to contain_file('/usr/bin/sensubility_scriptB')
+      end
+    end
   end
 
   on_supported_os.each do |os, facts|
