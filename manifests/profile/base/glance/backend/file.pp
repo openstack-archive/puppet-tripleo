@@ -62,10 +62,10 @@ class tripleo::profile::base::glance::backend::file (
     $multistore_description = pick($multistore_config[$backend_name], {})['GlanceStoreDescription']
     $store_description_real = pick($multistore_description, $store_description)
 
-    glance::backend::multistore::file { $backend_name:
-      filesystem_store_datadir     => $filesystem_store_datadir,
-      filesystem_thin_provisioning => $filesystem_thin_provisioning,
-      store_description            => $store_description_real,
-    }
+    create_resources('glance::backend::multistore::file', { $backend_name => delete_undef_values({
+      'filesystem_store_datadir'     => $filesystem_store_datadir,
+      'filesystem_thin_provisioning' => $filesystem_thin_provisioning,
+      'store_description'            => $store_description_real,
+    })})
   }
 }

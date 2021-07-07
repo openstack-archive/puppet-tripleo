@@ -108,15 +108,15 @@ class tripleo::profile::base::glance::backend::rbd (
         unless  => "getfacl ${ceph_client_keyring} | grep -q mask::r",
       }
 
-      glance::backend::multistore::rbd { $backend_name:
-        rbd_store_ceph_conf   => $rbd_store_ceph_conf_real,
-        rbd_store_user        => $rbd_store_user_real,
-        rbd_store_pool        => $rbd_store_pool_real,
-        rbd_store_chunk_size  => $rbd_store_chunk_size,
-        rbd_thin_provisioning => $rbd_thin_provisioning,
-        rados_connect_timeout => $rados_connect_timeout,
-        store_description     => $store_description_real,
-      }
+      create_resources('glance::backend::multistore::rbd', { $backend_name => delete_undef_values({
+        'rbd_store_ceph_conf'   => $rbd_store_ceph_conf_real,
+        'rbd_store_user'        => $rbd_store_user_real,
+        'rbd_store_pool'        => $rbd_store_pool_real,
+        'rbd_store_chunk_size'  => $rbd_store_chunk_size,
+        'rbd_thin_provisioning' => $rbd_thin_provisioning,
+        'rados_connect_timeout' => $rados_connect_timeout,
+        'store_description'     => $store_description_real,
+      })})
     }
   }
 }

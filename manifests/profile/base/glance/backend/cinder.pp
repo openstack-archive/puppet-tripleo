@@ -119,22 +119,22 @@ class tripleo::profile::base::glance::backend::cinder (
         $cinder_volume_type_real = $cinder_volume_type
       }
 
-      glance::backend::multistore::cinder { $backend_name:
-        cinder_api_insecure         => $cinder_api_insecure,
-        cinder_catalog_info         => $cinder_catalog_info,
-        cinder_http_retries         => $cinder_http_retries,
-        cinder_endpoint_template    => $cinder_endpoint_template,
-        cinder_ca_certificates_file => $cinder_ca_certificates_file,
-        cinder_store_auth_address   => $cinder_store_auth_address,
-        cinder_store_project_name   => $cinder_store_project_name,
-        cinder_store_user_name      => $cinder_store_user_name,
-        cinder_store_password       => $cinder_store_password,
-        cinder_enforce_multipath    => $cinder_enforce_multipath,
-        cinder_use_multipath        => $cinder_use_multipath,
-        cinder_mount_point_base     => $cinder_mount_point_base,
-        cinder_volume_type          => $cinder_volume_type_real,
-        store_description           => $store_description_real,
-      }
+      create_resources('glance::backend::multistore::cinder', { $backend_name => delete_undef_values({
+        'cinder_api_insecure'         => $cinder_api_insecure,
+        'cinder_catalog_info'         => $cinder_catalog_info,
+        'cinder_http_retries'         => $cinder_http_retries,
+        'cinder_endpoint_template'    => $cinder_endpoint_template,
+        'cinder_ca_certificates_file' => $cinder_ca_certificates_file,
+        'cinder_store_auth_address'   => $cinder_store_auth_address,
+        'cinder_store_project_name'   => $cinder_store_project_name,
+        'cinder_store_user_name'      => $cinder_store_user_name,
+        'cinder_store_password'       => $cinder_store_password,
+        'cinder_enforce_multipath'    => $cinder_enforce_multipath,
+        'cinder_use_multipath'        => $cinder_use_multipath,
+        'cinder_mount_point_base'     => $cinder_mount_point_base,
+        'cinder_volume_type'          => $cinder_volume_type_real,
+        'store_description'           => $store_description_real,
+      })})
     }
   }
 }
