@@ -32,6 +32,7 @@ describe 'tripleo::profile::base::ceilometer::agent::polling' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer::agent::polling')
         is_expected.to_not contain_class('ceilometer::agent::service_credentials')
+        is_expected.to_not contain_class('ceilometer::coordination')
         is_expected.to_not contain_class('ceilometer::agent::polling')
       end
     end
@@ -46,11 +47,13 @@ describe 'tripleo::profile::base::ceilometer::agent::polling' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('ceilometer::agent::service_credentials')
+        is_expected.to contain_class('ceilometer::coordination').with(
+          :backend_url  => 'redis://:password@127.0.0.1:6379/',
+        )
         is_expected.to contain_class('ceilometer::agent::polling').with(
           :central_namespace => true,
           :compute_namespace => false,
           :ipmi_namespace    => false,
-          :coordination_url  => 'redis://:password@127.0.0.1:6379/',
         )
       end
     end

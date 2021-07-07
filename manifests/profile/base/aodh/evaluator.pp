@@ -22,6 +22,12 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
+# [*aodh_redis_password*]
+#   (Optional) redis password to configure coordination url
+#
+# [*redis_vip*]
+#   (Optional) redis vip to configure coordination url
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -29,6 +35,8 @@
 #
 class tripleo::profile::base::aodh::evaluator (
   $enable_internal_tls = hiera('enable_internal_tls', false),
+  $aodh_redis_password = hiera('aodh_redis_password', undef),
+  $redis_vip           = hiera('redis_vip', undef),
   $step                = Integer(hiera('step')),
 ) {
 
@@ -40,9 +48,10 @@ class tripleo::profile::base::aodh::evaluator (
   }
 
   if $step >= 4 {
-    class { 'aodh::evaluator':
-      coordination_url => join(['redis://:', hiera('aodh_redis_password'), '@', normalize_ip_for_uri(hiera('redis_vip')), ':6379/', $tls_query_param]),
+    class { 'aodh::coordination':
+      backend_url => join(['redis://:', $aodh_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
     }
+    include aodh::evaluator
   }
 
 }

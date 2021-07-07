@@ -28,20 +28,23 @@ describe 'tripleo::profile::base::aodh::evaluator' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::aodh::evaluator')
         is_expected.to contain_class('tripleo::profile::base::aodh')
+        is_expected.to_not contain_class('aodh::coordination')
         is_expected.to_not contain_class('aodh::evaluator')
       end
     end
 
     context 'with step 4' do
       let(:params) { {
-        :step => 4,
+        :step                => 4,
+        :aodh_redis_password => 'password',
+        :redis_vip           => '127.0.0.1',
       } }
 
       it 'should trigger complete configuration' do
-        # TODO(aschultz): need to parameterize the pass/vip so we can test ipv6
-        is_expected.to contain_class('aodh::evaluator').with(
-          :coordination_url => 'redis://:password@127.0.0.1:6379/'
+        is_expected.to contain_class('aodh::coordination').with(
+          :backend_url => 'redis://:password@127.0.0.1:6379/'
         )
+        is_expected.to contain_class('aodh::evaluator')
       end
     end
   end

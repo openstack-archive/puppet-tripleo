@@ -68,11 +68,13 @@ class tripleo::profile::base::ceilometer::agent::polling (
 
   if $step >= 4 {
     include ceilometer::agent::service_credentials
+    class { 'ceilometer::coordination':
+      backend_url  => join(['redis://:', $ceilometer_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
+    }
     class { 'ceilometer::agent::polling':
       central_namespace => $central_namespace,
       compute_namespace => $compute_namespace,
       ipmi_namespace    => $ipmi_namespace,
-      coordination_url  => join(['redis://:', $ceilometer_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param]),
     }
   }
 }
