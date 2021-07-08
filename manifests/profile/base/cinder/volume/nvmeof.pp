@@ -62,18 +62,18 @@ class tripleo::profile::base::cinder::volume::nvmeof (
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    cinder::backend::nvmeof { $volume_backend_name :
-      target_ip_address         => normalize_ip_for_uri($target_ip_address),
-      target_port               => $target_port,
-      target_helper             => $target_helper,
-      target_protocol           => $target_protocol,
-      target_prefix             => $target_prefix,
-      nvmet_port_id             => $nvmet_port_id,
-      nvmet_ns_id               => $nvmet_ns_id,
-      volume_backend_name       => $volume_backend_name,
-      backend_availability_zone => $backend_availability_zone,
-      volume_driver             => $volume_driver,
-    }
+    create_resources('cinder::backend::nvmeof', { $volume_backend_name => delete_undef_values({
+      'target_ip_address'         => normalize_ip_for_uri($target_ip_address),
+      'target_port'               => $target_port,
+      'target_helper'             => $target_helper,
+      'target_protocol'           => $target_protocol,
+      'target_prefix'             => $target_prefix,
+      'nvmet_port_id'             => $nvmet_port_id,
+      'nvmet_ns_id'               => $nvmet_ns_id,
+      'volume_backend_name'       => $volume_backend_name,
+      'backend_availability_zone' => $backend_availability_zone,
+      'volume_driver'             => $volume_driver,
+    })})
   }
 
 }

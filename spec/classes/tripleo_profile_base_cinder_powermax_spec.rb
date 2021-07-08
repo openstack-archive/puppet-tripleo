@@ -44,7 +44,9 @@ describe 'tripleo::profile::base::cinder::volume::dellemc_powermax' do
       context 'with multiple backends' do
         let(:params) { {
           :backend_name => ['tripleo_dellemc_powermax_1', 'tripleo_dellemc_powermax_2'],
-          :multi_config => { 'tripleo_dellemc_powermax_2' => { 'CinderPowermaxStorageProtocol' => 'FC' }},
+          :multi_config => { 'tripleo_dellemc_powermax_2' => {
+            'CinderPowermaxStorageProtocol' => 'FC'
+            }},
           :step         => 4,
         } }
 

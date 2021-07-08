@@ -36,10 +36,10 @@ class tripleo::profile::base::cinder::volume::dellemc_vmax_iscsi (
   warning('The tripleo_dellemc_vmax_iscsi class is not supported, please use the triplo_dellemc_powermax resource instead.')
 
   if $step >= 4 {
-    cinder::backend::dellemc_vmax_iscsi { $backend_name :
-      backend_availability_zone => hiera('cinder::backend::dellemc_vmax_iscsi::backend_availability_zone', undef),
-      cinder_emc_config_file    => hiera('cinder::backend::dellemc_vmax_iscsi::cinder_emc_config_file', undef),
-    }
+    create_resources('cinder::backend::dellemc_vmax_iscsi', { $backend_name => delete_undef_values({
+      'backend_availability_zone' => hiera('cinder::backend::dellemc_vmax_iscsi::backend_availability_zone', undef),
+      'cinder_emc_config_file'    => hiera('cinder::backend::dellemc_vmax_iscsi::cinder_emc_config_file', undef),
+    })})
   }
 
 }

@@ -52,15 +52,15 @@ class tripleo::profile::base::cinder::volume::pure (
     $backend_name.each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
-      cinder::backend::pure { $backend :
-        backend_availability_zone    => $backend_config['CinderPureAvailabilityZone'],
-        san_ip                       => $backend_config['CinderPureSanIp'],
-        pure_api_token               => $backend_config['CinderPureAPIToken'],
-        pure_storage_protocol        => $backend_config['CinderPureStorageProtocol'],
-        use_chap_auth                => $backend_config['CinderPureUseChap'],
-        use_multipath_for_image_xfer => $backend_config['CinderPureMultipathXfer'],
-        image_volume_cache_enabled   => $backend_config['CinderPureImageCache'],
-      }
+      create_resources('cinder::backend::pure', { $backend => delete_undef_values({
+        'backend_availability_zone'    => $backend_config['CinderPureAvailabilityZone'],
+        'san_ip'                       => $backend_config['CinderPureSanIp'],
+        'pure_api_token'               => $backend_config['CinderPureAPIToken'],
+        'pure_storage_protocol'        => $backend_config['CinderPureStorageProtocol'],
+        'use_chap_auth'                => $backend_config['CinderPureUseChap'],
+        'use_multipath_for_image_xfer' => $backend_config['CinderPureMultipathXfer'],
+        'image_volume_cache_enabled'   => $backend_config['CinderPureImageCache'],
+      })})
     }
   }
 }

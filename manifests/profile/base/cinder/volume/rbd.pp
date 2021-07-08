@@ -104,26 +104,26 @@ class tripleo::profile::base::cinder::volume::rbd (
 
       $backend_config = merge($backend_defaults, $backend_multi_config)
 
-      cinder::backend::rbd { $backend :
-        backend_availability_zone        => $backend_config['CinderRbdAvailabilityZone'],
-        backend_host                     => $cinder_rbd_backend_host,
-        rbd_ceph_conf                    => $backend_ceph_conf,
-        rbd_pool                         => $backend_config['CinderRbdPoolName'],
-        rbd_user                         => $backend_config['CephClientUserName'],
-        rbd_secret_uuid                  => $backend_config['CephClusterFSID'],
-        rbd_flatten_volume_from_snapshot => $backend_config['CinderRbdFlattenVolumeFromSnapshot'],
-      }
+      create_resources('cinder::backend::rbd', { $backend => delete_undef_values({
+        'backend_availability_zone'        => $backend_config['CinderRbdAvailabilityZone'],
+        'backend_host'                     => $cinder_rbd_backend_host,
+        'rbd_ceph_conf'                    => $backend_ceph_conf,
+        'rbd_pool'                         => $backend_config['CinderRbdPoolName'],
+        'rbd_user'                         => $backend_config['CephClientUserName'],
+        'rbd_secret_uuid'                  => $backend_config['CephClusterFSID'],
+        'rbd_flatten_volume_from_snapshot' => $backend_config['CinderRbdFlattenVolumeFromSnapshot'],
+      })})
 
       any2array($backend_config['CinderRbdExtraPools']).each |String $pool_name| {
-        cinder::backend::rbd { "${backend}_${pool_name}" :
-          backend_availability_zone        => $backend_config['CinderRbdAvailabilityZone'],
-          backend_host                     => $cinder_rbd_backend_host,
-          rbd_ceph_conf                    => $backend_ceph_conf,
-          rbd_pool                         => $pool_name,
-          rbd_user                         => $backend_config['CephClientUserName'],
-          rbd_secret_uuid                  => $backend_config['CephClusterFSID'],
-          rbd_flatten_volume_from_snapshot => $backend_config['CinderRbdFlattenVolumeFromSnapshot'],
-        }
+        create_resources('cinder::backend::rbd', { "${backend}_${pool_name}" => delete_undef_values({
+          'backend_availability_zone'        => $backend_config['CinderRbdAvailabilityZone'],
+          'backend_host'                     => $cinder_rbd_backend_host,
+          'rbd_ceph_conf'                    => $backend_ceph_conf,
+          'rbd_pool'                         => $pool_name,
+          'rbd_user'                         => $backend_config['CephClientUserName'],
+          'rbd_secret_uuid'                  => $backend_config['CephClusterFSID'],
+          'rbd_flatten_volume_from_snapshot' => $backend_config['CinderRbdFlattenVolumeFromSnapshot'],
+        })})
       }
     }
   }

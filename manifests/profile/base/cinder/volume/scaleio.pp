@@ -37,24 +37,24 @@ class tripleo::profile::base::cinder::volume::scaleio (
   warning('The scaleio class will be removed in W-Release, please use the dellemc_vxflexos resource instead.')
 
   if $step >= 4 {
-    cinder::backend::scaleio { $backend_name :
-      backend_availability_zone        => hiera('cinder::backend::scaleio::backend_availability_zone', undef),
-      sio_login                        => hiera('cinder::backend::scaleio::sio_login', undef),
-      sio_password                     => hiera('cinder::backend::scaleio::sio_password', undef),
-      sio_server_hostname              => hiera('cinder::backend::scaleio::sio_server_hostname', undef),
-      sio_server_port                  => hiera('cinder::backend::scaleio::sio_server_port', undef),
-      sio_verify_server_certificate    => hiera('cinder::backend::scaleio::sio_verify_server_certificate', undef),
-      sio_server_certificate_path      => hiera('cinder::backend::scaleio::sio_server_certificate_path', undef),
-      sio_protection_domain_name       => hiera('cinder::backend::scaleio::sio_protection_domain_name', undef),
-      sio_protection_domain_id         => hiera('cinder::backend::scaleio::sio_protection_domain_id', undef),
-      sio_storage_pool_id              => hiera('cinder::backend::scaleio::sio_storage_pool_id', undef),
-      sio_storage_pool_name            => hiera('cinder::backend::scaleio::sio_storage_pool_name', undef),
-      sio_storage_pools                => hiera('cinder::backend::scaleio::sio_storage_pools', undef),
-      sio_round_volume_capacity        => hiera('cinder::backend::scaleio::sio_round_volume_capacity', undef),
-      sio_unmap_volume_before_deletion => hiera('cinder::backend::scaleio::sio_unmap_volume_before_deletion', undef),
-      sio_max_over_subscription_ratio  => hiera('cinder::backend::scaleio::sio_max_over_subscription_ratio', undef),
-      sio_thin_provision               => hiera('cinder::backend::scaleio::sio_thin_provision', undef),
-    }
+    create_resources('cinder::backend::scaleio', { $backend_name => delete_undef_values({
+      'backend_availability_zone'        => hiera('cinder::backend::scaleio::backend_availability_zone', undef),
+      'sio_login'                        => hiera('cinder::backend::scaleio::sio_login', undef),
+      'sio_password'                     => hiera('cinder::backend::scaleio::sio_password', undef),
+      'sio_server_hostname'              => hiera('cinder::backend::scaleio::sio_server_hostname', undef),
+      'sio_server_port'                  => hiera('cinder::backend::scaleio::sio_server_port', undef),
+      'sio_verify_server_certificate'    => hiera('cinder::backend::scaleio::sio_verify_server_certificate', undef),
+      'sio_server_certificate_path'      => hiera('cinder::backend::scaleio::sio_server_certificate_path', undef),
+      'sio_protection_domain_name'       => hiera('cinder::backend::scaleio::sio_protection_domain_name', undef),
+      'sio_protection_domain_id'         => hiera('cinder::backend::scaleio::sio_protection_domain_id', undef),
+      'sio_storage_pool_id'              => hiera('cinder::backend::scaleio::sio_storage_pool_id', undef),
+      'sio_storage_pool_name'            => hiera('cinder::backend::scaleio::sio_storage_pool_name', undef),
+      'sio_storage_pools'                => hiera('cinder::backend::scaleio::sio_storage_pools', undef),
+      'sio_round_volume_capacity'        => hiera('cinder::backend::scaleio::sio_round_volume_capacity', undef),
+      'sio_unmap_volume_before_deletion' => hiera('cinder::backend::scaleio::sio_unmap_volume_before_deletion', undef),
+      'sio_max_over_subscription_ratio'  => hiera('cinder::backend::scaleio::sio_max_over_subscription_ratio', undef),
+      'sio_thin_provision'               => hiera('cinder::backend::scaleio::sio_thin_provision', undef),
+    })})
   }
 
 }
