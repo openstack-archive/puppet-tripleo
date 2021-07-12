@@ -120,7 +120,6 @@ class tripleo::profile::base::manila::share (
         'cephfs_conf_path'                   => hiera('manila::backend::cephfs::cephfs_conf_path', undef),
         'cephfs_auth_id'                     => $cephfs_auth_id,
         'cephfs_cluster_name'                => hiera('manila::backend::cephfs::cephfs_cluster_name', undef),
-        'cephfs_enable_snapshots'            => hiera('manila::backend::cephfs::cephfs_enable_snapshots', undef),
         'cephfs_volume_mode'                 => hiera('manila::backend::cephfs::cephfs_volume_mode', '0755'),
         'cephfs_protocol_helper_type'        => $manila_cephfs_protocol_helper_type,
         'cephfs_ganesha_server_ip'           => $cephfs_ganesha_server_ip_real,
