@@ -47,6 +47,7 @@ eos
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
+        is_expected.to_not contain_class('neutron::healthcheck')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -66,6 +67,7 @@ eos
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
+        is_expected.to_not contain_class('neutron::healthcheck')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -85,6 +87,7 @@ eos
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
+        is_expected.to_not contain_class('neutron::healthcheck')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -107,6 +110,7 @@ eos
           :l3_ha   => false,
         )
         is_expected.to contain_class('neutron::db')
+        is_expected.to contain_class('neutron::healthcheck')
         is_expected.to contain_class('neutron::quota')
       end
     end
@@ -126,6 +130,7 @@ eos
         is_expected.to_not contain_class('neutron::server::placement')
         is_expected.to_not contain_class('neutron::server')
         is_expected.to_not contain_class('neutron::db')
+        is_expected.to_not contain_class('neutron::healthcheck')
         is_expected.to_not contain_class('neutron::quota')
       end
     end
@@ -148,6 +153,7 @@ eos
           :l3_ha   => false,
         )
         is_expected.to contain_class('neutron::db')
+        is_expected.to contain_class('neutron::healthcheck')
         is_expected.to contain_class('neutron::quota')
       end
     end

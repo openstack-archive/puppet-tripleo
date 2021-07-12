@@ -76,7 +76,7 @@ class tripleo::profile::base::heat::api_cfn (
 
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include heat::api_cfn
-
+    include heat::healthcheck
     include tripleo::profile::base::apache
     class { 'heat::wsgi::apache_api_cfn':
       ssl_cert => $tls_certfile,

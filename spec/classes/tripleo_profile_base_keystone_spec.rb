@@ -43,6 +43,7 @@ describe 'tripleo::profile::base::keystone' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::keystone')
         is_expected.to_not contain_class('keystone')
+        is_expected.to_not contain_class('keystone::healthcheck')
         is_expected.to_not contain_class('keystone::config')
         is_expected.to_not contain_class('keystone::logging')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
@@ -68,6 +69,7 @@ describe 'tripleo::profile::base::keystone' do
           :default_transport_url => 'rabbit://keystone1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://keystone2:baa@192.168.0.2:5678/?ssl=0',
         )
+        is_expected.to contain_class('keystone::healthcheck')
         is_expected.to contain_class('keystone::config')
         is_expected.to contain_class('keystone::logging')
         is_expected.to contain_class('tripleo::profile::base::apache')
@@ -92,6 +94,7 @@ describe 'tripleo::profile::base::keystone' do
       it 'should not trigger any configuration' do
         is_expected.to contain_class('tripleo::profile::base::keystone')
         is_expected.to_not contain_class('keystone')
+        is_expected.to_not contain_class('keystone::healthcheck')
         is_expected.to_not contain_class('keystone::config')
         is_expected.to_not contain_class('keystone::logging')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
@@ -117,6 +120,7 @@ describe 'tripleo::profile::base::keystone' do
           :default_transport_url => 'rabbit://keystone1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://keystone2:baa@192.168.0.2:5678/?ssl=0',
         )
+        is_expected.to contain_class('keystone::healthcheck')
         is_expected.to contain_class('keystone::config')
         is_expected.to contain_class('keystone::logging')
         is_expected.to contain_class('tripleo::profile::base::apache')
@@ -146,6 +150,7 @@ describe 'tripleo::profile::base::keystone' do
           :default_transport_url => 'rabbit://keystone1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://keystone2:baa@192.168.0.2:5678/?ssl=0',
         )
+        is_expected.to contain_class('keystone::healthcheck')
         is_expected.to contain_class('keystone::config')
         is_expected.to contain_class('keystone::logging')
         is_expected.to contain_class('tripleo::profile::base::apache')

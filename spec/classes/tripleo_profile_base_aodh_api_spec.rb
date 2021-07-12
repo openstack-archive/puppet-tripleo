@@ -34,6 +34,7 @@ describe 'tripleo::profile::base::aodh::api' do
         is_expected.to contain_class('tripleo::profile::base::aodh::api')
         is_expected.to contain_class('tripleo::profile::base::aodh')
         is_expected.to_not contain_class('aodh::api')
+        is_expected.to_not contain_class('aodh::healthcheck')
         is_expected.to_not contain_class('aodh::wsgi::apache')
         is_expected.to_not contain_class('aodh::expirer')
       end
@@ -46,6 +47,7 @@ describe 'tripleo::profile::base::aodh::api' do
 
       it 'should trigger complete configuration' do
         is_expected.to_not contain_class('aodh::api')
+        is_expected.to_not contain_class('aodh::healthcheck')
         is_expected.to_not contain_class('aodh::wsgi::apache')
         is_expected.to_not contain_class('aodh::expirer')
       end
@@ -59,6 +61,7 @@ describe 'tripleo::profile::base::aodh::api' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh::api')
+        is_expected.to contain_class('aodh::healthcheck')
         is_expected.to contain_class('aodh::wsgi::apache')
         is_expected.to_not contain_class('aodh::expirer')
       end
@@ -71,6 +74,7 @@ describe 'tripleo::profile::base::aodh::api' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh::api')
+        is_expected.to contain_class('aodh::healthcheck')
         is_expected.to contain_class('aodh::wsgi::apache')
         is_expected.to_not contain_class('aodh::expirer')
       end
@@ -83,6 +87,7 @@ describe 'tripleo::profile::base::aodh::api' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh::api')
+        is_expected.to contain_class('aodh::healthcheck')
         is_expected.to contain_class('aodh::wsgi::apache')
         is_expected.to contain_class('aodh::expirer')
       end
@@ -96,6 +101,7 @@ describe 'tripleo::profile::base::aodh::api' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('aodh::api')
+        is_expected.to contain_class('aodh::healthcheck')
         is_expected.to contain_class('aodh::wsgi::apache')
         is_expected.to_not contain_class('aodh::expirer')
       end

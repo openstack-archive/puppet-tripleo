@@ -244,6 +244,7 @@ class tripleo::profile::base::keystone (
                                           $barbican_notification_topics,
                                           $extra_notification_topics),
     }
+    include keystone::healthcheck
 
     if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{
       include keystone::messaging::amqp

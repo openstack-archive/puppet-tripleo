@@ -831,7 +831,7 @@ class tripleo::haproxy (
   }
 
   $keystone_listen_opts = {
-    'option' => [ 'httpchk GET /v3', 'httplog' ]
+    'option' => [ 'httpchk GET /healthcheck', 'httplog' ]
   }
   if $keystone_admin {
     # NOTE(jaosorior): Given that the admin endpoint is in the same vhost
@@ -868,6 +868,10 @@ class tripleo::haproxy (
   }
 
   if $neutron {
+    $neutron_listen_opts = {
+      'balance' => $haproxy_lb_mode_longrunning,
+      'option'  => [ 'httpchk GET /healthcheck', 'httplog' ]
+    }
     ::tripleo::haproxy::endpoint { 'neutron':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('neutron_api_vip', $controller_virtual_ip),
@@ -875,9 +879,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'balance' => $haproxy_lb_mode_longrunning
-      }),
+      listen_options    => merge($default_listen_options, $neutron_listen_opts),
       public_ssl_port   => $ports[neutron_api_ssl_port],
       service_network   => $neutron_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -885,6 +887,10 @@ class tripleo::haproxy (
   }
 
   if $cinder {
+    $cinder_listen_opts = {
+      'balance' => $haproxy_lb_mode_longrunning,
+      'option'  => [ 'httpchk GET /healthcheck', 'httplog' ]
+    }
     ::tripleo::haproxy::endpoint { 'cinder':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('cinder_api_vip', $controller_virtual_ip),
@@ -892,9 +898,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
       server_names      => hiera('cinder_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'balance' => $haproxy_lb_mode_longrunning
-      }),
+      listen_options    => merge($default_listen_options, $cinder_listen_opts),
       public_ssl_port   => $ports[cinder_api_ssl_port],
       service_network   => $cinder_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -902,6 +906,9 @@ class tripleo::haproxy (
   }
 
   if $manila {
+    $manila_listen_opts = {
+      'option' => [ 'httpchk GET /healthcheck', 'httplog' ],
+    }
     ::tripleo::haproxy::endpoint { 'manila':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('manila_api_vip', $controller_virtual_ip),
@@ -909,6 +916,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('manila_api_node_ips', $controller_hosts_real),
       server_names      => hiera('manila_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $manila_listen_opts),
       public_ssl_port   => $ports[manila_api_ssl_port],
       service_network   => $manila_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -916,6 +924,9 @@ class tripleo::haproxy (
   }
 
   if $glance_api {
+    $glance_listen_opts = {
+      'option' => [ 'httpchk GET /healthcheck', 'httplog' ],
+    }
     ::tripleo::haproxy::endpoint { 'glance_api':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('glance_api_vip', $controller_virtual_ip),
@@ -924,9 +935,7 @@ class tripleo::haproxy (
       server_names      => hiera('glance_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[glance_api_ssl_port],
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'option' => [ 'httpchk GET /healthcheck', 'httplog' ]
-      }),
+      listen_options    => merge($default_listen_options, $glance_listen_opts),
       service_network   => $glance_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -1002,6 +1011,7 @@ class tripleo::haproxy (
 
   $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
   if $nova_osapi {
+    # NOTE(tkajinam): Nova doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'nova_osapi':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $nova_api_vip,
@@ -1017,6 +1027,7 @@ class tripleo::haproxy (
 
   $placement_vip = hiera('placement_vip', $controller_virtual_ip)
   if $placement {
+    # NOTE(tkajinam): Placement doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'placement':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $placement_vip,
@@ -1031,6 +1042,7 @@ class tripleo::haproxy (
   }
 
   if $nova_metadata {
+    # NOTE(tkajinam): Nova doesn't provide healthcheck API
     if hiera('nova_is_additional_cell', undef) {
       $nova_metadata_server_names_real = hiera('nova_metadata_cell_node_names', $controller_hosts_names_real)
     } else {
@@ -1053,6 +1065,7 @@ class tripleo::haproxy (
 
   $nova_vnc_proxy_vip = hiera('nova_vnc_proxy_vip', $controller_virtual_ip)
   if $nova_novncproxy {
+    # NOTE(tkajinam): Nova-VNCProxy doesn't provide healthcheck API
     if $enable_internal_tls {
       # we need to make sure we use ssl for checks.
       $haproxy_member_options_real   = delete($haproxy_member_options, 'check')
@@ -1085,6 +1098,9 @@ class tripleo::haproxy (
   }
 
   if $aodh {
+    $aodh_listen_opts = {
+      'option' => [ 'httpchk GET /healthcheck', 'httplog' ],
+    }
     ::tripleo::haproxy::endpoint { 'aodh':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('aodh_api_vip', $controller_virtual_ip),
@@ -1092,6 +1108,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
       server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $aodh_listen_opts),
       public_ssl_port   => $ports[aodh_api_ssl_port],
       service_network   => $aodh_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1099,6 +1116,9 @@ class tripleo::haproxy (
   }
 
   if $barbican {
+    $barbican_listen_opts = {
+      'option' => [ 'httpchk GET /healthcheck', 'httplog' ],
+    }
     ::tripleo::haproxy::endpoint { 'barbican':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('barbican_api_vip', $controller_virtual_ip),
@@ -1108,11 +1128,13 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[barbican_api_ssl_port],
       service_network   => $barbican_network,
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $barbican_listen_opts),
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
   if $gnocchi {
+    # NOTE(tkajinam): Gnocchi doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'gnocchi':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('gnocchi_api_vip', $controller_virtual_ip),
@@ -1127,6 +1149,7 @@ class tripleo::haproxy (
   }
 
   if $mistral {
+    # NOTE(tkajinam): Mistral doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'mistral':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('mistral_api_vip', $controller_virtual_ip),
@@ -1167,7 +1190,7 @@ class tripleo::haproxy (
     'timeout server' => '10m',
   }
   $heat_durability_options = {
-    'option'         => [ 'tcpka', 'httpchk', 'httplog' ],
+    'option'         => [ 'tcpka', 'httpchk GET /healthcheck', 'httplog' ],
     'balance'        => $haproxy_lb_mode_longrunning,
   }
   if $service_certificate {
@@ -1227,6 +1250,7 @@ class tripleo::haproxy (
   }
 
   if $ironic {
+    # TODO(tkajina): Switch to /healthcheck after enabling the healthcheck api
     ::tripleo::haproxy::endpoint { 'ironic':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('ironic_api_vip', $controller_virtual_ip),
@@ -1241,6 +1265,7 @@ class tripleo::haproxy (
   }
 
   if $ironic_inspector {
+    # NOTE(tkajinam): Ironic-inspector doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'ironic-inspector':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('ironic_inspector_vip', $controller_virtual_ip),
@@ -1257,6 +1282,9 @@ class tripleo::haproxy (
   }
 
   if $designate {
+    $designate_listen_opts = {
+      'option' => [ 'httpchk GET /healthcheck', 'httplog' ],
+    }
     ::tripleo::haproxy::endpoint { 'designate':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('designate_api_vip', $controller_virtual_ip),
@@ -1264,6 +1292,7 @@ class tripleo::haproxy (
       ip_addresses      => hiera('designate_api_node_ips', $controller_hosts_real),
       server_names      => hiera('designate_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $designate_listen_opts),
       public_ssl_port   => $ports[designate_api_ssl_port],
       service_network   => $designate_network,
     }
@@ -1454,6 +1483,7 @@ class tripleo::haproxy (
   }
 
   if $zaqar_api {
+    # NOTE(tkajinam): Zaqar doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'zaqar_api':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('zaqar_api_vip', $controller_virtual_ip),
@@ -1487,6 +1517,12 @@ class tripleo::haproxy (
   }
 
   if $octavia {
+    # TODO(tkajina): Switch to /healthcheck after enabling the healthcheck api
+    $octavia_listen_opts = {
+      'hash-type' => 'consistent',
+      'option'    => [ 'httpchk HEAD /', 'httplog' ],
+      'balance'   => 'source',
+    }
     ::tripleo::haproxy::endpoint { 'octavia':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('octavia_api_vip', $controller_virtual_ip),
@@ -1497,11 +1533,7 @@ class tripleo::haproxy (
       service_network   => $octavia_network,
       mode              => 'http',
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
-      listen_options    => merge($default_listen_options, {
-        'hash-type' => 'consistent',
-        'option'    => [ 'httpchk HEAD /', 'httplog' ],
-        'balance'   => 'source',
-      }),
+      listen_options    => merge($default_listen_options, $octavia_listen_opts),
     }
   }
 

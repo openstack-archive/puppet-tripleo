@@ -77,6 +77,7 @@ class tripleo::profile::base::ironic::api (
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include ironic::api
     include ironic::cors
+    include ironic::healthcheck
     include tripleo::profile::base::apache
     class { 'ironic::wsgi::apache':
       ssl_cert => $tls_certfile,

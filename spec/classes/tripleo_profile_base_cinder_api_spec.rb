@@ -34,6 +34,7 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to_not contain_class('cinder::api')
+        is_expected.to_not contain_class('cinder::healthcheck')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
       end
     end
@@ -51,6 +52,7 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('cinder::api').with(
           :sync_db => true,
         )
+        is_expected.to contain_class('cinder::healthcheck')
         is_expected.to contain_class('tripleo::profile::base::apache')
       end
     end
@@ -66,6 +68,7 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to contain_class('tripleo::profile::base::cinder::authtoken')
         is_expected.to_not contain_class('cinder::api')
+        is_expected.to_not contain_class('cinder::healthcheck')
         is_expected.to_not contain_class('tripleo::profile::base::apache')
       end
     end
@@ -83,6 +86,7 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('cinder::api').with(
           :sync_db => true,
         )
+        is_expected.to contain_class('cinder::healthcheck')
         is_expected.to contain_class('tripleo::profile::base::apache')
       end
     end
@@ -100,6 +104,7 @@ describe 'tripleo::profile::base::cinder::api' do
         is_expected.to contain_class('cinder::api').with(
           :sync_db => false,
         )
+        is_expected.to contain_class('cinder::healthcheck')
         is_expected.to contain_class('tripleo::profile::base::apache')
       end
     end
