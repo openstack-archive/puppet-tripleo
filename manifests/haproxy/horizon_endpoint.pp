@@ -36,6 +36,11 @@
 #  If this service is internal only this should be ommitted.
 #  Defaults to undef.
 #
+# [*use_backend_syntax*]
+#  (optional) When set to true, generate a config with frontend and
+#  backend sections, otherwise use listen sections.
+#  Defaults to hiera('haproxy_backend_syntax', false)
+#
 # [*haproxy_listen_bind_param*]
 #  A list of params to be added to the HAProxy listener bind directive.
 #  Defaults to undef.
@@ -77,6 +82,7 @@ class tripleo::haproxy::horizon_endpoint (
   $server_names,
   $member_options,
   $public_virtual_ip,
+  $use_backend_syntax          = hiera('haproxy_backend_syntax', false),
   $haproxy_listen_bind_param   = undef,
   $public_certificate          = undef,
   $use_internal_certificates   = false,
@@ -86,6 +92,8 @@ class tripleo::haproxy::horizon_endpoint (
 ) {
   # Let users override the options on a per-service basis
   $custom_options = hiera('tripleo::haproxy::horizon::options', undef)
+  $custom_frontend_options = hiera('tripleo::haproxy::horizon::frontend_options', undef)
+  $custom_backend_options = hiera('tripleo::haproxy::horizon::backend_options', undef)
   $custom_bind_options_public = delete(any2array(hiera('tripleo::haproxy::horizon::public_bind_options', undef)), undef).flatten()
   $custom_bind_options_internal = delete(any2array(hiera('tripleo::haproxy::horizon::internal_bind_options', undef)), undef).flatten()
   # service exposed to the public network
@@ -120,26 +128,30 @@ class tripleo::haproxy::horizon_endpoint (
       "${public_virtual_ip}:80"  => union($haproxy_listen_bind_param, $custom_bind_options_public),
       "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate], $custom_bind_options_public),
     }
-    $horizon_options = merge({
-      'cookie'       => 'SERVERID insert indirect nocache',
+    $horizon_frontend_options = {
       'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
       'redirect'     => 'scheme https code 301 if !{ ssl_fc }',
-      'option'       => [ 'forwardfor', 'httpchk' ],
+      'option'       => [ 'forwardfor' ],
       'http-request' => [
           'set-header X-Forwarded-Proto https if { ssl_fc }',
           'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
-    }, $custom_options)
+    }
   } else {
     $horizon_bind_opts = {
       "${internal_ip}:80" => union($haproxy_listen_bind_param, $custom_bind_options_internal),
       "${public_virtual_ip}:80" => union($haproxy_listen_bind_param, $custom_bind_options_public),
     }
-    $horizon_options = merge({
-      'cookie' => 'SERVERID insert indirect nocache',
-      'option' => [ 'forwardfor', 'httpchk' ],
-    }, $custom_options)
+    $horizon_frontend_options = {
+      'option' => [ 'forwardfor' ],
+    }
   }
+  $horizon_backend_options = {
+    'cookie' => 'SERVERID insert indirect nocache',
+    'option' => [ 'httpchk' ],
+  }
+  $horizon_options = merge_hash_values($horizon_backend_options,
+                                          $horizon_frontend_options)
 
   if $use_internal_certificates {
     # Use SSL port if TLS in the internal network is enabled.
@@ -148,18 +160,33 @@ class tripleo::haproxy::horizon_endpoint (
     $backend_port = '80'
   }
 
-  haproxy::listen { 'horizon':
-    bind             => $horizon_bind_opts,
-    options          => $horizon_options,
-    mode             => 'http',
-    collect_exported => false,
+  if $use_backend_syntax {
+    haproxy::frontend { 'horizon':
+      bind             => $horizon_bind_opts,
+      options          => merge($horizon_frontend_options,
+                                  { default_backend => 'horizon_be' },
+                                  $custom_frontend_options),
+      mode             => 'http',
+      collect_exported => false,
+    }
+    haproxy::backend { 'horizon_be':
+      options => merge($horizon_backend_options, $custom_backend_options),
+      mode    => 'http',
+    }
+  } else {
+    haproxy::listen { 'horizon':
+      bind             => $horizon_bind_opts,
+      options          => merge($horizon_options, $custom_options),
+      mode             => 'http',
+      collect_exported => false,
+    }
   }
   hash(zip($ip_addresses, $server_names)).each | $ip, $server | {
     # We need to be sure the IP (IPv6) don't have colons
     # which is a reserved character to reference manifests
     $non_colon_ip = regsubst($ip, ':', '-', 'G')
     haproxy::balancermember { "horizon_${non_colon_ip}_${server}":
-      listening_service => 'horizon',
+      listening_service => 'horizon_be',
       ports             => $backend_port,
       ipaddresses       => $ip,
       server_names      => $server,

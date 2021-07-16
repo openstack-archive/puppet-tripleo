@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Haproxy configuration file can now use the frontend and backend
+    keywords to describe a service, rather than using the listen
+    keyword. The new format can be enabled via hiera parameter
+    `haproxy_backend_syntax`. When enabled, any frontend or backend
+    configuration can be overriden on a per service-basis via new
+    hiera keys `tripleo::haproxy::<service>::frontend_options` and
+    `tripleo::haproxy::<service>::frontend_options`. The original
+    hiera key `tripleo::haproxy::<service>::options` has no effect
+    on the frontend and backend sections.
