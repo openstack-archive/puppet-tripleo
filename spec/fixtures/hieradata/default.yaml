@@ -151,6 +151,10 @@ tripleo::dynamic_stuff::haproxy_endpoints:
 tripleo::haproxy::neutron::options:
     'timeout client': '90m'
     'timeout server': '90m'
+tripleo::haproxy::neutron::frontend_options:
+    'timeout client': '90m'
+tripleo::haproxy::neutron::backend_options:
+    'timeout server': '90m'
 
 tripleo::haproxy_basic_auth::haproxy_endpoints:
   starwars:

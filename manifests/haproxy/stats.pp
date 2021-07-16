@@ -24,6 +24,11 @@
 #  IP Address(es) on which the stats interface is listening on.
 #  Can be a string or a list of ip addresses
 #
+# [*use_backend_syntax*]
+#  (optional) When set to true, generate a config with frontend and
+#  backend sections, otherwise use listen sections.
+#  Defaults to hiera('haproxy_backend_syntax', false)
+#
 # [*port*]
 #  Port on which to listen to for haproxy stats web interface
 #  Defaults to '1993'
@@ -47,6 +52,7 @@
 class tripleo::haproxy::stats (
   $haproxy_listen_bind_param,
   $ip,
+  $use_backend_syntax = hiera('haproxy_backend_syntax', false),
   $port        = '1993',
   $password    = undef,
   $certificate = undef,
@@ -66,12 +72,29 @@ class tripleo::haproxy::stats (
   } else {
     $stats_config = $stats_base
   }
-  haproxy::listen { 'haproxy.stats':
-    bind             => $haproxy_stats_bind_opts,
-    mode             => 'http',
-    options          => {
-      'stats' => $stats_config,
-    },
-    collect_exported => false,
+  if $use_backend_syntax {
+    haproxy::frontend { 'haproxy.stats':
+      bind             => $haproxy_stats_bind_opts,
+      mode             => 'http',
+      options          => {
+        'stats' => $stats_config,
+      },
+      collect_exported => false,
+    }
+    haproxy::backend { 'haproxy.stats_be':
+      mode    => 'http',
+      options => {
+        'stats' => $stats_config,
+      },
+    }
+  } else {
+    haproxy::listen { 'haproxy.stats':
+      bind             => $haproxy_stats_bind_opts,
+      mode             => 'http',
+      options          => {
+        'stats' => $stats_config,
+      },
+      collect_exported => false,
+    }
   }
 }
