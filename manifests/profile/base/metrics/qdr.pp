@@ -119,6 +119,10 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*ssl_cert_dir*]
+#   (Optional) Path to directory where SSL certificate files should be created.
+#   Defaults to '/etc/pki/tls/certs/'
+#
 class tripleo::profile::base::metrics::qdr (
   $username                  = undef,
   $password                  = undef,
@@ -142,6 +146,7 @@ class tripleo::profile::base::metrics::qdr (
   $autolink_addresses        = [],
   $router_mode               = 'edge',
   $step                      = Integer(hiera('step')),
+  $ssl_cert_dir              = '/etc/pki/tls/certs/',
 ) {
   if $step >= 1 {
     $interior_nodes = any2array(split($interior_mesh_nodes, ','))
@@ -211,6 +216,25 @@ class tripleo::profile::base::metrics::qdr (
       $all_connectors = $connectors + $internal_connectors
     }
 
+    file { $ssl_cert_dir:
+      ensure => directory,
+      mode   => '0700'
+    }
+    $prep_ssl_profiles = qdr_ssl_certificate($ssl_profiles, $ssl_cert_dir)
+    $final_ssl_profiles = $prep_ssl_profiles.reduce( [] ) |$memo, $prf| {
+      if has_key($prf, 'caCertFileContent') {
+        file { $prf['caCertFile']:
+          ensure  => exists,
+          content => $prf['caCertFileContent'],
+          mode    => '0600',
+          require => File[$ssl_cert_dir]
+        }
+        $memo << delete($prf, 'caCertFileContent')
+      } else {
+        $memo << $prf
+      }
+    }
+
     class { 'qdr':
       listener_addr            => $listener_addr,
       listener_port            => $listener_port,
@@ -224,7 +248,7 @@ class tripleo::profile::base::metrics::qdr (
       listener_trusted_certs   => $listener_trusted_certs,
       router_mode              => $router_mode,
       connectors               => $all_connectors,
-      ssl_profiles             => $ssl_profiles,
+      ssl_profiles             => $final_ssl_profiles,
       extra_addresses          => $addresses,
       autolink_addresses       => $autolink_addresses,
       extra_listeners          => $internal_listeners,
