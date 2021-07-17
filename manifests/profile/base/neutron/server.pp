@@ -140,6 +140,10 @@ class tripleo::profile::base::neutron::server (
       include neutron::designate
     }
     include tripleo::profile::base::apache
+    class { 'neutron::wsgi::apache':
+      ssl_cert => $tls_certfile,
+      ssl_key  => $tls_keyfile,
+    }
   }
   # We start neutron-server on the bootstrap node first, because
   # it will try to populate tables and we need to make sure this happens
