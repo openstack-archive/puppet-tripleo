@@ -18,7 +18,7 @@ case ${CONTAINER_STATUS_SHORT} in
     Up | up | UP)
         echo "Container ${NAME} with id ${CONTAINER_ID} is already running!"
         ;;
-    Exited| exited| EXITED)
+    Exited| exited| EXITED| Created| created| CREATED)
         echo "Removing orphaned ${NAME} container ${CONTAINER_ID}"
         $CLI stop ${CONTAINER_ID} || true
         $CLI rm -f ${CONTAINER_ID} || true
