@@ -39,6 +39,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::producer')
         is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to_not contain_class('designate::coordination')
         is_expected.to_not contain_class('designate::producer')
       }
     end
@@ -53,6 +54,24 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::producer')
         is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to contain_class('designate::coordination').with(
+          :backend_url => 'redis://:password@127.0.0.1:6379/',
+        )
+        is_expected.to contain_class('designate::producer')
+      }
+    end
+
+    context 'with step 4 without redis_vip' do
+      let(:params) { {
+        :designate_redis_password => 'password',
+        :redis_vip                => false,
+        :step                     => 4,
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::designate::producer')
+        is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to_not contain_class('designate::coordination')
         is_expected.to contain_class('designate::producer')
       }
     end
