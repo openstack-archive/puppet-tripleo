@@ -12,7 +12,8 @@ Puppet::Functions.create_function(:'pacemaker_bundle_replicas') do
     # the name of the node holding the replicas attribute varies based on the
     # container engine used (podman, docker...), so match via attributes instead
     replicas = `cibadmin -Q | xmllint --xpath "string(//bundle[@id='#{bundle}']/*[boolean(@image) and boolean(@run-command)]/@replicas)" -`
-
+    # strip line break
+    replicas.strip!
     # post-condition: 0 in case the bundle does not exist or an error occurred
     if $?.success? && !replicas.empty?
       return Integer(replicas)
