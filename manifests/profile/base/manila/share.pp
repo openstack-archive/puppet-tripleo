@@ -38,13 +38,17 @@
 #   (Optional) Whether or not the unity backend is enabled
 #   Defaults to hiera('manila_backend_unity_enabled', false)
 #
-# [*backend_cephfs_enabled*]
-#   (Optional) Whether or not the cephfs backend is enabled
-#   Defaults to hiera('manila_backend_cephfs_enabled', false)
-#
 # [*backend_vnx_enabled*]
 #   (Optional) Whether or not the vnx backend is enabled
 #   Defaults to hiera('manila_backend_vnx_enabled', false)
+#
+# [*backend_flashblade_enabled*]
+#   (Optional) Whether or not the flashblade backend is enabled
+#   Defaults to hiera('manila_backend_flashblade_enabled', false)
+#
+# [*backend_cephfs_enabled*]
+#   (Optional) Whether or not the cephfs backend is enabled
+#   Defaults to hiera('manila_backend_cephfs_enabled', false)
 #
 # [*manila_user_enabled_backends*]
 #   (Optional) List of additional backend stanzas to activate
@@ -62,6 +66,7 @@ class tripleo::profile::base::manila::share (
   $backend_isilon_enabled       = hiera('manila_backend_isilon_enabled', false),
   $backend_unity_enabled        = hiera('manila_backend_unity_enabled', false),
   $backend_vnx_enabled          = hiera('manila_backend_vnx_enabled', false),
+  $backend_flashblade_enabled   = hiera('manila_backend_flashblade_enabled', false),
   $backend_cephfs_enabled       = hiera('manila_backend_cephfs_enabled', false),
   $manila_user_enabled_backends = hiera('manila_user_enabled_backends', undef),
   $step = Integer(hiera('step')),
@@ -189,6 +194,7 @@ class tripleo::profile::base::manila::share (
         'vmax_ethernet_ports'          => hiera('manila::backend::dellemc_vmax::vmax_ethernet_ports', undef),
       })})
     }
+
     # manila unity:
     if $backend_unity_enabled {
       $manila_unity_backend = hiera('manila::backend::dellemc_unity::title')
@@ -206,6 +212,7 @@ class tripleo::profile::base::manila::share (
         'emc_ssl_cert_path'            => hiera('manila::backend::dellemc_unity::emc_ssl_cert_path', undef),
       })})
     }
+
     # manila vnx:
     if $backend_vnx_enabled {
       $manila_vnx_backend = hiera('manila::backend::dellemc_vnx::title')
@@ -224,8 +231,6 @@ class tripleo::profile::base::manila::share (
       })})
     }
 
-
-
     # manila isilon:
     if $backend_isilon_enabled {
       $manila_isilon_backend = hiera('manila::backend::dellemc_isilon::title')
@@ -241,6 +246,17 @@ class tripleo::profile::base::manila::share (
       })})
     }
 
+    # manila flashblade:
+    if $backend_flashblade_enabled {
+      $manila_flashblade_backend = hiera('manila::backend::flashblade::title')
+      create_resources('manila::backend::flashblade', { $manila_flashblade_backend => delete_undef_values({
+        'flashblade_mgmt_vip'  => hiera('manila::backend::flashblade::flashblade_mgmt_vip', undef),
+        'flashblade_data_vip'  => hiera('manila::backend::flashblade::flashblade_data_vip', undef),
+        'flashblade_api_token' => hiera('manila::backend::flashblade::flashblade_api_token', undef),
+        'flashblade_eradicate' => hiera('manila::backend::flashblade::flashblade_eradicate', undef),
+      })})
+    }
+
     $backends = delete_undef_values(concat([], $manila_generic_backend,
                                       $manila_cephfs_backend,
                                       $manila_netapp_backend,
@@ -248,6 +264,7 @@ class tripleo::profile::base::manila::share (
                                       $manila_isilon_backend,
                                       $manila_unity_backend,
                                       $manila_vnx_backend,
+                                      $manila_flashblade_backend,
                                       $manila_user_enabled_backends))
     $manila_enabled_backends = delete($backends, '')
 

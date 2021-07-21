@@ -46,6 +46,10 @@
 #   (Optional) Whether or not the vnx backend is enabled
 #   Defaults to hiera('manila_backend_vnx_enabled', false)
 #
+# [*backend_flashblade_enabled*]
+#   (Optional) Whether or not the flashblade backend is enabled
+#   Defaults to hiera('manila_backend_flashblade_enabled', false)
+#
 # [*backend_cephfs_enabled*]
 #   (Optional) Whether or not the cephfs backend is enabled
 #   Defaults to hiera('manila_backend_cephfs_enabled', false)
@@ -85,20 +89,21 @@
 #   Defaults to true
 #
 class tripleo::profile::base::manila::api (
-  $enabled_share_protocols = hiera('manila_enabled_share_protocols', undef),
-  $backend_generic_enabled = hiera('manila_backend_generic_enabled', false),
-  $backend_netapp_enabled  = hiera('manila_backend_netapp_enabled', false),
-  $backend_vmax_enabled    = hiera('manila_backend_vmax_enabled', false),
-  $backend_isilon_enabled  = hiera('manila_backend_isilon_enabled', false),
-  $backend_unity_enabled   = hiera('manila_backend_unity_enabled', false),
-  $backend_vnx_enabled     = hiera('manila_backend_vnx_enabled', false),
-  $backend_cephfs_enabled  = hiera('manila_backend_cephfs_enabled', false),
-  $bootstrap_node          = hiera('manila_api_short_bootstrap_node_name', undef),
-  $certificates_specs      = hiera('apache_certificates_specs', {}),
-  $manila_api_network      = hiera('manila_api_network', undef),
-  $enable_internal_tls     = hiera('enable_internal_tls', false),
-  $step                    = Integer(hiera('step')),
-  $manila_enable_db_purge  = true,
+  $enabled_share_protocols    = hiera('manila_enabled_share_protocols', undef),
+  $backend_generic_enabled    = hiera('manila_backend_generic_enabled', false),
+  $backend_netapp_enabled     = hiera('manila_backend_netapp_enabled', false),
+  $backend_vmax_enabled       = hiera('manila_backend_vmax_enabled', false),
+  $backend_isilon_enabled     = hiera('manila_backend_isilon_enabled', false),
+  $backend_unity_enabled      = hiera('manila_backend_unity_enabled', false),
+  $backend_vnx_enabled        = hiera('manila_backend_vnx_enabled', false),
+  $backend_flashblade_enabled = hiera('manila_backend_flashblade_enabled', false),
+  $backend_cephfs_enabled     = hiera('manila_backend_cephfs_enabled', false),
+  $bootstrap_node             = hiera('manila_api_short_bootstrap_node_name', undef),
+  $certificates_specs         = hiera('apache_certificates_specs', {}),
+  $manila_api_network         = hiera('manila_api_network', undef),
+  $enable_internal_tls        = hiera('enable_internal_tls', false),
+  $step                       = Integer(hiera('step')),
+  $manila_enable_db_purge     = true,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -128,7 +133,8 @@ class tripleo::profile::base::manila::api (
     } else {
       if $backend_generic_enabled or $backend_netapp_enabled
         or $backend_vmax_enabled or $backend_isilon_enabled
-        or $backend_unity_enabled or $backend_vnx_enabled {
+        or $backend_unity_enabled or $backend_vnx_enabled
+        or $backend_flashblade_enabled{
           $nfs_protocol = 'NFS'
           $cifs_protocol = 'CIFS'
       } else {
