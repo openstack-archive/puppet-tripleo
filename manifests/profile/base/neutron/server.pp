@@ -120,6 +120,7 @@ class tripleo::profile::base::neutron::server (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
+    include tripleo::profile::base::apache
     if $enable_internal_tls {
       if !$neutron_network {
         fail('neutron_api_network is not set in the hieradata.')
@@ -136,13 +137,14 @@ class tripleo::profile::base::neutron::server (
       }
       Tripleo::Tls_proxy['neutron-api'] ~> Anchor<| title == 'neutron::service::begin' |>
     }
+    else {
+      class { 'neutron::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
+    }
     if $designate_api_enabled {
       include neutron::designate
-    }
-    include tripleo::profile::base::apache
-    class { 'neutron::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
     }
   }
   # We start neutron-server on the bootstrap node first, because
