@@ -12,13 +12,13 @@ VIRTLOGD_CONTAINER=$(${CLI} ps -a --filter name="^${NAME}$" --format '{{.ID}}:{{
 
 CONTAINER_ID=$(echo $VIRTLOGD_CONTAINER | awk -F: '{print $1}')
 CONTAINER_STATUS=$(echo $VIRTLOGD_CONTAINER | awk -F: '{print $2}')
-CONTAINER_STATUS_SHORT=$(echo $CONTAINER_STATUS | awk '{print $1}')
+CONTAINER_STATUS_SHORT=$(echo $CONTAINER_STATUS | awk '{print $1}' | tr '[A-Z]' '[a-z]' )
 
 case ${CONTAINER_STATUS_SHORT} in
-    Up | up | UP)
+    up)
         echo "Container ${NAME} with id ${CONTAINER_ID} is already running!"
         ;;
-    Exited| exited| EXITED| Created| created| CREATED)
+    exited| created)
         echo "Removing orphaned ${NAME} container ${CONTAINER_ID}"
         $CLI stop ${CONTAINER_ID} || true
         $CLI rm -f ${CONTAINER_ID} || true
