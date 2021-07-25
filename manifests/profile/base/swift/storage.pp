@@ -50,6 +50,7 @@ class tripleo::profile::base::swift::storage (
       include swift::storage::disks
       include swift::storage::loopbacks
       include swift::storage::all
+      include swift::storage::cron::recon
       if(!defined(File['/srv/node'])) {
         file { '/srv/node':
           ensure  => directory,
