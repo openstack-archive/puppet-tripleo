@@ -41,6 +41,7 @@ class tripleo::profile::base::ironic::conductor (
   $enable_staging = false,
 ) {
   include tripleo::profile::base::ironic
+  include tripleo::profile::base::ironic::authtoken
   # Database is accessed by both API and conductor, hence it's here.
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
