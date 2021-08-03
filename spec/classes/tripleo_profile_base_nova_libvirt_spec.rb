@@ -19,8 +19,18 @@ require 'spec_helper'
 describe 'tripleo::profile::base::nova::libvirt' do
   shared_examples_for 'tripleo::profile::base::nova::libvirt' do
 
+    let(:libvirt_daemon_config_default) do {
+      "unix_sock_group"    => {"value" => '"libvirt"'},
+      "auth_unix_ro"       => {"value" => '"none"'},
+      "auth_unix_rw"       => {"value" => '"none"'},
+      "unix_sock_ro_perms" => {"value" => '"0444"'},
+      "unix_sock_rw_perms" => {"value" => '"0770"'}
+    }
+    end
+
     context 'with step less than 4' do
-      let(:params) { { :step => 1, } }
+      let(:params) { { :step => 1, :modular_libvirt => false} }
+
       let(:pre_condition) do
         <<-eos
         class { 'tripleo::profile::base::nova::compute_libvirt_shared':
@@ -33,11 +43,15 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
         is_expected.to_not contain_class('tripleo::profile::base::nova')
         is_expected.to_not contain_class('nova::compute::libvirt::virtlogd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtnodedevd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtproxyd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtqemud')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtsecretd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtstoraged')
         is_expected.to_not contain_class('nova::compute::libvirt::services')
         is_expected.to_not contain_file('/etclibvirt/qemu/networks/autostart/default.xml')
         is_expected.to_not contain_file('/etclibvirt/qemu/networks/default.xml')
         is_expected.to_not contain_exec('libvirt-default-net-destroy')
-        is_expected.to_not contain_class('nova::compute::libvirt::virtlogd::config')
         is_expected.to_not contain_exec('set libvirt sasl credentials')
       }
     end
@@ -61,27 +75,77 @@ eos
 eos
       end
 
-      let(:params) { { :step => 4, } }
+      let(:params) { { :step => 4, :modular_libvirt => false} }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
         is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('nova::compute::libvirt::virtlogd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtnodedevd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtproxyd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtqemud')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtsecretd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtstoraged')
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_class('nova::compute::libvirt::qemu')
         is_expected.to contain_class('nova::migration::qemu')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
         is_expected.to contain_exec('libvirt-default-net-destroy')
-        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config({
-          "unix_sock_group"    => {"value" => '"libvirt"'},
-          "auth_unix_ro"       => {"value" => '"none"'},
-          "auth_unix_rw"       => {"value" => '"none"'},
-          "unix_sock_ro_perms" => {"value" => '"0777"'},
-          "unix_sock_rw_perms" => {"value" => '"0770"'}
-        })
-        is_expected.to contain_class('nova::compute::libvirt::virtlogd::config')
+        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config(
+          libvirt_daemon_config_default)
+        is_expected.to contain_package('cyrus-sasl-scram')
+        is_expected.to contain_file('/etc/sasl2/libvirt.conf')
+        is_expected.to contain_file('/etc/libvirt/auth.conf').with_ensure('absent')
+        is_expected.to contain_exec('set libvirt sasl credentials').with_command(
+          'saslpasswd2 -d -a libvirt -u overcloud migration'
+        )
+      }
+    end
+
+
+    context 'modular-libvirt with step 4' do
+      let(:pre_condition) do
+        <<-eos
+        class { 'tripleo::profile::base::nova':
+          step => #{params[:step]},
+          oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        }
+        class { 'tripleo::profile::base::nova::migration':
+          step => #{params[:step]}
+        }
+        class { 'tripleo::profile::base::nova::migration::client':
+          step => #{params[:step]}
+        }
+        class { 'tripleo::profile::base::nova::compute_libvirt_shared':
+          step => #{params[:step]}
+        }
+eos
+      end
+
+      let(:params) { { :step => 4, :modular_libvirt => true} }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::compute_libvirt_shared')
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::compute::libvirt::virtlogd')
+        is_expected.to contain_class('nova::compute::libvirt::virtnodedevd')
+        is_expected.to contain_class('nova::compute::libvirt::virtproxyd')
+        is_expected.to contain_class('nova::compute::libvirt::virtqemud')
+        is_expected.to contain_class('nova::compute::libvirt::virtsecretd')
+        is_expected.to contain_class('nova::compute::libvirt::virtstoraged')
+        is_expected.to contain_class('nova::compute::libvirt::services')
+        is_expected.to contain_class('nova::compute::libvirt::qemu')
+        is_expected.to contain_class('nova::migration::qemu')
+        is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
+        is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
+        is_expected.to contain_exec('libvirt-default-net-destroy')
+        is_expected.to contain_class('nova::compute::libvirt::config').with_virtnodedevd_config(libvirt_daemon_config_default)
+        is_expected.to contain_class('nova::compute::libvirt::config').with_virtqemud_config(libvirt_daemon_config_default)
+        is_expected.to contain_class('nova::compute::libvirt::config').with_virtproxyd_config(libvirt_daemon_config_default)
+        is_expected.to contain_class('nova::compute::libvirt::config').with_virtstoraged_config(libvirt_daemon_config_default)
+        is_expected.to contain_class('nova::compute::libvirt::config').with_virtsecretd_config(libvirt_daemon_config_default)
         is_expected.to contain_package('cyrus-sasl-scram')
         is_expected.to contain_file('/etc/sasl2/libvirt.conf')
         is_expected.to contain_file('/etc/libvirt/auth.conf').with_ensure('absent')
@@ -110,24 +174,23 @@ eos
 eos
       end
 
-      let(:params) { { :step => 4, :libvirtd_config => { "unix_sock_group" => {"value" => '"foobar"'}} } }
+      let(:params) { { :step => 4, :modular_libvirt => false, :libvirtd_config => { "unix_sock_group" => {"value" => '"foobar"'}} } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('nova::compute::libvirt::virtlogd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtnodedevd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtproxyd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtqemud')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtsecretd')
+        is_expected.to_not contain_class('nova::compute::libvirt::virtstoraged')
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
         is_expected.to contain_exec('libvirt-default-net-destroy')
-        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config({
-          "unix_sock_group"    => {"value" => '"foobar"'},
-          "auth_unix_ro"       => {"value" => '"none"'},
-          "auth_unix_rw"       => {"value" => '"none"'},
-          "unix_sock_ro_perms" => {"value" => '"0777"'},
-          "unix_sock_rw_perms" => {"value" => '"0770"'}
-        })
-        is_expected.to contain_class('nova::compute::libvirt::virtlogd::config')
+        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config(
+          libvirt_daemon_config_default.merge(params[:libvirtd_config]))
         is_expected.to contain_package('cyrus-sasl-scram')
         is_expected.to contain_file('/etc/sasl2/libvirt.conf')
         is_expected.to contain_file('/etc/libvirt/auth.conf').with_ensure('absent')
@@ -156,7 +219,7 @@ eos
 eos
       end
 
-      let(:params) { { :step => 4, :tls_password => 'foo'} }
+      let(:params) { { :step => 4, :tls_password => 'foo', :modular_libvirt => false} }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::libvirt')
@@ -169,14 +232,8 @@ eos
         is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
         is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
         is_expected.to contain_exec('libvirt-default-net-destroy')
-        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config({
-          "unix_sock_group"    => {"value" => '"libvirt"'},
-          "auth_unix_ro"       => {"value" => '"none"'},
-          "auth_unix_rw"       => {"value" => '"none"'},
-          "unix_sock_ro_perms" => {"value" => '"0777"'},
-          "unix_sock_rw_perms" => {"value" => '"0770"'}
-        })
-        is_expected.to contain_class('nova::compute::libvirt::virtlogd::config')
+        is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config(
+          libvirt_daemon_config_default)
         is_expected.to contain_package('cyrus-sasl-scram')
         is_expected.to contain_file('/etc/sasl2/libvirt.conf')
         is_expected.to contain_file('/etc/libvirt/auth.conf').with_ensure('present')

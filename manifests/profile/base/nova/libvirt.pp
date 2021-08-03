@@ -35,11 +35,44 @@
 #   (Optional) SASL Password for libvirtd TLS connections
 #   Defaults to '' (disabled)
 #
+# [*virtproxyd_config*]
+#   (Optional) Overrides for virtproxyd config options
+#   Defaults to {}
+#
+# [*virtqemud_config*]
+#   (Optional) Overrides for virtqemud config options
+#   Defaults to {}
+#
+# [*virtnodedevd_config*]
+#   (Optional) Overrides for virtnodedevd config options
+#   Defaults to {}
+#
+# [*virtstoraged_config*]
+#   (Optional) Overrides for virtstoraged config options
+#   Defaults to {}
+#
+# [*virtsecretd_config*]
+#   (Optional) Overrides for virtsecretd config options
+#   Defaults to {}
+#
+# DEPRECATED PARAMETERS
+#
+# [*modular_libvirt*]
+#   (Optional) Whether to enable modular libvirt daemons or not.
+#   Defaults to false
+#
 class tripleo::profile::base::nova::libvirt (
   $step = Integer(hiera('step')),
   $libvirtd_config = {},
   $virtlogd_config = {},
+  $virtproxyd_config = {},
+  $virtqemud_config = {},
+  $virtnodedevd_config = {},
+  $virtstoraged_config = {},
+  $virtsecretd_config = {},
   $tls_password    = '',
+  # DEPRECATED PARAMETERS
+  $modular_libvirt = false,
 ) {
   include tripleo::profile::base::nova::compute_libvirt_shared
 
@@ -49,20 +82,43 @@ class tripleo::profile::base::nova::libvirt (
     include nova::compute::libvirt::virtlogd
     include nova::compute::libvirt::services
 
-    $libvirtd_config_default = {
+    $libvirt_daemon_config_default = {
       unix_sock_group    => {value => '"libvirt"'},
       auth_unix_ro       => {value => '"none"'},
       auth_unix_rw       => {value => '"none"'},
-      unix_sock_ro_perms => {value => '"0777"'},
+      unix_sock_ro_perms => {value => '"0444"'},
       unix_sock_rw_perms => {value => '"0770"'}
     }
 
-    class { 'nova::compute::libvirt::config':
-      libvirtd_config => merge($libvirtd_config_default, $libvirtd_config)
-    }
+    if $modular_libvirt {
+      include nova::compute::libvirt::virtproxyd
+      include nova::compute::libvirt::virtqemud
+      include nova::compute::libvirt::virtnodedevd
+      include nova::compute::libvirt::virtstoraged
+      include nova::compute::libvirt::virtsecretd
 
-    class { 'nova::compute::libvirt::virtlogd::config':
-      virtlogd_config => $virtlogd_config
+      $virtproxyd_config_default = $libvirt_daemon_config_default
+      $virtqemud_config_default = $libvirt_daemon_config_default
+      $virtnodedevd_config_default = $libvirt_daemon_config_default
+      $virtstoraged_config_default = $libvirt_daemon_config_default
+      $virtsecretd_config_default = $libvirt_daemon_config_default
+
+      class { 'nova::compute::libvirt::config':
+        virtlogd_config     => $virtlogd_config,
+        virtproxyd_config   => merge($virtproxyd_config_default, $virtproxyd_config),
+        virtqemud_config    => merge($virtqemud_config_default, $virtqemud_config),
+        virtnodedevd_config => merge($virtnodedevd_config_default, $virtnodedevd_config),
+        virtstoraged_config => merge($virtstoraged_config_default, $virtstoraged_config),
+        virtsecretd_config  => merge($virtsecretd_config_default, $virtsecretd_config),
+      }
+
+    } else {
+      $libvirtd_config_default = $libvirt_daemon_config_default
+
+      class { 'nova::compute::libvirt::config':
+        virtlogd_config => $virtlogd_config,
+        libvirtd_config => merge($libvirtd_config_default, $libvirtd_config),
+      }
     }
 
     # This removal of files in /etc/libvirt/qemu should not happen inside containers
