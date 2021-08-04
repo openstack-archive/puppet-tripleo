@@ -80,6 +80,7 @@ class tripleo::profile::base::ironic_inspector (
       dnsmasq_ip_subnets => $inspection_subnets_real,
     }
 
+    include ironic::inspector::db
     include ironic::inspector::pxe_filter
     include ironic::inspector::pxe_filter::dnsmasq
     include ironic::config

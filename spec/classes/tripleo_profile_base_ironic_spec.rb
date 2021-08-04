@@ -32,6 +32,7 @@ describe 'tripleo::profile::base::ironic' do
         is_expected.to_not contain_class('ironic')
         is_expected.to_not contain_class('ironic::config')
         is_expected.to_not contain_class('ironic::cors')
+        is_expected.to_not contain_class('ironic::db')
         is_expected.to_not contain_class('ironic::logging')
       }
     end
@@ -52,6 +53,7 @@ describe 'tripleo::profile::base::ironic' do
         )
         is_expected.to contain_class('ironic::config')
         is_expected.to contain_class('ironic::cors')
+        is_expected.to contain_class('ironic::db')
         is_expected.to contain_class('ironic::logging')
       }
     end
@@ -69,6 +71,7 @@ describe 'tripleo::profile::base::ironic' do
         is_expected.to_not contain_class('ironic')
         is_expected.to_not contain_class('ironic::config')
         is_expected.to_not contain_class('ironic::cors')
+        is_expected.to_not contain_class('ironic::db')
         is_expected.to_not contain_class('ironic::logging')
       }
     end
@@ -88,6 +91,7 @@ describe 'tripleo::profile::base::ironic' do
         )
         is_expected.to contain_class('ironic::config')
         is_expected.to contain_class('ironic::cors')
+        is_expected.to contain_class('ironic::db')
         is_expected.to contain_class('ironic::logging')
       }
     end

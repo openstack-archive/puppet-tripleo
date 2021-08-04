@@ -34,6 +34,7 @@ describe 'tripleo::profile::base::octavia' do
       it 'should not do anything' do
         is_expected.to_not contain_class('octavia')
         is_expected.to_not contain_class('octavia::config')
+        is_expected.to_not contain_class('octavia::db')
       end
     end
 
@@ -47,6 +48,7 @@ describe 'tripleo::profile::base::octavia' do
           :default_transport_url => 'rabbit://guest:password@some.server.com:5672/?ssl=0'
         )
         is_expected.to contain_class('octavia::config')
+        is_expected.to contain_class('octavia::db')
       end
     end
 

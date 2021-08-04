@@ -28,8 +28,8 @@ describe 'tripleo::profile::base::placement' do
         is_expected.to contain_class('tripleo::profile::base::placement')
         is_expected.to_not contain_class('placement')
         is_expected.to_not contain_class('placement::config')
-        is_expected.to_not contain_class('placement::logging')
         is_expected.to_not contain_class('placement::db')
+        is_expected.to_not contain_class('placement::logging')
       }
     end
 
@@ -43,8 +43,8 @@ describe 'tripleo::profile::base::placement' do
         is_expected.to contain_class('tripleo::profile::base::placement')
         is_expected.to contain_class('placement')
         is_expected.to contain_class('placement::config')
-        is_expected.to contain_class('placement::logging')
         is_expected.to contain_class('placement::db')
+        is_expected.to contain_class('placement::logging')
       }
     end
 
@@ -58,8 +58,8 @@ describe 'tripleo::profile::base::placement' do
         is_expected.to contain_class('tripleo::profile::base::placement')
         is_expected.to_not contain_class('placement')
         is_expected.to_not contain_class('placement::config')
-        is_expected.to_not contain_class('placement::logging')
         is_expected.to_not contain_class('placement::db')
+        is_expected.to_not contain_class('placement::logging')
       }
     end
 
@@ -73,8 +73,8 @@ describe 'tripleo::profile::base::placement' do
         is_expected.to contain_class('tripleo::profile::base::placement')
         is_expected.to contain_class('placement')
         is_expected.to contain_class('placement::config')
-        is_expected.to contain_class('placement::logging')
         is_expected.to contain_class('placement::db')
+        is_expected.to contain_class('placement::logging')
       }
     end
 

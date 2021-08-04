@@ -123,6 +123,7 @@ class tripleo::profile::base::cinder (
       }),
     }
     include cinder::config
+    include cinder::db
     include cinder::glance
     include cinder::nova
     include cinder::logging

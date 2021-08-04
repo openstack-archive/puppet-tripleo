@@ -211,6 +211,7 @@ class tripleo::profile::base::glance::api (
     include glance
     include glance::config
     include glance::healthcheck
+    include glance::api::db
     include glance::api::logging
     class { 'glance::api':
       enabled_backends => $enabled_backends,

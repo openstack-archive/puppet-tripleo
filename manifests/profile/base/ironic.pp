@@ -85,6 +85,7 @@ class tripleo::profile::base::ironic (
     include ironic::config
     include ironic::json_rpc
     include ironic::cors
+    include ironic::db
     include ironic::logging
   }
 }

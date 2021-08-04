@@ -150,6 +150,7 @@ class tripleo::profile::base::heat (
 
     include heat::config
     include heat::cors
+    include heat::db
     include heat::logging
 
     if is_ipv6_address($memcached_hosts_real[0]) {

@@ -24,6 +24,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to_not contain_class('cinder')
         is_expected.to_not contain_class('cinder::config')
+        is_expected.to_not contain_class('cinder::db')
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::logging')
@@ -54,6 +55,7 @@ describe 'tripleo::profile::base::cinder' do
           :notification_transport_url => 'rabbit://cinder2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::db')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
@@ -73,6 +75,7 @@ describe 'tripleo::profile::base::cinder' do
       it 'should not trigger any configuration' do
         is_expected.to_not contain_class('cinder')
         is_expected.to_not contain_class('cinder::config')
+        is_expected.to_not contain_class('cinder::db')
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::logging')
@@ -103,6 +106,7 @@ describe 'tripleo::profile::base::cinder' do
           :notification_transport_url => 'rabbit://cinder2:baa@192.168.0.2:5678/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::db')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
@@ -127,6 +131,7 @@ describe 'tripleo::profile::base::cinder' do
           :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::db')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
@@ -152,6 +157,7 @@ describe 'tripleo::profile::base::cinder' do
           :default_transport_url => 'rabbit://cinder:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('cinder::config')
+        is_expected.to contain_class('cinder::db')
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')

@@ -112,6 +112,7 @@ class tripleo::profile::base::ceilometer (
     }
 
     include ceilometer::config
+    include ceilometer::db
     include ceilometer::logging
   }
 }
