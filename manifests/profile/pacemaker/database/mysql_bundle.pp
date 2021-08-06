@@ -248,11 +248,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     }
   }
 
-  if is_array($galera_node_names_lookup) {
-    $galera_nodes = join($galera_fqdns_names_lookup, ',')
-  } else {
-    $galera_nodes = $galera_node_names_lookup
-  }
+  $galera_nodes = join(any2array($galera_fqdns_names_lookup), ',')
   $galera_nodes_array = split($galera_nodes, ',')
   $galera_nodes_count = count($galera_nodes_array)
 
