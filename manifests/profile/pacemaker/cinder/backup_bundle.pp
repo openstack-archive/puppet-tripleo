@@ -218,7 +218,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
         }
       }
 
-      if is_hash($docker_environment) {
+      if $docker_environment =~ Hash {
         $docker_env = join($docker_environment.map |$index, $value| { "-e ${index}=${value}" }, ' ')
       } else {
         $docker_env_arr = delete(any2array($docker_environment), '').flatten()
