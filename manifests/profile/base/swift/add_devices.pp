@@ -29,7 +29,7 @@ define tripleo::profile::base::swift::add_devices(
   # For now our regex supports the r1z1-192.0.2.6:%PORT%/d1 syntax or the
   # newer r1z%<controller or SwiftStorage><N>%-192.0.2.6:%PORT%/d1 syntax.
   $server_num_or_device = regsubst($name,'^r1z%+[A-Za-z]*([0-9]+)%+-(.*)$','\1')
-  if (is_integer($server_num_or_device)) {
+  if $server_num_or_device =~ Stdlib::Compat::Integer {
     $server_num = $server_num_or_device
   } else {
     $server_num = '1'
