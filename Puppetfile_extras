@@ -42,11 +42,9 @@ mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
   :ref => '20a465b0d8751bc08913b556d0a5b7fdac139271'
 
-# NOTE(aschultz): rsyslog broke backwards compatibility with
-# https://github.com/voxpupuli/puppet-rsyslog/pull/136
 mod 'rsyslog',
   :git => 'https://github.com/voxpupuli/puppet-rsyslog',
-  :ref => '2548a0d95c1549b506b7bb2314dd149b028fc04b'
+  :ref => 'master'
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
