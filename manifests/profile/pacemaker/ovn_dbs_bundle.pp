@@ -321,7 +321,7 @@ monitor interval=${monitor_interval_slave}s role=Slave timeout=${dbs_timeout}s",
         }
 
         # We create a separate VIP by default now in OVN (since train)
-        if is_ipv6_address($ovn_dbs_vip) {
+        if $ovn_dbs_vip =~ Stdlib::Compat::Ipv6 {
           $netmask        = '128'
           $vip_nic        = interface_for_ip($ovn_dbs_vip)
           $ipv6_addrlabel = '99'

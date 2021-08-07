@@ -45,7 +45,7 @@ class tripleo::profile::pacemaker::ceph_nfs (
   $ganesha_vip = hiera('ganesha_vip')
   # NB: Until the IPaddr2 RA has a fix for https://bugzilla.redhat.com/show_bug.cgi?id=1445628
   # we need to specify the nic when creating the ipv6 vip.
-  if is_ipv6_address($ganesha_vip) {
+  if $ganesha_vip =~ Stdlib::Compat::Ipv6 {
     $netmask        = '128'
     $nic            = interface_for_ip($ganesha_vip)
     $ipv6_addrlabel = '99'

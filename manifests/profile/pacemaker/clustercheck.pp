@@ -46,7 +46,7 @@ class tripleo::profile::pacemaker::clustercheck (
     # configuration used by the galera resource agent,
     # and by the clustercheck service when it is configured
     # to listen via socat
-    if is_ipv6_address($bind_address) {
+    if $bind_address =~ Stdlib::Compat::Ipv6 {
       $socat_listen_type = 'tcp6-listen'
     } else {
       $socat_listen_type = 'tcp4-listen'

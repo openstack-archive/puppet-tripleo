@@ -58,7 +58,7 @@ class tripleo::profile::base::cinder::authtoken (
   $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
 
   if $step >= 3 {
-    if is_ipv6_address($memcached_hosts_real[0]) {
+    if $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
       $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}"), 'inet6:')
     } else {
       $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
