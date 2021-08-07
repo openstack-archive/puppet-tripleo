@@ -146,7 +146,8 @@ class tripleo::profile::base::logging::rsyslog (
 
     $modules = $modules_es + $modules_qdr
     $actions = $actions_es + $actions_qdr
-    class { 'rsyslog::server':
+    include rsyslog
+    class { 'rsyslog::config':
       modules => $modules,
       actions => $actions
     }
