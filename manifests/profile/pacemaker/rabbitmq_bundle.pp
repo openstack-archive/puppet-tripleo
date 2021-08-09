@@ -105,6 +105,18 @@
 #   (optional) Use --force when creating the ocf resource via pcs
 #   Defaults to false
 #
+# [*debug*]
+#   (optional) Enable it when creating the ocf resource via pcs to get extra
+#   logging. Defaults to false
+#
+# [*master_max*]
+#   (optional) Limit the number of promotable masters of the ocf resource
+#   Defaults to undef (will take the number of cluster nodes)
+#
+# [*use_masterslave_rabbitmqra*]
+#   (optional) If set to true it uses the rabbimtq-server-ha upstream RA
+#   Defaults to false
+#
 # [*start_timeout*]
 #   (Optional) Maximum time in second for starting up a rabbitmq server
 #   before pacemaker considers the operation timed out.
@@ -143,6 +155,9 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $tls_priorities               = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user                  = 'root',
   $force_ocf                    = false,
+  $debug                        = false,
+  $master_max                   = undef,
+  $use_masterslave_rabbitmqra   = false,
   $start_timeout                = 200,
   $monitor_timeout              = undef,
   $stop_timeout                 = 200,
@@ -157,12 +172,15 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   if $rpc_scheme == 'rabbit' {
     $bootstrap_node = $rpc_bootstrap_node
     $rabbit_nodes = $rpc_nodes_real
+    $rabbit_short_nodes = hiera('oslo_messaging_rpc_short_node_names', [])
   } elsif $notify_scheme == 'rabbit' {
     $bootstrap_node = $notify_bootstrap_node
     $rabbit_nodes = $notify_nodes
+    $rabbit_short_nodes = hiera('oslo_messaging_notify_short_node_names', [])
   } else {
     $bootstrap_node = undef
     $rabbit_nodes = []
+    $rabbit_short_nodes = []
   }
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -313,25 +331,6 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         $tls_priorities_real = ''
       }
 
-      pacemaker::resource::bundle { 'rabbitmq-bundle':
-        image             => $rabbitmq_docker_image,
-        replicas          => $rabbitmq_nodes_count,
-        location_rule     => {
-          resource_discovery => 'exclusive',
-          score              => 0,
-          expression         => ['rabbitmq-role eq true'],
-        },
-        container_options => 'network=host',
-        # lint:ignore:140chars
-        options           => "--user=${bundle_user} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
-        # lint:endignore
-        run_command       => '/bin/bash /usr/local/bin/kolla_start',
-        network           => "control-port=${rabbitmq_docker_control_port}",
-        storage_maps      => merge($storage_maps, $storage_maps_tls),
-        container_backend => $container_backend,
-        tries             => $pcs_tries,
-      }
-
       # The default nr of ha queues is ceiling(N/2)
       if $user_ha_queues == 0 {
         $nr_rabbit_nodes = size($rabbit_nodes)
@@ -346,36 +345,108 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
       $ha_policy = merge($ha_queues_policy, $rabbitmq_extra_policies)
       $ocf_params = "set_policy='ha-all ^(?!amq\\.).* ${to_json($ha_policy)}'"
 
-      $op_start_params = $start_timeout ? {
-        undef   => undef,
-        default => "start timeout=${start_timeout}s"
-      }
-      $op_monitor_params = $monitor_timeout ? {
-        undef   => undef,
-        default => "monitor timeout=${monitor_timeout}s"
-      }
-      $op_stop_params = $stop_timeout ? {
-        undef   => undef,
-        default => "stop timeout=${stop_timeout}s"
-      }
-      $op_params = join(delete_undef_values([$op_start_params, $op_monitor_params, $op_stop_params]), ' ')
-
-      pacemaker::resource::ocf { 'rabbitmq':
-        ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
-        resource_params => $ocf_params,
-        meta_params     => 'notify=true container-attribute-target=host',
-        op_params       => $op_params,
-        tries           => $pcs_tries,
-        location_rule   => {
-          resource_discovery => 'exclusive',
-          score              => 0,
-          expression         => ['rabbitmq-role eq true'],
-        },
-        bundle          => 'rabbitmq-bundle',
-        require         => [Class['rabbitmq'],
-                            Pacemaker::Resource::Bundle['rabbitmq-bundle']],
-        before          => Exec['rabbitmq-ready'],
-        force           => $force_ocf,
+      if $use_masterslave_rabbitmqra {
+        if length($rabbit_short_nodes) > 0 {
+          $allowed_cluster_nodes = join($rabbit_short_nodes, ' ')
+          $allowed_cluster_string = " allowed_cluster_nodes='${allowed_cluster_nodes}'"
+        } else {
+          $allowed_cluster_string = ''
+        }
+        pacemaker::resource::bundle { 'rabbitmq-bundle':
+          image             => $rabbitmq_docker_image,
+          replicas          => $rabbitmq_nodes_count,
+          masters           => $rabbitmq_nodes_count,
+          location_rule     => {
+            resource_discovery => 'exclusive',
+            score              => 0,
+            expression         => ['rabbitmq-role eq true'],
+          },
+          container_options => 'network=host',
+          # lint:ignore:140chars
+          options           => "--user=${bundle_user} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
+          # lint:endignore
+          run_command       => '/bin/bash /usr/local/bin/kolla_start',
+          network           => "control-port=${rabbitmq_docker_control_port}",
+          storage_maps      => merge($storage_maps, $storage_maps_tls),
+          container_backend => $container_backend,
+          tries             => $pcs_tries,
+        }
+        # Needs an RA which has https://github.com/rabbitmq/rabbitmq-server/pull/2853
+        if $master_max != undef {
+          $rabbitmq_nodes_count_real = $master_max
+        } else {
+          $rabbitmq_nodes_count_real = $rabbitmq_nodes_count
+        }
+        pacemaker::resource::ocf { 'rabbitmq':
+          ocf_agent_name  => 'rabbitmq:rabbitmq-server-ha',
+          # no need to call set policy as we do so below anyway
+          resource_params => "debug=${debug} avoid_using_iptables=true${allowed_cluster_string}",
+          # lint:ignore:140chars
+          meta_params     => "notify=true container-attribute-target=host master-max=${rabbitmq_nodes_count_real} master-node-max=${rabbitmq_nodes_count_real} ordered=false interleave=false",
+          # lint:ignore:140chars
+          op_params       => 'start timeout=360s stop timeout=120s promote timeout=120s notify timeout=180s monitor interval=30 timeout=60 monitor interval=27 role=Master timeout=60',
+          # lint:endignore
+          tries           => $pcs_tries,
+          location_rule   => {
+            resource_discovery => 'exclusive',
+            score              => 0,
+            expression         => ['rabbitmq-role eq true'],
+          },
+          bundle          => 'rabbitmq-bundle',
+          require         => [Class['rabbitmq'],
+                              Pacemaker::Resource::Bundle['rabbitmq-bundle']],
+          before          => Exec['rabbitmq-ready'],
+          force           => $force_ocf,
+        }
+      } else {
+        $op_start_params = $start_timeout ? {
+          undef   => undef,
+          default => "start timeout=${start_timeout}s"
+        }
+        $op_monitor_params = $monitor_timeout ? {
+          undef   => undef,
+          default => "monitor timeout=${monitor_timeout}s"
+        }
+        $op_stop_params = $stop_timeout ? {
+          undef   => undef,
+          default => "stop timeout=${stop_timeout}s"
+        }
+        $op_params = join(delete_undef_values([$op_start_params, $op_monitor_params, $op_stop_params]), ' ')
+        pacemaker::resource::bundle { 'rabbitmq-bundle':
+          image             => $rabbitmq_docker_image,
+          replicas          => $rabbitmq_nodes_count,
+          location_rule     => {
+            resource_discovery => 'exclusive',
+            score              => 0,
+            expression         => ['rabbitmq-role eq true'],
+          },
+          container_options => 'network=host',
+          # lint:ignore:140chars
+          options           => "--user=${bundle_user} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
+          # lint:endignore
+          run_command       => '/bin/bash /usr/local/bin/kolla_start',
+          network           => "control-port=${rabbitmq_docker_control_port}",
+          storage_maps      => merge($storage_maps, $storage_maps_tls),
+          container_backend => $container_backend,
+          tries             => $pcs_tries,
+        }
+        pacemaker::resource::ocf { 'rabbitmq':
+          ocf_agent_name  => 'heartbeat:rabbitmq-cluster',
+          resource_params => $ocf_params,
+          meta_params     => 'notify=true container-attribute-target=host',
+          op_params       => $op_params,
+          tries           => $pcs_tries,
+          location_rule   => {
+            resource_discovery => 'exclusive',
+            score              => 0,
+            expression         => ['rabbitmq-role eq true'],
+          },
+          bundle          => 'rabbitmq-bundle',
+          require         => [Class['rabbitmq'],
+                              Pacemaker::Resource::Bundle['rabbitmq-bundle']],
+          before          => Exec['rabbitmq-ready'],
+          force           => $force_ocf,
+        }
       }
 
       if size($rabbit_nodes) == 1 {
