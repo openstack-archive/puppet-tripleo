@@ -179,6 +179,10 @@
 #   (optional) Use --force when creating the ocf resource via pcs
 #   Defaults to false
 #
+# [*gcache_size*]
+#   (optional) Controls the gcache size.
+#   Defaults to undef
+#
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = undef,
   $control_port                   = 3123,
@@ -213,6 +217,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $demote_timeout                 = undef,
   $stop_timeout                   = undef,
   $force_ocf                      = false,
+  $gcache_size                    = undef,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -264,6 +269,12 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   }
   $cluster_host_map_string = join($host_map_array, ';')
 
+  if $gcache_size {
+    $gcache_options = "gcache.size=${gcache_size};"
+  } else {
+    $gcache_options = ''
+  }
+
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
@@ -302,9 +313,9 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $mysqld_options_sst = {}
   }
   if $ipv6 {
-    $wsrep_provider_options = "gmcast.listen_addr=tcp://[::]:4567;${tls_options}"
+    $wsrep_provider_options = "${gcache_options}gmcast.listen_addr=tcp://[::]:4567;${tls_options}"
   } else {
-    $wsrep_provider_options = "gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}"
+    $wsrep_provider_options = "${gcache_options}gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}"
   }
 
   $mysqld_options_mysqld = {
