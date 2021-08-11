@@ -67,10 +67,10 @@ class tripleo::profile::base::ironic_inspector (
     $sync_db = false
   }
 
-  if is_hash($inspection_subnets) {
-    $inspection_subnets_real = $inspection_subnets[$::hostname]
-  } elsif is_array($inspection_subnets) {
-    $inspection_subnets_real = $inspection_subnets
+  $inspection_subnets_real = $inspection_subnets ? {
+    Hash    => $inspection_subnets[$::hostname],
+    Array   => $inspection_subnets,
+    default => undef
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
