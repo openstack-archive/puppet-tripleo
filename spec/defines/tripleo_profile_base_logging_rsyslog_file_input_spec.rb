@@ -21,7 +21,10 @@ describe 'tripleo::profile::base::logging::rsyslog::file_input' do
   let(:title) { 'foobar' }
 
   let :pre_condition do
-    'include rsyslog::server'
+    <<-EOS
+    include rsyslog
+    include rsyslog::config
+EOS
   end
 
   shared_examples_for 'tripleo::profile::base::logging::rsyslog::file_input' do
