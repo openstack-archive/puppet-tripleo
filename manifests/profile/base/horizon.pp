@@ -97,7 +97,7 @@ class tripleo::profile::base::horizon (
     include tripleo::profile::base::apache
     include apache::mod::remoteip
 
-    if is_ipv6_address($memcached_hosts_real[0]) {
+    if $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
       $horizon_memcached_servers = prefix(any2array(normalize_ip_for_uri($memcached_hosts_real)), 'inet6:')
     } else {
       $horizon_memcached_servers = any2array(normalize_ip_for_uri($memcached_hosts_real))
