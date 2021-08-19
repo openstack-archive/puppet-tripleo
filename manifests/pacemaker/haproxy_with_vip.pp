@@ -72,18 +72,18 @@ define tripleo::pacemaker::haproxy_with_vip(
   $ensure        = true)
 {
   if($ensure) {
-    if !is_ip_addresses($ip_address) {
-      fail("Haproxy VIP: ${ip_address} is not a proper IP address.")
-    }
-    if is_ipv6_address($ip_address) {
+    if $ip_address =~ Stdlib::Compat::Ipv6 {
       $netmask        = '128'
       $vip_nic        = interface_for_ip($ip_address)
       $ipv6_addrlabel = '99'
-    } else {
+    } elsif $ip_address =~ Stdlib::Compat::Ip_address {
       $netmask        = '32'
       $vip_nic        = ''
       $ipv6_addrlabel = ''
+    } else {
+      fail("Haproxy VIP: ${ip_address} is not a proper IP address.")
     }
+
     if $nic != undef {
       $nic_real = $nic
     } else {
