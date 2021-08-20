@@ -23,22 +23,46 @@
 #
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to hiera('memcached_node_ips', [])
+#
+# [*memcached_port*]
+#   (Optional) Memcached port to use.
+#   Defaults to hiera('memcached_authtoken_port', 11211)
+#
+# [*security_strategy*]
+#   (Optional) Memcached (authtoken) security strategy.
+#   Defaults to hiera('memcached_authtoken_security_strategy', undef)
+#
+# [*secret_key*]
+#   (Optional) Memcached (authtoken) secret key, used with security_strategy.
+#   The key is hashed with a salt, to isolate services.
+#   Defaults to hiera('memcached_authtoken_secret_key', undef)
 #
 class tripleo::profile::base::mistral::authtoken (
   $step                = Integer(hiera('step')),
   $memcached_ips       = hiera('memcached_node_ips', []),
+  $memcached_port      = hiera('memcached_authtoken_port', 11211),
+  $security_strategy   = hiera('memcached_authtoken_security_strategy', undef),
+  $secret_key          = hiera('memcached_authtoken_secret_key', undef),
 ) {
 
   if $step >= 3 {
     if is_ipv6_address($memcached_ips[0]) {
-      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211'), 'inet6:')
+      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}"), 'inet6:')
     } else {
-      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
+    }
+
+    if $secret_key {
+      $hashed_secret_key = sha256("${secret_key}+mistral")
+    } else {
+      $hashed_secret_key = undef
     }
 
     class { '::mistral::keystone::authtoken':
-      memcached_servers => $memcache_servers
+      memcached_servers          => $memcache_servers,
+      memcache_security_strategy => $security_strategy,
+      memcache_secret_key        => $hashed_secret_key,
     }
   }
 }
