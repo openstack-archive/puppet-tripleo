@@ -65,7 +65,6 @@ class tripleo::profile::base::gnocchi (
   $redis_vip              = hiera('redis_vip'),
   $step                   = Integer(hiera('step')),
 ) {
-  warning('Gnocchi is deprecated and is going to be removed in future.')
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
