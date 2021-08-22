@@ -15,7 +15,7 @@
     templates:
       - puppet-openstack-check-jobs
       - puppet-tripleo-module-unit-jobs
-      - tripleo-undercloud-jobs
+      - tripleo-undercloud-jobs-pipeline
       - tripleo-multinode-container-minimal-pipeline
       - release-notes-jobs-python3
       - tripleo-standalone-scenarios-pipeline
