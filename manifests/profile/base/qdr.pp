@@ -31,6 +31,22 @@
 #   directly because it requires a string and we have a number.
 #   Defaults to 5672
 #
+# [*listener_require_ssl*]
+#   (optional) Require the use of SSL on the connection
+#   Defaults to false
+#
+# [*listener_ssl_cert_db*]
+#   (optional) Path to certificate db
+#   Defaults to undef
+#
+# [*listener_ssl_cert_file*]
+#   (optional) Path to certificat file
+#   Defaults to undef
+#
+# [*listener_ssl_key_file*]
+#   (optional) Path to private key file
+#   Defaults to undef
+#
 # [*qdr_log_enable*]
 #   Log level for the qdrouterd module
 #   Defaults to 'info+'
@@ -48,11 +64,22 @@ class tripleo::profile::base::qdr (
   $qdr_username      = undef,
   $qdr_password      = undef,
   $qdr_listener_port = 5672,
+  $listener_require_ssl      = false,
+  $listener_ssl_cert_db      = undef,
+  $listener_ssl_cert_file    = undef,
+  $listener_ssl_key_file     = undef,
   $qdr_log_enable    = 'info+',
   $oslomsg_rpc_hosts = hiera('oslo_messaging_rpc_node_names', undef),
   $step              = Integer(hiera('step')),
 ) {
   $qdr_node_names = $oslomsg_rpc_hosts
+
+  if $listener_require_ssl {
+      $ssl_opts = {'sslProfile' => "Router.${::fqdn}"}
+  } else {
+      $ssl_opts = {}
+  }
+
   if $step >= 1 {
     # For multi-node deployments of the dispatch router, a mesh of
     # inter-router links is created. Bi-directional links must
@@ -73,9 +100,10 @@ class tripleo::profile::base::qdr (
         if true in $memo {
           $memo
         } else {
-          $memo + [{'host' => $node,
-                    'role' => 'inter-router',
-                    'port' => '31460'}]
+          $memo + [merge($ssl_opts,
+                    { 'host' => $node,
+                      'role' => 'inter-router',
+                      'port' => '31460'})]
         }
       }
     } - true
@@ -87,9 +115,10 @@ class tripleo::profile::base::qdr (
 
     $extra_listeners = size($qdr_node_names) ? {
       1       => [],
-      default => [{'host' => '0.0.0.0',
-                  'port' => '31460',
-                  'role' => 'inter-router'}],
+      default => [merge($ssl_opts,
+                  { 'host' => '0.0.0.0',
+                    'port' => '31460',
+                    'role' => 'inter-router'})],
     }
 
     $extra_addresses = [{'prefix'       => 'openstack.org/om/rpc/multicast',
@@ -106,13 +135,17 @@ class tripleo::profile::base::qdr (
                         'distribution' => 'balanced'}]
 
     class { 'qdr':
-      listener_addr   => '0.0.0.0',
-      listener_port   => "${qdr_listener_port}",
-      router_mode     => $router_mode,
-      connectors      => $connectors,
-      extra_listeners => $extra_listeners,
-      extra_addresses => $extra_addresses,
-      log_enable      => "${qdr_log_enable}",
+      listener_addr          => '0.0.0.0',
+      listener_port          => "${qdr_listener_port}",
+      listener_require_ssl   => $listener_require_ssl,
+      listener_ssl_cert_db   => $listener_ssl_cert_db,
+      listener_ssl_cert_file => $listener_ssl_cert_file,
+      listener_ssl_key_file  => $listener_ssl_key_file,
+      router_mode            => $router_mode,
+      connectors             => $connectors,
+      extra_listeners        => $extra_listeners,
+      extra_addresses        => $extra_addresses,
+      log_enable             => "${qdr_log_enable}",
     }
 
     qdr_user { $qdr_username:
