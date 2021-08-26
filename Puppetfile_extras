@@ -74,6 +74,7 @@ mod 'keepalived',
   :git => 'https://github.com/Unyonsys/puppet-module-keepalived',
   :ref => 'bbca37ade629a9178f09366fd0368187fb645f4e'
 
+# NOTE(tkajinam): Pinnned due to LP#1941772
 mod 'redis',
   :git => 'https://github.com/voxpupuli/puppet-redis',
-  :ref => 'master'
+  :ref => 'v8.0.0'
