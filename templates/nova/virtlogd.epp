@@ -2,7 +2,7 @@
       Boolean $debug
 | -%>
 #!/bin/bash
-<%- if $debug { -%>set -x<%- } -%>
+<%- if $debug { -%>set -x<%- } %>
 ARGS="$@"
 NAME=nova_virtlogd
 CMD='/usr/sbin/virtlogd --config /etc/libvirt/virtlogd.conf'
