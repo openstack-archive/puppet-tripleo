@@ -134,12 +134,16 @@ class tripleo::fencing(
     $kdump_devices = local_fence_devices('fence_kdump', $all_devices)
     create_resources('pacemaker::stonith::fence_kdump', $kdump_devices, $common_params)
 
+    $kubevirt_devices = local_fence_devices('fence_kubevirt', $all_devices)
+    create_resources('pacemaker::stonith::fence_kubevirt', $kubevirt_devices, $common_params)
+
     $rhev_devices = local_fence_devices('fence_rhevm', $all_devices)
     create_resources('pacemaker::stonith::fence_rhevm', $rhev_devices, $common_params)
 
     $data = {
       'xvm' => $xvm_devices, 'ironic' => $ironic_devices, 'redfish' => $redfish_devices,
-      'ipmilan' => $ipmilan_devices, 'kdump' => $kdump_devices, 'rhevm' => $rhev_devices
+      'ipmilan' => $ipmilan_devices, 'kdump' => $kdump_devices, 'kubevirt' => $kubevirt_devices,
+      'rhevm' => $rhev_devices
     }
 
     $data.each |$items| {
