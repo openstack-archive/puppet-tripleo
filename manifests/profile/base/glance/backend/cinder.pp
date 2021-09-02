@@ -61,6 +61,10 @@
 #   (Optional) A valid password for the user specified by `cinder_store_user_name'
 #   Defaults to hiera('glance::backend::cinder::cinder_store_password', undef)
 #
+# [*cinder_os_region_name*]
+#   (optional) Sets the keystone region to use.
+#   Defaults to hiera('glance::backend::cinder::cinder_os_region_name', undef)
+#
 # [*cinder_enforce_multipath*]
 #   (Optional) Set to True when multipathd is enabled
 #   Defaults to hiera('glance::backend::cinder::cinder_enforce_multipath', undef)
@@ -99,6 +103,7 @@ class tripleo::profile::base::glance::backend::cinder (
   $cinder_store_project_name   = hiera('glance::backend::cinder::cinder_store_project_name', undef),
   $cinder_store_user_name      = hiera('glance::backend::cinder::cinder_store_user_name', undef),
   $cinder_store_password       = hiera('glance::backend::cinder::cinder_store_password', undef),
+  $cinder_os_region_name       = hiera('glance::backend::cinder::cinder_os_region_name', undef),
   $cinder_enforce_multipath    = hiera('glance::backend::cinder::cinder_enforce_multipath', undef),
   $cinder_use_multipath        = hiera('glance::backend::cinder::cinder_use_multipath', undef),
   $cinder_mount_point_base     = hiera('glance::backend::cinder::cinder_mount_point_base', undef),
@@ -129,6 +134,7 @@ class tripleo::profile::base::glance::backend::cinder (
         'cinder_store_project_name'   => $cinder_store_project_name,
         'cinder_store_user_name'      => $cinder_store_user_name,
         'cinder_store_password'       => $cinder_store_password,
+        'cinder_os_region_name'       => $cinder_os_region_name,
         'cinder_enforce_multipath'    => $cinder_enforce_multipath,
         'cinder_use_multipath'        => $cinder_use_multipath,
         'cinder_mount_point_base'     => $cinder_mount_point_base,
