@@ -184,7 +184,6 @@ class tripleo::profile::base::manila::share (
     if $backend_vmax_enabled {
       $manila_vmax_backend = hiera('manila::backend::dellemc_vmax::title')
       create_resources('manila::backend::dellemc_vmax', { $manila_vmax_backend => delete_undef_values({
-        'driver_handles_share_servers' => hiera('manila::backend::dellemc_vmax::driver_handles_share_servers', true),
         'emc_nas_login'                => hiera('manila::backend::dellemc_vmax::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_vmax::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_vmax::emc_nas_server', undef),
@@ -217,7 +216,6 @@ class tripleo::profile::base::manila::share (
     if $backend_vnx_enabled {
       $manila_vnx_backend = hiera('manila::backend::dellemc_vnx::title')
       create_resources('manila::backend::dellemc_vnx', { $manila_vnx_backend => delete_undef_values({
-        'driver_handles_share_servers' => hiera('manila::backend::dellemc_vnx::driver_handles_share_servers', false),
         'emc_nas_login'                => hiera('manila::backend::dellemc_vnx::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_vnx::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_vnx::emc_nas_server', undef),
@@ -235,7 +233,6 @@ class tripleo::profile::base::manila::share (
     if $backend_isilon_enabled {
       $manila_isilon_backend = hiera('manila::backend::dellemc_isilon::title')
       create_resources('manila::backend::dellemc_isilon', { $manila_isilon_backend => delete_undef_values({
-        'driver_handles_share_servers' => hiera('manila::backend::dellemc_isilon::driver_handles_share_servers', false),
         'emc_nas_login'                => hiera('manila::backend::dellemc_isilon::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_isilon::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_isilon::emc_nas_server', undef),
