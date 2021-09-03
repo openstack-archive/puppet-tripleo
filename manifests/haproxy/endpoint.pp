@@ -28,6 +28,11 @@
 #  Options for the balancer member, specified after the server declaration.
 #  These should go in the member's configuration block.
 #
+# [*use_backend_syntax*]
+#  (optional) When set to true, generate a config with frontend and
+#  backend sections, otherwise use listen sections.
+#  Defaults to hiera('haproxy_backend_syntax', false)
+#
 # [*haproxy_port*]
 #  An alternative port, on which haproxy will listen for incoming requests.
 #  Defaults to service_port.
@@ -63,6 +68,14 @@
 # [*listen_options*]
 #  Options specified for the listening service's configuration block (in
 #  HAproxy terms, the frontend).
+#  defaults to {'option' => []}
+#
+# [*frontend_options*]
+#  Options specified for the frontend service's configuration block
+#  defaults to {'option' => []}
+#
+# [*backend_options*]
+#  Options specified for the service's backend configuration block
 #  defaults to {'option' => []}
 #
 # [*public_ssl_port*]
@@ -119,6 +132,7 @@ define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
   $member_options,
+  $use_backend_syntax          = hiera('haproxy_backend_syntax', false),
   $haproxy_port                = undef,
   $base_service_name           = undef,
   $ip_addresses                = hiera("${name}_node_ips", undef),
@@ -127,6 +141,12 @@ define tripleo::haproxy::endpoint (
   $mode                        = undef,
   $haproxy_listen_bind_param   = undef,
   $listen_options              = {
+    'option' => [],
+  },
+  $frontend_options            = {
+    'option' => [],
+  },
+  $backend_options             = {
     'option' => [],
   },
   $public_ssl_port             = undef,
@@ -160,6 +180,8 @@ define tripleo::haproxy::endpoint (
   }
   # Let users override the options on a per-service basis
   $custom_options = hiera("tripleo::haproxy::${name}::options", undef)
+  $custom_frontend_options = hiera("tripleo::haproxy::${name}::frontend_options", undef)
+  $custom_backend_options = hiera("tripleo::haproxy::${name}::backend_options", undef)
   $custom_bind_options_public = delete(any2array(hiera("tripleo::haproxy::${name}::public_bind_options", undef)), undef).flatten()
   $custom_bind_options_internal = delete(any2array(hiera("tripleo::haproxy::${name}::internal_bind_options", undef)), undef).flatten()
   if $public_virtual_ip {
@@ -173,13 +195,16 @@ define tripleo::haproxy::endpoint (
           'option'       => 'forwardfor',
         }
         $listen_options_precookie = merge($tls_listen_options, $listen_options, $custom_options)
+        $frontend_options_precookie = merge($tls_listen_options, $frontend_options, $custom_frontend_options)
       } else {
         $listen_options_precookie = merge($listen_options, $custom_options)
+        $frontend_options_precookie = merge($frontend_options, $custom_frontend_options)
       }
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${public_ssl_port}"),
                                         union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate], $custom_bind_options_public))
     } else {
       $listen_options_precookie = merge($listen_options, $custom_options)
+      $frontend_options_precookie = merge($frontend_options, $custom_frontend_options)
       $public_bind_opts = list_to_hash(suffix(any2array($public_virtual_ip), ":${haproxy_port_real}"),
                                         union($haproxy_listen_bind_param, $custom_bind_options_public))
     }
@@ -187,14 +212,17 @@ define tripleo::haproxy::endpoint (
     # internal service only
     $public_bind_opts = {}
     $listen_options_precookie = merge($listen_options, $custom_options)
+    $frontend_options_precookie = merge($frontend_options, $custom_frontend_options)
   }
   if $sticky_sessions {
     $cookie_options = {
       'cookie' => "${session_cookie} insert indirect nocache",
     }
     $listen_options_real = merge($listen_options_precookie, $cookie_options)
+    $frontend_options_real = merge($frontend_options_precookie, $cookie_options)
   } else {
     $listen_options_real = $listen_options_precookie
+    $frontend_options_real = $frontend_options_precookie
   }
   if $use_internal_certificates {
     if !$service_network {
@@ -231,22 +259,45 @@ define tripleo::haproxy::endpoint (
         'acl'          => "acl Auth${name} http_auth(${authorized_userlist})",
         'http-request' => "auth realm ${name} if !Auth${name}",
     }
-    Haproxy::Listen[$name] {
-      require => Tripleo::Haproxy::Userlist[$authorized_userlist],
+    if $use_backend_syntax {
+      Haproxy::Frontend[$name] {
+        require => Tripleo::Haproxy::Userlist[$authorized_userlist],
+      }
+    } else {
+      Haproxy::Listen[$name] {
+        require => Tripleo::Haproxy::Userlist[$authorized_userlist],
+      }
     }
   } else {
     $access_rules = {}
   }
 
   $_real_options = merge($listen_options_real, $access_rules)
+  $_real_frontend_options = merge($frontend_options_real, $access_rules,
+                                  { 'default_backend' => "${name}_be" })
 
   $bind_opts = merge($internal_bind_opts, $public_bind_opts)
 
-  haproxy::listen { "${name}":
-    bind             => $bind_opts,
-    collect_exported => false,
-    mode             => $mode,
-    options          => $_real_options,
+  if $use_backend_syntax {
+    haproxy::frontend { "${name}":
+      bind             => $bind_opts,
+      collect_exported => false,
+      mode             => $mode,
+      options          => $_real_frontend_options,
+    }
+    haproxy::backend { "${name}_be":
+      mode    => $mode,
+      options => merge($backend_options, $custom_backend_options),
+    }
+    $listening_service = "${name}_be"
+  } else {
+    haproxy::listen { "${name}":
+      bind             => $bind_opts,
+      collect_exported => false,
+      mode             => $mode,
+      options          => $_real_options,
+    }
+    $listening_service = "${name}"
   }
   if $sticky_sessions {
     hash(zip($ip_addresses_real, $server_names_real)).each | $ip, $server | {
@@ -254,7 +305,7 @@ define tripleo::haproxy::endpoint (
       # which is a reserved character to reference manifests
       $non_colon_ip = regsubst($ip, ':', '-', 'G')
       haproxy::balancermember { "${name}_${non_colon_ip}_${server}":
-        listening_service => $name,
+        listening_service => $listening_service,
         ports             => $service_port_real,
         ipaddresses       => $ip,
         server_names      => $server,
@@ -263,7 +314,7 @@ define tripleo::haproxy::endpoint (
     }
   } else {
     haproxy::balancermember { "${name}":
-      listening_service => $name,
+      listening_service => $listening_service,
       ports             => $service_port_real,
       ipaddresses       => $ip_addresses_real,
       server_names      => $server_names_real,
