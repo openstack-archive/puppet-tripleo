@@ -129,11 +129,11 @@ class tripleo::haproxy::horizon_endpoint (
       "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate], $custom_bind_options_public),
     }
     $horizon_frontend_options = {
-      'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
+      'http-response' => 'replace-header Location http://(.*) https://\\1',
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
-      'redirect'     => 'scheme https code 301 if !{ ssl_fc }',
-      'option'       => [ 'forwardfor' ],
-      'http-request' => [
+      'redirect'      => 'scheme https code 301 if !{ ssl_fc }',
+      'option'        => [ 'forwardfor' ],
+      'http-request'  => [
           'set-header X-Forwarded-Proto https if { ssl_fc }',
           'set-header X-Forwarded-Proto http if !{ ssl_fc }'],
     }
