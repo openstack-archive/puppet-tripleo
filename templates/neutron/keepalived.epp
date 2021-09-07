@@ -56,6 +56,7 @@ $CLI run --detach ${LOGGING} \
     -v /dev/log:/dev/log \
     --net host \
     --pid host \
+    --cgroupns host \
     --privileged \
     -u root \
     --name $NAME \
