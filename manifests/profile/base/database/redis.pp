@@ -18,10 +18,6 @@
 #
 # === Parameters
 #
-# [*redis_short_bootstrap_node_name*]
-#   (Optional) Hostname of Redis master
-#   Defaults to hiera('redis_short_bootstrap_node_name')
-#
 # [*certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
 #   it will create.
@@ -41,10 +37,6 @@
 #   (Optional) The network name where the redis endpoint is listening on.
 #   This is set by t-h-t.
 #   Defaults to hiera('redis_network', undef)
-#
-# [*redis_node_ips*]
-#   (Optional) List of Redis node ips
-#   Defaults to hiera('redis_node_ips')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -67,11 +59,9 @@
 #   defaults to 6379
 #
 class tripleo::profile::base::database::redis (
-  $redis_short_bootstrap_node_name    = hiera('redis_short_bootstrap_node_name'),
-  $certificate_specs  = hiera('redis_certificate_specs', {}),
+  $certificate_specs   = hiera('redis_certificate_specs', {}),
   $enable_internal_tls = hiera('enable_internal_tls', false),
   $redis_network       = hiera('redis_network', undef),
-  $redis_node_ips      = hiera('redis_node_ips'),
   $step                = Integer(hiera('step')),
   $tls_proxy_bind_ip   = undef,
   $tls_proxy_fqdn      = undef,
@@ -102,19 +92,6 @@ class tripleo::profile::base::database::redis (
         notify       => Class['redis'],
       }
     }
-    if downcase($redis_short_bootstrap_node_name) == $::hostname {
-      $slaveof = undef
-    } else {
-      $slaveof = "${redis_short_bootstrap_node_name} 6379"
-    }
-    class { 'redis' :
-      slaveof => $slaveof,
-    }
-
-    if count($redis_node_ips) > 1 {
-      Class['tripleo::redis_notification'] -> Service['redis-sentinel']
-      include redis::sentinel
-      include tripleo::redis_notification
-    }
+    include redis
   }
 }

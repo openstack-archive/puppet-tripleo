@@ -21,77 +21,26 @@ describe 'tripleo::profile::base::database::redis' do
 
     context 'with step less than 2' do
       let(:params) { {
-        :step             => 1,
-        :redis_short_bootstrap_node_name => 'node.example.com',
-        :redis_node_ips   => []
+        :step => 1,
       } }
 
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::database::redis')
         is_expected.to_not contain_class('redis')
-        is_expected.to_not contain_class('redis::sentinel')
         is_expected.to_not contain_class('tripleo::redis_notification')
       end
     end
 
-    context 'with step 2 on bootstrap node' do
+    context 'with step 2' do
       let(:params) { {
-        :step             => 2,
-        :redis_short_bootstrap_node_name => 'node.example.com',
-        :redis_node_ips   => ['10.0.0.1']
+        :step => 2,
       } }
 
       it 'should configure redis' do
         is_expected.to contain_class('tripleo::profile::base::database::redis')
         is_expected.to contain_class('redis')
-        is_expected.to_not contain_class('redis::sentinel')
-        is_expected.to_not contain_class('tripleo::redis_notification')
       end
     end
-
-    context 'with step 2 on bootstrap node with capital letters' do
-      let(:params) { {
-        :step             => 2,
-        :redis_short_bootstrap_node_name => 'NODE.example.com',
-        :redis_node_ips   => ['10.0.0.1']
-      } }
-
-      it 'should configure redis' do
-        is_expected.to contain_class('tripleo::profile::base::database::redis')
-        is_expected.to contain_class('redis').with(:slaveof => nil)
-      end
-    end
-
-    context 'with step 2 not on bootstrap node' do
-      let(:params) { {
-        :step             => 2,
-        :redis_short_bootstrap_node_name => 'othernode.example.com',
-        :redis_node_ips   => ['10.0.0.1']
-      } }
-
-      it 'should configure redis' do
-        is_expected.to contain_class('tripleo::profile::base::database::redis')
-        is_expected.to contain_class('redis').with(:slaveof => "#{params[:redis_short_bootstrap_node_name]} 6379")
-        is_expected.to_not contain_class('redis::sentinel')
-        is_expected.to_not contain_class('tripleo::redis_notification')
-      end
-    end
-
-    context 'with step 2 with multiple nodes' do
-      let(:params) { {
-        :step             => 2,
-        :redis_short_bootstrap_node_name => 'othernode.example.com',
-        :redis_node_ips   => ['10.0.0.1', '10.0.0.2']
-      } }
-
-      it 'should configure redis' do
-        is_expected.to contain_class('tripleo::profile::base::database::redis')
-        is_expected.to contain_class('redis').with(:slaveof => "#{params[:redis_short_bootstrap_node_name]} 6379")
-        is_expected.to contain_class('redis::sentinel')
-        is_expected.to contain_class('tripleo::redis_notification')
-      end
-    end
-
   end
 
   on_supported_os.each do |os, facts|
