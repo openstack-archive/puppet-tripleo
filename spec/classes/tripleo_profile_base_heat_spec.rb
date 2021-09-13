@@ -53,7 +53,7 @@ eos
         :oslomsg_notify_username => 'heat2',
         :oslomsg_notify_password => 'baa',
         :oslomsg_notify_port     => '5678',
-        :memcached_ips           => '127.0.0.1',
+        :memcached_hosts         => '127.0.0.1',
       } }
 
       it 'should trigger complete configuration without db_purge' do
@@ -89,7 +89,7 @@ eos
         :oslomsg_notify_username => 'heat2',
         :oslomsg_notify_password => 'baa',
         :oslomsg_notify_port     => '5678',
-        :memcached_ips           => '127.0.0.1',
+        :memcached_hosts         => '127.0.0.1',
       } }
 
       it 'should trigger complete configuration' do
@@ -128,7 +128,7 @@ eos
         :oslomsg_notify_password => 'baa',
         :oslomsg_notify_port     => '5678',
         :manage_db_purge         => false,
-        :memcached_ips           => '::1',
+        :memcached_hosts         => '::1',
       } }
 
       it 'should trigger complete configuration without db_purge' do
