@@ -425,19 +425,19 @@ MYSQL_HOST=localhost\n",
         'mysql-lib'         => {
           'source-dir' => '/var/lib/mysql',
           'target-dir' => '/var/lib/mysql',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         # NOTE: we cannot remove this bind mount until the resource-agent
         # can use the configured log-file for initial bootstrap operations
         'mysql-log-mariadb' => {
           'source-dir' => '/var/log/mariadb',
           'target-dir' => '/var/log/mariadb',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         'mysql-log'         => {
           'source-dir' => '/var/log/containers/mysql',
           'target-dir' => '/var/log/mysql',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         'mysql-dev-log'     => {
           'source-dir' => '/dev/log',

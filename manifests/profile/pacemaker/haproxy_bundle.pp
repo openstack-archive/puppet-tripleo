@@ -204,7 +204,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
           'haproxy-var-lib'                 => {
             'source-dir' => '/var/lib/haproxy',
             'target-dir' => '/var/lib/haproxy',
-            'options'    => 'rw',
+            'options'    => 'rw,z',
           },
           'haproxy-pki-extracted'           => {
             'source-dir' => '/etc/pki/ca-trust/extracted',
