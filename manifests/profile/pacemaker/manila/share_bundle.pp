@@ -185,7 +185,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
           'manila-share-var-lib-manila'          => {
             'source-dir' => '/var/lib/manila',
             'target-dir' => '/var/lib/manila',
-            'options'    => 'rw',
+            'options'    => 'rw,z',
           },
           'manila-share-pki-extracted'           => {
             'source-dir' => '/etc/pki/ca-trust/extracted',
@@ -210,7 +210,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
           'manila-share-var-log'                 => {
             'source-dir' => '/var/log/containers/manila',
             'target-dir' => '/var/log/manila',
-            'options'    => 'rw',
+            'options'    => 'rw,z',
           },
           'manila-share-ceph-cfg-dir'            => {
             'source-dir' => $ceph_conf_path,

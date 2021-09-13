@@ -183,7 +183,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
           'cinder-backup-var-lib-cinder'          => {
             'source-dir' => '/var/lib/cinder',
             'target-dir' => '/var/lib/cinder',
-            'options'    => 'rw',
+            'options'    => 'rw,z',
           },
           'cinder-backup-pki-extracted'           => {
             'source-dir' => '/etc/pki/ca-trust/extracted',
@@ -208,7 +208,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
           'cinder-backup-var-log'                 => {
             'source-dir' => '/var/log/containers/cinder',
             'target-dir' => '/var/log/cinder',
-            'options'    => 'rw',
+            'options'    => 'rw,z',
           },
           'cinder-backup-ceph-cfg-dir'            => {
             'source-dir' => $ceph_conf_path,

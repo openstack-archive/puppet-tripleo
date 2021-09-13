@@ -295,12 +295,12 @@ slave-announce-port ${local_tuple[0][2]}
         'redis-lib'                     => {
           'source-dir' => '/var/lib/redis',
           'target-dir' => '/var/lib/redis',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         'redis-log'                     => {
           'source-dir' => '/var/log/containers/redis',
           'target-dir' => '/var/log/redis',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         'redis-run'                     => {
           'source-dir' => '/var/run/redis',

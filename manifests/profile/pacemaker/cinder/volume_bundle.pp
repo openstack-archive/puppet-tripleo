@@ -184,7 +184,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
           'cinder-volume-var-lib-cinder'          => {
             'source-dir' => '/var/lib/cinder',
             'target-dir' => '/var/lib/cinder',
-            'options'    => 'rw',
+            'options'    => 'rw,z',
           },
           'cinder-volume-pki-extracted'           => {
             'source-dir' => '/etc/pki/ca-trust/extracted',
@@ -209,7 +209,7 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
           'cinder-volume-var-log'                 => {
             'source-dir' => '/var/log/containers/cinder',
             'target-dir' => '/var/log/cinder',
-            'options'    => 'rw',
+            'options'    => 'rw,z',
           },
           'cinder-volume-ceph-cfg-dir'            => {
             'source-dir' => $ceph_conf_path,
