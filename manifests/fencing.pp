@@ -85,11 +85,9 @@ class tripleo::fencing(
 
   # check if the devices: section in fence.yaml contains levels.
   # if it doesn't, assume level=1 and build a hash with the content.
-  if is_array($content) {
-    $all_levels = {'level1' => $content}
-  }
-  else {
-    $all_levels = $content
+  $all_levels = $content ? {
+    Array   => {'level1' => $content},
+    default => $content
   }
 
   # collect the number of stonith levels currently defined for this system
