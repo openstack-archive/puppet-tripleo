@@ -190,9 +190,9 @@ define tripleo::haproxy::endpoint (
     if $public_certificate {
       if $mode == 'http' {
         $tls_listen_options = {
-          'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
-          'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
-          'option'       => 'forwardfor',
+          'http-response' => 'replace-header Location http://(.*) https://\\1',
+          'redirect'      => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
+          'option'        => 'forwardfor',
         }
         $listen_options_precookie = merge($tls_listen_options, $listen_options, $custom_options)
         $frontend_options_precookie = merge($tls_listen_options, $frontend_options, $custom_frontend_options)

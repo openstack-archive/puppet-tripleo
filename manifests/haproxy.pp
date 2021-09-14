@@ -1308,7 +1308,7 @@ class tripleo::haproxy (
   }
   if $service_certificate {
     $heat_ssl_options = {
-      'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
+      'http-response' => "replace-header Location http://${public_virtual_ip}(.*) https://${public_virtual_ip}\\1",
     }
     $heat_listen_options = merge($default_listen_options, $heat_ssl_options, $heat_timeout_options)
     $heat_frontend_options = merge($default_frontend_options, $heat_ssl_options, $heat_timeout_options)
