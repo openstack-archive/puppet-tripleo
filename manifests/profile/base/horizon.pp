@@ -52,9 +52,15 @@
 #   (Optional) A hash of parameters to enable features specific to Neutron
 #   Defaults to hiera('horizon::neutron_options', {})
 #
+# [*memcached_hosts*]
+#   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_names', [])
+#
+# DEPRECATED PARAMETERS
+#
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips', [])
+#   Defaults to undef
 #
 class tripleo::profile::base::horizon (
   $step                = Integer(hiera('step')),
@@ -63,8 +69,12 @@ class tripleo::profile::base::horizon (
   $enable_internal_tls = hiera('enable_internal_tls', false),
   $horizon_network     = hiera('horizon_network', undef),
   $neutron_options     = hiera('horizon::neutron_options', {}),
-  $memcached_ips       = hiera('memcached_node_ips', [])
+  $memcached_hosts     = hiera('memcached_node_names', []),
+  # DEPRECATED PARAMETERS
+  $memcached_ips       = undef
 ) {
+  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
+
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
   } else {
@@ -87,11 +97,10 @@ class tripleo::profile::base::horizon (
     include tripleo::profile::base::apache
     include apache::mod::remoteip
 
-    if is_ipv6_address($memcached_ips[0]) {
-        $horizon_memcached_servers = prefix(any2array(normalize_ip_for_uri($memcached_ips)), 'inet6:')
-
+    if is_ipv6_address($memcached_hosts_real[0]) {
+      $horizon_memcached_servers = prefix(any2array(normalize_ip_for_uri($memcached_hosts_real)), 'inet6:')
     } else {
-        $horizon_memcached_servers = any2array(normalize_ip_for_uri($memcached_ips))
+      $horizon_memcached_servers = any2array(normalize_ip_for_uri($memcached_hosts_real))
     }
 
     class { 'horizon':
