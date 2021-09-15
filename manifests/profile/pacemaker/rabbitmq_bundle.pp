@@ -275,7 +275,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         'rabbitmq-lib'                     => {
           'source-dir' => '/var/lib/rabbitmq',
           'target-dir' => '/var/lib/rabbitmq',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         'rabbitmq-pki-extracted'           => {
           'source-dir' => '/etc/pki/ca-trust/extracted',
@@ -300,7 +300,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         'rabbitmq-log'                     => {
           'source-dir' => '/var/log/containers/rabbitmq',
           'target-dir' => '/var/log/rabbitmq',
-          'options'    => 'rw',
+          'options'    => 'rw,z',
         },
         'rabbitmq-dev-log'                 => {
           'source-dir' => '/dev/log',
