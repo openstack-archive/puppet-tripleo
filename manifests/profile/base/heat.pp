@@ -79,9 +79,19 @@
 #   Enable ssl oslo messaging services
 #   Defaults to hiera('oslo_messaging_notify_use_ssl', '0')
 #
+# [*memcached_hosts*]
+#   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_names', [])
+#
+# [*memcached_port*]
+#   (Optional) Memcached port to use.
+#   Defaults to hiera('memcached_port', 11211)
+#
+# DEPRECATED PARAMETERS
+#
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+#   Defaults to undef
 #
 class tripleo::profile::base::heat (
   $bootstrap_node          = downcase(hiera('heat_engine_short_bootstrap_node_name')),
@@ -99,8 +109,12 @@ class tripleo::profile::base::heat (
   $oslomsg_notify_port     = hiera('oslo_messaging_notify_port', '5672'),
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
-  $memcached_ips           = hiera('memcached_node_ips'),
+  $memcached_hosts         = hiera('memcached_node_names', []),
+  $memcached_port          = hiera('memcached_port', 11211),
+  # DEPRECATED PARAMETERS
+  $memcached_ips           = undef
 ) {
+  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
 
   include ::tripleo::profile::base::heat::authtoken
 
@@ -137,10 +151,10 @@ class tripleo::profile::base::heat (
     include ::heat::cors
     include ::heat::logging
 
-    if is_ipv6_address($memcached_ips[0]) {
-      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211'), 'inet6:')
+    if is_ipv6_address($memcached_hosts_real[0]) {
+      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}"), 'inet6:')
     } else {
-      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ':11211')
+      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
     }
 
     class { '::heat::cache':

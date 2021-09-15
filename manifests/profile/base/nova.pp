@@ -74,13 +74,19 @@
 #   (Optional) The current step of the deployment
 #   Defaults to hiera('step')
 #
-# [*memcached_ips*]
-#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+# [*memcached_hosts*]
+#   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_names', [])
 #
 # [*memcached_port*]
 #   (Optional) Memcached port to use.
 #   Defaults to hiera('memcached_port', 11211)
+#
+# DEPRECATED PARAMETERS
+#
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to undef
 #
 class tripleo::profile::base::nova (
   $bootstrap_node          = hiera('nova_api_short_bootstrap_node_name', undef),
@@ -97,9 +103,12 @@ class tripleo::profile::base::nova (
   $oslomsg_notify_username = hiera('oslo_messaging_notify_user_name', 'guest'),
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $step                    = Integer(hiera('step')),
-  $memcached_ips           = hiera('memcached_node_ips'),
+  $memcached_hosts         = hiera('memcached_node_names', []),
   $memcached_port          = hiera('memcached_port', 11211),
+  # DEPRECATED PARAMETERS
+  $memcached_ips           = undef
 ) {
+  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -107,10 +116,10 @@ class tripleo::profile::base::nova (
     $sync_db = false
   }
 
-  if is_ipv6_address($memcached_ips[0]) {
-    $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}"), 'inet6:')
+  if is_ipv6_address($memcached_hosts_real[0]) {
+    $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}"), 'inet6:')
   } else {
-    $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
+    $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {

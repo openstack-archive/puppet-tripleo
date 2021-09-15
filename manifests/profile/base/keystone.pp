@@ -154,9 +154,9 @@
 #   (Optional) Enable OpenIDC federation
 #   Defaults to hiera('keystone_openidc_enabled', false)
 #
-# [*memcached_ips*]
-#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips')
+# [*memcached_hosts*]
+#   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
+#   Defaults to hiera('memcached_node_names', [])
 #
 # [*memcached_port*]
 #   (Optional) Memcached port to use.
@@ -168,6 +168,12 @@
 #   The resources are: endpoints, roles, services, projects, users and their
 #   assignment.
 #   Defaults to hiera('keystone_resources_managed', true)
+#
+# DEPRECATED PARAMETERS
+#
+# [*memcached_ips*]
+#   (Optional) Array of ipv4 or ipv6 addresses for memcache.
+#   Defaults to undef
 #
 class tripleo::profile::base::keystone (
   $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
@@ -201,10 +207,14 @@ class tripleo::profile::base::keystone (
   $keystone_enable_member         = hiera('keystone_enable_member', false),
   $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
-  $memcached_ips                  = hiera('memcached_node_ips', []),
+  $memcached_hosts                = hiera('memcached_node_names', []),
   $memcached_port                 = hiera('memcached_port', 11211),
   $keystone_resources_managed     = hiera('keystone_resources_managed', true),
+  # DEPRECATED PARAMETERS
+  $memcached_ips                  = undef
 ) {
+  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
+
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) and $keystone_resources_managed {
     $sync_db = true
     $manage_roles = true
@@ -235,7 +245,7 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_ips)), ":${memcached_port}")
+    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
 
     class { '::keystone':
       sync_db                    => $sync_db,
