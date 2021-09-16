@@ -805,6 +805,9 @@ class tripleo::haproxy (
   }
 
 
+  # NOTE(bogdando): the rule is: *log is only needed for frontend usually,
+  # but tcpka and other "durability" related options should be set for both
+  # sides, based on a service case by case.
   $default_frontend_options = {
     'option'       => [ 'httplog', ],
     'http-request' => [
@@ -890,7 +893,7 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => merge($default_listen_options, $keystone_listen_opts),
       frontend_options  => merge($default_frontend_options, $keystone_frontend_opts),
-      backend_options   => $keystone_backend_opts,
+      backend_options   => merge($default_backend_options, $keystone_backend_opts),
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
       service_network   => $keystone_public_network,
       sticky_sessions   => $keystone_sticky_sessions,
@@ -1164,6 +1167,7 @@ class tripleo::haproxy (
       'option'  => [ 'tcpka', 'tcplog' ],
     }
     $nova_vncproxy_backend_opts = {
+      'option'  => [ 'tcpka' ],
       'balance' => 'source',
       'timeout' => [ 'tunnel 1h' ],
     }
@@ -1292,26 +1296,27 @@ class tripleo::haproxy (
 
   $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
   $heat_ip_addresses = hiera('heat_api_node_ips', $controller_hosts_real)
-  $heat_timeout_options = {
+  $heat_frontend_options = {
+    'option'         => [ 'httplog' ],
     'timeout client' => '10m',
-    'timeout server' => '10m',
   }
   $heat_durability_options = {
-    'option'         => [ 'tcpka', 'httpchk', 'httplog' ],
+    'option'         => [ 'tcpka', 'httpchk' ],
     'balance'        => $haproxy_lb_mode_longrunning,
+    'timeout server' => '10m',
   }
   if $service_certificate {
     $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
     }
-    $heat_listen_options = merge($default_listen_options, $heat_ssl_options, $heat_timeout_options)
-    $heat_frontend_options = merge($default_frontend_options, $heat_ssl_options, $heat_timeout_options)
+    $heat_listen_options = merge($default_listen_options, $heat_ssl_options, $heat_frontend_options)
+    $heat_frontend_options_real = merge($default_frontend_options, $heat_ssl_options, $heat_frontend_options)
   } else {
-    $heat_listen_options = merge($default_listen_options, $heat_timeout_options)
-    $heat_frontend_options = merge($default_frontend_options, $heat_timeout_options)
+    $heat_listen_options = merge($default_listen_options, $heat_frontend_options)
+    $heat_frontend_options_real = merge($default_frontend_options, $heat_frontend_options)
   }
-  $heat_listen_options_real = merge($heat_listen_options, $heat_durability_options)
-  $heat_frontend_options_real = merge($heat_frontend_options, $heat_durability_options)
+  $heat_listen_options_real = merge_hash_values($heat_listen_options, $heat_durability_options)
+  $heat_backend_options = merge($default_backend_options, $heat_durability_options)
 
   if $heat_api {
     ::tripleo::haproxy::endpoint { 'heat_api':
@@ -1323,6 +1328,7 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => $heat_listen_options_real,
       frontend_options  => $heat_frontend_options_real,
+      backend_options   => $heat_backend_options,
       public_ssl_port   => $ports[heat_api_ssl_port],
       service_network   => $heat_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1339,6 +1345,7 @@ class tripleo::haproxy (
       mode              => 'http',
       listen_options    => $heat_listen_options_real,
       frontend_options  => $heat_frontend_options_real,
+      backend_options   => $heat_backend_options,
       public_ssl_port   => $ports[heat_cfn_ssl_port],
       service_network   => $heat_cfn_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1443,12 +1450,15 @@ class tripleo::haproxy (
     if $use_backend_syntax {
       haproxy::frontend { 'metrics_qdr':
         bind             => $metrics_bind_opts,
-        options          => { 'default_backend' => 'metrics_qdr_be' },
+        options          => {
+          'default_backend' => 'metrics_qdr_be',
+          'option'          => [ 'tcplog' ],
+        },
         collect_exported => false,
       }
       haproxy::backend { 'metrics_qdr_be':
         options => {
-          'option'    => [ 'tcp-check', 'tcplog' ],
+          'option'    => [ 'tcp-check' ],
           'tcp-check' => ["connect port ${ports[metrics_qdr_port]}"],
         },
       }
@@ -1566,11 +1576,15 @@ class tripleo::haproxy (
       haproxy::frontend { 'rabbitmq':
         bind             => $rabbitmq_bind_opts,
         collect_exported => false,
+        options          => {
+          'option'  => [ 'tcpka', 'tcplog' ],
+          'timeout' => [ 'client 0' ],
+        },
       }
       haproxy::backend { 'rabbitmq_be':
         options => {
-          'option'  => [ 'tcpka', 'tcplog' ],
-          'timeout' => [ 'client 0', 'server 0' ],
+          'option'  => [ 'tcpka' ],
+          'timeout' => [ 'server 0' ],
         },
       }
       $rabbitmq_service = 'rabbitmq_be'
@@ -1654,11 +1668,14 @@ class tripleo::haproxy (
       haproxy::frontend { 'redis':
         bind             => $redis_bind_opts,
         collect_exported => false,
+        options          => {
+          'option'    => [ 'tcplog' ],
+        },
       }
       haproxy::backend { 'redis_be':
         options => {
           'balance'   => 'first',
-          'option'    => [ 'tcp-check', 'tcplog', ],
+          'option'    => [ 'tcp-check' ],
           'tcp-check' => $redis_tcp_check_options,
         },
       }
@@ -1668,7 +1685,7 @@ class tripleo::haproxy (
         bind             => $redis_bind_opts,
         options          => {
           'balance'   => 'first',
-          'option'    => [ 'tcp-check', 'tcplog', ],
+          'option'    => [ 'tcp-check', 'tcplog' ],
           'tcp-check' => $redis_tcp_check_options,
         },
         collect_exported => false,
@@ -1737,7 +1754,7 @@ class tripleo::haproxy (
     }
     $octavia_backend_opts = {
       'hash-type' => 'consistent',
-      'option'    => [ 'httpchk HEAD /', 'httplog' ],
+      'option'    => [ 'httpchk HEAD /' ],
       'balance'   => 'source',
     }
     $octavia_listen_opts = merge_hash_values($octavia_frontend_opts,
@@ -1769,6 +1786,7 @@ class tripleo::haproxy (
       'timeout client' => '90m',
     }
     $ovn_db_backend_opts = {
+      'option'         => [ 'tcpka' ],
       'timeout server' => '90m',
       'stick-table'    => 'type ip size 1000',
       'stick'          => 'on dst',
@@ -1811,11 +1829,11 @@ class tripleo::haproxy (
       # timeouts get overridden by others at certain times of the connection.
       # The following values were taken from the following site:
       # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
-      'timeout'      => ['connect 5s', 'client 25s'],
+      'timeout'      => ['client 25s'],
       'http-request' => [join(['set-header Host %[dst]:', $ports[zaqar_ws_port]])],
     }
     $zaqar_ws_backend_opts = {
-      'timeout'      => ['server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
+      'timeout'      => ['connect 5s', 'server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
     }
     $zaqar_ws_listen_opts = merge_hash_values($zaqar_ws_frontend_opts,
                                                 $zaqar_ws_backend_opts)
