@@ -326,10 +326,6 @@
 #  specific monitoring we do from HAProxy for Redis
 #  Defaults to undef
 #
-# [*zaqar_api*]
-#  (optional) Enable or not Zaqar Api binding
-#  Defaults to hiera('zaqar_api_enabled', false)
-#
 # [*ceph_rgw*]
 #  (optional) Enable or not Ceph RadosGW binding
 #  Defaults to hiera('ceph_rgw_enabled', false)
@@ -349,10 +345,6 @@
 # [*ovn_dbs_manage_lb*]
 #  (optional) Whether or not haproxy should configure OVN dbs for load balancing
 #  if ovn_dbs is enabled.
-#  Defaults to false
-#
-# [*zaqar_ws*]
-#  (optional) Enable or not Zaqar Websockets binding
 #  Defaults to false
 #
 # [*aodh_network*]
@@ -476,14 +468,6 @@
 #  (optional) Specify the network swift_proxy_server is running on.
 #  Defaults to hiera('swift_proxy_network', undef)
 #
-# [*zaqar_api_network*]
-#  (optional) Specify the network zaqar_api is running on.
-#  Defaults to hiera('zaqar_api_network', undef)
-#
-# [*zaqar_ws_timeout_tunnel*]
-# (optional) Specify the tunnel timeout in seconds for the Zaqar API.
-# Defaults to hiera('zaqar_ws_timeout_tunnel', '14400')
-#
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
@@ -530,18 +514,12 @@
 #    'ovn_sbdb_ssl_port' (Defaults to 13642)
 #    'swift_proxy_port' (Defaults to 8080)
 #    'swift_proxy_ssl_port' (Defaults to 13808)
-#    'zaqar_api_port' (Defaults to 8888)
-#    'zaqar_api_ssl_port' (Defaults to 13888)
 #    'ceph_rgw_port' (Defaults to 8080)
 #    'ceph_rgw_ssl_port' (Defaults to 13808)
 #    'ceph_grafana_port' (Defaults to 3100)
 #    'ceph_grafana_ssl_port' (Defaults to 3100)
 #    'ceph_dashboard_port' (Defaults to 8444)
 #    'ceph_dashboard_ssl_port' (Defaults to 8444)
-#    'zaqar_ws_port' (Defaults to 9000)
-#    'zaqar_ws_ssl_port' (Defaults to 3000)
-#  * Note that for zaqar's websockets we don't support having a different
-#  port for SSL, because it ignores the handshake.
 #  Defaults to {}
 #
 class tripleo::haproxy (
@@ -614,11 +592,9 @@ class tripleo::haproxy (
   $docker_registry               = hiera('enable_docker_registry', false),
   $redis                         = hiera('redis_enabled', false),
   $redis_password                = undef,
-  $zaqar_api                     = hiera('zaqar_api_enabled', false),
   $ceph_rgw                      = hiera('ceph_rgw_enabled', false),
   $ovn_dbs                       = hiera('ovn_dbs_enabled', false),
   $ovn_dbs_manage_lb             = false,
-  $zaqar_ws                      = hiera('zaqar_api_enabled', false),
   $aodh_network                  = hiera('aodh_api_network', undef),
   $barbican_network              = hiera('barbican_api_network', false),
   $ceph_rgw_network              = hiera('ceph_rgw_network', undef),
@@ -649,8 +625,6 @@ class tripleo::haproxy (
   $ovn_dbs_network               = hiera('ovn_dbs_network', undef),
   $etcd_network                  = hiera('etcd_network', undef),
   $swift_proxy_server_network    = hiera('swift_proxy_network', undef),
-  $zaqar_api_network             = hiera('zaqar_api_network', undef),
-  $zaqar_ws_timeout_tunnel       = hiera('zaqar_ws_timeout_tunnel', '14400'),
   $service_ports                 = {}
 ) {
   $default_service_ports = {
@@ -700,12 +674,8 @@ class tripleo::haproxy (
     ovn_sbdb_ssl_port => 13642,
     swift_proxy_port => 8080,
     swift_proxy_ssl_port => 13808,
-    zaqar_api_port => 8888,
-    zaqar_api_ssl_port => 13888,
     ceph_rgw_port => 8080,
     ceph_rgw_ssl_port => 13808,
-    zaqar_ws_port => 9000,
-    zaqar_ws_ssl_port => 3000,
     ceph_grafana_port => 3100,
     ceph_grafana_ssl_port => 3100,
     ceph_prometheus_port => 9092,
@@ -1684,20 +1654,6 @@ class tripleo::haproxy (
     }
   }
 
-  if $zaqar_api {
-    ::tripleo::haproxy::endpoint { 'zaqar_api':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('zaqar_api_vip', $controller_virtual_ip),
-      service_port      => $ports[zaqar_api_port],
-      ip_addresses      => hiera('zaqar_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('zaqar_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      public_ssl_port   => $ports[zaqar_api_ssl_port],
-      service_network   => $zaqar_api_network,
-      member_options    => union($haproxy_member_options, $internal_tls_member_options),
-    }
-  }
-
   if $ceph_rgw {
     $ceph_rgw_backend_opts = {
       'option'  => [ 'httpchk GET /swift/healthcheck' ],
@@ -1793,37 +1749,4 @@ class tripleo::haproxy (
       mode              => 'tcp'
     }
   }
-
-  if $zaqar_ws {
-    $zaqar_ws_frontend_opts = {
-      # NOTE(jaosorior): Websockets have more overhead in establishing
-      # connections than regular HTTP connections. Also, since it begins
-      # as an HTTP connection and then "upgrades" to a TCP connection, some
-      # timeouts get overridden by others at certain times of the connection.
-      # The following values were taken from the following site:
-      # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
-      'timeout'      => ['client 25s'],
-      'http-request' => [join(['set-header Host %[dst]:', $ports[zaqar_ws_port]])],
-    }
-    $zaqar_ws_backend_opts = {
-      'timeout'      => ['connect 5s', 'server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
-    }
-    $zaqar_ws_listen_opts = merge_hash_values($zaqar_ws_frontend_opts,
-                                                $zaqar_ws_backend_opts)
-    ::tripleo::haproxy::endpoint { 'zaqar_ws':
-      public_virtual_ip         => $public_virtual_ip,
-      internal_ip               => hiera('zaqar_ws_vip', $controller_virtual_ip),
-      service_port              => $ports[zaqar_ws_port],
-      ip_addresses              => hiera('zaqar_ws_node_ips', $controller_hosts_real),
-      server_names              => hiera('zaqar_ws_node_names', $controller_hosts_names_real),
-      mode                      => 'http',
-      haproxy_listen_bind_param => [],  # We don't use a transparent proxy here
-      listen_options            => $zaqar_ws_listen_opts,
-      frontend_options          => $zaqar_ws_frontend_opts,
-      backend_options           => $zaqar_ws_backend_opts,
-      public_ssl_port           => $ports[zaqar_ws_ssl_port],
-      service_network           => $zaqar_api_network,
-    }
-  }
-
 }
