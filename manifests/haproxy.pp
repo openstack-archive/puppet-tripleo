@@ -245,10 +245,6 @@
 #  (optional) Enable or not Gnocchi API binding
 #  Defaults to hiera('gnocchi_api_enabled', false)
 #
-# [*mistral*]
-#  (optional) Enable or not Mistral API binding
-#  Defaults to hiera('mistral_api_enabled', false)
-#
 # [*swift_proxy_server*]
 #  (optional) Enable or not Swift API binding
 #  Defaults to hiera('swift_proxy_enabled', false)
@@ -444,10 +440,6 @@
 #  (optional) Specify the network manila is running on.
 #  Defaults to hiera('manila_api_network', undef)
 #
-# [*mistral_network*]
-#  (optional) Specify the network mistral is running on.
-#  Defaults to hiera('mistral_api_network', undef)
-#
 # [*neutron_network*]
 #  (optional) Specify the network neutron is running on.
 #  Defaults to hiera('neutron_api_network', undef)
@@ -507,8 +499,6 @@
 #    'glance_api_ssl_port' (Defaults to 13292)
 #    'gnocchi_api_port' (Defaults to 8041)
 #    'gnocchi_api_ssl_port' (Defaults to 13041)
-#    'mistral_api_port' (Defaults to 8989)
-#    'mistral_api_ssl_port' (Defaults to 13989)
 #    'heat_api_port' (Defaults to 8004)
 #    'heat_api_ssl_port' (Defaults to 13004)
 #    'heat_cfn_port' (Defaults to 8000)
@@ -603,7 +593,6 @@ class tripleo::haproxy (
   $ceph_grafana                  = hiera('ceph_grafana_enabled', false),
   $ceph_dashboard                = hiera('ceph_grafana_enabled', false),
   $gnocchi                       = hiera('gnocchi_api_enabled', false),
-  $mistral                       = hiera('mistral_api_enabled', false),
   $swift_proxy_server            = hiera('swift_proxy_enabled', false),
   $heat_api                      = hiera('heat_api_enabled', false),
   $heat_cfn                      = hiera('heat_api_cfn_enabled', false),
@@ -651,7 +640,6 @@ class tripleo::haproxy (
   $keystone_sticky_sessions      = hiera('keystone_sticky_sessions', false),
   $keystone_session_cookie       = hiera('keystone_session_cookie,', 'KEYSTONESESSION'),
   $manila_network                = hiera('manila_api_network', undef),
-  $mistral_network               = hiera('mistral_api_network', undef),
   $neutron_network               = hiera('neutron_api_network', undef),
   $nova_metadata_network         = hiera('nova_metadata_network', undef),
   $nova_novncproxy_network       = hiera('nova_vnc_proxy_network', hiera('nova_libvirt_network', undef)),
@@ -681,8 +669,6 @@ class tripleo::haproxy (
     glance_api_ssl_port => 13292,
     gnocchi_api_port => 8041,
     gnocchi_api_ssl_port => 13041,
-    mistral_api_port => 8989,
-    mistral_api_ssl_port => 13989,
     heat_api_port => 8004,
     heat_api_ssl_port => 13004,
     heat_cfn_port => 8000,
@@ -1250,19 +1236,6 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
       service_network   => $gnocchi_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
-    }
-  }
-
-  if $mistral {
-    ::tripleo::haproxy::endpoint { 'mistral':
-      public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('mistral_api_vip', $controller_virtual_ip),
-      service_port      => $ports[mistral_api_port],
-      ip_addresses      => hiera('mistral_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('mistral_api_node_names', $controller_hosts_names_real),
-      mode              => 'http',
-      public_ssl_port   => $ports[mistral_api_ssl_port],
-      service_network   => $mistral_network,
     }
   }
 
