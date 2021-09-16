@@ -277,9 +277,6 @@ class tripleo::profile::base::database::mysql (
     if hiera('manila_api_enabled', false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'manila::db::mysql':}
     }
-    if hiera('mistral_api_enabled', false) {
-      tripleo::profile::base::database::mysql::include_and_check_auth{'mistral::db::mysql':}
-    }
     if hiera('neutron_api_enabled', false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'neutron::db::mysql':}
     }
