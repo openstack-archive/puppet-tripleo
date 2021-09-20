@@ -75,6 +75,31 @@ describe 'tripleo::haproxy::endpoint' do
         )
       end
     end
+
+    context 'with frontend/backend sections' do
+      before :each do
+        params.merge!({
+          :use_backend_syntax => true,
+        })
+      end
+      it 'should configure haproxy' do
+        is_expected.to compile.with_all_deps
+        is_expected.to contain_haproxy__frontend('neutron').with(
+          :collect_exported => false,
+          :bind             => { "10.0.0.1:9696"    => ["transparent"],
+                                 "192.168.0.1:9696" => ["transparent"] },
+          :options          => {'option'          => [],
+                                'timeout client'  => '90m',
+                                'default_backend' => 'neutron_be',
+                               },
+        )
+        is_expected.to contain_haproxy__backend('neutron_be').with(
+          :options          => {'option'         => [],
+                                'timeout server' => '90m',
+                               },
+        )
+      end
+    end
   end
 
   on_supported_os.each do |os, facts|

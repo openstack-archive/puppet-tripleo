@@ -108,6 +108,11 @@
 #  Can be a string or an array.
 #  Defaults to undef
 #
+# [*use_backend_syntax*]
+#  (optional) When set to true, generate a config with frontend and
+#  backend sections, otherwise use listen sections.
+#  Defaults to hiera('haproxy_backend_syntax', false)
+#
 # [*haproxy_stats_user*]
 #  Username for haproxy stats authentication.
 #  A string.
@@ -294,6 +299,14 @@
 #
 # [*mysql_custom_listen_options*]
 #  Hash to pass to the mysql haproxy listen stanza to be deepmerged with the other options
+#  Defaults to {}
+#
+# [*mysql_custom_frontend_options*]
+#  Hash to pass to the mysql haproxy frontend stanza to be deepmerged with the other options
+#  Defaults to {}
+#
+# [*mysql_custom_backend_options*]
+#  Hash to pass to the mysql haproxy backend stanza to be deepmerged with the other options
 #  Defaults to {}
 #
 # [*rabbitmq*]
@@ -544,110 +557,113 @@
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
-  $haproxy_service_manage      = true,
-  $haproxy_global_maxconn      = 20480,
-  $haproxy_default_maxconn     = 4096,
-  $haproxy_default_timeout     = [ 'http-request 10s', 'queue 2m', 'connect 10s', 'client 2m', 'server 2m', 'check 10s' ],
-  $haproxy_listen_bind_param   = [ 'transparent' ],
-  $haproxy_member_options      = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
-  $haproxy_log_address         = '/dev/log',
-  $haproxy_log_facility        = 'local0',
-  $activate_httplog            = false,
-  $haproxy_globals_override    = {},
-  $haproxy_defaults_override   = {},
-  $haproxy_lb_mode_longrunning = 'leastconn',
-  $haproxy_daemon              = true,
-  $haproxy_socket_access_level = 'user',
-  $haproxy_stats_user          = 'admin',
-  $haproxy_stats_password      = undef,
-  $haproxy_stats_bind_address  = undef,
-  $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
-  $controller_hosts            = hiera('controller_node_ips'),
-  $controller_hosts_names      = hiera('controller_node_names', undef),
-  $service_certificate         = undef,
-  $use_internal_certificates   = false,
-  $internal_certificates_specs = {},
-  $enable_internal_tls         = hiera('enable_internal_tls', false),
-  $ssl_cipher_suite            = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
-  $ssl_options                 = 'no-sslv3 no-tlsv10',
-  $ca_bundle                   = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
-  $crl_file                    = undef,
-  $haproxy_stats_certificate   = undef,
-  $haproxy_stats               = true,
-  $keystone_admin              = hiera('keystone_enabled', false),
-  $keystone_public             = hiera('keystone_enabled', false),
-  $neutron                     = hiera('neutron_api_enabled', false),
-  $cinder                      = hiera('cinder_api_enabled', false),
-  $manila                      = hiera('manila_api_enabled', false),
-  $glance_api                  = hiera('glance_api_enabled', false),
-  $nova_osapi                  = hiera('nova_api_enabled', false),
-  $placement                   = hiera('placement_enabled', false),
-  $nova_metadata               = hiera('nova_metadata_enabled', false),
-  $nova_novncproxy             = hiera('nova_vnc_proxy_enabled', false),
-  $aodh                        = hiera('aodh_api_enabled', false),
-  $barbican                    = hiera('barbican_api_enabled', false),
-  $ceph_grafana                = hiera('ceph_grafana_enabled', false),
-  $ceph_dashboard              = hiera('ceph_grafana_enabled', false),
-  $gnocchi                     = hiera('gnocchi_api_enabled', false),
-  $mistral                     = hiera('mistral_api_enabled', false),
-  $swift_proxy_server          = hiera('swift_proxy_enabled', false),
-  $heat_api                    = hiera('heat_api_enabled', false),
-  $heat_cfn                    = hiera('heat_api_cfn_enabled', false),
-  $horizon                     = hiera('horizon_enabled', false),
-  $ironic                      = hiera('ironic_api_enabled', false),
-  $ironic_inspector            = hiera('ironic_inspector_enabled', false),
-  $octavia                     = hiera('octavia_api_enabled', false),
-  $designate                   = hiera('designate_api_enabled', false),
-  $metrics_qdr                 = hiera('metrics_qdr_enabled', false),
-  $mysql                       = hiera('mysql_enabled', false),
-  $mysql_clustercheck          = false,
-  $mysql_max_conn              = undef,
-  $mysql_member_options        = undef,
-  $mysql_custom_listen_options = {},
-  $rabbitmq                    = false,
-  $etcd                        = hiera('etcd_enabled', false),
-  $docker_registry             = hiera('enable_docker_registry', false),
-  $redis                       = hiera('redis_enabled', false),
-  $redis_password              = undef,
-  $zaqar_api                   = hiera('zaqar_api_enabled', false),
-  $ceph_rgw                    = hiera('ceph_rgw_enabled', false),
-  $ovn_dbs                     = hiera('ovn_dbs_enabled', false),
-  $ovn_dbs_manage_lb           = false,
-  $zaqar_ws                    = hiera('zaqar_api_enabled', false),
-  $aodh_network                = hiera('aodh_api_network', undef),
-  $barbican_network            = hiera('barbican_api_network', false),
-  $ceph_rgw_network            = hiera('ceph_rgw_network', undef),
-  $cinder_network              = hiera('cinder_api_network', undef),
-  $designate_network           = hiera('designate_api_network', undef),
-  $metrics_qdr_network         = hiera('metrics_qdr_network', undef),
-  $docker_registry_network     = hiera('docker_registry_network', undef),
-  $glance_api_network          = hiera('glance_api_network', undef),
-  $gnocchi_network             = hiera('gnocchi_api_network', undef),
-  $heat_api_network            = hiera('heat_api_network', undef),
-  $ceph_grafana_network        = hiera('ceph_grafana_network', undef),
-  $ceph_dashboard_network      = hiera('ceph_dashboard_network', undef),
-  $heat_cfn_network            = hiera('heat_api_cfn_network', undef),
-  $horizon_network             = hiera('horizon_network', undef),
-  $ironic_inspector_network    = hiera('ironic_inspector_network', undef),
-  $ironic_network              = hiera('ironic_api_network', undef),
-  $keystone_admin_network      = hiera('keystone_admin_api_network', undef),
-  $keystone_public_network     = hiera('keystone_public_api_network', undef),
-  $keystone_sticky_sessions    = hiera('keystone_sticky_sessions', false),
-  $keystone_session_cookie     = hiera('keystone_session_cookie,', 'KEYSTONESESSION'),
-  $manila_network              = hiera('manila_api_network', undef),
-  $mistral_network             = hiera('mistral_api_network', undef),
-  $neutron_network             = hiera('neutron_api_network', undef),
-  $nova_metadata_network       = hiera('nova_metadata_network', undef),
-  $nova_novncproxy_network     = hiera('nova_vnc_proxy_network', hiera('nova_libvirt_network', undef)),
-  $nova_osapi_network          = hiera('nova_api_network', undef),
-  $placement_network           = hiera('placement_network', undef),
-  $octavia_network             = hiera('octavia_api_network', undef),
-  $ovn_dbs_network             = hiera('ovn_dbs_network', undef),
-  $etcd_network                = hiera('etcd_network', undef),
-  $swift_proxy_server_network  = hiera('swift_proxy_network', undef),
-  $zaqar_api_network           = hiera('zaqar_api_network', undef),
-  $zaqar_ws_timeout_tunnel     = hiera('zaqar_ws_timeout_tunnel', '14400'),
-  $service_ports               = {}
+  $use_backend_syntax            = hiera('haproxy_backend_syntax', false),
+  $haproxy_service_manage        = true,
+  $haproxy_global_maxconn        = 20480,
+  $haproxy_default_maxconn       = 4096,
+  $haproxy_default_timeout       = [ 'http-request 10s', 'queue 2m', 'connect 10s', 'client 2m', 'server 2m', 'check 10s' ],
+  $haproxy_listen_bind_param     = [ 'transparent' ],
+  $haproxy_member_options        = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
+  $haproxy_log_address           = '/dev/log',
+  $haproxy_log_facility          = 'local0',
+  $activate_httplog              = false,
+  $haproxy_globals_override      = {},
+  $haproxy_defaults_override     = {},
+  $haproxy_lb_mode_longrunning   = 'leastconn',
+  $haproxy_daemon                = true,
+  $haproxy_socket_access_level   = 'user',
+  $haproxy_stats_user            = 'admin',
+  $haproxy_stats_password        = undef,
+  $haproxy_stats_bind_address    = undef,
+  $manage_firewall               = hiera('tripleo::firewall::manage_firewall', true),
+  $controller_hosts              = hiera('controller_node_ips'),
+  $controller_hosts_names        = hiera('controller_node_names', undef),
+  $service_certificate           = undef,
+  $use_internal_certificates     = false,
+  $internal_certificates_specs   = {},
+  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $ssl_cipher_suite              = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
+  $ssl_options                   = 'no-sslv3 no-tlsv10',
+  $ca_bundle                     = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
+  $crl_file                      = undef,
+  $haproxy_stats_certificate     = undef,
+  $haproxy_stats                 = true,
+  $keystone_admin                = hiera('keystone_enabled', false),
+  $keystone_public               = hiera('keystone_enabled', false),
+  $neutron                       = hiera('neutron_api_enabled', false),
+  $cinder                        = hiera('cinder_api_enabled', false),
+  $manila                        = hiera('manila_api_enabled', false),
+  $glance_api                    = hiera('glance_api_enabled', false),
+  $nova_osapi                    = hiera('nova_api_enabled', false),
+  $placement                     = hiera('placement_enabled', false),
+  $nova_metadata                 = hiera('nova_metadata_enabled', false),
+  $nova_novncproxy               = hiera('nova_vnc_proxy_enabled', false),
+  $aodh                          = hiera('aodh_api_enabled', false),
+  $barbican                      = hiera('barbican_api_enabled', false),
+  $ceph_grafana                  = hiera('ceph_grafana_enabled', false),
+  $ceph_dashboard                = hiera('ceph_grafana_enabled', false),
+  $gnocchi                       = hiera('gnocchi_api_enabled', false),
+  $mistral                       = hiera('mistral_api_enabled', false),
+  $swift_proxy_server            = hiera('swift_proxy_enabled', false),
+  $heat_api                      = hiera('heat_api_enabled', false),
+  $heat_cfn                      = hiera('heat_api_cfn_enabled', false),
+  $horizon                       = hiera('horizon_enabled', false),
+  $ironic                        = hiera('ironic_api_enabled', false),
+  $ironic_inspector              = hiera('ironic_inspector_enabled', false),
+  $octavia                       = hiera('octavia_api_enabled', false),
+  $designate                     = hiera('designate_api_enabled', false),
+  $metrics_qdr                   = hiera('metrics_qdr_enabled', false),
+  $mysql                         = hiera('mysql_enabled', false),
+  $mysql_clustercheck            = false,
+  $mysql_max_conn                = undef,
+  $mysql_member_options          = undef,
+  $mysql_custom_listen_options   = {},
+  $mysql_custom_frontend_options = {},
+  $mysql_custom_backend_options  = {},
+  $rabbitmq                      = false,
+  $etcd                          = hiera('etcd_enabled', false),
+  $docker_registry               = hiera('enable_docker_registry', false),
+  $redis                         = hiera('redis_enabled', false),
+  $redis_password                = undef,
+  $zaqar_api                     = hiera('zaqar_api_enabled', false),
+  $ceph_rgw                      = hiera('ceph_rgw_enabled', false),
+  $ovn_dbs                       = hiera('ovn_dbs_enabled', false),
+  $ovn_dbs_manage_lb             = false,
+  $zaqar_ws                      = hiera('zaqar_api_enabled', false),
+  $aodh_network                  = hiera('aodh_api_network', undef),
+  $barbican_network              = hiera('barbican_api_network', false),
+  $ceph_rgw_network              = hiera('ceph_rgw_network', undef),
+  $cinder_network                = hiera('cinder_api_network', undef),
+  $designate_network             = hiera('designate_api_network', undef),
+  $metrics_qdr_network           = hiera('metrics_qdr_network', undef),
+  $docker_registry_network       = hiera('docker_registry_network', undef),
+  $glance_api_network            = hiera('glance_api_network', undef),
+  $gnocchi_network               = hiera('gnocchi_api_network', undef),
+  $heat_api_network              = hiera('heat_api_network', undef),
+  $ceph_grafana_network          = hiera('ceph_grafana_network', undef),
+  $ceph_dashboard_network        = hiera('ceph_dashboard_network', undef),
+  $heat_cfn_network              = hiera('heat_api_cfn_network', undef),
+  $horizon_network               = hiera('horizon_network', undef),
+  $ironic_inspector_network      = hiera('ironic_inspector_network', undef),
+  $ironic_network                = hiera('ironic_api_network', undef),
+  $keystone_admin_network        = hiera('keystone_admin_api_network', undef),
+  $keystone_public_network       = hiera('keystone_public_api_network', undef),
+  $keystone_sticky_sessions      = hiera('keystone_sticky_sessions', false),
+  $keystone_session_cookie       = hiera('keystone_session_cookie,', 'KEYSTONESESSION'),
+  $manila_network                = hiera('manila_api_network', undef),
+  $mistral_network               = hiera('mistral_api_network', undef),
+  $neutron_network               = hiera('neutron_api_network', undef),
+  $nova_metadata_network         = hiera('nova_metadata_network', undef),
+  $nova_novncproxy_network       = hiera('nova_vnc_proxy_network', hiera('nova_libvirt_network', undef)),
+  $nova_osapi_network            = hiera('nova_api_network', undef),
+  $placement_network             = hiera('placement_network', undef),
+  $octavia_network               = hiera('octavia_api_network', undef),
+  $ovn_dbs_network               = hiera('ovn_dbs_network', undef),
+  $etcd_network                  = hiera('etcd_network', undef),
+  $swift_proxy_server_network    = hiera('swift_proxy_network', undef),
+  $zaqar_api_network             = hiera('zaqar_api_network', undef),
+  $zaqar_ws_timeout_tunnel       = hiera('zaqar_ws_timeout_tunnel', '14400'),
+  $service_ports                 = {}
 ) {
   $default_service_ports = {
     aodh_api_port => 8042,
@@ -789,13 +805,18 @@ class tripleo::haproxy (
   }
 
 
-  $default_listen_options = {
-    'option'       => [ 'httpchk', 'httplog', ],
+  $default_frontend_options = {
+    'option'       => [ 'httplog', ],
     'http-request' => [
       'set-header X-Forwarded-Proto https if { ssl_fc }',
       'set-header X-Forwarded-Proto http if !{ ssl_fc }',
       'set-header X-Forwarded-Port %[dst_port]'],
   }
+  $default_backend_options = {
+    'option' => [ 'httpchk' ],
+  }
+  $default_listen_options = merge_hash_values($default_frontend_options,
+                                              $default_backend_options)
   Tripleo::Haproxy::Endpoint {
     haproxy_listen_bind_param   => $haproxy_listen_bind_param,
     member_options              => $haproxy_member_options,
@@ -803,6 +824,8 @@ class tripleo::haproxy (
     use_internal_certificates   => $use_internal_certificates,
     internal_certificates_specs => $internal_certificates_specs,
     listen_options              => $default_listen_options,
+    frontend_options            => $default_frontend_options,
+    backend_options             => $default_backend_options,
     manage_firewall             => $manage_firewall,
   }
 
@@ -830,23 +853,30 @@ class tripleo::haproxy (
     }
   }
 
-  $keystone_listen_opts = {
-    'option' => [ 'httpchk GET /v3', 'httplog' ]
+  $keystone_frontend_opts = {
+    'option' => [ 'httplog' ]
   }
+  $keystone_backend_opts = {
+    'option' => [ 'httpchk GET /v3' ]
+  }
+  $keystone_listen_opts = merge_hash_values($keystone_frontend_opts,
+                                              $keystone_backend_opts)
   if $keystone_admin {
     # NOTE(jaosorior): Given that the admin endpoint is in the same vhost
     # nowadays as the public/internal one. We can just loadbalance towards the
     # same IP.
     ::tripleo::haproxy::endpoint { 'keystone_admin':
-      internal_ip     => hiera('keystone_admin_api_vip', $controller_virtual_ip),
-      service_port    => $ports[keystone_public_api_port],
-      haproxy_port    => $ports[keystone_admin_api_port],
-      ip_addresses    => hiera('keystone_public_api_node_ips', $controller_hosts_real),
-      server_names    => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      listen_options  => merge($default_listen_options, $keystone_listen_opts),
-      service_network => $keystone_admin_network,
-      member_options  => union($haproxy_member_options, $internal_tls_member_options),
+      internal_ip      => hiera('keystone_admin_api_vip', $controller_virtual_ip),
+      service_port     => $ports[keystone_public_api_port],
+      haproxy_port     => $ports[keystone_admin_api_port],
+      ip_addresses     => hiera('keystone_public_api_node_ips', $controller_hosts_real),
+      server_names     => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
+      mode             => 'http',
+      listen_options   => merge($default_listen_options, $keystone_listen_opts),
+      frontend_options => merge($default_frontend_options, $keystone_frontend_opts),
+      backend_options  => merge($default_backend_options, $keystone_backend_opts),
+      service_network  => $keystone_admin_network,
+      member_options   => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
@@ -859,6 +889,8 @@ class tripleo::haproxy (
       server_names      => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $keystone_listen_opts),
+      frontend_options  => merge($default_frontend_options, $keystone_frontend_opts),
+      backend_options   => $keystone_backend_opts,
       public_ssl_port   => $ports[keystone_public_api_ssl_port],
       service_network   => $keystone_public_network,
       sticky_sessions   => $keystone_sticky_sessions,
@@ -868,6 +900,15 @@ class tripleo::haproxy (
   }
 
   if $neutron {
+    $neutron_frontend_opts = {
+      'option'  => [ 'httplog' ]
+    }
+    $neutron_backend_opts = {
+      'balance' => $haproxy_lb_mode_longrunning,
+      'option'  => [ 'httpchk' ]
+    }
+    $neutron_listen_opts = merge_hash_values($neutron_frontend_opts,
+                                                $neutron_backend_opts)
     ::tripleo::haproxy::endpoint { 'neutron':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('neutron_api_vip', $controller_virtual_ip),
@@ -875,9 +916,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
       server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'balance' => $haproxy_lb_mode_longrunning
-      }),
+      listen_options    => merge($default_listen_options, $neutron_listen_opts),
+      frontend_options  => merge($default_frontend_options, $neutron_frontend_opts),
+      backend_options   => merge($default_backend_options, $neutron_backend_opts),
       public_ssl_port   => $ports[neutron_api_ssl_port],
       service_network   => $neutron_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -885,6 +926,15 @@ class tripleo::haproxy (
   }
 
   if $cinder {
+    $cinder_frontend_opts = {
+      'option'  => [ 'httplog' ],
+    }
+    $cinder_backend_opts = {
+      'option'  => [ 'httpchk' ],
+      'balance' => $haproxy_lb_mode_longrunning,
+    }
+    $cinder_listen_opts = merge_hash_values($cinder_frontend_opts,
+                                              $cinder_backend_opts)
     ::tripleo::haproxy::endpoint { 'cinder':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('cinder_api_vip', $controller_virtual_ip),
@@ -892,9 +942,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
       server_names      => hiera('cinder_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'balance' => $haproxy_lb_mode_longrunning
-      }),
+      listen_options    => merge($default_listen_options, $cinder_listen_opts),
+      frontend_options  => merge($default_frontend_options, $cinder_frontend_opts),
+      backend_options   => merge($default_backend_options, $cinder_backend_opts),
       public_ssl_port   => $ports[cinder_api_ssl_port],
       service_network   => $cinder_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -902,6 +952,14 @@ class tripleo::haproxy (
   }
 
   if $manila {
+    $manila_frontend_opts = {
+      'option' => [ 'httplog' ],
+    }
+    $manila_backend_opts = {
+      'option' => [ 'httpchk GET /healthcheck' ],
+    }
+    $manila_listen_opts = merge_hash_values($manila_frontend_opts,
+                                              $manila_backend_opts)
     ::tripleo::haproxy::endpoint { 'manila':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('manila_api_vip', $controller_virtual_ip),
@@ -909,6 +967,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('manila_api_node_ips', $controller_hosts_real),
       server_names      => hiera('manila_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $manila_listen_opts),
+      frontend_options  => merge($default_frontend_options, $manila_frontend_opts),
+      backend_options   => merge($default_backend_options, $manila_backend_opts),
       public_ssl_port   => $ports[manila_api_ssl_port],
       service_network   => $manila_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -916,6 +977,14 @@ class tripleo::haproxy (
   }
 
   if $glance_api {
+    $glance_frontend_opts = {
+      'option' => [ 'httplog' ],
+    }
+    $glance_backend_opts = {
+      'option' => [ 'httpchk GET /healthcheck' ],
+    }
+    $glance_listen_opts = merge_hash_values($glance_frontend_opts,
+                                              $glance_backend_opts)
     ::tripleo::haproxy::endpoint { 'glance_api':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('glance_api_vip', $controller_virtual_ip),
@@ -924,9 +993,9 @@ class tripleo::haproxy (
       server_names      => hiera('glance_api_node_names', $controller_hosts_names_real),
       public_ssl_port   => $ports[glance_api_ssl_port],
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'option' => [ 'httpchk GET /healthcheck', 'httplog' ]
-      }),
+      listen_options    => merge($default_listen_options, $glance_listen_opts),
+      frontend_options  => merge($default_frontend_options, $glance_frontend_opts),
+      backend_options   => merge($default_backend_options, $glance_backend_opts),
       service_network   => $glance_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
@@ -934,46 +1003,61 @@ class tripleo::haproxy (
 
   if $ceph_grafana {
     ::tripleo::haproxy::endpoint { 'ceph_grafana':
-      internal_ip     => hiera('ceph_dashboard_vip', $controller_virtual_ip),
-      service_port    => $ports[ceph_grafana_port],
-      ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      public_ssl_port => $ports[ceph_grafana_ssl_port],
-      listen_options  => merge($default_listen_options, {
+      internal_ip      => hiera('ceph_dashboard_vip', $controller_virtual_ip),
+      service_port     => $ports[ceph_grafana_port],
+      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      mode             => 'http',
+      public_ssl_port  => $ports[ceph_grafana_ssl_port],
+      listen_options   => merge($default_listen_options, {
         'option'  => [ 'httpchk HEAD /', 'httplog' ],
         'balance' => 'source',
       }),
-      service_network => $ceph_grafana_network,
-      member_options  => union($haproxy_member_options, $internal_tls_member_options),
+      frontend_options => $default_frontend_options,
+      backend_options  => merge($default_backend_options, {
+        'option'  => [ 'httpchk HEAD /' ],
+        'balance' => 'source',
+      }),
+      service_network  => $ceph_grafana_network,
+      member_options   => union($haproxy_member_options, $internal_tls_member_options),
     }
     ::tripleo::haproxy::endpoint { 'ceph_prometheus':
-      internal_ip     => hiera('ceph_grafana_vip', $controller_virtual_ip),
-      service_port    => $ports[ceph_prometheus_port],
-      ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      public_ssl_port => $ports[ceph_prometheus_ssl_port],
-      listen_options  => merge($default_listen_options, {
+      internal_ip      => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      service_port     => $ports[ceph_prometheus_port],
+      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      mode             => 'http',
+      public_ssl_port  => $ports[ceph_prometheus_ssl_port],
+      listen_options   => merge($default_listen_options, {
         'option'  => [ 'httpchk GET /metrics', 'httplog' ],
         'balance' => 'source',
       }),
-      service_network => $ceph_grafana_network,
-      member_options  => $haproxy_member_options,
+      frontend_options => $default_frontend_options,
+      backend_options  => merge($default_backend_options, {
+        'option'  => [ 'httpchk GET /metrics' ],
+        'balance' => 'source',
+      }),
+      service_network  => $ceph_grafana_network,
+      member_options   => $haproxy_member_options,
     }
     ::tripleo::haproxy::endpoint { 'ceph_alertmanager':
-      internal_ip     => hiera('ceph_grafana_vip', $controller_virtual_ip),
-      service_port    => $ports[ceph_alertmanager_port],
-      ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      public_ssl_port => $ports[ceph_alertmanager_ssl_port],
-      listen_options  => merge($default_listen_options, {
+      internal_ip      => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      service_port     => $ports[ceph_alertmanager_port],
+      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      mode             => 'http',
+      public_ssl_port  => $ports[ceph_alertmanager_ssl_port],
+      listen_options   => merge($default_listen_options, {
         'option'  => [ 'httpchk GET /', 'httplog' ],
         'balance' => 'source',
       }),
-      service_network => $ceph_grafana_network,
-      member_options  => $haproxy_member_options,
+      frontend_options => $default_frontend_options,
+      backend_options  => merge($default_backend_options, {
+        'option'  => [ 'httpchk GET /' ],
+        'balance' => 'source',
+      }),
+      service_network  => $ceph_grafana_network,
+      member_options   => $haproxy_member_options,
     }
   }
 
@@ -983,20 +1067,25 @@ class tripleo::haproxy (
     } else {
       $ceph_dashboard_tls_member_options = []
     }
+    $ceph_dashboard_backend_opts = {
+      'option'     => [ 'httpchk HEAD /' ],
+      'balance'    => 'source',
+      'http-check' => 'expect rstatus 2[0-9][0-9]',
+    }
+    $ceph_dashboard_listen_opts = merge_hash_values($default_frontend_options,
+                                                      $ceph_dashboard_backend_opts)
     ::tripleo::haproxy::endpoint { 'ceph_dashboard':
-      internal_ip     => hiera('ceph_dashboard_vip', $controller_virtual_ip),
-      service_port    => $ports[ceph_dashboard_port],
-      ip_addresses    => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names    => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
-      mode            => 'http',
-      public_ssl_port => $ports[ceph_dashboard_ssl_port],
-      listen_options  => merge($default_listen_options, {
-        'option'     => [ 'httpchk HEAD /', 'httplog' ],
-        'balance'    => 'source',
-        'http-check' => 'expect rstatus 2[0-9][0-9]',
-      }),
-      service_network => $ceph_dashboard_network,
-      member_options  => union($haproxy_member_options, $ceph_dashboard_tls_member_options),
+      internal_ip      => hiera('ceph_dashboard_vip', $controller_virtual_ip),
+      service_port     => $ports[ceph_dashboard_port],
+      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
+      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      mode             => 'http',
+      public_ssl_port  => $ports[ceph_dashboard_ssl_port],
+      listen_options   => merge($default_listen_options, $ceph_dashboard_listen_opts),
+      frontend_options => $default_frontend_options,
+      backend_options  => merge($default_backend_options, $ceph_dashboard_backend_opts),
+      service_network  => $ceph_dashboard_network,
+      member_options   => union($haproxy_member_options, $ceph_dashboard_tls_member_options),
     }
   }
 
@@ -1036,18 +1125,23 @@ class tripleo::haproxy (
     } else {
       $nova_metadata_server_names_real = hiera('nova_metadata_node_names', $controller_hosts_names_real)
     }
+    $nova_metadata_backend_opts = {
+      'balance'   => 'source',
+      'hash-type' => 'consistent',
+    }
+    $nova_metadata_listen_opts = merge_hash_values($default_listen_options,
+                                                      $nova_metadata_backend_opts)
     ::tripleo::haproxy::endpoint { 'nova_metadata':
-      internal_ip     => hiera('nova_metadata_vip', $controller_virtual_ip),
-      service_port    => $ports[nova_metadata_port],
-      ip_addresses    => hiera('nova_metadata_node_ips', $controller_hosts_real),
-      server_names    => $nova_metadata_server_names_real,
-      mode            => 'http',
-      service_network => $nova_metadata_network,
-      member_options  => union($haproxy_member_options, $internal_tls_member_options),
-      listen_options  => merge($default_listen_options, {
-        'balance'   => 'source',
-        'hash-type' => 'consistent',
-      }),
+      internal_ip      => hiera('nova_metadata_vip', $controller_virtual_ip),
+      service_port     => $ports[nova_metadata_port],
+      ip_addresses     => hiera('nova_metadata_node_ips', $controller_hosts_real),
+      server_names     => $nova_metadata_server_names_real,
+      mode             => 'http',
+      service_network  => $nova_metadata_network,
+      member_options   => union($haproxy_member_options, $internal_tls_member_options),
+      listen_options   => merge($default_listen_options, $nova_metadata_listen_opts),
+      frontend_options => $default_frontend_options,
+      backend_options  => merge($default_backend_options, $nova_metadata_backend_opts),
     }
   }
 
@@ -1066,6 +1160,15 @@ class tripleo::haproxy (
     } else {
       $novncproxy_server_names_real = hiera('nova_vnc_proxy_node_names', $controller_hosts_names_real)
     }
+    $nova_vncproxy_frontend_opts = {
+      'option'  => [ 'tcpka', 'tcplog' ],
+    }
+    $nova_vncproxy_backend_opts = {
+      'balance' => 'source',
+      'timeout' => [ 'tunnel 1h' ],
+    }
+    $nova_vncproxy_listen_opts = merge_hash_values($nova_vncproxy_frontend_opts,
+                                                      $nova_vncproxy_backend_opts)
     ::tripleo::haproxy::endpoint { 'nova_novncproxy':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $nova_vnc_proxy_vip,
@@ -1073,11 +1176,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('nova_vnc_proxy_node_ips', $controller_hosts_real),
       server_names      => $novncproxy_server_names_real,
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'option'  => [ 'tcpka', 'tcplog' ],
-        'balance' => 'source',
-        'timeout' => [ 'tunnel 1h' ],
-      }),
+      listen_options    => merge($default_listen_options, $nova_vncproxy_listen_opts),
+      frontend_options  => merge($default_frontend_options, $nova_vncproxy_frontend_opts),
+      backend_options   => merge($default_backend_options, $nova_vncproxy_backend_opts),
       public_ssl_port   => $ports[nova_novnc_ssl_port],
       service_network   => $nova_novncproxy_network,
       member_options    => union($haproxy_member_options_real, $internal_tls_member_options, $novncproxy_ssl_member_options),
@@ -1085,6 +1186,14 @@ class tripleo::haproxy (
   }
 
   if $aodh {
+    $aodh_frontend_opts = {
+      'option' => [ 'httplog' ],
+    }
+    $aodh_backend_opts = {
+      'option' => [ 'httpchk GET /healthcheck' ],
+    }
+    $aodh_listen_opts = merge_hash_values($aodh_frontend_opts,
+                                            $aodh_backend_opts)
     ::tripleo::haproxy::endpoint { 'aodh':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('aodh_api_vip', $controller_virtual_ip),
@@ -1092,6 +1201,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
       server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $aodh_listen_opts),
+      frontend_options  => merge($default_frontend_options, $aodh_frontend_opts),
+      backend_options   => merge($default_backend_options, $aodh_backend_opts),
       public_ssl_port   => $ports[aodh_api_ssl_port],
       service_network   => $aodh_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1099,6 +1211,14 @@ class tripleo::haproxy (
   }
 
   if $barbican {
+    $barbican_frontend_opts = {
+      'option' => [ 'httplog' ],
+    }
+    $barbican_backend_opts = {
+      'option' => [ 'httpchk GET /healthcheck' ],
+    }
+    $barbican_listen_opts = merge_hash_values($barbican_frontend_opts,
+                                                $barbican_backend_opts)
     ::tripleo::haproxy::endpoint { 'barbican':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('barbican_api_vip', $controller_virtual_ip),
@@ -1108,6 +1228,9 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[barbican_api_ssl_port],
       service_network   => $barbican_network,
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $barbican_listen_opts),
+      frontend_options  => merge($default_frontend_options, $barbican_frontend_opts),
+      backend_options   => merge($default_backend_options, $barbican_backend_opts),
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
@@ -1140,12 +1263,17 @@ class tripleo::haproxy (
   }
 
   if $swift_proxy_server {
-    $swift_proxy_server_listen_options = {
-      'option'         => [ 'httpchk GET /healthcheck', 'httplog' ],
-      'balance'        => $haproxy_lb_mode_longrunning,
+    $swift_proxy_server_frontend_options = {
+      'option'         => [ 'httplog' ],
       'timeout client' => '2m',
+    }
+    $swift_proxy_server_backend_options = {
+      'option'         => [ 'httpchk GET /healthcheck' ],
+      'balance'        => $haproxy_lb_mode_longrunning,
       'timeout server' => '2m',
     }
+    $swift_proxy_server_listen_options = merge_hash_values($swift_proxy_server_frontend_options,
+                                                              $swift_proxy_server_backend_options)
     ::tripleo::haproxy::endpoint { 'swift_proxy_server':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('swift_proxy_vip', $controller_virtual_ip),
@@ -1154,6 +1282,8 @@ class tripleo::haproxy (
       server_names      => hiera('swift_proxy_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $swift_proxy_server_listen_options),
+      frontend_options  => merge($default_frontend_options, $swift_proxy_server_frontend_options),
+      backend_options   => merge($default_backend_options, $swift_proxy_server_backend_options),
       public_ssl_port   => $ports[swift_proxy_ssl_port],
       service_network   => $swift_proxy_server_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1174,11 +1304,14 @@ class tripleo::haproxy (
     $heat_ssl_options = {
       'rsprep' => "^Location:\\ http://${public_virtual_ip}(.*) Location:\\ https://${public_virtual_ip}\\1",
     }
-    $heat_options = merge($default_listen_options, $heat_ssl_options, $heat_timeout_options)
+    $heat_listen_options = merge($default_listen_options, $heat_ssl_options, $heat_timeout_options)
+    $heat_frontend_options = merge($default_frontend_options, $heat_ssl_options, $heat_timeout_options)
   } else {
-    $heat_options = merge($default_listen_options, $heat_timeout_options)
+    $heat_listen_options = merge($default_listen_options, $heat_timeout_options)
+    $heat_frontend_options = merge($default_frontend_options, $heat_timeout_options)
   }
-  $heat_options_real = merge($heat_options, $heat_durability_options)
+  $heat_listen_options_real = merge($heat_listen_options, $heat_durability_options)
+  $heat_frontend_options_real = merge($heat_frontend_options, $heat_durability_options)
 
   if $heat_api {
     ::tripleo::haproxy::endpoint { 'heat_api':
@@ -1188,7 +1321,8 @@ class tripleo::haproxy (
       ip_addresses      => $heat_ip_addresses,
       server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => $heat_options_real,
+      listen_options    => $heat_listen_options_real,
+      frontend_options  => $heat_frontend_options_real,
       public_ssl_port   => $ports[heat_api_ssl_port],
       service_network   => $heat_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1203,7 +1337,8 @@ class tripleo::haproxy (
       ip_addresses      => $heat_ip_addresses,
       server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
-      listen_options    => $heat_options_real,
+      listen_options    => $heat_listen_options_real,
+      frontend_options  => $heat_frontend_options_real,
       public_ssl_port   => $ports[heat_cfn_ssl_port],
       service_network   => $heat_cfn_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1227,6 +1362,14 @@ class tripleo::haproxy (
   }
 
   if $ironic {
+    $ironic_frontend_opts = {
+      'option' => [ 'httplog' ],
+    }
+    $ironic_backend_opts = {
+      'option' => [ 'httpchk' ],
+    }
+    $ironic_listen_opts = merge_hash_values($ironic_frontend_opts,
+                                            $ironic_backend_opts)
     ::tripleo::haproxy::endpoint { 'ironic':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('ironic_api_vip', $controller_virtual_ip),
@@ -1234,6 +1377,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
       server_names      => hiera('ironic_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      frontend_options  => merge($default_frontend_options, $ironic_frontend_opts),
+      backend_options   => merge($default_backend_options, $ironic_backend_opts),
+      listen_options    => merge($default_listen_options, $ironic_listen_opts),
       public_ssl_port   => $ports[ironic_api_ssl_port],
       service_network   => $ironic_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1241,6 +1387,16 @@ class tripleo::haproxy (
   }
 
   if $ironic_inspector {
+    $ironic_inspector_frontend_opts = {
+      'option' => [ 'httplog' ],
+    }
+    $ironic_inspector_backend_opts = {
+      'option'  => [ 'httpchk' ],
+      'balance' => $haproxy_lb_mode_longrunning
+    }
+    $ironic_inspector_listen_opts = merge_hash_values($ironic_inspector_frontend_opts,
+                                                        $ironic_inspector_backend_opts)
+    # NOTE(tkajinam): Ironic-inspector doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'ironic-inspector':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('ironic_inspector_vip', $controller_virtual_ip),
@@ -1250,13 +1406,21 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
       mode              => 'http',
-      listen_options    => merge($default_listen_options, {
-        'balance' => $haproxy_lb_mode_longrunning
-      }),
+      listen_options    => merge($default_listen_options, $ironic_inspector_listen_opts),
+      frontend_options  => merge($default_frontend_options, $ironic_inspector_frontend_opts),
+      backend_options   => merge($default_backend_options, $ironic_inspector_backend_opts),
     }
   }
 
   if $designate {
+    $designate_frontend_opts = {
+      'option' => [ 'httplog' ],
+    }
+    $designate_backend_opts = {
+      'option' => [ 'httpchk GET /healthcheck' ],
+    }
+    $designate_listen_opts = merge_hash_values($designate_frontend_opts,
+                                                  $designate_backend_opts)
     ::tripleo::haproxy::endpoint { 'designate':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('designate_api_vip', $controller_virtual_ip),
@@ -1264,6 +1428,9 @@ class tripleo::haproxy (
       ip_addresses      => hiera('designate_api_node_ips', $controller_hosts_real),
       server_names      => hiera('designate_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
+      listen_options    => merge($default_listen_options, $designate_listen_opts),
+      frontend_options  => merge($default_frontend_options, $designate_frontend_opts),
+      backend_options   => merge($default_backend_options, $designate_backend_opts),
       public_ssl_port   => $ports[designate_api_ssl_port],
       service_network   => $designate_network,
     }
@@ -1273,13 +1440,29 @@ class tripleo::haproxy (
     $metrics_bind_opts = {
       "${public_virtual_ip}:${ports[metrics_qdr_port]}" => $haproxy_listen_bind_param,
     }
-    haproxy::listen { 'metrics_qdr':
-      bind             => $metrics_bind_opts,
-      options          => {
-        'option'    => [ 'tcp-check', 'tcplog' ],
-        'tcp-check' => ["connect port ${ports[metrics_qdr_port]}"],
-      },
-      collect_exported => false,
+    if $use_backend_syntax {
+      haproxy::frontend { 'metrics_qdr':
+        bind             => $metrics_bind_opts,
+        options          => { 'default_backend' => 'metrics_qdr_be' },
+        collect_exported => false,
+      }
+      haproxy::backend { 'metrics_qdr_be':
+        options => {
+          'option'    => [ 'tcp-check', 'tcplog' ],
+          'tcp-check' => ["connect port ${ports[metrics_qdr_port]}"],
+        },
+      }
+      $metrics_qdr_service = 'metrics_qdr_be'
+    } else {
+      haproxy::listen { 'metrics_qdr':
+        bind             => $metrics_bind_opts,
+        options          => {
+          'option'    => [ 'tcp-check', 'tcplog' ],
+          'tcp-check' => ["connect port ${ports[metrics_qdr_port]}"],
+        },
+        collect_exported => false,
+      }
+      $metrics_qdr_service = 'metrics_qdr'
     }
     # Note(mmagr): while MetricsQdr service runs on all overcloud nodes, we need load balancing
     # only on controllers as those are only QDRs forming mesh (listening on connection
@@ -1289,7 +1472,7 @@ class tripleo::haproxy (
     # MetricsQdr will be refactored (split to QDR running on controller or on other node)
     # to better integrate, but for now we need this hack to enable the feature
     haproxy::balancermember { 'metrics_qdr':
-      listening_service => 'metrics_qdr',
+      listening_service => $metrics_qdr_service,
       ports             => $ports[metrics_qdr_port],
       ipaddresses       => hiera('pacemaker_node_ips', $controller_hosts_real),
       server_names      => hiera('pacemaker_node_names', $controller_hosts_names_real),
@@ -1299,25 +1482,34 @@ class tripleo::haproxy (
   }
 
   if $mysql_clustercheck {
-    $mysql_listen_options = {
-      'option'         => [ 'tcpka', 'httpchk', 'tcplog' ],
+    $mysql_frontend_opts = {
+      'option'         => [ 'tcpka', 'tcplog' ],
       'timeout client' => '90m',
-      'timeout server' => '90m',
-      'stick-table'    => 'type ip size 1000',
-      'stick'          => 'on dst',
       'maxconn'        => $mysql_max_conn
     }
+    $mysql_backend_opts = {
+      'option'         => [ 'tcpka', 'httpchk' ],
+      'stick-table'    => 'type ip size 1000',
+      'stick'          => 'on dst',
+      'timeout server' => '90m',
+    }
+    $mysql_listen_opts = merge_hash_values($mysql_frontend_opts,
+                                              $mysql_backend_opts)
     if $mysql_member_options {
         $mysql_member_options_real = $mysql_member_options
     } else {
         $mysql_member_options_real = ['backup', 'port 9200', 'on-marked-down shutdown-sessions', 'check', 'inter 1s']
     }
   } else {
-    $mysql_listen_options = {
+    $mysql_frontend_opts = {
       'timeout client' => '90m',
-      'timeout server' => '90m',
       'maxconn'        => $mysql_max_conn
     }
+    $mysql_backend_opts = {
+      'timeout server' => '90m',
+    }
+    $mysql_listen_opts = merge_hash_values($mysql_frontend_opts,
+                                              $mysql_backend_opts)
     if $mysql_member_options {
         $mysql_member_options_real = $mysql_member_options
     } else {
@@ -1331,13 +1523,28 @@ class tripleo::haproxy (
     } else {
       $mysql_server_names_real = hiera('mysql_node_names', $controller_hosts_names_real)
     }
-    haproxy::listen { 'mysql':
-      bind             => $mysql_bind_opts,
-      options          => deep_merge($mysql_listen_options, $mysql_custom_listen_options),
-      collect_exported => false,
+    if $use_backend_syntax {
+      haproxy::frontend { 'mysql':
+        bind             => $mysql_bind_opts,
+        options          => deep_merge($mysql_frontend_opts,
+                                          { 'default_backend' => 'mysql_be' },
+                                          $mysql_custom_frontend_options),
+        collect_exported => false,
+      }
+      haproxy::backend { 'mysql_be':
+        options => deep_merge($mysql_backend_opts, $mysql_custom_backend_options),
+      }
+      $mysql_service = 'mysql_be'
+    } else {
+      haproxy::listen { 'mysql':
+        bind             => $mysql_bind_opts,
+        options          => deep_merge($mysql_listen_opts, $mysql_custom_listen_options),
+        collect_exported => false,
+      }
+      $mysql_service = 'mysql'
     }
     haproxy::balancermember { 'mysql-backup':
-      listening_service => 'mysql',
+      listening_service => $mysql_service,
       ports             => '3306',
       ipaddresses       => hiera('mysql_node_ips', $controller_hosts_real),
       server_names      => $mysql_server_names_real,
@@ -1355,16 +1562,31 @@ class tripleo::haproxy (
   }
 
   if $rabbitmq {
-    haproxy::listen { 'rabbitmq':
-      bind             => $rabbitmq_bind_opts,
-      options          => {
-        'option'  => [ 'tcpka', 'tcplog' ],
-        'timeout' => [ 'client 0', 'server 0' ],
-      },
-      collect_exported => false,
+    if $use_backend_syntax {
+      haproxy::frontend { 'rabbitmq':
+        bind             => $rabbitmq_bind_opts,
+        collect_exported => false,
+      }
+      haproxy::backend { 'rabbitmq_be':
+        options => {
+          'option'  => [ 'tcpka', 'tcplog' ],
+          'timeout' => [ 'client 0', 'server 0' ],
+        },
+      }
+      $rabbitmq_service = 'rabbitmq_be'
+    } else {
+      haproxy::listen { 'rabbitmq':
+        bind             => $rabbitmq_bind_opts,
+        options          => {
+          'option'  => [ 'tcpka', 'tcplog' ],
+          'timeout' => [ 'client 0', 'server 0' ],
+        },
+        collect_exported => false,
+      }
+      $rabbitmq_service = 'rabbitmq'
     }
     haproxy::balancermember { 'rabbitmq':
-      listening_service => 'rabbitmq',
+      listening_service => $rabbitmq_service,
       ports             => '5672',
       ipaddresses       => hiera('rabbitmq_node_ips', $controller_hosts_real),
       server_names      => hiera('rabbitmq_node_names', $controller_hosts_names_real),
@@ -1381,6 +1603,9 @@ class tripleo::haproxy (
       service_network => $etcd_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
       listen_options  => {
+        'balance' => 'source',
+      },
+      backend_options => {
         'balance' => 'source',
       }
     }
@@ -1425,17 +1650,33 @@ class tripleo::haproxy (
                                         'send QUIT\r\n',
                                         'expect string +OK']
     $redis_tcp_check_options = $redis_tcp_check_connect_options + $redis_tcp_check_common_options
-    haproxy::listen { 'redis':
-      bind             => $redis_bind_opts,
-      options          => {
-        'balance'   => 'first',
-        'option'    => [ 'tcp-check', 'tcplog', ],
-        'tcp-check' => $redis_tcp_check_options,
-      },
-      collect_exported => false,
+    if $use_backend_syntax {
+      haproxy::frontend { 'redis':
+        bind             => $redis_bind_opts,
+        collect_exported => false,
+      }
+      haproxy::backend { 'redis_be':
+        options => {
+          'balance'   => 'first',
+          'option'    => [ 'tcp-check', 'tcplog', ],
+          'tcp-check' => $redis_tcp_check_options,
+        },
+      }
+      $redis_service = 'redis_be'
+    } else {
+      haproxy::listen { 'redis':
+        bind             => $redis_bind_opts,
+        options          => {
+          'balance'   => 'first',
+          'option'    => [ 'tcp-check', 'tcplog', ],
+          'tcp-check' => $redis_tcp_check_options,
+        },
+        collect_exported => false,
+      }
+      $redis_service = 'redis'
     }
     haproxy::balancermember { 'redis':
-      listening_service => 'redis',
+      listening_service => $redis_service,
       ports             => '6379',
       ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
       server_names      => hiera('redis_node_names', $controller_hosts_names_real),
@@ -1468,6 +1709,12 @@ class tripleo::haproxy (
   }
 
   if $ceph_rgw {
+    $ceph_rgw_backend_opts = {
+      'option'  => [ 'httpchk GET /swift/healthcheck' ],
+      'balance' => $haproxy_lb_mode_longrunning
+    }
+    $ceph_rgw_listen_opts = merge_hash_values($default_frontend_options,
+                                                $ceph_rgw_backend_opts)
     ::tripleo::haproxy::endpoint { 'ceph_rgw':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('ceph_rgw_vip', $controller_virtual_ip),
@@ -1477,16 +1724,24 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
-      listen_options    => merge($default_listen_options, {
-          'option'  => [ 'httpchk GET /swift/healthcheck', 'httplog' ],
-          'balance' => $haproxy_lb_mode_longrunning
-        }
-      ),
+      listen_options    => merge($default_listen_options, $ceph_rgw_listen_opts),
+      frontend_options  => $default_frontend_options,
+      backend_options   => merge($default_backend_options, $ceph_rgw_backend_opts),
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
   if $octavia {
+    $octavia_frontend_opts = {
+      'option'    => [ 'httplog' ],
+    }
+    $octavia_backend_opts = {
+      'hash-type' => 'consistent',
+      'option'    => [ 'httpchk HEAD /', 'httplog' ],
+      'balance'   => 'source',
+    }
+    $octavia_listen_opts = merge_hash_values($octavia_frontend_opts,
+                                                $octavia_backend_opts)
     ::tripleo::haproxy::endpoint { 'octavia':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('octavia_api_vip', $controller_virtual_ip),
@@ -1497,11 +1752,9 @@ class tripleo::haproxy (
       service_network   => $octavia_network,
       mode              => 'http',
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
-      listen_options    => merge($default_listen_options, {
-        'hash-type' => 'consistent',
-        'option'    => [ 'httpchk HEAD /', 'httplog' ],
-        'balance'   => 'source',
-      }),
+      listen_options    => merge($default_listen_options, $octavia_listen_opts),
+      frontend_options  => merge($default_frontend_options, $octavia_frontend_opts),
+      backend_options   => $octavia_backend_opts,
     }
   }
 
@@ -1511,13 +1764,17 @@ class tripleo::haproxy (
     # We only configure ovn_dbs_vip in haproxy if HA for OVN DB servers is
     # disabled.
     # If HA is enabled, pacemaker configures the OVN DB servers accordingly.
-    $ovn_db_listen_options = {
+    $ovn_db_frontend_opts = {
       'option'         => [ 'tcpka', 'tcplog' ],
       'timeout client' => '90m',
+    }
+    $ovn_db_backend_opts = {
       'timeout server' => '90m',
       'stick-table'    => 'type ip size 1000',
       'stick'          => 'on dst',
     }
+    $ovn_db_listen_opts = merge_hash_values($ovn_db_frontend_opts,
+                                              $ovn_db_backend_opts)
     ::tripleo::haproxy::endpoint { 'ovn_nbdb':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => hiera('ovn_dbs_vip', $controller_virtual_ip),
@@ -1526,7 +1783,9 @@ class tripleo::haproxy (
       server_names      => hiera('ovn_dbs_node_names', $controller_hosts_names_real),
       service_network   => $ovn_dbs_network,
       public_ssl_port   => $ports[ovn_nbdb_ssl_port],
-      listen_options    => $ovn_db_listen_options,
+      listen_options    => $ovn_db_listen_opts,
+      frontend_options  => $ovn_db_frontend_opts,
+      backend_options   => $ovn_db_backend_opts,
       mode              => 'tcp'
     }
     ::tripleo::haproxy::endpoint { 'ovn_sbdb':
@@ -1537,12 +1796,29 @@ class tripleo::haproxy (
       server_names      => hiera('ovn_dbs_node_names', $controller_hosts_names_real),
       service_network   => $ovn_dbs_network,
       public_ssl_port   => $ports[ovn_sbdb_ssl_port],
-      listen_options    => $ovn_db_listen_options,
+      listen_options    => $ovn_db_listen_opts,
+      frontend_options  => $ovn_db_frontend_opts,
+      backend_options   => $ovn_db_backend_opts,
       mode              => 'tcp'
     }
   }
 
   if $zaqar_ws {
+    $zaqar_ws_frontend_opts = {
+      # NOTE(jaosorior): Websockets have more overhead in establishing
+      # connections than regular HTTP connections. Also, since it begins
+      # as an HTTP connection and then "upgrades" to a TCP connection, some
+      # timeouts get overridden by others at certain times of the connection.
+      # The following values were taken from the following site:
+      # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
+      'timeout'      => ['connect 5s', 'client 25s'],
+      'http-request' => [join(['set-header Host %[dst]:', $ports[zaqar_ws_port]])],
+    }
+    $zaqar_ws_backend_opts = {
+      'timeout'      => ['server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
+    }
+    $zaqar_ws_listen_opts = merge_hash_values($zaqar_ws_frontend_opts,
+                                                $zaqar_ws_backend_opts)
     ::tripleo::haproxy::endpoint { 'zaqar_ws':
       public_virtual_ip         => $public_virtual_ip,
       internal_ip               => hiera('zaqar_ws_vip', $controller_virtual_ip),
@@ -1551,16 +1827,9 @@ class tripleo::haproxy (
       server_names              => hiera('zaqar_ws_node_names', $controller_hosts_names_real),
       mode                      => 'http',
       haproxy_listen_bind_param => [],  # We don't use a transparent proxy here
-      listen_options            => {
-        # NOTE(jaosorior): Websockets have more overhead in establishing
-        # connections than regular HTTP connections. Also, since it begins
-        # as an HTTP connection and then "upgrades" to a TCP connection, some
-        # timeouts get overridden by others at certain times of the connection.
-        # The following values were taken from the following site:
-        # http://blog.haproxy.com/2012/11/07/websockets-load-balancing-with-haproxy/
-        'timeout'      => ['connect 5s', 'client 25s', 'server 25s', regsubst('tunnel Xs', 'X', $zaqar_ws_timeout_tunnel)],
-        'http-request' => [join(['set-header Host %[dst]:', $ports[zaqar_ws_port]])],
-      },
+      listen_options            => $zaqar_ws_listen_opts,
+      frontend_options          => $zaqar_ws_frontend_opts,
+      backend_options           => $zaqar_ws_backend_opts,
       public_ssl_port           => $ports[zaqar_ws_ssl_port],
       service_network           => $zaqar_api_network,
     }
