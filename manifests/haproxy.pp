@@ -1302,7 +1302,8 @@ class tripleo::haproxy (
 
   $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
   $heat_ip_addresses = hiera('heat_api_node_ips', $controller_hosts_real)
-  $heat_timeout_options = {
+  $heat_frontend_options = {
+    'option'         => [ 'httplog' ],
     'timeout client' => '10m',
   }
   $heat_durability_options = {
@@ -1314,13 +1315,13 @@ class tripleo::haproxy (
     $heat_ssl_options = {
       'http-response' => "replace-header Location http://${public_virtual_ip}(.*) https://${public_virtual_ip}\\1",
     }
-    $heat_listen_options = merge($default_listen_options, $heat_ssl_options, $heat_timeout_options)
-    $heat_frontend_options = merge($default_frontend_options, $heat_ssl_options, $heat_timeout_options)
+    $heat_listen_options = merge($default_listen_options, $heat_ssl_options, $heat_frontend_options)
+    $heat_frontend_options_real = merge($default_frontend_options, $heat_ssl_options, $heat_frontend_options)
   } else {
-    $heat_listen_options = merge($default_listen_options, $heat_timeout_options)
-    $heat_frontend_options = merge($default_frontend_options, $heat_timeout_options)
+    $heat_listen_options = merge($default_listen_options, $heat_frontend_options)
+    $heat_frontend_options_real = merge($default_frontend_options, $heat_frontend_options)
   }
-  $heat_listen_options_real = merge($heat_listen_options, $heat_durability_options)
+  $heat_listen_options_real = merge_hash_values($heat_listen_options, $heat_durability_options)
   $heat_backend_options = merge($default_backend_options, $heat_durability_options)
 
   if $heat_api {
@@ -1332,7 +1333,7 @@ class tripleo::haproxy (
       server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => $heat_listen_options_real,
-      frontend_options  => $heat_frontend_options,
+      frontend_options  => $heat_frontend_options_real,
       backend_options   => $heat_backend_options,
       public_ssl_port   => $ports[heat_api_ssl_port],
       service_network   => $heat_api_network,
@@ -1349,7 +1350,7 @@ class tripleo::haproxy (
       server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => $heat_listen_options_real,
-      frontend_options  => $heat_frontend_options,
+      frontend_options  => $heat_frontend_options_real,
       backend_options   => $heat_backend_options,
       public_ssl_port   => $ports[heat_cfn_ssl_port],
       service_network   => $heat_cfn_network,
@@ -1690,7 +1691,7 @@ class tripleo::haproxy (
         bind             => $redis_bind_opts,
         options          => {
           'balance'   => 'first',
-          'option'    => [ 'tcp-check' ],
+          'option'    => [ 'tcp-check', 'tcplog' ],
           'tcp-check' => $redis_tcp_check_options,
         },
         collect_exported => false,
