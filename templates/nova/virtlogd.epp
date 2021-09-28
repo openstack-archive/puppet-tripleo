@@ -35,8 +35,7 @@ case ${CONTAINER_STATUS_SHORT} in
             -v /sys/fs/cgroup:/sys/fs/cgroup \
             -v /var/run/libvirt:/var/run/libvirt:shared \
             -v /var/lib/libvirt:/var/lib/libvirt \
-            -v /var/log/containers/libvirt:/var/log/libvirt \
-            -v /var/log/libvirt/qemu:/var/log/libvirt/qemu \
+            -v /var/log/containers/libvirt:/var/log/libvirt:shared,z \
             -v /var/lib/nova:/var/lib/nova:shared \
             --net host \
             --pid host \
