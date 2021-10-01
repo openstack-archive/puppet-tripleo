@@ -81,6 +81,7 @@ class tripleo::profile::base::manila::share (
       $manila_generic_backend = hiera('manila::backend::generic::title')
       create_resources('manila::backend::generic', { $manila_generic_backend => delete_undef_values({
         'driver_handles_share_servers'     => hiera('manila::backend::generic::driver_handles_share_servers', true),
+        'backend_availability_zone'        => hiera('manila::backend::generic::backend_availability_zone', undef),
         'max_time_to_attach'               => hiera('manila::backend::generic::max_time_to_attach', undef),
         'max_time_to_create_volume'        => hiera('manila::backend::generic::max_time_to_create_volume', undef),
         'service_instance_smb_config_path' => hiera('manila::backend::generic::service_instance_smb_config_path', undef),
@@ -121,6 +122,7 @@ class tripleo::profile::base::manila::share (
 
       create_resources('manila::backend::cephfs', { $manila_cephfs_backend => delete_undef_values({
         'driver_handles_share_servers'       => hiera('manila::backend::cephfs::driver_handles_share_servers', false),
+        'backend_availability_zone'          => hiera('manila::backend::cephfs::backend_availability_zone', undef),
         'share_backend_name'                 => hiera('manila::backend::cephfs::share_backend_name', undef),
         'cephfs_conf_path'                   => hiera('manila::backend::cephfs::cephfs_conf_path', undef),
         'cephfs_auth_id'                     => $cephfs_auth_id,
@@ -162,6 +164,7 @@ class tripleo::profile::base::manila::share (
       $manila_netapp_backend = hiera('manila::backend::netapp::title')
       create_resources('manila::backend::netapp', { $manila_netapp_backend => delete_undef_values({
         'driver_handles_share_servers'         => hiera('manila::backend::netapp::driver_handles_share_servers', true),
+        'backend_availability_zone'            => hiera('manila::backend::netapp::backend_availability_zone', undef),
         'netapp_login'                         => hiera('manila::backend::netapp::netapp_login', undef),
         'netapp_password'                      => hiera('manila::backend::netapp::netapp_password', undef),
         'netapp_server_hostname'               => hiera('manila::backend::netapp::netapp_server_hostname', undef),
@@ -184,6 +187,7 @@ class tripleo::profile::base::manila::share (
     if $backend_vmax_enabled {
       $manila_vmax_backend = hiera('manila::backend::dellemc_vmax::title')
       create_resources('manila::backend::dellemc_vmax', { $manila_vmax_backend => delete_undef_values({
+        'backend_availability_zone'    => hiera('manila::backend::dellemc_vmax::backend_availability_zone', undef),
         'emc_nas_login'                => hiera('manila::backend::dellemc_vmax::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_vmax::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_vmax::emc_nas_server', undef),
@@ -199,6 +203,7 @@ class tripleo::profile::base::manila::share (
       $manila_unity_backend = hiera('manila::backend::dellemc_unity::title')
       create_resources('manila::backend::dellemc_unity', { $manila_unity_backend => delete_undef_values({
         'driver_handles_share_servers' => hiera('manila::backend::dellemc_unity::driver_handles_share_servers', true),
+        'backend_availability_zone'    => hiera('manila::backend::dellemc_unity::backend_availability_zone', undef),
         'emc_nas_login'                => hiera('manila::backend::dellemc_unity::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_unity::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_unity::emc_nas_server', undef),
@@ -216,6 +221,7 @@ class tripleo::profile::base::manila::share (
     if $backend_vnx_enabled {
       $manila_vnx_backend = hiera('manila::backend::dellemc_vnx::title')
       create_resources('manila::backend::dellemc_vnx', { $manila_vnx_backend => delete_undef_values({
+        'backend_availability_zone'    => hiera('manila::backend::dellemc_vnx::backend_availability_zone', undef),
         'emc_nas_login'                => hiera('manila::backend::dellemc_vnx::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_vnx::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_vnx::emc_nas_server', undef),
@@ -233,6 +239,7 @@ class tripleo::profile::base::manila::share (
     if $backend_isilon_enabled {
       $manila_isilon_backend = hiera('manila::backend::dellemc_isilon::title')
       create_resources('manila::backend::dellemc_isilon', { $manila_isilon_backend => delete_undef_values({
+        'backend_availability_zone'    => hiera('manila::backend::dellemc_isilon::backend_availability_zone', undef),
         'emc_nas_login'                => hiera('manila::backend::dellemc_isilon::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_isilon::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_isilon::emc_nas_server', undef),
@@ -247,10 +254,11 @@ class tripleo::profile::base::manila::share (
     if $backend_flashblade_enabled {
       $manila_flashblade_backend = hiera('manila::backend::flashblade::title')
       create_resources('manila::backend::flashblade', { $manila_flashblade_backend => delete_undef_values({
-        'flashblade_mgmt_vip'  => hiera('manila::backend::flashblade::flashblade_mgmt_vip', undef),
-        'flashblade_data_vip'  => hiera('manila::backend::flashblade::flashblade_data_vip', undef),
-        'flashblade_api_token' => hiera('manila::backend::flashblade::flashblade_api_token', undef),
-        'flashblade_eradicate' => hiera('manila::backend::flashblade::flashblade_eradicate', undef),
+        'flashblade_mgmt_vip'          => hiera('manila::backend::flashblade::flashblade_mgmt_vip', undef),
+        'backend_availability_zone'    => hiera('manila::backend::flashblade::backend_availability_zone', undef),
+        'flashblade_data_vip'          => hiera('manila::backend::flashblade::flashblade_data_vip', undef),
+        'flashblade_api_token'         => hiera('manila::backend::flashblade::flashblade_api_token', undef),
+        'flashblade_eradicate'         => hiera('manila::backend::flashblade::flashblade_eradicate', undef),
       })})
     }
 
