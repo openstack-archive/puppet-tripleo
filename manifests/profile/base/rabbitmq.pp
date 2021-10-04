@@ -41,16 +41,24 @@
 # [*ssl_versions*]
 #   (Optional) When enable_internal_tls is in use, list the enabled
 #   TLS protocol version.
-#   Defaults to undef
+#   Defaults to ['tlsv1.2', 'tlsv1.3']
 #
 # [*inter_node_ciphers*]
 #   (Optional) When enable_internal_tls is in use, list the allowed ciphers
 #   for the encrypted inter-node communication.
-# lint:ignore:140chars
-#   Defaults to "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:AES256-GCM-SHA384:AES256-SHA256:AES128-GCM-SHA256:AES128-SHA256:DHE-DSS-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA256:DHE-DSS-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-SHA256:DHE-DSS-AES128-SHA256"
-# lint:endignore
-#   which is the list of ciphers enabled out of the openssl cipher list format
-#   !SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1
+#   Defaults to ''
+#
+# [*rabbitmq_cacert*]
+#   (Optional) When internal tls is enabled this should point to the CA file
+#   Defaults to hiera('rabbitmq::ssl_cacert')
+#
+# [*verify_server_peer*]
+#   (Optional) Server verify peer
+#   Defaults to 'verify_none'
+#
+# [*verify_client_peer*]
+#   (Optional) Client verify peer
+#   Defaults to 'verify_peer'
 #
 # [*environment*]
 #   (Optional) RabbitMQ environment.
@@ -120,10 +128,11 @@ class tripleo::profile::base::rabbitmq (
   $enable_internal_tls           = undef,
   $environment                   = hiera('rabbitmq_environment'),
   $additional_erl_args           = undef,
-  $ssl_versions                  = undef,
-  # lint:ignore:140chars
-  $inter_node_ciphers            = 'ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:AES256-GCM-SHA384:AES256-SHA256:AES128-GCM-SHA256:AES128-SHA256:DHE-DSS-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA256:DHE-DSS-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-SHA256:DHE-DSS-AES128-SHA256',
-  # lint:endignore
+  $ssl_versions                  = ['tlsv1.2', 'tlsv1.3'],
+  $inter_node_ciphers            = '',
+  $rabbitmq_cacert               = hiera('rabbitmq::ssl_cacert'),
+  $verify_server_peer            = 'verify_none',
+  $verify_client_peer            = 'verify_peer',
   $inet_dist_interface           = hiera('rabbitmq::interface', undef),
   $ipv6                          = str2bool(hiera('rabbit_ipv6', false)),
   $kernel_variables              = hiera('rabbitmq_kernel_variables'),
@@ -151,10 +160,6 @@ class tripleo::profile::base::rabbitmq (
   if $enable_internal_tls {
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
-    $cert_option = "-ssl_dist_opt server_certfile ${tls_certfile}"
-    $key_option = "-ssl_dist_opt server_keyfile ${tls_keyfile}"
-    $ciphers_option = "-ssl_dist_opt server_ciphers ${inter_node_ciphers}"
-    $secure_renegotiate = '-ssl_dist_opt server_secure_renegotiate true -ssl_dist_opt client_secure_renegotiate true'
 
     # Historically in THT the default value of RabbitAdditionalErlArgs was "'+sbwt none'", we
     # want to strip leading and trailing ' chars.
@@ -163,20 +168,15 @@ class tripleo::profile::base::rabbitmq (
     } else {
       $additional_erl_args_real = ''
     }
-    $rabbitmq_additional_erl_args = "\"${cert_option} ${key_option} ${ciphers_option} ${secure_renegotiate} ${additional_erl_args_real}\""
+    $rabbitmq_additional_erl_args = "\"${additional_erl_args_real} -ssl_dist_optfile /etc/rabbitmq/ssl-dist.conf\""
+    $rabbitmq_client_additional_erl_args = "\"${additional_erl_args_real}\""
     $environment_real = merge($environment, {
       'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS' => $rabbitmq_additional_erl_args,
       'RABBITMQ_CTL_ERL_ARGS' => $rabbitmq_additional_erl_args,
-      'LANG' => 'en_US.UTF-8',
+      'LANG'   => 'en_US.UTF-8',
       'LC_ALL' => 'en_US.UTF-8'
     })
-    # Configure a list of secure transport protocols, unless the
-    # user explicitly sets one
-    if !defined(ssl_versions) {
-      $configured_ssl_versions = ['tlsv1.2', 'tlsv1.1']
-    } else {
-      $configured_ssl_versions = $ssl_versions
-    }
+    $configured_ssl_versions = $ssl_versions
   } else {
     $tls_certfile = undef
     $tls_keyfile = undef
@@ -206,6 +206,13 @@ class tripleo::profile::base::rabbitmq (
 
   $manage_service = hiera('rabbitmq::service_manage', true)
   if $step >= 1 {
+    file { '/etc/rabbitmq/ssl-dist.conf':
+      ensure  => file,
+      content => template('tripleo/rabbitmq/ssl-dist.conf.erb'),
+      owner   => 'rabbitmq',
+      group   => 'rabbitmq',
+      mode    => '0640',
+    }
     # Specific configuration for multi-nodes or when running with Pacemaker.
     if count($nodes) > 1 or ! $manage_service {
       class { 'rabbitmq':
@@ -218,6 +225,7 @@ class tripleo::profile::base::rabbitmq (
         ssl_cert                => $tls_certfile,
         ssl_key                 => $tls_keyfile,
         ssl_versions            => $configured_ssl_versions,
+        ssl_verify              => $verify_server_peer,
         ipv6                    => $ipv6,
       }
 
