@@ -33,6 +33,17 @@ class Puppet::Provider::Noop < Puppet::Provider
     false
   end
 
+  def status
+    0
+  end
+
+  def start
+    true
+  end
+
+  def stop
+    true
+  end
   # some puppet-keystone resources require this
   def self.resource_to_name(domain, name, check_for_default = true)
     return name
