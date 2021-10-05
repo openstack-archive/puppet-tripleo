@@ -77,7 +77,8 @@ class tripleo::haproxy::stats (
       bind             => $haproxy_stats_bind_opts,
       mode             => 'http',
       options          => {
-        'stats' => $stats_config,
+        'default_backend' => 'haproxy.stats_be',
+        'stats'           => $stats_config,
       },
       collect_exported => false,
     }
