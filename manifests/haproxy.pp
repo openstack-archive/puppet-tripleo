@@ -1525,8 +1525,9 @@ class tripleo::haproxy (
         bind             => $rabbitmq_bind_opts,
         collect_exported => false,
         options          => {
-          'option'  => [ 'tcpka', 'tcplog' ],
-          'timeout' => [ 'client 0' ],
+          'default_backend' => 'rabbitmq_be',
+          'option'          => [ 'tcpka', 'tcplog' ],
+          'timeout'         => [ 'client 0' ],
         },
       }
       haproxy::backend { 'rabbitmq_be':
@@ -1617,7 +1618,8 @@ class tripleo::haproxy (
         bind             => $redis_bind_opts,
         collect_exported => false,
         options          => {
-          'option'    => [ 'tcplog' ],
+          'default_backend' => 'redis_be',
+          'option'          => [ 'tcplog' ],
         },
       }
       haproxy::backend { 'redis_be':
