@@ -66,6 +66,10 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
+# [*rabbitmq_cacert*]
+#   (Optional) When internal tls is enabled this should point to the CA file
+#   Defaults to hiera('rabbitmq::ssl_cacert', '/etc/ipa/ca.crt')
+#
 # [*rabbitmq_extra_policies*]
 #   (Optional) Hash of extra policies for the HA queues
 #   Defaults to hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'})
@@ -146,6 +150,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $notify_nodes                 = hiera('oslo_messaging_notify_node_names_override',
                                         hiera('oslo_messaging_notify_node_names', [])),
   $enable_internal_tls          = hiera('enable_internal_tls', false),
+  $rabbitmq_cacert              = hiera('rabbitmq::ssl_cacert', '/etc/ipa/ca.crt'),
   $rabbitmq_extra_policies      = hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'}),
   $pcs_tries                    = hiera('pcs_tries', 20),
   $step                         = Integer(hiera('step')),
@@ -319,6 +324,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           'rabbitmq-pki-key'  => {
             'source-dir' => '/etc/pki/tls/private/rabbitmq.key',
             'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/private/rabbitmq.key',
+            'options'    => 'ro',
+          },
+          'rabbitmq-pki-cafile' => {
+            'source-dir' => $rabbitmq_cacert,
+            'target-dir' => "/var/lib/kolla/config_files/src-tls${rabbitmq_cacert}",
             'options'    => 'ro',
           },
         }
