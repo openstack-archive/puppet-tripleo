@@ -224,7 +224,7 @@ class tripleo::profile::base::metrics::qdr (
     $final_ssl_profiles = $prep_ssl_profiles.reduce( [] ) |$memo, $prf| {
       if has_key($prf, 'caCertFileContent') {
         file { $prf['caCertFile']:
-          ensure  => exists,
+          ensure  => present,
           content => $prf['caCertFileContent'],
           mode    => '0600',
           require => File[$ssl_cert_dir]
