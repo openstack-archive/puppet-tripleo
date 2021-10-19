@@ -50,7 +50,7 @@
 #
 # [*rabbitmq_cacert*]
 #   (Optional) When internal tls is enabled this should point to the CA file
-#   Defaults to hiera('rabbitmq::ssl_cacert')
+#   Defaults to hiera('rabbitmq::ssl_cacert', undef)
 #
 # [*verify_server_peer*]
 #   (Optional) Server verify peer
@@ -130,7 +130,7 @@ class tripleo::profile::base::rabbitmq (
   $additional_erl_args           = undef,
   $ssl_versions                  = ['tlsv1.2', 'tlsv1.3'],
   $inter_node_ciphers            = '',
-  $rabbitmq_cacert               = hiera('rabbitmq::ssl_cacert'),
+  $rabbitmq_cacert               = hiera('rabbitmq::ssl_cacert', undef),
   $verify_server_peer            = 'verify_none',
   $verify_client_peer            = 'verify_peer',
   $inet_dist_interface           = hiera('rabbitmq::interface', undef),
