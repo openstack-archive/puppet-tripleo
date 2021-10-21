@@ -325,5 +325,10 @@ class tripleo::profile::base::pacemaker (
         tries    => $pcs_tries,
       }
     }
+    # See LP#1948032. We want to ensure that we set the default resource time out
+    # before we create any bundles. Because the default timeout affects how long
+    # we wait for podman, and on a starved system the default of 20s might bite us
+    # too early on
+    Pcmk_resource_default<||> -> Pcmk_bundle<||>
   }
 }
