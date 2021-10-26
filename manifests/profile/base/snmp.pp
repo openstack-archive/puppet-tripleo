@@ -32,6 +32,10 @@
 #   THT via SnmpdReadonlyUserName and SnmpdReadonlyUserPassword.
 #   Defaults to undef.
 #
+# [*snmpd_auth_type*]
+#   The SNMP auth type
+#   Defaults to hiera('snmpd_readonly_user_authtype') if set else 'MD5'
+#
 # [*snmpd_password*]
 #   The SNMP password
 #   Defaults to hiera('snmpd_readonly_user_password')
@@ -46,14 +50,15 @@
 #   Defaults to hiera('step')
 #
 class tripleo::profile::base::snmp (
-  $snmpd_config   = undef,
-  $snmpd_password = hiera('snmpd_readonly_user_password'),
-  $snmpd_user     = hiera('snmpd_readonly_user_name'),
-  $step           = Integer(hiera('step')),
+  $snmpd_config    = undef,
+  $snmpd_auth_type = hiera('snmpd_readonly_user_authtype', 'MD5'),
+  $snmpd_password  = hiera('snmpd_readonly_user_password'),
+  $snmpd_user      = hiera('snmpd_readonly_user_name'),
+  $step            = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     snmp::snmpv3_user { $snmpd_user:
-      authtype => 'MD5',
+      authtype => $snmpd_auth_type,
       authpass => $snmpd_password,
     }
     if $snmpd_config {
@@ -63,7 +68,7 @@ class tripleo::profile::base::snmp (
       }
     } else {
       class { 'snmp':
-        snmpd_config => [ join(['createUser ', $snmpd_user, ' MD5 "', $snmpd_password, '"']),
+        snmpd_config => [ join(['createUser ', $snmpd_user, ' ', $snmpd_auth_type, ' "', $snmpd_password, '"']),
                           join(['rouser ', $snmpd_user]),
                           'proc  cron',
                           'includeAllDisks  10%',

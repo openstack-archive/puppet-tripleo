@@ -44,6 +44,32 @@ describe 'tripleo::profile::base::snmp' do
         )
       end
     end
+    context 'with default configuration and SHA' do
+      let :params do
+        {
+          :snmpd_user      => 'ro_snmp_user',
+          :snmpd_password  => 'secrete',
+          :snmpd_auth_type => 'SHA',
+          :step            => 4,
+        }
+      end
+
+      it 'should configure snmpd with SHA' do
+        is_expected.to contain_class('snmp').with(
+          :snmpd_config => [
+            'createUser ro_snmp_user SHA "secrete"',
+            'rouser ro_snmp_user',
+            'proc  cron',
+            'includeAllDisks  10%',
+            'master agentx',
+            'iquerySecName internalUser',
+            'rouser internalUser',
+            'defaultMonitors yes',
+             'linkUpDownNotifications yes',
+          ]
+        )
+      end
+    end
     context 'with snmpd_config setting' do
       let :params do
         {
