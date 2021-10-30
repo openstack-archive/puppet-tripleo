@@ -1,0 +1,15 @@
+---
+features:
+  - |
+    This change adds functionality to enable modular libvirt daemons
+    support. Also all the daemons runs in separate containers, so the
+    configuration is done for all the daemon containers.
+    Here is the list of daemons added in this change.
+    - virtnodedevd
+    - virtproxyd
+    - virtqemud
+    - virtsecretd
+    - virtstoraged
+
+    More information regarding modular libvirt daemons is available here.
+    `Libvirt Daemons <https://libvirt.org/daemons.html>` _.
