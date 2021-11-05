@@ -40,13 +40,16 @@ class tripleo::profile::base::cinder::volume::pure (
 
   if $step >= 4 {
     $backend_defaults = {
-      'CinderPureAvailabilityZone' => hiera('cinder::backend::pure::backend_availability_zone', undef),
-      'CinderPureSanIp'            => hiera('cinder::backend::pure::san_ip', undef),
-      'CinderPureAPIToken'         => hiera('cinder::backend::pure::pure_api_token', undef),
-      'CinderPureStorageProtocol'  => hiera('cinder::backend::pure::pure_storage_protocol', undef),
-      'CinderPureUseChap'          => hiera('cinder::backend::pure::use_chap_auth', undef),
-      'CinderPureMultipathXfer'    => hiera('cinder::backend::pure::use_multipath_for_image_xfer', undef),
-      'CinderPureImageCache'       => hiera('cinder::backend::pure::image_volume_cache_enabled', undef),
+      'CinderPureAvailabilityZone'   => hiera('cinder::backend::pure::backend_availability_zone', undef),
+      'CinderPureSanIp'              => hiera('cinder::backend::pure::san_ip', undef),
+      'CinderPureAPIToken'           => hiera('cinder::backend::pure::pure_api_token', undef),
+      'CinderPureStorageProtocol'    => hiera('cinder::backend::pure::pure_storage_protocol', undef),
+      'CinderPureUseChap'            => hiera('cinder::backend::pure::use_chap_auth', undef),
+      'CinderPureMultipathXfer'      => hiera('cinder::backend::pure::use_multipath_for_image_xfer', undef),
+      'CinderPureImageCache'         => hiera('cinder::backend::pure::image_volume_cache_enabled', undef),
+      'CinderPureIscsiCidr'          => hiera('cinder::backend::pure::pure_iscsi_cidr', undef),
+      'CinderPureHostPersonality'    => hiera('cinder::backend::pure::pure_host_personality', undef),
+      'CinderPureEradicateOnDelete'  => hiera('cinder::backend::pure::pure_eradicate_on_delete', undef),
     }
 
     $backend_name.each |String $backend| {
@@ -60,6 +63,9 @@ class tripleo::profile::base::cinder::volume::pure (
         'use_chap_auth'                => $backend_config['CinderPureUseChap'],
         'use_multipath_for_image_xfer' => $backend_config['CinderPureMultipathXfer'],
         'image_volume_cache_enabled'   => $backend_config['CinderPureImageCache'],
+        'pure_iscsi_cidr'              => $backend_config['CinderPureIscsiCidr'],
+        'pure_host_personality'        => $backend_config['CinderPureHostPersonality'],
+        'pure_eradicate_on_delete'     => $backend_config['CinderPureEradicateOnDelete'],
       })})
     }
   }
