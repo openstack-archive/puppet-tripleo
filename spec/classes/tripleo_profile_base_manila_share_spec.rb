@@ -62,14 +62,6 @@ eos
           :enabled_share_backends => []
         )
       }
-      context 'with customizations' do
-        before :each do
-          params.merge!(
-            {
-              :backend_availability_zone => 'my_zone',
-            })
-        end
-      end
     end
   end
 
