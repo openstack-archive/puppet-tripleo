@@ -47,11 +47,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*generate_dropin_file_limit*]
-#   (Optional) Generate a systemd drop-in file to raise the file descriptor
-#   limit for the mysql service.
-#   Defaults to false
-#
 # [*innodb_buffer_pool_size*]
 #   (Optional) Configure the size of the MySQL buffer pool.
 #   Defaults to hiera('innodb_buffer_pool_size', undef)
@@ -115,7 +110,6 @@ class tripleo::profile::base::database::mysql (
   $certificate_specs             = {},
   $cipher_list                   = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1',
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $generate_dropin_file_limit    = false,
   $innodb_buffer_pool_size       = hiera('innodb_buffer_pool_size', undef),
   $innodb_log_file_size          = undef,
   $innodb_lock_wait_timeout      = hiera('innodb_lock_wait_timeout', undef),
@@ -202,15 +196,6 @@ class tripleo::profile::base::database::mysql (
       service_manage          => $manage_resources,
       service_enabled         => $manage_resources,
       remove_default_accounts => $remove_default_accounts,
-    }
-
-    if $generate_dropin_file_limit and $manage_resources {
-      # Raise the mysql file limit
-      ::systemd::service_limits { 'mariadb.service':
-        limits => {
-          'LimitNOFILE' => 16384
-        }
-      }
     }
   }
 
