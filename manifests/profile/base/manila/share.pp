@@ -30,6 +30,10 @@
 #   (Optional) Whether or not the vmax backend is enabled
 #   Defaults to hiera('manila_backend_vmax_enabled', false)
 #
+# [*backend_powermax_enabled*]
+#   (Optional) Whether or not the powermax backend is enabled
+#   Defaults to hiera('manila_backend_powermax_enabled', false)
+#
 # [*backend_isilon_enabled*]
 #   (Optional) Whether or not the isilon backend is enabled
 #   Defaults to hiera('manila_backend_isilon_enabled', false)
@@ -63,6 +67,7 @@ class tripleo::profile::base::manila::share (
   $backend_generic_enabled      = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled       = hiera('manila_backend_netapp_enabled', false),
   $backend_vmax_enabled         = hiera('manila_backend_vmax_enabled', false),
+  $backend_powermax_enabled     = hiera('manila_backend_powermax_enabled', false),
   $backend_isilon_enabled       = hiera('manila_backend_isilon_enabled', false),
   $backend_unity_enabled        = hiera('manila_backend_unity_enabled', false),
   $backend_vnx_enabled          = hiera('manila_backend_vnx_enabled', false),
@@ -198,6 +203,24 @@ class tripleo::profile::base::manila::share (
       })})
     }
 
+    # manila powermax:
+    if $backend_powermax_enabled {
+      $manila_powermax_backend = hiera('manila::backend::dellemc_powermax::title')
+      create_resources('manila::backend::dellemc_powermax', { $manila_powermax_backend => delete_undef_values({
+        'backend_availability_zone'    => hiera('manila::backend::dellemc_powermax::backend_availability_zone', undef),
+        'emc_nas_login'                => hiera('manila::backend::dellemc_powermax::emc_nas_login', undef),
+        'emc_nas_password'             => hiera('manila::backend::dellemc_powermax::emc_nas_password', undef),
+        'emc_nas_server'               => hiera('manila::backend::dellemc_powermax::emc_nas_server', undef),
+        'emc_share_backend'            => hiera('manila::backend::dellemc_powermax::emc_share_backend','powermax'),
+        'emc_ssl_cert_verify'          => hiera('manila::backend::dellemc_powermax::emc_ssl_cert_verify', false),
+        'emc_nas_server_secure'        => hiera('manila::backend::dellemc_powermax::emc_nas_server_secure', false),
+        'emc_ssl_cert_path'            => hiera('manila::backend::dellemc_powermax::emc_ssl_cert_path', undef),
+        'powermax_server_container'    => hiera('manila::backend::dellemc_powermax::powermax_server_container', undef),
+        'powermax_share_data_pools'    => hiera('manila::backend::dellemc_powermax::powermax_share_data_pools', undef),
+        'powermax_ethernet_ports'      => hiera('manila::backend::dellemc_powermax::powermax_ethernet_ports', undef),
+      })})
+    }
+
     # manila unity:
     if $backend_unity_enabled {
       $manila_unity_backend = hiera('manila::backend::dellemc_unity::title')
@@ -266,6 +289,7 @@ class tripleo::profile::base::manila::share (
                                       $manila_cephfs_backend,
                                       $manila_netapp_backend,
                                       $manila_vmax_backend,
+                                      $manila_powermax_backend,
                                       $manila_isilon_backend,
                                       $manila_unity_backend,
                                       $manila_vnx_backend,
