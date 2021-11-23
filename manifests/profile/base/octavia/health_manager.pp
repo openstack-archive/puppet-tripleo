@@ -32,5 +32,7 @@ class tripleo::profile::base::octavia::health_manager (
     include octavia::nova
     include octavia::health_manager
     include octavia::certificates
+    include octavia::neutron
+    include octavia::glance
   }
 }
