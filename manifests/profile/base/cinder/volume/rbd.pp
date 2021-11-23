@@ -56,6 +56,11 @@
 #   in order to remove a dependency on the snapshot.
 #   Defaults to hiera('cinder::backend::rbd::flatten_volume_from_snapshot, undef)
 #
+# [*extra_options*]
+#   (optional) Hash of extra options to configure for the RBD backends.
+#   Example: { 'tripleo_ceph/param1' => { 'value' => value1 } }
+#   Defaults to: {}
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -73,6 +78,7 @@ class tripleo::profile::base::cinder::volume::rbd (
   $cinder_rbd_secret_uuid                  = undef,
   $cinder_rbd_user_name                    = 'openstack',
   $cinder_rbd_flatten_volume_from_snapshot = hiera('cinder::backend::rbd::flatten_volume_from_snapshot', undef),
+  $extra_options                           = {},
   $step                                    = Integer(hiera('step')),
 ) {
   include tripleo::profile::base::cinder::volume
@@ -86,6 +92,7 @@ class tripleo::profile::base::cinder::volume::rbd (
       rbd_user                         => $cinder_rbd_user_name,
       rbd_secret_uuid                  => $cinder_rbd_secret_uuid,
       rbd_flatten_volume_from_snapshot => $cinder_rbd_flatten_volume_from_snapshot,
+      extra_options                    => $extra_options,
     }
 
     if $cinder_rbd_extra_pools {
@@ -98,6 +105,7 @@ class tripleo::profile::base::cinder::volume::rbd (
           rbd_user                         => $cinder_rbd_user_name,
           rbd_secret_uuid                  => $cinder_rbd_secret_uuid,
           rbd_flatten_volume_from_snapshot => $cinder_rbd_flatten_volume_from_snapshot,
+          # extra_options are global, and are only applied once (not on each pool).
         }
       }
     }
