@@ -60,6 +60,11 @@
 #   (Optional) A config hash when multiple backends are used.
 #   Defaults to {}
 #
+# [*extra_options*]
+#   (optional) Hash of extra options to configure for the RBD backends.
+#   Example: { 'tripleo_ceph/param1' => { 'value' => value1 } }
+#   Defaults to: {}
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -78,6 +83,7 @@ class tripleo::profile::base::cinder::volume::rbd (
   $cinder_rbd_user_name                    = 'openstack',
   $cinder_rbd_flatten_volume_from_snapshot = hiera('cinder::backend::rbd::flatten_volume_from_snapshot', undef),
   $multi_config                            = {},
+  $extra_options                           = {},
   $step                                    = Integer(hiera('step')),
 ) {
   include tripleo::profile::base::cinder::volume
@@ -92,7 +98,8 @@ class tripleo::profile::base::cinder::volume::rbd (
       'CinderRbdFlattenVolumeFromSnapshot' => $cinder_rbd_flatten_volume_from_snapshot,
     }
 
-    any2array($backend_name).each |String $backend| {
+    $backends_array = any2array($backend_name)
+    $backends_array.each |String $backend| {
       $backend_multi_config  = pick($multi_config[$backend], {})
 
       $multi_config_cluster = $backend_multi_config['CephClusterName']
@@ -100,6 +107,13 @@ class tripleo::profile::base::cinder::volume::rbd (
         $backend_ceph_conf = "/etc/ceph/${multi_config_cluster}.conf"
       } else {
         $backend_ceph_conf = $cinder_rbd_ceph_conf
+      }
+
+      # Ensure extra_options are only applied once.
+      if $backend == $backends_array[0] {
+        $extra_options_real = $extra_options
+      } else {
+        $extra_options_real = undef
       }
 
       $backend_config = merge($backend_defaults, $backend_multi_config)
@@ -112,6 +126,7 @@ class tripleo::profile::base::cinder::volume::rbd (
         rbd_user                         => $backend_config['CephClientUserName'],
         rbd_secret_uuid                  => $backend_config['CephClusterFSID'],
         rbd_flatten_volume_from_snapshot => $backend_config['CinderRbdFlattenVolumeFromSnapshot'],
+        extra_options                    => $extra_options_real,
       }
 
       any2array($backend_config['CinderRbdExtraPools']).each |String $pool_name| {

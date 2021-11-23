@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    A new ``tripleo::profile::base::cinder::volume::rbd::extra_options``
+    parameter adds the ability to configure additional options for use
+    with cinder RBD backends.
