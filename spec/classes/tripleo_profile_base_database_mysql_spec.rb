@@ -22,44 +22,10 @@ describe 'tripleo::profile::base::database::mysql' do
       :mysql_max_connections   => 4096,
     }
   end
+
   shared_examples_for 'tripleo::profile::base::database::mysql' do
     before :each do
       facts.merge!({ :step => params[:step] })
-    end
-
-    context 'with noha and raise mariadb limit' do
-      before do
-        params.merge!({
-          :generate_dropin_file_limit => true
-        })
-      end
-      it 'should create limit file' do
-        is_expected.to contain_systemd__service_limits('mariadb.service').with(
-          :limits => { "LimitNOFILE" => 16384 })
-      end
-    end
-
-    context 'with noha and do not raise mariadb limit' do
-      before do
-        params.merge!({
-          :generate_dropin_file_limit => false
-        })
-      end
-      it 'should not create limit file' do
-        is_expected.to_not contain_systemd__service_limits('mariadb.service')
-      end
-    end
-
-    context 'with ha and raise mariadb limit' do
-      before do
-        params.merge!({
-          :generate_dropin_file_limit => true,
-          :manage_resources => false,
-        })
-      end
-      it 'should not create limit file in ha' do
-        is_expected.to_not contain_systemd__service_limits('mariadb.service')
-      end
     end
   end
 
