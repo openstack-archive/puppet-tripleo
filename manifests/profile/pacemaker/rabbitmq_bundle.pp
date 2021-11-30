@@ -353,7 +353,7 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         $ha_queues_policy = { 'ha-mode' => 'exactly', 'ha-params' => $nr_ha_queues }
       }
       $ha_policy = merge($ha_queues_policy, $rabbitmq_extra_policies)
-      $ocf_params = "set_policy='ha-all ^(?!amq\\.).* ${to_json($ha_policy)}'"
+      $ocf_params = "set_policy='ha-all ^(?!(amq\\.)|(.*_fanout)|(reply_)).* ${to_json($ha_policy)}'"
 
       if $use_masterslave_rabbitmqra {
         if length($rabbit_short_nodes) > 0 {
