@@ -36,5 +36,6 @@ class tripleo::profile::base::octavia::housekeeping (
     include octavia::neutron
     include octavia::glance
     include octavia::cinder
+    include octavia::task_flow
   }
 }
