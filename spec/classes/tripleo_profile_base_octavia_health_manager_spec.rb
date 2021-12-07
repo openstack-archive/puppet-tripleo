@@ -52,6 +52,7 @@ eos
         is_expected.to_not contain_class('octavia::neutron')
         is_expected.to_not contain_class('octavia::glance')
         is_expected.to_not contain_class('octavia::cinder')
+        is_expected.to_not contain_class('octavia::task_flow')
       end
     end
 
@@ -68,6 +69,7 @@ eos
         is_expected.to contain_class('octavia::neutron')
         is_expected.to contain_class('octavia::glance')
         is_expected.to contain_class('octavia::cinder')
+        is_expected.to contain_class('octavia::task_flow')
       end
     end
   end
