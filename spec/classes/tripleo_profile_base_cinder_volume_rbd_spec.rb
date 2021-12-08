@@ -62,6 +62,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :cinder_rbd_secret_uuid                  => 'secretuuid',
             :cinder_rbd_user_name                    => 'kcatsnepo',
             :cinder_rbd_flatten_volume_from_snapshot => true,
+            :extra_options                           => {'poodles/param1' => { 'value' => 'value1' }},
           })
         end
         it 'should trigger complete configuration' do
@@ -73,6 +74,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :rbd_user                         => 'kcatsnepo',
             :rbd_secret_uuid                  => 'secretuuid',
             :rbd_flatten_volume_from_snapshot => true,
+            :extra_options                    => {'poodles/param1' => { 'value' => 'value1' }},
           )
           is_expected.to contain_cinder__backend__rbd('poodles_aplenty').with(
             :backend_host                     => 'fe80::fc54:ff:fe9e:7846',
@@ -82,6 +84,8 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :rbd_user                         => 'kcatsnepo',
             :rbd_secret_uuid                  => 'secretuuid',
             :rbd_flatten_volume_from_snapshot => true,
+            # extra_options are provided with only the first RBD backend/pool
+            :extra_options                    => {},
           )
           is_expected.to contain_cinder__backend__rbd('poodles_galore').with(
             :backend_host                     => 'fe80::fc54:ff:fe9e:7846',
@@ -91,6 +95,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :rbd_user                         => 'kcatsnepo',
             :rbd_secret_uuid                  => 'secretuuid',
             :rbd_flatten_volume_from_snapshot => true,
+            :extra_options                    => {},
           )
         end
       end
@@ -111,6 +116,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
                 'CinderRbdFlattenVolumeFromSnapshot' => true,
               },
             },
+            :extra_options                           => {'poodles/param1' => { 'value' => 'value1' }},
           })
         end
         it 'should configure each backend' do
@@ -121,6 +127,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :rbd_pool                         => 'volumes',
             :rbd_user                         => 'openstack',
             :rbd_flatten_volume_from_snapshot => '<SERVICE DEFAULT>',
+            :extra_options                    => {'poodles/param1' => { 'value' => 'value1' }},
           )
 
           is_expected.to contain_cinder__backend__rbd('rbd2').with(
@@ -131,6 +138,8 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :rbd_user                         => 'kcatsnepo',
             :rbd_secret_uuid                  => 'secretuuid',
             :rbd_flatten_volume_from_snapshot => true,
+            # extra_options are provided with only the first RBD backend/pool
+            :extra_options                    => {},
           )
 
           is_expected.to contain_cinder__backend__rbd('rbd2_pool2b').with(
@@ -141,6 +150,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :rbd_user                         => 'kcatsnepo',
             :rbd_secret_uuid                  => 'secretuuid',
             :rbd_flatten_volume_from_snapshot => true,
+            :extra_options                    => {},
           )
 
           is_expected.to contain_cinder__backend__rbd('rbd2_pool2c').with(
@@ -151,6 +161,7 @@ describe 'tripleo::profile::base::cinder::volume::rbd' do
             :rbd_user                         => 'kcatsnepo',
             :rbd_secret_uuid                  => 'secretuuid',
             :rbd_flatten_volume_from_snapshot => true,
+            :extra_options                    => {},
           )
         end
       end
