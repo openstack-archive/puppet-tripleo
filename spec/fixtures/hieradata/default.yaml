@@ -225,6 +225,10 @@ redis_vip: '127.0.0.1'
 redis::bind: '10.0.0.1'
 # swift related
 swift_proxy_short_bootstrap_node_name: node
+swift::keymaster::password: 'password'
+swift::proxy::authtoken::password: 'password'
+swift::proxy::ceilometer::password: 'password'
+swift::proxy::s3token::password: 'password'
 # required for metrics::qdr_user
 ctlplane: '192.168.24.123'
 # required to avoid EPEL repo management when testing collectd::sensubility
