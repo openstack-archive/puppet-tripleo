@@ -43,10 +43,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*default_volume_type*]
-#   (Optional) The name of the default volume type.
-#   Defaults to hiera('cinder::api::default_volume_type', '')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -65,7 +61,6 @@ class tripleo::profile::base::cinder::api (
   $certificates_specs            = hiera('apache_certificates_specs', {}),
   $cinder_api_network            = hiera('cinder_api_network', undef),
   $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $default_volume_type           = hiera('cinder::api::default_volume_type', ''),
   $step                          = Integer(hiera('step')),
   # DEPRECATED PARAMETERS
   $keymgr_backend                = undef,
