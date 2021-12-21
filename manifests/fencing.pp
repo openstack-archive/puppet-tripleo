@@ -147,9 +147,24 @@ class tripleo::fencing(
       'rhevm' => $rhev_devices, 'cisco_ucs' => $ucs_devices
     }
 
+    # let's store the number of stonith devices created for this server.
+    # this will be used to detect if there is a least one and fail if
+    # instance_ha is configured and puppet is running on a compute node.
+    $data_num = [
+      length($ironic_devices), length($redfish_devices),
+      length($ipmilan_devices), length($kdump_devices), length($rhev_devices)
+    ]
+
+    $sum = $data_num.reduce |$memo, $value| { $memo + $value }
+
     $data.each |$items| {
       $driver = $items[0]
       $driver_devices = $items[1]
+
+      # if there is no valid stonith device and this is a compute-instanceha node we raise an exception
+      if $level == '1' and $sum == 0 and $enable_instanceha and $is_compute_instanceha_node {
+        fail('Instance HA requires at least one valid stonith device')
+      }
 
       if $driver_devices and length($driver_devices) == 1 {
         $mac = keys($driver_devices)[0]
