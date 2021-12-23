@@ -34,6 +34,10 @@
 #   (Optional) Whether or not the vmax backend is enabled
 #   Defaults to hiera('manila_backend_vmax_enabled', false)
 #
+# [*backend_powermax_enabled*]
+#   (Optional) Whether or not the powermax backend is enabled
+#   Defaults to hiera('manila_backend_powermax_enabled', false)
+#
 # [*backend_isilon_enabled*]
 #   (Optional) Whether or not the isilon backend is enabled
 #   Defaults to hiera('manila_backend_isilon_enabled', false)
@@ -93,6 +97,7 @@ class tripleo::profile::base::manila::api (
   $backend_generic_enabled    = hiera('manila_backend_generic_enabled', false),
   $backend_netapp_enabled     = hiera('manila_backend_netapp_enabled', false),
   $backend_vmax_enabled       = hiera('manila_backend_vmax_enabled', false),
+  $backend_powermax_enabled   = hiera('manila_backend_powermax_enabled', false),
   $backend_isilon_enabled     = hiera('manila_backend_isilon_enabled', false),
   $backend_unity_enabled      = hiera('manila_backend_unity_enabled', false),
   $backend_vnx_enabled        = hiera('manila_backend_vnx_enabled', false),
@@ -132,9 +137,9 @@ class tripleo::profile::base::manila::api (
       $enabled_share_protocols_real = join(any2array($enabled_share_protocols), ',')
     } else {
       if $backend_generic_enabled or $backend_netapp_enabled
-        or $backend_vmax_enabled or $backend_isilon_enabled
-        or $backend_unity_enabled or $backend_vnx_enabled
-        or $backend_flashblade_enabled{
+        or $backend_vmax_enabled or $backend_powermax_enabled
+        or $backend_isilon_enabled or $backend_unity_enabled
+        or $backend_vnx_enabled or $backend_flashblade_enabled{
           $nfs_protocol = 'NFS'
           $cifs_protocol = 'CIFS'
       } else {
