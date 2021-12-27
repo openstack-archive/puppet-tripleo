@@ -46,6 +46,11 @@ class tripleo::profile::base::nova::compute (
     include nova::key_manager
     include nova::key_manager::barbican
 
+    # NOTE(tkajinam): Policies are used in some features in nova-compute,
+    #                 For example when connecting an instance to an external
+    #                 network
+    include nova::policy
+
     # deploy basic bits for nova-compute
     include nova::compute
 
