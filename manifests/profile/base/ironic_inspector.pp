@@ -83,7 +83,7 @@ class tripleo::profile::base::ironic_inspector (
     include ironic::inspector::db
     include ironic::inspector::pxe_filter
     include ironic::inspector::pxe_filter::dnsmasq
-    include ironic::config
+    include ironic::inspector::config
     include ironic::inspector::logging
   }
 }

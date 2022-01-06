@@ -35,7 +35,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
         is_expected.to_not contain_class('ironic::inspector::db')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter::dnsmasq')
-        is_expected.to_not contain_class('ironic::config')
+        is_expected.to_not contain_class('ironic::inspector::config')
         is_expected.to_not contain_class('ironic::inspector::logging')
       }
     end
@@ -55,7 +55,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
         is_expected.to contain_class('ironic::inspector::db')
         is_expected.to contain_class('ironic::inspector::pxe_filter')
         is_expected.to contain_class('ironic::inspector::pxe_filter::dnsmasq')
-        is_expected.to contain_class('ironic::config')
+        is_expected.to contain_class('ironic::inspector::config')
         is_expected.to contain_class('ironic::inspector::logging')
       }
     end
@@ -72,7 +72,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
         is_expected.to_not contain_class('ironic::inspector::db')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter')
         is_expected.to_not contain_class('ironic::inspector::pxe_filter::dnsmasq')
-        is_expected.to_not contain_class('ironic::config')
+        is_expected.to_not contain_class('ironic::inspector::config')
         is_expected.to_not contain_class('ironic::inspector::logging')
       }
     end
@@ -92,7 +92,7 @@ describe 'tripleo::profile::base::ironic_inspector' do
         is_expected.to contain_class('ironic::inspector::db')
         is_expected.to contain_class('ironic::inspector::pxe_filter')
         is_expected.to contain_class('ironic::inspector::pxe_filter::dnsmasq')
-        is_expected.to contain_class('ironic::config')
+        is_expected.to contain_class('ironic::inspector::config')
         is_expected.to contain_class('ironic::inspector::logging')
       }
     end
