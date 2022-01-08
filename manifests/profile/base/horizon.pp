@@ -114,6 +114,7 @@ class tripleo::profile::base::horizon (
       ssl_cert        => $tls_certfile,
       ssl_key         => $tls_keyfile,
     }
+    include horizon::policy
 
     if $heat_api_enabled {
       include horizon::dashboards::heat

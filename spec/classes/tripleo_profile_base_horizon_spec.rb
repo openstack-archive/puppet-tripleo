@@ -28,6 +28,7 @@ describe 'tripleo::profile::base::horizon' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::horizon')
         is_expected.to_not contain_class('horizon')
+        is_expected.to_not contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
         is_expected.to_not contain_class('horizon::dashboards::manila')
@@ -41,6 +42,7 @@ describe 'tripleo::profile::base::horizon' do
 
       it 'should not configure anything' do
         is_expected.to_not contain_class('horizon')
+        is_expected.to_not contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
         is_expected.to_not contain_class('horizon::dashboards::manila')
@@ -57,6 +59,7 @@ describe 'tripleo::profile::base::horizon' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('horizon')
+        is_expected.to contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
         is_expected.to_not contain_class('horizon::dashboards::manila')
@@ -73,6 +76,7 @@ describe 'tripleo::profile::base::horizon' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('horizon')
+        is_expected.to contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
         is_expected.to_not contain_class('horizon::dashboards::manila')
@@ -90,6 +94,7 @@ describe 'tripleo::profile::base::horizon' do
 
       it 'should trigger complete configuration with heat dashboard' do
         is_expected.to contain_class('horizon')
+        is_expected.to contain_class('horizon::policy')
         is_expected.to contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
         is_expected.to_not contain_class('horizon::dashboards::manila')
@@ -107,6 +112,7 @@ describe 'tripleo::profile::base::horizon' do
 
       it 'should trigger complete configuration with heat dashboard' do
         is_expected.to contain_class('horizon')
+        is_expected.to contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to contain_class('horizon::dashboards::octavia')
         is_expected.to_not contain_class('horizon::dashboards::manila')
@@ -124,6 +130,7 @@ describe 'tripleo::profile::base::horizon' do
 
       it 'should trigger complete configuration with heat dashboard' do
         is_expected.to contain_class('horizon')
+        is_expected.to contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
         is_expected.to_not contain_class('horizon::dashboards::octavia')
         is_expected.to contain_class('horizon::dashboards::manila')
