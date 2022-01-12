@@ -144,7 +144,9 @@ placement::keystone::authtoken::password: 'password'
 memcached_node_names:
  - 'controller-1'
 # octavia related items
+octavia_api_short_bootstrap_node_name: node
 octavia::keystone::authtoken::password: 'password'
+octavia::health_manager::heartbeat_key: 'key'
 # horizon related
 horizon_short_bootstrap_node_name: node
 horizon::secret_key: 'secrete'

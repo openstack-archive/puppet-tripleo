@@ -18,12 +18,6 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::octavia::api' do
 
-  let :params do
-    { :step            => 5,
-      :bootstrap_node  => 'notbootstrap.example.com'
-   }
-  end
-
   shared_examples_for 'tripleo::profile::base::octavia::api' do
     before :each do
       facts.merge!({ :step => params[:step] })
@@ -44,110 +38,134 @@ eos
     end
 
     context 'with step less than 3 on bootstrap' do
-      before do
-        params.merge!({
-          :step           => 2,
-          :bootstrap_node => 'node.example.com'
-        })
-      end
+      let(:params) { {
+        :step           => 2,
+        :bootstrap_node => 'node.example.com'
+      } }
 
       it 'should not do anything' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::controller')
         is_expected.to_not contain_class('octavia::healthcheck')
+        is_expected.to_not contain_class('tripleo::profile::base::apache')
+        is_expected.to_not contain_class('octavia::wsgi::apache')
       end
     end
 
     context 'with step less than 3 on non-bootstrap' do
-      before do
-        params.merge!({ :step => 2 })
-      end
+      let(:params) { {
+        :step           => 2,
+        :bootstrap_node => 'other.example.com'
+      } }
 
       it 'should not do anything' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::controller')
         is_expected.to_not contain_class('octavia::healthcheck')
+        is_expected.to_not contain_class('tripleo::profile::base::apache')
+        is_expected.to_not contain_class('octavia::wsgi::apache')
       end
     end
 
     context 'with step 3 on bootstrap node' do
-      before do
-        params.merge!({
-          :step           => 3,
-          :bootstrap_node => 'node.example.com'
-        })
-      end
+      let(:params) { {
+        :step           => 3,
+        :bootstrap_node => 'node.example.com'
+      } }
 
       it 'should should start configurating database' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::controller')
         is_expected.to_not contain_class('octavia::healthcheck')
+        is_expected.to_not contain_class('tripleo::profile::base::apache')
+        is_expected.to_not contain_class('octavia::wsgi::apache')
       end
     end
 
     context 'with step 3 on non-bootstrap node' do
-      before do
-        params.merge!({ :step => 3 })
-      end
+      let(:params) { {
+        :step           => 3,
+        :bootstrap_node => 'other.example.com'
+      } }
 
       it 'should do nothing' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::controller')
         is_expected.to_not contain_class('octavia::healthcheck')
+        is_expected.to_not contain_class('tripleo::profile::base::apache')
+        is_expected.to_not contain_class('octavia::wsgi::apache')
       end
     end
 
     context 'with step 4 on bootstrap node' do
-      before do
-        params.merge!({
-          :step           => 4,
-          :bootstrap_node => 'node.example.com'
-        })
-      end
+      let(:params) { {
+        :step           => 4,
+        :bootstrap_node => 'node.example.com'
+      } }
 
-      it 'should should sync database' do
+      it 'should apply configurations with syncing database' do
         is_expected.to contain_class('octavia::api').with(:sync_db => true)
+        is_expected.to contain_class('octavia::controller')
         is_expected.to contain_class('octavia::healthcheck')
+        is_expected.to contain_class('tripleo::profile::base::apache')
+        is_expected.to contain_class('octavia::wsgi::apache')
       end
     end
 
     context 'with step 4 on non-bootstrap node' do
-      before do
-        params.merge!({ :step => 4 })
-      end
+      let(:params) { {
+        :step           => 4,
+        :bootstrap_node => 'other.example.com'
+      } }
 
       it 'should do nothing' do
         is_expected.to_not contain_class('octavia::api')
+        is_expected.to_not contain_class('octavia::controller')
         is_expected.to_not contain_class('octavia::healthcheck')
+        is_expected.to_not contain_class('tripleo::profile::base::apache')
+        is_expected.to_not contain_class('octavia::wsgi::apache')
       end
     end
 
     context 'with step 5 on non-bootstrap node' do
-      before do
-        params.merge!({ :step => 5 })
-      end
+      let(:params) { {
+        :step           => 5,
+        :bootstrap_node => 'other.example.com'
+      } }
 
-      it 'should do nothing' do
+      it 'should apply configurations without syncing database' do
         is_expected.to contain_class('octavia::api').with(:sync_db => false)
+        is_expected.to contain_class('octavia::controller')
         is_expected.to contain_class('octavia::healthcheck')
+        is_expected.to contain_class('tripleo::profile::base::apache')
+        is_expected.to contain_class('octavia::wsgi::apache')
       end
     end
 
     context 'Configure internal TLS' do
-      before do
-        params.merge!({
-          :step                 => 5,
-          :bootstrap_node       => 'node.example.com',
-          :enable_internal_tls  => true,
-          :octavia_network      => 'octavia-net',
-          :certificates_specs   => {
-            'httpd-octavia-net' => {
-              'hostname'            => 'somehost',
-              'service_certificate' => '/foo.pem',
-              'service_key'         => '/foo.key',
-            },
+      let(:params) { {
+        :step                 => 5,
+        :bootstrap_node       => 'other.example.com',
+        :enable_internal_tls  => true,
+        :octavia_network      => 'octavia-net',
+        :certificates_specs   => {
+          'httpd-octavia-net' => {
+            'hostname'            => 'somehost',
+            'service_certificate' => '/foo.pem',
+            'service_key'         => '/foo.key',
           },
-        })
-      end
+        },
+      } }
+
       it {
         is_expected.to contain_class('octavia::api')
+        is_expected.to contain_class('octavia::controller')
         is_expected.to contain_class('octavia::healthcheck')
+        is_expected.to contain_class('tripleo::profile::base::apache')
+        is_expected.to contain_class('octavia::wsgi::apache').with(
+          :ssl_cert => '/foo.pem',
+          :ssl_key  => '/foo.key',
+        )
       }
     end
   end
