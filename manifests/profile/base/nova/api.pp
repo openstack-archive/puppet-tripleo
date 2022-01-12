@@ -84,6 +84,7 @@ class tripleo::profile::base::nova::api (
     }
     include nova::cors
     include nova::quota
+    include nova::keystone
     include nova::network::neutron
     include nova::pci
     include nova::vendordata
