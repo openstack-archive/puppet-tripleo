@@ -46,16 +46,8 @@
 #   (Optional) Whether to enable the powerstore backend
 #   Defaults to false
 #
-# [*cinder_enable_dellemc_vmax_iscsi_backend*]
-#   (Optional) Whether to enable the vmax iscsi backend
-#   Defaults to false
-#
 # [*cinder_enable_dellemc_vnx_backend*]
 #   (Optional) Whether to enable the vnx backend
-#   Defaults to false
-#
-# [*cinder_enable_dellemc_vxflexos_backend*]
-#   (Optional) Whether to enable the vxflexos backend
 #   Defaults to false
 #
 # [*cinder_enable_dellemc_xtremio_backend*]
@@ -76,10 +68,6 @@
 #
 # [*cinder_enable_rbd_backend*]
 #   (Optional) Whether to enable the rbd backend
-#   Defaults to false
-#
-# [*cinder_enable_scaleio_backend*]
-#   (Optional) Whether to enable the scaleio backend
 #   Defaults to false
 #
 #[*cinder_enable_nvmeof_backend*]
@@ -137,15 +125,12 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_dellemc_powerflex_backend     = false,
   $cinder_enable_dellemc_powermax_backend      = false,
   $cinder_enable_dellemc_powerstore_backend    = false,
-  $cinder_enable_dellemc_vmax_iscsi_backend    = false,
   $cinder_enable_dellemc_vnx_backend           = false,
-  $cinder_enable_dellemc_vxflexos_backend      = false,
   $cinder_enable_dellemc_xtremio_backend       = false,
   $cinder_enable_iscsi_backend                 = true,
   $cinder_enable_netapp_backend                = false,
   $cinder_enable_nfs_backend                   = false,
   $cinder_enable_rbd_backend                   = false,
-  $cinder_enable_scaleio_backend               = false,
   $cinder_enable_nvmeof_backend                = false,
   $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
   $cinder_volume_cluster                       = '',
@@ -244,28 +229,12 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellemc_powerstore_backend_name = undef
     }
 
-    if $cinder_enable_dellemc_vmax_iscsi_backend {
-      include tripleo::profile::base::cinder::volume::dellemc_vmax_iscsi
-      $cinder_dellemc_vmax_iscsi_backend_name = hiera('cinder::backend::dellemc_vmax_iscsi::volume_backend_name',
-          'tripleo_dellemc_vmax_iscsi')
-    } else {
-      $cinder_dellemc_vmax_iscsi_backend_name = undef
-    }
-
     if $cinder_enable_dellemc_vnx_backend {
       include tripleo::profile::base::cinder::volume::dellemc_vnx
       $cinder_dellemc_vnx_backend_name = hiera('cinder::backend::emc_vnx::volume_backend_name',
           'tripleo_dellemc_vnx')
     } else {
       $cinder_dellemc_vnx_backend_name = undef
-    }
-
-    if $cinder_enable_dellemc_vxflexos_backend {
-      include tripleo::profile::base::cinder::volume::dellemc_vxflexos
-      $cinder_dellemc_vxflexos_backend_name = hiera('cinder::backend::dellemc_vxflexos::volume_backend_name',
-          'tripleo_dellemc_vxflexos')
-    } else {
-      $cinder_dellemc_vxflexos_backend_name = undef
     }
 
     if $cinder_enable_dellemc_xtremio_backend {
@@ -325,13 +294,6 @@ class tripleo::profile::base::cinder::volume (
       $cinder_rbd_extra_backend_names = undef
     }
 
-    if $cinder_enable_scaleio_backend {
-      include tripleo::profile::base::cinder::volume::scaleio
-      $cinder_scaleio_backend_name = hiera('cinder::backend::scaleio::volume_backend_name', 'tripleo_scaleio')
-    } else {
-      $cinder_scaleio_backend_name = undef
-    }
-
     if $cinder_enable_nvmeof_backend {
       include tripleo::profile::base::cinder::volume::nvmeof
       $cinder_nvmeof_backend_name = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof')
@@ -349,13 +311,10 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_dellemc_powerflex_backend_name,
                                       $cinder_dellemc_powermax_backend_name,
                                       $cinder_dellemc_powerstore_backend_name,
-                                      $cinder_dellemc_vmax_iscsi_backend_name,
                                       $cinder_dellemc_vnx_backend_name,
-                                      $cinder_dellemc_vxflexos_backend_name,
                                       $cinder_dellemc_xtremio_backend_name,
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
-                                      $cinder_scaleio_backend_name,
                                       $cinder_user_enabled_backends,
                                       $cinder_nvmeof_backend_name))
     # NOTE(aschultz): during testing it was found that puppet 3 may incorrectly
