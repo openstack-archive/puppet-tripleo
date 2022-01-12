@@ -85,5 +85,7 @@ class tripleo::profile::base::ironic_inspector (
     include ironic::inspector::pxe_filter::dnsmasq
     include ironic::inspector::config
     include ironic::inspector::logging
+    include ironic::inspector::ironic
+    include ironic::inspector::swift
   }
 }
