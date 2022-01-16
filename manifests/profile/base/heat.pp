@@ -152,6 +152,7 @@ class tripleo::profile::base::heat (
     include heat::cors
     include heat::db
     include heat::logging
+    include heat::trustee
 
     if $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
       $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}"), 'inet6:')

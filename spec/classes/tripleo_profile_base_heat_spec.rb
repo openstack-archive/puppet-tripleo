@@ -38,6 +38,7 @@ eos
         is_expected.to_not contain_class('heat::cors')
         is_expected.to_not contain_class('heat::db')
         is_expected.to_not contain_class('heat::logging')
+        is_expected.to_not contain_class('heat::trustee')
         is_expected.to_not contain_class('heat::cache')
         is_expected.to_not contain_class('heat::cron::purge_deleted')
       end
@@ -73,6 +74,7 @@ eos
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::db')
         is_expected.to contain_class('heat::logging')
+        is_expected.to contain_class('heat::trustee')
         is_expected.to contain_class('heat::cache').with(
           :memcache_servers => ['127.0.0.1:11211']
         )
@@ -110,7 +112,7 @@ eos
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::db')
         is_expected.to contain_class('heat::logging')
-        is_expected.to contain_class('heat::cache')
+        is_expected.to contain_class('heat::trustee')
         is_expected.to contain_class('heat::cache').with(
           :memcache_servers => ['127.0.0.1:11211']
         )
@@ -150,6 +152,7 @@ eos
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::db')
         is_expected.to contain_class('heat::logging')
+        is_expected.to contain_class('heat::trustee')
         is_expected.to contain_class('heat::cache').with(
           :memcache_servers => ['[::1]:11211']
         )
