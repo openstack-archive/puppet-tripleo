@@ -55,5 +55,6 @@ class tripleo::profile::base::designate::central (
     }
     include designate::central
     include designate::quota
+    include designate::network_api::neutron
   }
 }
