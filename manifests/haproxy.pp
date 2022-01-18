@@ -458,6 +458,11 @@
 #  (optional) Specify the network swift_proxy_server is running on.
 #  Defaults to hiera('swift_proxy_network', undef)
 #
+# [*designate_mdns_proxy_baseport*]
+#  (optional) Specify the base port value for the external->internal
+#  proxies used for external DNS integration with designate workers.
+#  Defaults to hiera('designate_mdns_public_port_start', undef)
+#
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
 #  The available keys to modify the services' ports are:
@@ -619,6 +624,7 @@ class tripleo::haproxy (
   $ovn_dbs_network               = hiera('ovn_dbs_network', undef),
   $etcd_network                  = hiera('etcd_network', undef),
   $swift_proxy_server_network    = hiera('swift_proxy_network', undef),
+  $designate_mdns_proxy_baseport = hiera('designate_mdns_public_port_start', 16000),
   $service_ports                 = {},
   # DEPRECATED PARAMETERS
   $activate_httplog              = undef
@@ -1387,6 +1393,51 @@ class tripleo::haproxy (
       backend_options   => merge($default_backend_options, $designate_backend_opts),
       public_ssl_port   => $ports[designate_api_ssl_port],
       service_network   => $designate_network,
+    }
+
+    # Create a reverse proxy for each miniDNS server running on the internal network so
+    # external bind instances can access them without having to have access to the internal
+    # network.
+    #
+    if $designate_mdns_proxy_baseport {
+      $mdns_nodes = zip(hiera('designate_mdns_node_ips', $controller_hosts_real),
+                        hiera('designate_mdns_node_names', $controller_hosts_names_real))
+
+      # TODO(beagles): it would preferable to implement in terms of
+      # tripleo::haproxy::endpoint. I'm leaving as a follow up as
+      # it seems like it would require more intrusive changes on a
+      # shared and critical bit of haproxy related code.
+      #
+      if $use_backend_syntax {
+        $mdns_nodes.each |$index, $mdns_node| {
+          haproxy::frontend { "designate_mdns_${index}":
+            ipaddress => $public_virtual_ip,
+            ports     => String($designate_mdns_proxy_baseport + $index),
+            mode      => 'tcp',
+            options   => {
+              'default_backend ' => "designate_mdns_${index}_be",
+              'option'           => [ 'tcplog' ],
+              },
+          }
+
+          haproxy::backend { "designate_mdns_${index}_be":
+            mode    => 'tcp',
+            options => {
+              'option' => [ 'tcplog' ],
+              },
+          }
+
+          haproxy::balancermember { "designate_mdns_${index}":
+            listening_service => "designate_mdns_${index}_be",
+            ports             => '5354',
+            ipaddresses       => $mdns_node[0],
+            server_names      => $mdns_node[1],
+            verifyhost        => false,
+          }
+        }
+      } else {
+        fail('Designate miniDNS haproxy configuration requires enabling backend syntax')
+      }
     }
   }
 
