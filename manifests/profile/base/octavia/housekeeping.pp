@@ -32,5 +32,8 @@ class tripleo::profile::base::octavia::housekeeping (
     include ::octavia::controller
     include ::octavia::nova
     include ::octavia::housekeeping
+    include ::octavia::certificates
+    include ::octavia::neutron
+    include ::octavia::glance
   }
 }
