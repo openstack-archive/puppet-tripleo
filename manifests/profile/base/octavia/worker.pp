@@ -33,5 +33,8 @@ class tripleo::profile::base::octavia::worker (
     include octavia::nova
     include octavia::worker
     include octavia::certificates
+    include octavia::neutron
+    include octavia::glance
+    include octavia::cinder
   }
 }
