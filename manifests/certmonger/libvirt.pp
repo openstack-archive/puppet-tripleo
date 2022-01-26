@@ -74,6 +74,7 @@ define tripleo::certmonger::libvirt (
     wait         => true,
     tag          => 'libvirt-cert',
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   # Just register the files in puppet's resource catalog. Certmonger should
@@ -82,7 +83,7 @@ define tripleo::certmonger::libvirt (
     require => Certmonger_certificate[$name],
   }
   file { $service_key :
-    require => Certmonger_certificate[$name],
+    audit   => [content],
   }
 
   File[$service_certificate] ~> Service<| title == $::nova::params::libvirt_service_name |>

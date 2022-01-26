@@ -72,6 +72,7 @@ class tripleo::certmonger::ceph_grafana (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   file { $service_certificate :
@@ -80,8 +81,8 @@ class tripleo::certmonger::ceph_grafana (
     group   => 472,
   }
   file { $service_key :
-    require => Certmonger_certificate['ceph_grafana'],
-    owner   => 472,
-    group   => 472,
+    owner => 472,
+    group => 472,
+    audit => [content],
   }
 }

@@ -84,6 +84,7 @@ define tripleo::certmonger::libvirt_vnc (
     wait         => true,
     tag          => 'libvirt-cert',
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
 
   if $cacertfile {
@@ -112,9 +113,9 @@ define tripleo::certmonger::libvirt_vnc (
     mode    => '0644'
   }
   file { $service_key :
-    require => Certmonger_certificate[$name],
-    group   => 'qemu',
-    mode    => '0640'
+    group => 'qemu',
+    mode  => '0640',
+    audit => [content],
   }
 
   File[$service_certificate] ~> Service<| title == $notify_service_real |>

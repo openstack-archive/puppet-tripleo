@@ -66,6 +66,7 @@ class tripleo::certmonger::openvswitch (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
   file { $service_certificate :
     owner   => 'openvswitch',
@@ -73,8 +74,8 @@ class tripleo::certmonger::openvswitch (
     require => Certmonger_certificate['openvswitch'],
   }
   file { $service_key :
-    owner   => 'openvswitch',
-    group   => 'hugetlbfs',
-    require => Certmonger_certificate['openvswitch'],
+    owner => 'openvswitch',
+    group => 'hugetlbfs',
+    audit => [content],
   }
 }

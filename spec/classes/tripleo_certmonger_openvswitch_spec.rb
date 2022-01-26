@@ -51,7 +51,7 @@ describe 'tripleo::certmonger::openvswitch' do
       is_expected.to contain_file('/etc/pki/key.pem').with(
         :owner   => 'openvswitch',
         :group   => 'hugetlbfs',
-        :require => 'Certmonger_certificate[openvswitch]'
+        :audit => ['content']
       )
     end
   end

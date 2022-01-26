@@ -65,12 +65,13 @@ class tripleo::certmonger::neutron_ovn (
     key_size     => $key_size,
     wait         => true,
     require      => Class['::certmonger'],
+    subscribe    => File[$service_key],
   }
   file { $service_certificate :
     require => Certmonger_certificate['neutron_ovn']
   }
   file { $service_key :
-    require => Certmonger_certificate['neutron_ovn']
+    audit   => [content],
   }
 
 }

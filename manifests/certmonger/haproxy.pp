@@ -113,7 +113,12 @@ define tripleo::certmonger::haproxy (
       wait         => true,
       tag          => 'haproxy-cert',
       require      => Class['::certmonger'],
+      subscribe    => File[$service_key],
     }
+    file { $service_key:
+      audit => [content],
+    }
+
     concat { $service_pem :
       ensure => present,
       mode   => '0640',
