@@ -120,6 +120,7 @@ nova_metadata_short_bootstrap_node_name: node
 nova_placement_short_bootstrap_node_name: node
 nova::rabbit_password: 'password'
 nova::keystone::authtoken::password: 'password'
+nova::keystone::password: 'password'
 nova::network::neutron::password: 'password'
 nova::metadata::novajoin::authtoken::password: 'password'
 # placement related items
