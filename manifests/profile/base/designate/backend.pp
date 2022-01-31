@@ -37,7 +37,7 @@ class tripleo::profile::base::designate::backend (
         configure_bind => false
       }
     } else {
-      fail('${backend} is not supported by designate')
+      fail("${backend} is not supported by designate")
     }
   }
 }

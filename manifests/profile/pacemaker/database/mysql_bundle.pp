@@ -550,7 +550,9 @@ MYSQL_HOST=localhost\n",
         undef   => undef,
         default => "stop timeout=${stop_timeout}s"
       }
+      # lint:ignore:140chars
       $op_params = join(delete_undef_values([$op_start_params, $op_promote_params, $op_monitor_params, $op_demote_params, $op_stop_params]), ' ')
+      # lint:endignore
 
       pacemaker::resource::ocf { 'galera':
         ocf_agent_name  => 'heartbeat:galera',
