@@ -393,7 +393,6 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           resource_params => "debug=${debug} avoid_using_iptables=true${allowed_cluster_string}",
           # lint:ignore:140chars
           meta_params     => "notify=true container-attribute-target=host master-max=${rabbitmq_nodes_count_real} master-node-max=${rabbitmq_nodes_count_real} ordered=false interleave=false",
-          # lint:ignore:140chars
           op_params       => 'start timeout=360s stop timeout=120s promote timeout=120s notify timeout=180s monitor interval=30 timeout=60 monitor interval=27 role=Master timeout=60',
           # lint:endignore
           tries           => $pcs_tries,

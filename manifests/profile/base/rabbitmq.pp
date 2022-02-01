@@ -173,7 +173,9 @@ class tripleo::profile::base::rabbitmq (
     } else {
       $additional_erl_args_real = ''
     }
+    # lint:ignore:140chars
     $rabbitmq_additional_erl_args = "\"${additional_erl_args_real} -ssl_dist_optfile /etc/rabbitmq/ssl-dist.conf -crypto fips_mode ${fips_mode}\""
+    # lint:endignore
     $rabbitmq_client_additional_erl_args = "\"${additional_erl_args_real}\""
     $environment_real = merge($environment, {
       'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS' => $rabbitmq_additional_erl_args,
