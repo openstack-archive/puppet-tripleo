@@ -27,6 +27,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::logging')
+        is_expected.to_not contain_class('cinder::quota')
         is_expected.to_not contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
@@ -55,6 +56,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::quota')
         is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end
@@ -72,6 +74,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to_not contain_class('cinder::glance')
         is_expected.to_not contain_class('cinder::nova')
         is_expected.to_not contain_class('cinder::logging')
+        is_expected.to_not contain_class('cinder::quota')
         is_expected.to_not contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
@@ -100,6 +103,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::quota')
         is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder:::cron::db_purge')
       end
@@ -122,6 +126,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::quota')
         is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to contain_class('cinder::cron::db_purge')
       end
@@ -145,6 +150,7 @@ describe 'tripleo::profile::base::cinder' do
         is_expected.to contain_class('cinder::glance')
         is_expected.to contain_class('cinder::nova')
         is_expected.to contain_class('cinder::logging')
+        is_expected.to contain_class('cinder::quota')
         is_expected.to contain_class('cinder::keystone::service_user')
         is_expected.to_not contain_class('cinder::cron::db_purge')
       end

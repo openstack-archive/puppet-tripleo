@@ -126,6 +126,7 @@ class tripleo::profile::base::cinder (
     include cinder::glance
     include cinder::nova
     include cinder::logging
+    include cinder::quota
     include cinder::keystone::service_user
   }
 
