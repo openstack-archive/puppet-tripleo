@@ -9,25 +9,25 @@
   # required for GDPR compliance.
   maxsize <%= @maxsize %>
   missingok
-<%- if @notifempty %>
+<%- if @notifempty -%>
   notifempty
-<%- end %>
-<%- if @copytruncate %>
+<%- end -%>
+<%- if @copytruncate -%>
   copytruncate
-<%- end %>
-<%- if @delaycompress %>
+<%- end -%>
+<%- if @delaycompress -%>
   delaycompress
-<%- end %>
-<%- if @compress %>
+<%- end -%>
+<%- if @compress -%>
   compress
-<%- end %>
-<%- if @dateext %>
+<%- end -%>
+<%- if @dateext -%>
   dateext
-<%- if @dateformat %>
+<%- if @dateformat -%>
   dateformat <%= @dateformat %>
-<%- end %>
-<%- if @dateyesterday %>
+<%- end -%>
+<%- if @dateyesterday -%>
   dateyesterday
-<%- end %>
-<%- end %>
+<%- end -%>
+<%- end -%>
 }
