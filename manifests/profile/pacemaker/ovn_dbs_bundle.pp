@@ -303,7 +303,8 @@ nb_master_protocol=ssl sb_master_protocol=ssl"
       pacemaker::resource::ocf { "${ovndb_servers_resource_name}":
         ocf_agent_name  => "${ovndb_servers_ocf_name}",
         master_params   => '',
-        op_params       => "start timeout=200s stop timeout=200s monitor interval=${monitor_interval_master}s role=Master timeout=${dbs_timeout}s \
+        op_params       => "start timeout=200s stop timeout=200s \
+monitor interval=${monitor_interval_master}s role=Master timeout=${dbs_timeout}s \
 monitor interval=${monitor_interval_slave}s role=Slave timeout=${dbs_timeout}s",
         resource_params => $resource_map,
         tries           => $pcs_tries,
