@@ -17,10 +17,9 @@ mod 'ptp',
   :git => 'https://github.com/redhat-nfvpe/ptp',
   :ref => 'master'
 
-# NOTE(aschultz): Pinned due to LP#1755211
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
-  :ref => '20a465b0d8751bc08913b556d0a5b7fdac139271'
+  :ref => 'master'
 
 mod 'rsyslog',
   :git => 'https://github.com/voxpupuli/puppet-rsyslog',
