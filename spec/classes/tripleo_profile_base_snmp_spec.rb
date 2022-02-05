@@ -23,7 +23,7 @@ describe 'tripleo::profile::base::snmp' do
       let :params do
         {
           :snmpd_user     => 'ro_snmp_user',
-          :snmpd_password => 'secrete',
+          :snmpd_password => 'snmppass',
           :step           => 4,
         }
       end
@@ -31,7 +31,7 @@ describe 'tripleo::profile::base::snmp' do
       it 'should configure snmpd' do
         is_expected.to contain_class('snmp').with(
           :snmpd_config => [
-            'createUser ro_snmp_user MD5 "secrete"',
+            'createUser ro_snmp_user MD5 "snmppass"',
             'rouser ro_snmp_user',
             'proc  cron',
             'includeAllDisks  10%',
@@ -48,7 +48,7 @@ describe 'tripleo::profile::base::snmp' do
       let :params do
         {
           :snmpd_user      => 'ro_snmp_user',
-          :snmpd_password  => 'secrete',
+          :snmpd_password  => 'snmppass',
           :snmpd_auth_type => 'SHA',
           :step            => 4,
         }
@@ -57,7 +57,7 @@ describe 'tripleo::profile::base::snmp' do
       it 'should configure snmpd with SHA' do
         is_expected.to contain_class('snmp').with(
           :snmpd_config => [
-            'createUser ro_snmp_user SHA "secrete"',
+            'createUser ro_snmp_user SHA "snmppass"',
             'rouser ro_snmp_user',
             'proc  cron',
             'includeAllDisks  10%',
@@ -74,9 +74,9 @@ describe 'tripleo::profile::base::snmp' do
       let :params do
         {
           :snmpd_user     => 'ro_snmp_user',
-          :snmpd_password => 'secrete',
+          :snmpd_password => 'snmppass',
           :snmpd_config   => [
-            'createUser ro_snmp_user MD5 "secrete"',
+            'createUser ro_snmp_user MD5 "snmppass"',
             'rouser ro_snmp_user',
             'proc  neutron-server',
           ],
@@ -87,7 +87,7 @@ describe 'tripleo::profile::base::snmp' do
       it 'should configure snmpd with custom parameters' do
         is_expected.to contain_class('snmp').with(
           :snmpd_config => [
-            'createUser ro_snmp_user MD5 "secrete"',
+            'createUser ro_snmp_user MD5 "snmppass"',
             'rouser ro_snmp_user',
             'proc  neutron-server',
           ]
