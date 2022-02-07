@@ -10,15 +10,15 @@
       - tripleo-upgrades-master-pipeline
     check:
       jobs:
-        - tripleo-ci-centos-8-content-provider
-        - tripleo-ci-centos-8-scenario007-multinode-oooq-container:
+        - tripleo-ci-centos-9-content-provider
+        - tripleo-ci-centos-9-scenario007-multinode-oooq-container:
             vars: &multi_consumer_vars
               consumer_job: true
               build_container_images: false
               remove_tags:
                 - build
             dependencies: &deps_cprovider
-                - tripleo-ci-centos-8-content-provider
+                - tripleo-ci-centos-9-content-provider
             files:
               - ^manifests/profile/pacemaker/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
