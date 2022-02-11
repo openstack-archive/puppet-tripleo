@@ -193,7 +193,7 @@ class tripleo::profile::base::swift::proxy (
     include swift::proxy::encryption
     include swift::keymaster
     if $audit_enabled {
-      include swift::audit
+      include swift::proxy::audit
     }
   }
 }
