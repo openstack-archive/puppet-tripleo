@@ -1618,15 +1618,17 @@ class tripleo::haproxy (
         bind             => $redis_bind_opts,
         collect_exported => false,
         options          => {
+          'timeout client'  => '90m',
           'default_backend' => 'redis_be',
           'option'          => [ 'tcplog' ],
         },
       }
       haproxy::backend { 'redis_be':
         options => {
-          'balance'   => 'first',
-          'option'    => [ 'tcp-check' ],
-          'tcp-check' => $redis_tcp_check_options,
+          'timeout server' => '90m',
+          'balance'        => 'first',
+          'option'         => [ 'tcp-check' ],
+          'tcp-check'      => $redis_tcp_check_options,
         },
       }
       $redis_service = 'redis_be'
@@ -1634,9 +1636,11 @@ class tripleo::haproxy (
       haproxy::listen { 'redis':
         bind             => $redis_bind_opts,
         options          => {
-          'balance'   => 'first',
-          'option'    => [ 'tcp-check', 'tcplog' ],
-          'tcp-check' => $redis_tcp_check_options,
+          'balance'        => 'first',
+          'timeout client' => '90m',
+          'timeout server' => '90m',
+          'option'         => [ 'tcp-check', 'tcplog' ],
+          'tcp-check'      => $redis_tcp_check_options,
         },
         collect_exported => false,
       }
