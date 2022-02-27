@@ -48,12 +48,6 @@ describe 'tripleo::profile::base::glance::backend::rbd' do
           :rbd_store_pool      => 'images',
           :store_description   => 'RBD store',
         )
-        is_expected.to contain_exec('exec-setfacl-ceph-openstack-glance').with_command(
-          'setfacl -m u:glance:r-- /etc/ceph/ceph.client.openstack.keyring'
-        )
-        is_expected.to contain_exec('exec-setfacl-ceph-openstack-glance-mask').with_command(
-          'setfacl -m m::r /etc/ceph/ceph.client.openstack.keyring'
-        )
       end
 
       context 'with parameters overridden' do
@@ -122,12 +116,6 @@ describe 'tripleo::profile::base::glance::backend::rbd' do
             :rbd_store_user      => 'openstack2',
             :rbd_store_pool      => 'images2',
             :store_description   => 'rbd2 backend',
-          )
-          is_expected.to contain_exec('exec-setfacl-ceph2-openstack2-glance').with_command(
-            'setfacl -m u:glance:r-- /etc/ceph/ceph2.client.openstack2.keyring'
-          )
-          is_expected.to contain_exec('exec-setfacl-ceph2-openstack2-glance-mask').with_command(
-            'setfacl -m m::r /etc/ceph/ceph2.client.openstack2.keyring'
           )
         end
       end
