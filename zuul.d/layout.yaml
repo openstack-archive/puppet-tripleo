@@ -11,7 +11,7 @@
     check:
       jobs:
         - tripleo-ci-centos-8-content-provider
-        - tripleo-ci-centos-8-scenario007-multinode-oooq-container:
+        - tripleo-ci-centos-8-scenario007-multinode-oooq-container: &c8_consumer
             vars: &multi_consumer_vars
               consumer_job: true
               build_container_images: false
@@ -19,10 +19,21 @@
                 - build
             dependencies: &deps_cprovider
                 - tripleo-ci-centos-8-content-provider
-            files:
+            files: &scen7_files
               - ^manifests/profile/pacemaker/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/agents/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/ovn.*$
+        - tripleo-ci-centos-9-content-provider
+        - tripleo-ci-centos-9-scenario007-multinode-oooq-container: &c9_consumer
+            vars: *multi_consumer_vars
+            dependencies:
+                - tripleo-ci-centos-9-content-provider
+            files: *scen7_files
     gate:
       queue: tripleo
+      jobs:
+        - tripleo-ci-centos-8-content-provider
+        - tripleo-ci-centos-8-scenario007-multinode-oooq-container: *c8_consumer
+        - tripleo-ci-centos-9-content-provider
+        - tripleo-ci-centos-9-scenario007-multinode-oooq-container: *c9_consumer
