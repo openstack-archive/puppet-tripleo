@@ -26,38 +26,38 @@ describe 'tripleo::profile::base::designate::producer' do
         oslomsg_rpc_username => 'designate',
         oslomsg_rpc_password => 'foo'
       }
+      class { 'tripleo::profile::base::designate::coordination':
+        step => #{params[:step]},
+      }
 eos
     end
 
     context 'with step less than 4' do
       let(:params) { {
-        :designate_redis_password => 'password',
-        :redis_vip                => '127.0.0.1',
-        :step                     => 1,
+        :step => 1,
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::producer')
         is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
         is_expected.to_not contain_class('designate::producer')
       }
     end
 
     context 'with step 4' do
       let(:params) { {
-        :designate_redis_password => 'password',
-        :redis_vip                => '127.0.0.1',
-        :step                     => 4,
+        :step => 4,
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::producer')
         is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
         is_expected.to contain_class('designate::producer')
       }
     end
   end
-
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do

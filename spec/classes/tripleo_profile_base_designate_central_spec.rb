@@ -26,7 +26,7 @@ describe 'tripleo::profile::base::designate::central' do
         oslomsg_rpc_username => 'designate',
         oslomsg_rpc_password => 'foo'
       }
-      class { 'tripleo::profile::base::designate::authtoken':
+      class { 'tripleo::profile::base::designate::coordination':
         step => #{params[:step]},
       }
 eos
@@ -40,6 +40,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::central')
         is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
         is_expected.to_not contain_class('designate::db')
         is_expected.to_not contain_class('designate::central')
         is_expected.to_not contain_class('designate::quota')
@@ -55,7 +56,10 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::central')
         is_expected.to contain_class('tripleo::profile::base::designate')
-        is_expected.to contain_class('designate::db').with(:sync_db => true)
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
+        is_expected.to contain_class('designate::db').with(
+          :sync_db => true
+        )
         is_expected.to contain_class('designate::central')
         is_expected.to contain_class('designate::quota')
       }
@@ -70,6 +74,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::central')
         is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
         is_expected.to_not contain_class('designate::db')
         is_expected.to_not contain_class('designate::central')
         is_expected.to_not contain_class('designate::quota')
@@ -85,6 +90,7 @@ eos
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::central')
         is_expected.to contain_class('tripleo::profile::base::designate')
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
         is_expected.to contain_class('designate::db').with(
           :sync_db => false
         )
@@ -94,7 +100,6 @@ eos
     end
 
   end
-
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do
