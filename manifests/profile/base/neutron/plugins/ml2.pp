@@ -63,10 +63,6 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include neutron::plugins::ml2::sriov_driver
     }
 
-    if 'bsn_ml2' in $mechanism_drivers {
-      include neutron::plugins::ml2::bigswitch::restproxy
-    }
-
     if 'ovn' in $mechanism_drivers {
       include tripleo::profile::base::neutron::plugins::ml2::ovn
     }
