@@ -1447,9 +1447,11 @@ class tripleo::haproxy (
     haproxy::listen { 'redis':
       bind             => $redis_bind_opts,
       options          => {
-        'balance'   => 'first',
-        'option'    => [ 'tcp-check', 'tcplog', ],
-        'tcp-check' => $redis_tcp_check_options,
+        'balance'        => 'first',
+        'timeout client' => '90m',
+        'timeout server' => '90m',
+        'option'         => [ 'tcp-check', 'tcplog', ],
+        'tcp-check'      => $redis_tcp_check_options,
       },
       collect_exported => false,
     }
