@@ -127,7 +127,7 @@ describe 'tripleo::haproxy' do
               "connect 10s",
               "client 2m",
               "server 2m",
-              "check 10s",
+              "check 30s",
             ],
             "maxconn"=>4096,
           }
@@ -153,7 +153,7 @@ describe 'tripleo::haproxy' do
               "connect 10s",
               "client 2m",
               "server 2m",
-              "check 10s",
+              "check 30s",
             ],
             "maxconn"=>4096,
             "option"=>"httplog",
