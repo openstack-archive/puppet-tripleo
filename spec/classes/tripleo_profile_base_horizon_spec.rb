@@ -18,10 +18,6 @@ require 'spec_helper'
 
 describe 'tripleo::profile::base::horizon' do
   shared_examples_for 'tripleo::profile::base::horizon' do
-    let(:pre_condition) do
-      "class { 'tripleo::profile::base::aodh': step => #{params[:step]}, oslomsg_rpc_hosts => ['localhost.localdomain'] }"
-    end
-
     context 'with step less than 3' do
       let(:params) { { :step => 2 } }
 
@@ -110,7 +106,7 @@ describe 'tripleo::profile::base::horizon' do
         :octavia_api_enabled => true,
       } }
 
-      it 'should trigger complete configuration with heat dashboard' do
+      it 'should trigger complete configuration with octavia dashboard' do
         is_expected.to contain_class('horizon')
         is_expected.to contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
@@ -128,7 +124,7 @@ describe 'tripleo::profile::base::horizon' do
         :manila_api_enabled => true,
       } }
 
-      it 'should trigger complete configuration with heat dashboard' do
+      it 'should trigger complete configuration with manila dashboard' do
         is_expected.to contain_class('horizon')
         is_expected.to contain_class('horizon::policy')
         is_expected.to_not contain_class('horizon::dashboards::heat')
