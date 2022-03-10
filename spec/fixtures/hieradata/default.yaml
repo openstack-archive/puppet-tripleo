@@ -131,6 +131,7 @@ placement::keystone::authtoken::password: 'password'
 # memcache related items
 memcached_node_names:
  - 'controller-1'
+memcached::max_memory: 4096
 # octavia related items
 octavia_api_short_bootstrap_node_name: node
 octavia::keystone::authtoken::password: 'password'
