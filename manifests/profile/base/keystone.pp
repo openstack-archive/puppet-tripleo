@@ -43,22 +43,6 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
 #
-# [*heat_admin_domain*]
-#   domain name for heat admin
-#   Defaults to undef
-#
-# [*heat_admin_email*]
-#   heat admin email address
-#   Defaults to undef
-#
-# [*heat_admin_password*]
-#   heat admin password
-#   Defaults to undef
-#
-# [*heat_admin_user*]
-#   heat admin user name
-#   Defaults to undef
-#
 # [*ldap_backends_config*]
 #   Configuration for keystone::ldap_backend. This takes a hash that will
 #   create each backend specified.
@@ -169,10 +153,6 @@ class tripleo::profile::base::keystone (
   $bootstrap_node                 = hiera('keystone_short_bootstrap_node_name', undef),
   $certificates_specs             = hiera('apache_certificates_specs', {}),
   $enable_internal_tls            = hiera('enable_internal_tls', false),
-  $heat_admin_domain              = undef,
-  $heat_admin_email               = undef,
-  $heat_admin_password            = undef,
-  $heat_admin_user                = undef,
   $ldap_backends_config           = undef,
   $ldap_backend_enable            = false,
   $manage_db_purge                = hiera('keystone_enable_db_purge', false),
