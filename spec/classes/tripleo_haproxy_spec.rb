@@ -235,7 +235,7 @@ describe 'tripleo::haproxy' do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) do
-        facts.merge({ })
+        facts.merge(OSDefaults.get_facts({ :hostname => 'node.example.com' }))
       end
 
       it_behaves_like 'tripleo::haproxy'

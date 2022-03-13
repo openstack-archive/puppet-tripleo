@@ -73,7 +73,7 @@ describe 'tripleo::profile::base::neutron::wrappers::keepalived_state_change' do
   on_supported_os.each do |os, facts|
     context "on #{os}" do
       let(:facts) do
-        facts.merge({ :hostname => 'node.example.com' })
+        facts.merge(OSDefaults.get_facts({ :hostname => 'node.example.com' }))
       end
 
       it_behaves_like 'tripleo::profile::base::neutron::wrappers::keepalived_state_change'
