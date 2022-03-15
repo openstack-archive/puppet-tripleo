@@ -38,6 +38,10 @@
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to undef
 #
+# [*fips_mode*]
+#   (Optional) Whether the erlang crypto app is configured for FIPS mode or not.
+#   Defaults to false
+#
 # [*ssl_versions*]
 #   (Optional) When enable_internal_tls is in use, list the enabled
 #   TLS protocol version.
@@ -126,6 +130,7 @@ class tripleo::profile::base::rabbitmq (
   $certificate_specs             = {},
   $config_variables              = hiera('rabbitmq_config_variables'),
   $enable_internal_tls           = undef,
+  $fips_mode                     = false,
   $environment                   = hiera('rabbitmq_environment'),
   $additional_erl_args           = undef,
   $ssl_versions                  = ['tlsv1.2', 'tlsv1.3'],
@@ -168,7 +173,9 @@ class tripleo::profile::base::rabbitmq (
     } else {
       $additional_erl_args_real = ''
     }
-    $rabbitmq_additional_erl_args = "\"${additional_erl_args_real} -ssl_dist_optfile /etc/rabbitmq/ssl-dist.conf\""
+    # lint:ignore:140chars
+    $rabbitmq_additional_erl_args = "\"${additional_erl_args_real} -ssl_dist_optfile /etc/rabbitmq/ssl-dist.conf -crypto fips_mode ${fips_mode}\""
+    # lint:endignore
     $rabbitmq_client_additional_erl_args = "\"${additional_erl_args_real}\""
     $environment_real = merge($environment, {
       'RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS' => $rabbitmq_additional_erl_args,
