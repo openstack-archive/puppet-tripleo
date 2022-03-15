@@ -51,6 +51,11 @@ class tripleo::profile::base::designate::producer (
 
   if $step >= 4 {
     include designate::producer
+    include designate::producer_task::delayed_notify
+    include designate::producer_task::periodic_exists
+    include designate::producer_task::periodic_secondary_refresh
+    include designate::producer_task::worker_periodic_recovery
+    include designate::producer_task::zone_purge
     if $redis_vip {
       class { 'designate::coordination':
         backend_url => join(['redis://:', $designate_redis_password, '@', normalize_ip_for_uri($redis_vip), ':6379/', $tls_query_param])

@@ -41,6 +41,11 @@ eos
         is_expected.to contain_class('tripleo::profile::base::designate')
         is_expected.to_not contain_class('designate::coordination')
         is_expected.to_not contain_class('designate::producer')
+        is_expected.to_not contain_class('designate::producer_task::delayed_notify')
+        is_expected.to_not contain_class('designate::producer_task::periodic_exists')
+        is_expected.to_not contain_class('designate::producer_task::periodic_secondary_refresh')
+        is_expected.to_not contain_class('designate::producer_task::worker_periodic_recovery')
+        is_expected.to_not contain_class('designate::producer_task::zone_purge')
       }
     end
 
@@ -58,6 +63,11 @@ eos
           :backend_url => 'redis://:password@127.0.0.1:6379/',
         )
         is_expected.to contain_class('designate::producer')
+        is_expected.to contain_class('designate::producer_task::delayed_notify')
+        is_expected.to contain_class('designate::producer_task::periodic_exists')
+        is_expected.to contain_class('designate::producer_task::periodic_secondary_refresh')
+        is_expected.to contain_class('designate::producer_task::worker_periodic_recovery')
+        is_expected.to contain_class('designate::producer_task::zone_purge')
       }
     end
 
@@ -73,6 +83,11 @@ eos
         is_expected.to contain_class('tripleo::profile::base::designate')
         is_expected.to_not contain_class('designate::coordination')
         is_expected.to contain_class('designate::producer')
+        is_expected.to contain_class('designate::producer_task::delayed_notify')
+        is_expected.to contain_class('designate::producer_task::periodic_exists')
+        is_expected.to contain_class('designate::producer_task::periodic_secondary_refresh')
+        is_expected.to contain_class('designate::producer_task::worker_periodic_recovery')
+        is_expected.to contain_class('designate::producer_task::zone_purge')
       }
     end
   end
