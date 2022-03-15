@@ -31,6 +31,10 @@
 #   (Optional) Memcached port to use.
 #   Defaults to hiera('memcached_authtoken_port', 11211)
 #
+# [*memcached_ipv6*]
+#   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
+#   Defauls to hiera('memcached_ipv6', false)
+#
 # [*security_strategy*]
 #   (Optional) Memcached (authtoken) security strategy.
 #   Defaults to hiera('memcached_authtoken_security_strategy', undef)
@@ -50,18 +54,19 @@ class tripleo::profile::base::ironic_inspector::authtoken (
   $step                = Integer(hiera('step')),
   $memcached_hosts     = hiera('memcached_node_names', []),
   $memcached_port      = hiera('memcached_authtoken_port', 11211),
+  $memcached_ipv6      = hiera('memcached_ipv6', false),
   $security_strategy   = hiera('memcached_authtoken_security_strategy', undef),
   $secret_key          = hiera('memcached_authtoken_secret_key', undef),
   # DEPRECATED PARAMETERS
   $memcached_ips       = undef
 ) {
-  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
+  $memcached_hosts_real = any2array(pick($memcached_ips, $memcached_hosts))
 
   if $step >= 3 {
-    if $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
-      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}"), 'inet6:')
+    if $memcached_ipv6 or $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
+      $memcache_servers = $memcached_hosts_real.map |$server| { "inet6:[${server}]:${memcached_port}" }
     } else {
-      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+      $memcache_servers = suffix($memcached_hosts_real, ":${memcached_port}")
     }
 
     if $secret_key {
