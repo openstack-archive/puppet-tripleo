@@ -31,30 +31,46 @@ describe 'tripleo::profile::base::zaqar::authtoken' do
 
     context 'with step 3' do
       let(:params) { {
-        :step => 3,
-        :memcached_ips => '127.0.0.1',
+        :step            => 3,
+        :memcached_hosts => '127.0.0.1',
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::zaqar::authtoken')
         is_expected.to contain_class('zaqar::keystone::authtoken').with(
-            :memcached_servers => ['127.0.0.1:11211'])
+          :memcached_servers => ['127.0.0.1:11211']
+        )
       }
     end
 
     context 'with step 3 with ipv6' do
       let(:params) { {
-        :step     => 3,
-        :memcached_ips => '::1',
+        :step            => 3,
+        :memcached_hosts => '::1',
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::zaqar::authtoken')
         is_expected.to contain_class('zaqar::keystone::authtoken').with(
-            :memcached_servers => ['[::1]:11211'])
+          :memcached_servers => ['inet6:[::1]:11211']
+        )
       }
     end
 
+    context 'with step 3 with the ipv6 parameter' do
+      let(:params) { {
+        :step            => 3,
+        :memcached_hosts => 'node.example.com',
+        :memcached_ipv6  => true,
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::zaqar::authtoken')
+        is_expected.to contain_class('zaqar::keystone::authtoken').with(
+          :memcached_servers => ['inet6:[node.example.com]:11211']
+        )
+      }
+    end
   end
 
 
