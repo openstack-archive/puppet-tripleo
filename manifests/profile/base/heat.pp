@@ -87,6 +87,14 @@
 #   (Optional) Memcached port to use.
 #   Defaults to hiera('memcached_port', 11211)
 #
+# [*memcached_ipv6*]
+#   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
+#   Defauls to hiera('memcached_ipv6', false)
+#
+# [*cache_backend*]
+#   (Optional) oslo.cache backend used for caching.
+#   Defaults to hiera('heat::cache::backend', false)
+#
 # DEPRECATED PARAMETERS
 #
 # [*memcached_ips*]
@@ -111,10 +119,12 @@ class tripleo::profile::base::heat (
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $memcached_hosts         = hiera('memcached_node_names', []),
   $memcached_port          = hiera('memcached_port', 11211),
+  $memcached_ipv6          = hiera('memcached_ipv6', false),
+  $cache_backend           = hiera('heat::cache::backend', false),
   # DEPRECATED PARAMETERS
   $memcached_ips           = undef
 ) {
-  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
+  $memcached_hosts_real = any2array(pick($memcached_ips, $memcached_hosts))
 
   include tripleo::profile::base::heat::authtoken
 
@@ -152,14 +162,22 @@ class tripleo::profile::base::heat (
     include heat::cors
     include heat::logging
 
-    if $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
-      $memcache_servers = prefix(suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}"), 'inet6:')
+    if $memcached_ipv6 or $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
+      if $cache_backend in ['oslo_cache.memcache_pool', 'dogpile.cache.memcached'] {
+        # NOTE(tkajinm): The inet6 prefix is required for backends using
+        #                python-memcached
+        $cache_memcache_servers = $memcached_hosts_real.map |$server| { "inet6:[${server}]:${memcached_port}" }
+      } else {
+        # NOTE(tkajinam): The other backends like pymemcache don't require
+        #                 the inet6 prefix
+        $cache_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+      }
     } else {
-      $memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+      $cache_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
     }
 
     class { 'heat::cache':
-      memcache_servers => $memcache_servers
+      memcache_servers => $cache_memcache_servers
     }
   }
 
