@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 Red Hat, Inc.
+# Copyright (C) 2019 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -31,30 +31,46 @@ describe 'tripleo::profile::base::nova::authtoken' do
 
     context 'with step 3' do
       let(:params) { {
-        :step => 3,
+        :step            => 3,
         :memcached_hosts => '127.0.0.1',
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
         is_expected.to contain_class('nova::keystone::authtoken').with(
-            :memcached_servers => ['127.0.0.1:11211'])
+          :memcached_servers => ['127.0.0.1:11211']
+        )
       }
     end
 
     context 'with step 3 with ipv6' do
       let(:params) { {
-        :step     => 3,
+        :step            => 3,
         :memcached_hosts => '::1',
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
         is_expected.to contain_class('nova::keystone::authtoken').with(
-            :memcached_servers => ['[::1]:11211'])
+          :memcached_servers => ['inet6:[::1]:11211']
+        )
       }
     end
 
+    context 'with step 3 with the ipv6 parameter' do
+      let(:params) { {
+        :step            => 3,
+        :memcached_hosts => 'node.example.com',
+        :memcached_ipv6  => true,
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
+        is_expected.to contain_class('nova::keystone::authtoken').with(
+          :memcached_servers => ['inet6:[node.example.com]:11211']
+        )
+      }
+    end
   end
 
 
