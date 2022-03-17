@@ -115,6 +115,61 @@ describe 'tripleo::profile::base::nova' do
       }
     end
 
+    context 'with step 4 and memcache ipv6' do
+      let(:params) { {
+        :step            => 4,
+        :memcached_hosts => '::1',
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('nova::cache').with(
+          :memcache_servers => ['[::1]:11211']
+        )
+      end
+    end
+
+    context 'with step 4, memcache ipv6 and memcached backend' do
+      let(:params) { {
+        :step            => 4,
+        :memcached_hosts => '::1',
+        :cache_backend   => 'dogpile.cache.memcached',
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('nova::cache').with(
+          :memcache_servers => ['inet6:[::1]:11211']
+        )
+      end
+    end
+
+    context 'with step 4 and the ipv6 parameter' do
+      let(:params) { {
+        :step            => 4,
+        :memcached_hosts => 'node.example.com',
+        :memcached_ipv6  => true,
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('nova::cache').with(
+          :memcache_servers => ['node.example.com:11211']
+        )
+      end
+    end
+
+    context 'with step 4, the ipv6 parameter and memcached backend' do
+      let(:params) { {
+        :step            => 4,
+        :memcached_hosts => 'node.example.com',
+        :memcached_ipv6  => true,
+        :cache_backend   => 'dogpile.cache.memcached',
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('nova::cache').with(
+          :memcache_servers => ['inet6:[node.example.com]:11211']
+        )
+      end
+    end
   end
 
 
