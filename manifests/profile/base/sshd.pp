@@ -108,8 +108,8 @@ class tripleo::profile::base::sshd (
 
   # NB (owalsh) in puppet-ssh hiera takes precedence over the class param
   # we need to control this, so error if it's set in hiera
-  if lookup('ssh:server::options', undef, undef, undef) {
-    err('ssh:server::options must not be set, use tripleo::profile::base::sshd::options')
+  if lookup('ssh::server::options', undef, undef, undef) {
+    err('ssh::server::options must not be set, use tripleo::profile::base::sshd::options')
   }
   class { 'ssh':
     storeconfigs_enabled => false,
