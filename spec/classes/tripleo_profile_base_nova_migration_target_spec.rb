@@ -25,9 +25,9 @@ describe 'tripleo::profile::base::nova::migration::target' do
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }
@@ -56,9 +56,9 @@ eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }
@@ -87,9 +87,9 @@ eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }
@@ -107,9 +107,9 @@ eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }
@@ -152,9 +152,9 @@ eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }
@@ -204,9 +204,9 @@ eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }
@@ -256,9 +256,9 @@ eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }
@@ -278,9 +278,9 @@ eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
         }
-        class { 'ssh::server':
+        class { 'ssh':
           storeconfigs_enabled => false,
-          options              => {}
+          server_options       => {}
         }
 eos
       }

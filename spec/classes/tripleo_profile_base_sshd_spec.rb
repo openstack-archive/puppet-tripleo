@@ -24,9 +24,9 @@ describe 'tripleo::profile::base::sshd' do
 
     context 'it should do nothing' do
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options'   => {
+          'server_options' => {
             'Port'    => [22],
             'HostKey' => [
               '/etc/ssh/ssh_host_rsa_key',
@@ -34,7 +34,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
         is_expected.to_not contain_file('/etc/issue')
         is_expected.to_not contain_file('/etc/issue.net')
@@ -45,9 +46,9 @@ describe 'tripleo::profile::base::sshd' do
     context 'it should do nothing with empty strings' do
       let(:params) {{ :bannertext => '', :motd => '' }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Port' => [22],
             'HostKey' => [
               '/etc/ssh/ssh_host_rsa_key',
@@ -55,7 +56,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
         is_expected.to_not contain_file('/etc/issue')
         is_expected.to_not contain_file('/etc/issue.net')
@@ -66,9 +68,9 @@ describe 'tripleo::profile::base::sshd' do
     context 'with port and paswword_authentification configured' do
       let(:params) {{ :port => 123, :password_authentication => 'yes' }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Port' => [123],
             'HostKey' => [
               '/etc/ssh/ssh_host_rsa_key',
@@ -76,7 +78,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'yes',
-          }
+          },
+          'client_options' => {},
         })
       end
     end
@@ -84,9 +87,9 @@ describe 'tripleo::profile::base::sshd' do
     context 'with port configured and port option' do
       let(:params) {{ :port => 123, :options => {'Port' => 456}  }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Port' => [456, 123],
             'HostKey' => [
               '/etc/ssh/ssh_host_rsa_key',
@@ -94,7 +97,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
       end
     end
@@ -102,9 +106,9 @@ describe 'tripleo::profile::base::sshd' do
     context 'with port configured and same port option' do
       let(:params) {{ :port => 123, :options => {'Port' => 123}  }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Port' => [123],
             'HostKey' => [
               '/etc/ssh/ssh_host_rsa_key',
@@ -112,7 +116,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
       end
     end
@@ -120,9 +125,9 @@ describe 'tripleo::profile::base::sshd' do
     context 'with issue and issue.net configured' do
       let(:params) {{ :bannertext => 'foo' }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Banner' => '/etc/issue.net',
             'Port' => [22],
             'HostKey' => [
@@ -131,7 +136,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
         is_expected.to contain_file('/etc/issue').with({
           'content' => 'foo',
@@ -152,9 +158,9 @@ describe 'tripleo::profile::base::sshd' do
     context 'with motd configured' do
       let(:params) {{ :motd => 'foo' }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Port' => [22],
             'PrintMotd' => 'yes',
             'HostKey' => [
@@ -163,7 +169,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
         is_expected.to contain_file('/etc/motd').with({
           'content' => 'foo',
@@ -179,9 +186,9 @@ describe 'tripleo::profile::base::sshd' do
     context 'with options configured' do
       let(:params) {{ :options => {'X11Forwarding' => 'no'} }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Port' => [22],
             'X11Forwarding' => 'no',
             'HostKey' => [
@@ -190,7 +197,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
         is_expected.to_not contain_file('/etc/motd')
         is_expected.to_not contain_file('/etc/issue')
@@ -204,9 +212,9 @@ describe 'tripleo::profile::base::sshd' do
         :motd => 'foo'
       }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Banner' => '/etc/issue.net',
             'Port' => [22],
             'PrintMotd' => 'yes',
@@ -216,7 +224,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
         is_expected.to contain_file('/etc/motd').with({
           'content' => 'foo',
@@ -250,9 +259,9 @@ describe 'tripleo::profile::base::sshd' do
         }
       }}
       it do
-        is_expected.to contain_class('ssh::server').with({
+        is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
-          'options' => {
+          'server_options' => {
             'Banner' => '/etc/issue.net',
             'Port' => [22],
             'PrintMotd' => 'yes',
@@ -263,7 +272,8 @@ describe 'tripleo::profile::base::sshd' do
               '/etc/ssh/ssh_host_ed25519_key',
             ],
             'PasswordAuthentication' => 'no',
-          }
+          },
+          'client_options' => {},
         })
         is_expected.to contain_file('/etc/motd').with({
           'content' => 'foo',
