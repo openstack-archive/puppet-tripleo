@@ -23,12 +23,29 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*neutron_dns_integration*]
+#   (Optional) Configure neutron to use the supplied unbound resolver nodes.
+#   Defaults to false
+#
+# [*unbound_resolvers*]
+#   (Optional) Unbound resolvers if configured.
+#   Defaults to hiera('unbound_node_ips', undef)
+#
 class tripleo::profile::base::neutron::dhcp (
-  $step = Integer(hiera('step')),
+  $step                     = Integer(hiera('step')),
+  $neutron_dns_integration  = false,
+  $unbound_resolvers        = hiera('unbound_node_ips', undef),
 ) {
   if $step >= 4 {
     include tripleo::profile::base::neutron
-    include neutron::agents::dhcp
+
+    if $neutron_dns_integration and $unbound_resolvers {
+      class{ 'neutron::agents::dhcp':
+        dnsmasq_dns_servers => $unbound_resolvers
+      }
+    } else {
+      include neutron::agents::dhcp
+    }
 
     Service<| title == 'neutron-server' |> -> Service <| title == 'neutron-dhcp' |>
   }
