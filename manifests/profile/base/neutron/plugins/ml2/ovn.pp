@@ -74,6 +74,18 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*neutron_dns_integration*]
+#   (Optional) Configure neutron to use the supplied unbound resolver nodes.
+#   Defaults to false
+#
+# [*unbound_resolvers*]
+#   (Optional) Unbound resolvers if configured.
+#   Defaults to hiera('unbound_node_ips', undef)
+#
+# [*dns_servers*]
+#   (Optional) Heat template defined dns servers if provided.
+#   Defaults to hiera('neutron::plugins::ml2::ovn', $::os_service_default)
+#
 class tripleo::profile::base::neutron::plugins::ml2::ovn (
   $ovn_db_host              = hiera('ovn_dbs_vip', undef),
   $ovn_db_node_ips          = hiera('ovn_dbs_node_ips', undef),
@@ -87,7 +99,10 @@ class tripleo::profile::base::neutron::plugins::ml2::ovn (
   $ovn_sb_certificate       = $::os_service_default,
   $ovn_sb_ca_cert           = $::os_service_default,
   $protocol                 = 'tcp',
-  $step                     = Integer(hiera('step'))
+  $step                     = Integer(hiera('step')),
+  $neutron_dns_integration  = false,
+  $unbound_resolvers        = hiera('unbound_node_ips', undef),
+  $dns_servers              = hiera('neutron::plugins::ml2::ovn::dns_servers', $::os_service_default),
 ) {
 
   if $step >= 4 {
@@ -99,6 +114,12 @@ class tripleo::profile::base::neutron::plugins::ml2::ovn (
     $sb_conn = $db_hosts.map |$h| { join([$protocol, normalize_ip_for_uri($h), "${ovn_sb_port}"], ':') }
     $nb_conn = $db_hosts.map |$h| { join([$protocol, normalize_ip_for_uri($h), "${ovn_nb_port}"], ':') }
 
+    if $neutron_dns_integration and $unbound_resolvers {
+      $unbound_resolvers_real = $unbound_resolvers
+    } else {
+      $unbound_resolvers_real = $dns_servers
+    }
+
     class { 'neutron::plugins::ml2::ovn':
       ovn_nb_connection  => join(any2array($nb_conn), ','),
       ovn_sb_connection  => join(any2array($sb_conn), ','),
@@ -108,6 +129,7 @@ class tripleo::profile::base::neutron::plugins::ml2::ovn (
       ovn_sb_private_key => $ovn_sb_private_key,
       ovn_sb_certificate => $ovn_sb_certificate,
       ovn_sb_ca_cert     => $ovn_sb_ca_cert,
+      dns_servers        => $unbound_resolvers_real
     }
   }
 }
