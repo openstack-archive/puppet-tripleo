@@ -75,6 +75,20 @@
 #   (Optional) The password for the clustercheck user.
 #   Defaults to hiera('mysql_clustercheck_password')
 #
+# [*sst_method*]
+#   (Optional) Method used by galera to perform State Snapshot Transfers
+#   Defaults to 'rsync'
+#
+# [*mariabackup_user*]
+#   (Optional) When sst_method is set to mariabackup, the name of the
+#   mariabackup user
+#   Defaults to 'mariabackup'
+#
+# [*mariabackup_password*]
+#   (Optional) When sst_method is set to mariabackup, the password for
+#   the mariabackup user
+#   Defaults to ''
+#
 # [*cipher_list*]
 #   (Optional) When enable_internal_tls is true, defines the list of allowed
 #   ciphers for the mysql server and Galera (including SST).
@@ -177,6 +191,9 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $innodb_flush_log_at_trx_commit = hiera('innodb_flush_log_at_trx_commit', '1'),
   $clustercheck_user              = 'clustercheck',
   $clustercheck_password          = hiera('mysql_clustercheck_password'),
+  $sst_method                     = 'rsync',
+  $mariabackup_user               = 'mariabackup',
+  $mariabackup_password           = '',
   $sst_tls_cipher                 = undef,
   $sst_tls_options                = undef,
   $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
@@ -251,22 +268,48 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $gcache_options = ''
   }
 
+  if $sst_method == 'mariabackup' {
+    $wsrep_sst_method = 'mariabackup'
+    $mysqld_sst_auth = {
+      'mysqld' => { 'wsrep_sst_auth' => "${mariabackup_user}:${mariabackup_password}" }
+    }
+  } else {
+    if $enable_internal_tls {
+      $wsrep_sst_method = 'rsync_tunnel'
+    } else {
+      $wsrep_sst_method = 'rsync'
+    }
+    $mysqld_sst_auth = {}
+  }
   if $enable_internal_tls {
+    if $sst_method == 'mariabackup' {
+      $tcert = 'ssl-cert'
+      $tkey = 'ssl-key'
+      $tca = 'ssl-ca'
+    } else {
+      $tcert = 'tcert'
+      $tkey = 'tkey'
+      $tca = 'tca'
+    }
     $tls_certfile = $certificate_specs['service_certificate']
     $tls_keyfile = $certificate_specs['service_key']
     $sst_tls = {
-      'tcert' => $tls_certfile,
-      'tkey' => $tls_keyfile,
+      $tcert => $tls_certfile,
+      $tkey => $tls_keyfile,
     }
     if $ca_file {
       $tls_ca_options = "socket.ssl_ca=${ca_file}"
-      $sst_tca = { 'tca' => $ca_file }
+      $sst_tca = { $tca => $ca_file }
     } else {
       $tls_ca_options = ''
       $sst_tca = {}
     }
     $tls_options = "socket.ssl_key=${tls_keyfile};socket.ssl_cert=${tls_certfile};socket.ssl_cipher=${gcomm_cipher};${tls_ca_options};"
-    $wsrep_sst_method = 'rsync_tunnel'
+    if $sst_method == 'mariabackup' {
+      $sst_encrypt = { 'encrypt' => 3 }
+    } else {
+      $sst_encrypt = {}
+    }
     if $ipv6 {
       $sst_ipv6 = 'pf=ip6'
     } else {
@@ -282,11 +325,18 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $sst_sockopt = {
       'sockopt' => join(delete_undef_values($all_sst_options), ',')
     }
-    $mysqld_options_sst = { 'sst' => merge($sst_tls, $sst_tca, $sst_sockopt) }
+    $mysqld_options_sst = { 'sst' => merge($sst_tls, $sst_tca, $sst_sockopt, $sst_encrypt) }
   } else {
     $tls_options = ''
-    $wsrep_sst_method = 'rsync'
-    $mysqld_options_sst = {}
+    if $sst_method == 'mariabackup' {
+      if $ipv6 {
+        $mysqld_options_sst = { 'sst' => { 'sockopt' => 'pf=ip6' } }
+      } else {
+        $mysqld_options_sst = {}
+      }
+    } else {
+      $mysqld_options_sst = {}
+    }
   }
   if $ipv6 {
     $wsrep_provider_options = "${gcache_options}gmcast.listen_addr=tcp://[::]:4567;${tls_options}"
@@ -330,7 +380,8 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     }
   }
 
-  $mysqld_options = deep_merge($mysqld_options_mysqld, $mysqld_options_sst, $mysql_server_options)
+  $mysqld_options = deep_merge($mysqld_options_mysqld, $mysqld_options_sst,
+                                  $mysqld_sst_auth, $mysql_server_options)
 
   # remove_default_accounts parameter will execute some mysql commands
   # to remove the default accounts created by MySQL package.
