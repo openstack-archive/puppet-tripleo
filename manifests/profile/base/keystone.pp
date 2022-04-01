@@ -162,6 +162,14 @@
 #   (Optional) Memcached port to use.
 #   Defaults to hiera('memcached_port', 11211)
 #
+# [*memcached_ipv6*]
+#   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
+#   Defauls to hiera('memcached_ipv6', false)
+#
+# [*cache_backend*]
+#   (Optional) oslo.cache backend used for caching.
+#   Defaults to hiera('keystone::cache_backend', false)
+#
 # DEPRECATED PARAMETERS
 #
 # [*memcached_ips*]
@@ -202,10 +210,12 @@ class tripleo::profile::base::keystone (
   $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
   $memcached_hosts                = hiera('memcached_node_names', []),
   $memcached_port                 = hiera('memcached_port', 11211),
+  $memcached_ipv6                 = hiera('memcached_ipv6', false),
+  $cache_backend                  = hiera('keystone::cache_backend', false),
   # DEPRECATED PARAMETERS
   $memcached_ips                  = undef
 ) {
-  $memcached_hosts_real = pick($memcached_ips, $memcached_hosts)
+  $memcached_hosts_real = any2array(pick($memcached_ips, $memcached_hosts))
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -231,7 +241,20 @@ class tripleo::profile::base::keystone (
   if $step >= 4 or ( $step >= 3 and $sync_db ) {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
-    $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+
+    if $memcached_ipv6 or is_ipv6_address($memcached_hosts_real[0]) {
+      if $cache_backend in ['oslo_cache.memcache_pool', 'dogpile.cache.memcached'] {
+        # NOTE(tkajinm): The inet6 prefix is required for backends using
+        #                python-memcached
+        $cache_memcache_servers = $memcached_hosts_real.map |$server| { "inet6:[${server}]:${memcached_port}" }
+      } else {
+        # NOTE(tkajinam): The other backends like pymemcache don't require
+        #                 the inet6 prefix
+        $cache_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+      }
+    } else {
+      $cache_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+    }
 
     class { 'keystone':
       sync_db                    => $sync_db,
@@ -255,7 +278,7 @@ class tripleo::profile::base::keystone (
       notification_topics        => union($ceilometer_notification_topics,
                                           $barbican_notification_topics,
                                           $extra_notification_topics),
-      cache_memcache_servers     => $memcached_servers
+      cache_memcache_servers     => $cache_memcache_servers
     }
 
     if 'amqp' in [$oslomsg_rpc_proto, $oslomsg_notify_proto]{
@@ -288,7 +311,7 @@ class tripleo::profile::base::keystone (
     }
 
     if $keystone_openidc_enabled {
-
+      $memcached_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
       class { 'keystone::federation::openidc':
         memcached_servers  => $memcached_servers,
       }
