@@ -32,21 +32,14 @@
 #   IPs.
 #   Defaults to [] (no restriction)
 #
-# [*services_enabled*]
-#   (Optional) List of services enabled on the current role.
-#   If the nova_migration_target service is not enabled then migration over
-#   ssh will be disabled.
-#   Defaults to hiera('service_names', [])
-#
 # [*wrapper_command*]
 #   (Internal) Used to override the wrapper command when proxying
 #   Defaults to /bin/nova-migration-wrapper
-
+#
 class tripleo::profile::base::nova::migration::target (
   $step                = Integer(hiera('step')),
   $ssh_authorized_keys = [],
   $ssh_localaddrs      = [],
-  $services_enabled    = hiera('service_names', []),
   $wrapper_command     = '/bin/nova-migration-wrapper',
 ) {
 
@@ -64,49 +57,45 @@ class tripleo::profile::base::nova::migration::target (
 
   if $step >= 4 {
     if !empty($ssh_authorized_keys_real) {
-      if ('nova_migration_target' in $services_enabled) {
-        if !empty($ssh_localaddrs_real) {
-          $allow_type = sprintf('LocalAddress %s User', join($ssh_localaddrs_real,','))
-          $deny_type = 'LocalAddress'
-          $deny_name = sprintf('!%s', join($ssh_localaddrs_real,',!'))
+      if !empty($ssh_localaddrs_real) {
+        $allow_type = sprintf('LocalAddress %s User', join($ssh_localaddrs_real,','))
+        $deny_type = 'LocalAddress'
+        $deny_name = sprintf('!%s', join($ssh_localaddrs_real,',!'))
 
-          ssh::server::match_block { 'nova_migration deny':
-            name    => $deny_name,
-            type    => $deny_type,
-            order   => 2,
-            options => {
-              'DenyUsers' => 'nova_migration'
-            },
-            notify  => Service['sshd']
-          }
-        }
-        else {
-          $allow_type = 'User'
-        }
-        $allow_name = 'nova_migration'
-
-        ssh::server::match_block { 'nova_migration allow':
-          name    => $allow_name,
-          type    => $allow_type,
-          order   => 1,
+        ssh::server::match_block { 'nova_migration deny':
+          name    => $deny_name,
+          type    => $deny_type,
+          order   => 2,
           options => {
-            'AllowUsers'             => $allow_name,
-            'ForceCommand'           => $wrapper_command,
-            'PasswordAuthentication' => 'no',
-            'AllowTcpForwarding'     => 'no',
-            'X11Forwarding'          => 'no',
-            'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
+            'DenyUsers' => 'nova_migration'
           },
           notify  => Service['sshd']
         }
-        $migration_authorized_keys = $ssh_authorized_keys_real
-        $migration_user_shell = '/bin/bash'
       }
       else {
-        # Remove the keys and prevent login when migration over SSH is not enabled
-        $migration_authorized_keys = '# Migration over SSH disabled by TripleO'
-        $migration_user_shell = '/sbin/nologin'
+        $allow_type = 'User'
       }
+
+      $allow_name = 'nova_migration'
+
+      ssh::server::match_block { 'nova_migration allow':
+        name    => $allow_name,
+        type    => $allow_type,
+        order   => 1,
+        options => {
+          'AllowUsers'             => $allow_name,
+          'ForceCommand'           => $wrapper_command,
+          'PasswordAuthentication' => 'no',
+          'AllowTcpForwarding'     => 'no',
+          'X11Forwarding'          => 'no',
+          'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
+        },
+        notify  => Service['sshd']
+      }
+
+      $migration_authorized_keys = $ssh_authorized_keys_real
+      $migration_user_shell = '/bin/bash'
+
     }
     else {
       # Remove the keys and prevent login when migration over SSH is not enabled

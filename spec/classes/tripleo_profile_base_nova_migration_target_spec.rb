@@ -31,40 +31,9 @@ describe 'tripleo::profile::base::nova::migration::target' do
         }
 eos
       }
-      let(:params) { {
-        :step           => 4,
-        :services_enabled    => ['docker', 'nova_migration_target']
-      } }
 
-      it {
-        is_expected.to contain_class('tripleo::profile::base::nova::migration')
-        is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
-          :content => '# Migration over SSH disabled by TripleO',
-          :mode    => '0640',
-          :owner   => 'root',
-          :group   => 'nova_migration',
-        )
-        is_expected.to contain_user('nova_migration').with(
-          :shell => '/sbin/nologin'
-        )
-      }
-    end
-
-    context 'with step 4 without nova_migration_target service enabled' do
-        let(:pre_condition) {
-        <<-eos
-        class { 'tripleo::profile::base::nova::migration':
-          step => #{params[:step]}
-        }
-        class { 'ssh':
-          storeconfigs_enabled => false,
-          server_options       => {}
-        }
-eos
-      }
       let(:params) { {
-        :step             => 4,
-        :ssh_authorized_keys => ['bar', 'baz'],
+        :step => 4,
       } }
 
       it {
@@ -93,16 +62,17 @@ eos
         }
 eos
       }
+
       let(:params) { {
-        :step             => 4,
+        :step                => 4,
         :ssh_authorized_keys => 'ssh-rsa bar',
       } }
 
       it { is_expected.to_not compile }
     end
 
-    context 'with step 4 with nova_migration_target services enabled' do
-        let(:pre_condition) {
+    context 'with step 4 with authorized_keys' do
+      let(:pre_condition) {
         <<-eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
@@ -113,10 +83,10 @@ eos
         }
 eos
       }
+
       let(:params) { {
         :step                => 4,
         :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :services_enabled    => ['docker', 'nova_migration_target']
       } }
 
       it {
@@ -147,7 +117,7 @@ eos
     end
 
     context 'with step 4 with ssh_localaddrs' do
-        let(:pre_condition) {
+      let(:pre_condition) {
         <<-eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
@@ -158,11 +128,11 @@ eos
         }
 eos
       }
+
       let(:params) { {
-        :step             => 4,
+        :step                => 4,
         :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :services_enabled    => ['docker', 'nova_migration_target'],
-        :ssh_localaddrs => ['127.0.0.1', '127.0.0.2']
+        :ssh_localaddrs      => ['127.0.0.1', '127.0.0.2']
       } }
 
       it {
@@ -199,7 +169,7 @@ eos
     end
 
     context 'with step 4 with duplicate ssh_localaddrs' do
-        let(:pre_condition) {
+      let(:pre_condition) {
         <<-eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
@@ -210,11 +180,11 @@ eos
         }
 eos
       }
+
       let(:params) { {
-        :step             => 4,
+        :step                => 4,
         :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :services_enabled    => ['docker', 'nova_migration_target'],
-        :ssh_localaddrs => ['127.0.0.1', '127.0.0.1']
+        :ssh_localaddrs      => ['127.0.0.1', '127.0.0.1']
       } }
 
       it {
@@ -251,7 +221,7 @@ eos
     end
 
     context 'with step 4 with invalid ssh_localaddrs' do
-        let(:pre_condition) {
+      let(:pre_condition) {
         <<-eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
@@ -262,18 +232,18 @@ eos
         }
 eos
       }
+
       let(:params) { {
-        :step             => 4,
+        :step                => 4,
         :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :services_enabled    => ['docker', 'nova_migration_target'],
-        :ssh_localaddrs => ['127.0.0.1', '']
+        :ssh_localaddrs      => ['127.0.0.1', '']
       } }
 
       it { is_expected.to_not compile }
     end
 
     context 'with step 4 with wrapper_command' do
-        let(:pre_condition) {
+      let(:pre_condition) {
         <<-eos
         class { 'tripleo::profile::base::nova::migration':
           step => #{params[:step]}
@@ -284,10 +254,10 @@ eos
         }
 eos
       }
+
       let(:params) { {
         :step                => 4,
         :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :services_enabled    => ['docker', 'nova_migration_target'],
         :wrapper_command     => '/bin/true'
       } }
 
@@ -317,7 +287,6 @@ eos
         )
       }
     end
-
   end
 
 
