@@ -20,7 +20,7 @@
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*aodh_redis_password*]
 #   (Optional) redis password to configure coordination url
@@ -31,13 +31,13 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to lookup('step')
 #
 class tripleo::profile::base::aodh::evaluator (
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $aodh_redis_password = hiera('aodh_redis_password', undef),
-  $redis_vip           = hiera('redis_vip', undef),
-  $step                = Integer(hiera('step')),
+  $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
+  $aodh_redis_password = lookup('aodh_redis_password', undef, undef, undef),
+  $redis_vip           = lookup('redis_vip', undef, undef, undef),
+  $step                = Integer(lookup('step')),
 ) {
 
   include tripleo::profile::base::aodh
