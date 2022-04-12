@@ -170,7 +170,6 @@ define tripleo::haproxy::endpoint (
         $tls_listen_options = {
           'rsprep'       => '^Location:\ http://(.*) Location:\ https://\1',
           'redirect'     => "scheme https code 301 if { hdr(host) -i ${public_virtual_ip} } !{ ssl_fc }",
-          'option'       => 'forwardfor',
         }
         $listen_options_precookie = merge($tls_listen_options, $listen_options, $custom_options)
       } else {

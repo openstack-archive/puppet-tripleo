@@ -897,7 +897,7 @@ class tripleo::haproxy (
 
 
   $default_listen_options = {
-    'option'       => [ 'httpchk', 'httplog', ],
+    'option'       => [ 'httpchk', 'httplog', 'forwardfor' ],
     'http-request' => [
       'set-header X-Forwarded-Proto https if { ssl_fc }',
       'set-header X-Forwarded-Proto http if !{ ssl_fc }',
@@ -938,7 +938,7 @@ class tripleo::haproxy (
   }
 
   $keystone_listen_opts = {
-    'option' => [ 'httpchk GET /v3', 'httplog' ]
+    'option' => [ 'httpchk GET /v3', 'httplog', 'forwardfor' ]
   }
   if $keystone_admin {
     # NOTE(jaosorior): Given that the admin endpoint is in the same vhost
@@ -1052,7 +1052,7 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[glance_api_ssl_port],
       mode              => 'http',
       listen_options    => merge($default_listen_options, {
-        'option' => [ 'httpchk GET /healthcheck', 'httplog' ]
+        'option' => [ 'httpchk GET /healthcheck', 'httplog', 'forwardfor' ]
       }),
       service_network   => $glance_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1068,7 +1068,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_grafana_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'  => [ 'httpchk HEAD /', 'httplog' ],
+        'option'  => [ 'httpchk HEAD /', 'httplog', 'forwardfor' ],
         'balance' => 'source',
       }),
       service_network => $ceph_grafana_network,
@@ -1082,7 +1082,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_prometheus_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'  => [ 'httpchk GET /metrics', 'httplog' ],
+        'option'  => [ 'httpchk GET /metrics', 'httplog', 'forwardfor' ],
         'balance' => 'source',
       }),
       service_network => $ceph_grafana_network,
@@ -1096,7 +1096,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_alertmanager_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'  => [ 'httpchk GET /', 'httplog' ],
+        'option'  => [ 'httpchk GET /', 'httplog', 'forwardfor' ],
         'balance' => 'source',
       }),
       service_network => $ceph_grafana_network,
@@ -1118,7 +1118,7 @@ class tripleo::haproxy (
       mode            => 'http',
       public_ssl_port => $ports[ceph_dashboard_ssl_port],
       listen_options  => merge($default_listen_options, {
-        'option'     => [ 'httpchk HEAD /', 'httplog' ],
+        'option'     => [ 'httpchk HEAD /', 'httplog', 'forwardfor' ],
         'balance'    => 'source',
         'http-check' => 'expect rstatus 2[0-9][0-9]',
       }),
@@ -1216,7 +1216,7 @@ class tripleo::haproxy (
       mode              => 'http',
       public_ssl_port   => $ports[ec2_api_ssl_port],
       listen_options    => merge($default_listen_options, {
-        'option' => [ 'tcpka', 'httplog' ]
+        'option' => [ 'tcpka', 'httplog', 'forwardfor' ]
       }),
       service_network   => $ec2_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
@@ -1306,7 +1306,7 @@ class tripleo::haproxy (
 
   if $swift_proxy_server {
     $swift_proxy_server_listen_options = {
-      'option'         => [ 'httpchk GET /healthcheck', 'httplog' ],
+      'option'         => [ 'httpchk GET /healthcheck', 'httplog', 'forwardfor' ],
       'timeout client' => '2m',
       'timeout server' => '2m',
     }
@@ -1636,7 +1636,7 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
       listen_options    => merge($default_listen_options, {
-          'option'  => [ 'httpchk GET /swift/healthcheck', 'httplog' ],
+          'option'  => [ 'httpchk GET /swift/healthcheck', 'httplog', 'forwardfor' ],
         }
       ),
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
