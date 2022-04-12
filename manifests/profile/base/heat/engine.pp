@@ -20,16 +20,16 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('heat_engine_short_bootstrap_node_name')
+#   Defaults to lookup('heat_engine_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to lookup('step')
 #
 class tripleo::profile::base::heat::engine (
-  $bootstrap_node = hiera('heat_engine_short_bootstrap_node_name', undef),
-  $step           = Integer(hiera('step')),
+  $bootstrap_node = lookup('heat_engine_short_bootstrap_node_name', undef, undef, undef),
+  $step           = Integer(lookup('step')),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
