@@ -765,7 +765,7 @@ class tripleo::haproxy (
   # but tcpka and other "durability" related options should be set for both
   # sides, based on a service case by case.
   $default_frontend_options = {
-    'option'       => [ 'httplog', ],
+    'option'       => [ 'httplog', 'forwardfor'],
     'http-request' => [
       'set-header X-Forwarded-Proto https if { ssl_fc }',
       'set-header X-Forwarded-Proto http if !{ ssl_fc }',
@@ -813,7 +813,7 @@ class tripleo::haproxy (
   }
 
   $keystone_frontend_opts = {
-    'option' => [ 'httplog' ]
+    'option' => [ 'httplog', 'forwardfor' ]
   }
   $keystone_backend_opts = {
     'option' => [ 'httpchk GET /healthcheck' ]
@@ -860,7 +860,7 @@ class tripleo::haproxy (
 
   if $neutron {
     $neutron_frontend_opts = {
-      'option'  => [ 'httplog' ]
+      'option'  => [ 'httplog', 'forwardfor' ]
     }
     $neutron_backend_opts = {
       'balance' => $haproxy_lb_mode_longrunning,
@@ -886,7 +886,7 @@ class tripleo::haproxy (
 
   if $cinder {
     $cinder_frontend_opts = {
-      'option'  => [ 'httplog' ],
+      'option'  => [ 'httplog', 'forwardfor' ],
     }
     $cinder_backend_opts = {
       'option'  => [ 'httpchk GET /healthcheck' ],
@@ -912,7 +912,7 @@ class tripleo::haproxy (
 
   if $manila {
     $manila_frontend_opts = {
-      'option' => [ 'httplog' ],
+      'option' => [ 'httplog', 'forwardfor' ],
     }
     $manila_backend_opts = {
       'option' => [ 'httpchk GET /healthcheck' ],
@@ -937,7 +937,7 @@ class tripleo::haproxy (
 
   if $glance_api {
     $glance_frontend_opts = {
-      'option' => [ 'httplog' ],
+      'option' => [ 'httplog', 'forwardfor' ],
     }
     $glance_backend_opts = {
       'option' => [ 'httpchk GET /healthcheck' ],
@@ -969,7 +969,7 @@ class tripleo::haproxy (
       mode             => 'http',
       public_ssl_port  => $ports[ceph_grafana_ssl_port],
       listen_options   => merge($default_listen_options, {
-        'option'  => [ 'httpchk HEAD /', 'httplog' ],
+        'option'  => [ 'httpchk HEAD /', 'httplog', 'forwardfor' ],
         'balance' => 'source',
       }),
       frontend_options => $default_frontend_options,
@@ -988,7 +988,7 @@ class tripleo::haproxy (
       mode             => 'http',
       public_ssl_port  => $ports[ceph_prometheus_ssl_port],
       listen_options   => merge($default_listen_options, {
-        'option'  => [ 'httpchk GET /metrics', 'httplog' ],
+        'option'  => [ 'httpchk GET /metrics', 'httplog', 'forwardfor' ],
         'balance' => 'source',
       }),
       frontend_options => $default_frontend_options,
@@ -1007,7 +1007,7 @@ class tripleo::haproxy (
       mode             => 'http',
       public_ssl_port  => $ports[ceph_alertmanager_ssl_port],
       listen_options   => merge($default_listen_options, {
-        'option'  => [ 'httpchk GET /', 'httplog' ],
+        'option'  => [ 'httpchk GET /', 'httplog', 'forwardfor' ],
         'balance' => 'source',
       }),
       frontend_options => $default_frontend_options,
@@ -1151,7 +1151,7 @@ class tripleo::haproxy (
 
   if $aodh {
     $aodh_frontend_opts = {
-      'option' => [ 'httplog' ],
+      'option' => [ 'httplog', 'forwardfor' ],
     }
     $aodh_backend_opts = {
       'option' => [ 'httpchk GET /healthcheck' ],
@@ -1176,7 +1176,7 @@ class tripleo::haproxy (
 
   if $barbican {
     $barbican_frontend_opts = {
-      'option' => [ 'httplog' ],
+      'option' => [ 'httplog', 'forwardfor' ],
     }
     $barbican_backend_opts = {
       'option' => [ 'httpchk GET /healthcheck' ],
@@ -1216,7 +1216,7 @@ class tripleo::haproxy (
 
   if $swift_proxy_server {
     $swift_proxy_server_frontend_options = {
-      'option'         => [ 'httplog' ],
+      'option'         => [ 'httplog', 'forwardfor' ],
       'timeout client' => '2m',
     }
     $swift_proxy_server_backend_options = {
@@ -1245,7 +1245,7 @@ class tripleo::haproxy (
   $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
   $heat_ip_addresses = hiera('heat_api_node_ips', $controller_hosts_real)
   $heat_frontend_options = {
-    'option'         => [ 'httplog' ],
+    'option'         => [ 'httplog', 'forwardfor' ],
     'timeout client' => '10m',
   }
   $heat_durability_options = {
@@ -1318,7 +1318,7 @@ class tripleo::haproxy (
 
   if $ironic {
     $ironic_frontend_opts = {
-      'option' => [ 'httplog' ],
+      'option' => [ 'httplog', 'forwardfor' ],
     }
     $ironic_backend_opts = {
       'option' => [ 'httpchk GET /healthcheck' ],
@@ -1343,7 +1343,7 @@ class tripleo::haproxy (
 
   if $ironic_inspector {
     $ironic_inspector_frontend_opts = {
-      'option' => [ 'httplog' ],
+      'option' => [ 'httplog', 'forwardfor' ],
     }
     $ironic_inspector_backend_opts = {
       'option'  => [ 'httpchk' ],
@@ -1369,7 +1369,7 @@ class tripleo::haproxy (
 
   if $designate {
     $designate_frontend_opts = {
-      'option' => [ 'httplog' ],
+      'option' => [ 'httplog', 'forwardfor' ],
     }
     $designate_backend_opts = {
       'option' => [ 'httpchk GET /healthcheck' ],
@@ -1690,7 +1690,7 @@ class tripleo::haproxy (
 
   if $octavia {
     $octavia_frontend_opts = {
-      'option'    => [ 'httplog' ],
+      'option'    => [ 'httplog', 'forwardfor' ],
     }
     $octavia_backend_opts = {
       'hash-type' => 'consistent',
