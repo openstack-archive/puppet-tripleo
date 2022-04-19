@@ -31,50 +31,50 @@
 #
 # [*rbd_store_ceph_conf*]
 #   (Optional) Ceph cluster config file.
-#   Defaults to hiera('glance::backend::rbd::rbd_store_ceph_conf', '/etc/ceph/ceph.conf').
+#   Defaults to lookup('glance::backend::rbd::rbd_store_ceph_conf', undef, undef, '/etc/ceph/ceph.conf').
 #
 # [*rbd_store_user*]
 #   (Optional) Ceph client username.
-#   Defaults to hiera('glance::backend::rbd::rbd_store_user', 'openstack').
+#   Defaults to lookup('glance::backend::rbd::rbd_store_user', undef, undef, 'openstack').
 #
 # [*rbd_store_pool*]
 #   (Optional) Ceph pool for storing images.
-#   Defaults to hiera('glance::backend::rbd::rbd_store_pool', 'images').
+#   Defaults to lookup('glance::backend::rbd::rbd_store_pool', undef, undef, 'images').
 #
 # [*rbd_store_chunk_size*]
 #   (Optional) RBD chunk size.
-#   Defaults to hiera('glance::backend::rbd::rbd_store_chunk_size', undef).
+#   Defaults to lookup('glance::backend::rbd::rbd_store_chunk_size', undef, undef, undef).
 #
 # [*rbd_thin_provisioning*]
 #   (Optional) Boolean describing if thin provisioning is enabled or not
-#   Defaults to hiera('glance::backend::rbd::rbd_thin_provisioning', undef).
+#   Defaults to lookup('glance::backend::rbd::rbd_thin_provisioning', undef, undef, undef).
 #
 # [*rados_connect_timeout*]
 #   (Optional) RADOS connection timeout.
-#   Defaults to hiera('glance::backend::rbd::rados_connect_timeout', undef).
+#   Defaults to lookup('glance::backend::rbd::rados_connect_timeout', undef, undef, undef).
 #
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
-#   Defaults to hiera('tripleo::profile::base::glance::api::glance_store_description', 'RBD store').
+#   Defaults to lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'RBD store').
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::glance::backend::rbd (
   $backend_names,
   $multistore_config         = {},
   $glance_rbd_ceph_conf_path = '/etc/ceph',
-  $rbd_store_ceph_conf       = hiera('glance::backend::rbd::rbd_store_ceph_conf', '/etc/ceph/ceph.conf'),
-  $rbd_store_user            = hiera('glance::backend::rbd::rbd_store_user', 'openstack'),
-  $rbd_store_pool            = hiera('glance::backend::rbd::rbd_store_pool', 'images'),
-  $rbd_store_chunk_size      = hiera('glance::backend::rbd::rbd_store_chunk_size', undef),
-  $rbd_thin_provisioning     = hiera('glance::backend::rbd::rbd_thin_provisioning', undef),
-  $rados_connect_timeout     = hiera('glance::backend::rbd::rados_connect_timeout', undef),
-  $store_description         = hiera('tripleo::profile::base::glance::api::glance_store_description', 'RBD store'),
-  $step                      = Integer(hiera('step')),
+  $rbd_store_ceph_conf       = lookup('glance::backend::rbd::rbd_store_ceph_conf', undef, undef, '/etc/ceph/ceph.conf'),
+  $rbd_store_user            = lookup('glance::backend::rbd::rbd_store_user', undef, undef, 'openstack'),
+  $rbd_store_pool            = lookup('glance::backend::rbd::rbd_store_pool', undef, undef, 'images'),
+  $rbd_store_chunk_size      = lookup('glance::backend::rbd::rbd_store_chunk_size', undef, undef, undef),
+  $rbd_thin_provisioning     = lookup('glance::backend::rbd::rbd_thin_provisioning', undef, undef, undef),
+  $rados_connect_timeout     = lookup('glance::backend::rbd::rados_connect_timeout', undef, undef, undef),
+  $store_description         = lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'RBD store'),
+  $step                      = Integer(lookup('step')),
 ) {
 
   if $step >= 4 {

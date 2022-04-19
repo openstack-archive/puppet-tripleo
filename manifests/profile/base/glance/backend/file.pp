@@ -27,29 +27,29 @@
 #
 # [*filesystem_store_datadir*]
 #   (Optional) Location where dist images are stored when the backend type is file.
-#   Defaults to hiera('glance::backend::file::filesystem_store_datadir', undef).
+#   Defaults to lookup('glance::backend::file::filesystem_store_datadir', undef, undef, undef).
 #
 # [*filesystem_thin_provisioning*]
 #   (Optional) Boolean describing if thin provisioning is enabled or not
-#   Defaults to hiera('glance::backend::file::filesystem_thin_provisioning', undef).
+#   Defaults to lookup('glance::backend::file::filesystem_thin_provisioning', undef, undef, undef).
 #
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
-#   Defaults to hiera('tripleo::profile::base::glance::api::glance_store_description', 'File store').
+#   Defaults to lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'File store').
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::glance::backend::file (
   $backend_names,
   $multistore_config            = {},
-  $filesystem_store_datadir     = hiera('glance::backend::file::filesystem_store_datadir', undef),
-  $filesystem_thin_provisioning = hiera('glance::backend::file::filesystem_thin_provisioning', undef),
-  $store_description            = hiera('tripleo::profile::base::glance::api::glance_store_description', 'File store'),
-  $step                         = Integer(hiera('step')),
+  $filesystem_store_datadir     = lookup('glance::backend::file::filesystem_store_datadir', undef, undef, undef),
+  $filesystem_thin_provisioning = lookup('glance::backend::file::filesystem_thin_provisioning', undef, undef, undef),
+  $store_description            = lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'File store'),
+  $step                         = Integer(lookup('step')),
 ) {
 
   if $backend_names.length() > 1 {
