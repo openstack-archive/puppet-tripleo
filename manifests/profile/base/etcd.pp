@@ -32,7 +32,7 @@
 #
 # [*nodes*]
 #   (Optional) Array of host(s) for etcd nodes.
-#   Defaults to hiera('etcd_node_ips', []).
+#   Defaults to lookup('etcd_node_ips', undef, undef, []).
 #
 # [*certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate
@@ -48,21 +48,21 @@
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::etcd (
   $bind_ip             = '127.0.0.1',
   $client_port         = '2379',
   $peer_port           = '2380',
-  $nodes               = hiera('etcd_node_names', []),
+  $nodes               = lookup('etcd_node_names', undef, undef, []),
   $certificate_specs   = {},
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $step                = Integer(hiera('step')),
+  $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
+  $step                = Integer(lookup('step')),
 ) {
 
   validate_legacy(Hash, 'validate_hash', $certificate_specs)
