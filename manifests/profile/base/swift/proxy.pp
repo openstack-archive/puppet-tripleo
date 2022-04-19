@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('swift_proxy_short_bootstrap_node_name')
+#   Defaults to lookup('swift_proxy_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*ceilometer_enabled*]
 #   Whether the ceilometer pipeline is enabled.
@@ -28,27 +28,27 @@
 #
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_scheme', rabbit)
+#   Defaults to lookup('oslo_messaging_rpc_scheme', undef, undef, rabbit)
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('oslo_messaging_rpc_node_names')
+#   Defaults to any2array(lookup('oslo_messaging_rpc_node_names', undef, undef, undef))
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_port', 5672)
+#   Defaults to lookup('oslo_messaging_rpc_port', undef, undef, 5672)
 #
 # [*oslomsg_rpc_username*]
 #   Username for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_user_name', 'guest')
+#   Defaults to lookup('oslo_messaging_rpc_user_name', undef, undef, 'guest')
 #
 # [*oslomsg_rpc_password*]
 #   Password for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_password')
+#   Defaults to lookup('oslo_messaging_rpc_password')
 #
 # [*oslomsg_rpc_use_ssl*]
 #   Enable ssl oslo messaging services
-#   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
+#   Defaults to lookup('oslo_messaging_rpc_use_ssl', undef, undef, '0')
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -60,29 +60,29 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*memcache_port*]
 #   (Optional) Memcached port to use.
-#   Defaults to hiera('memcached_port', 11211)
+#   Defaults to lookup('memcached_port', undef, undef, 11211)
 #
 # [*memcache_servers*]
 #   (Optional) List of memcache servers
-#   Defaults to hiera('memcached_node_names', [])
+#   Defaults to lookup('memcached_node_names', undef, undef, [])
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*swift_proxy_network*]
 #   (Optional) The network name where the swift proxy endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('swift_proxy_network', undef)
+#   Defaults to lookup('swift_proxy_network', undef, undef, undef)
 #
 # [*tls_proxy_bind_ip*]
 #   IP on which the TLS proxy will listen on. Required only if
@@ -104,20 +104,20 @@
 #   Defaults to false
 #
 class tripleo::profile::base::swift::proxy (
-  $bootstrap_node       = hiera('swift_proxy_short_bootstrap_node_name', undef),
+  $bootstrap_node       = lookup('swift_proxy_short_bootstrap_node_name', undef, undef, undef),
   $ceilometer_enabled   = true,
-  $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
-  $oslomsg_rpc_hosts    = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
-  $oslomsg_rpc_password = hiera('oslo_messaging_rpc_password'),
-  $oslomsg_rpc_port     = hiera('oslo_messaging_rpc_port', '5672'),
-  $oslomsg_rpc_username = hiera('oslo_messaging_rpc_user_name', 'guest'),
-  $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
-  $certificates_specs   = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls  = hiera('enable_internal_tls', false),
-  $memcache_port        = hiera('memcached_port', 11211),
-  $memcache_servers     = hiera('memcached_node_names', []),
-  $step                 = Integer(hiera('step')),
-  $swift_proxy_network  = hiera('swift_proxy_network', undef),
+  $oslomsg_rpc_proto    = lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit'),
+  $oslomsg_rpc_hosts    = any2array(lookup('oslo_messaging_rpc_node_names', undef, undef, undef)),
+  $oslomsg_rpc_password = lookup('oslo_messaging_rpc_password'),
+  $oslomsg_rpc_port     = lookup('oslo_messaging_rpc_port', undef, undef, '5672'),
+  $oslomsg_rpc_username = lookup('oslo_messaging_rpc_user_name', undef, undef, 'guest'),
+  $oslomsg_rpc_use_ssl  = lookup('oslo_messaging_rpc_use_ssl', undef, undef, '0'),
+  $certificates_specs   = lookup('apache_certificates_specs', undef, undef, {}),
+  $enable_internal_tls  = lookup('enable_internal_tls', undef, undef, false),
+  $memcache_port        = lookup('memcached_port', undef, undef, 11211),
+  $memcache_servers     = lookup('memcached_node_names', undef, undef, []),
+  $step                 = Integer(lookup('step')),
+  $swift_proxy_network  = lookup('swift_proxy_network', undef, undef, undef),
   $tls_proxy_bind_ip    = undef,
   $tls_proxy_fqdn       = undef,
   $tls_proxy_port       = 8080,

@@ -25,7 +25,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*use_local_dir*]
 #   (Optional) Creates a local directory to store data on the system disk
@@ -38,7 +38,7 @@
 class tripleo::profile::base::swift::storage (
   # Deprecated conditional to support ControllerEnableSwiftStorage parameter
   $enable_swift_storage = true,
-  $step                 = Integer(hiera('step')),
+  $step                 = Integer(lookup('step')),
   $use_local_dir        = true,
   $local_dir            = '/srv/node/d1',
 ) {

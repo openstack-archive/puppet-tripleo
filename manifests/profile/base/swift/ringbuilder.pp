@@ -33,7 +33,7 @@
 #  [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 #  [*swift_zones*]
 #   (Optional) The swift zones
@@ -52,7 +52,7 @@
 #
 #  [*swift_storage_node_ips*]
 #  (Optional) list of ip addresses for nodes running swift_storage service
-#  Defaults to hiera('swift_storage_node_ips') or an empty list
+#  Defaults to lookup('swift_storage_node_ips', undef, undef, [])
 #
 #  [*part_power*]
 #  (Optional) The total number of partitions that should exist in the ring.
@@ -65,9 +65,11 @@
 #
 # [*swift_ring_get_tempurl*]
 # GET tempurl to fetch Swift rings from
+# Defaults to lookup('swift_ring_get_tempurl', undef, undef, '')
 #
 # [*swift_ring_put_tempurl*]
 # PUT tempurl to upload Swift rings to
+# Defaults to lookup('swift_ring_put_tempurl', undef, undef, '')
 #
 # [*skip_consistency_check*]
 # If set to true, skip the recon check to ensure rings are identical on all
@@ -77,15 +79,15 @@ class tripleo::profile::base::swift::ringbuilder (
   $replicas,
   $build_ring  = true,
   $devices     = undef,
-  $step        = Integer(hiera('step')),
+  $step        = Integer(lookup('step')),
   $swift_zones = '1',
   $raw_disk_prefix = 'r1z1-',
   $raw_disks = [],
-  $swift_storage_node_ips = hiera('swift_storage_node_ips', []),
+  $swift_storage_node_ips = lookup('swift_storage_node_ips', undef, undef, []),
   $part_power = undef,
   $min_part_hours = undef,
-  $swift_ring_get_tempurl = hiera('swift_ring_get_tempurl', ''),
-  $swift_ring_put_tempurl = hiera('swift_ring_put_tempurl', ''),
+  $swift_ring_get_tempurl = lookup('swift_ring_get_tempurl', undef, undef, ''),
+  $swift_ring_put_tempurl = lookup('swift_ring_put_tempurl', undef, undef, ''),
   $skip_consistency_check = false,
 ) {
 
