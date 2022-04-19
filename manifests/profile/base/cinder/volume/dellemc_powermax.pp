@@ -20,35 +20,35 @@
 #
 # [*backend_name*]
 #   (Optional) List of names given to the Cinder backend stanza.
-#   Defaults to hiera('cinder::backend:dellemc_powermax::volume_backend_name,'
+#   Defaults to lookup('cinder::backend:dellemc_powermax::volume_backend_name', undef, undef,
 #   ['tripleo_dellemc_powermax'])
 #
 # [*multi_config*]
 #   (Optional) A config hash when multiple backends are used.
-#   Defaults to hiera('cinder::backend::dellemc_powermax::volume_multi_config', {})
+#   Defaults to lookup('cinder::backend::dellemc_powermax::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_powermax (
-  $backend_name = hiera('cinder::backend::dellemc_powermax::volume_backend_name', ['tripleo_dellemc_powermax']),
-  $multi_config = hiera('cinder::backend::dellemc_powermax::volume_multi_config', {}),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::dellemc_powermax::volume_backend_name', undef, undef, ['tripleo_dellemc_powermax']),
+  $multi_config = lookup('cinder::backend::dellemc_powermax::volume_multi_config', undef, undef, {}),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     $backend_defaults = {
-      'CinderPowermaxAvailabilityZone' => hiera('cinder::backend::dellemc_powermax::backend_availability_zone', undef),
-      'CinderPowermaxSanIp'            => hiera('cinder::backend::dellemc_powermax::san_ip', undef),
-      'CinderPowermaxSanLogin'         => hiera('cinder::backend::dellemc_powermax::san_login', undef),
-      'CinderPowermaxSanPassword'      => hiera('cinder::backend::dellemc_powermax::san_password', undef),
-      'CinderPowermaxStorageProtocol'  => hiera('cinder::backend::dellemc_powermax::powermax_storage_protocol', undef),
-      'CinderPowermaxArray'            => hiera('cinder::backend::dellemc_powermax::powermax_array', undef),
-      'CinderPowermaxSrp'              => hiera('cinder::backend::dellemc_powermax::powermax_srp', undef),
-      'CinderPowermaxPortGroups'       => hiera('cinder::backend::dellemc_powermax::powermax_port_groups', undef),
+      'CinderPowermaxAvailabilityZone' => lookup('cinder::backend::dellemc_powermax::backend_availability_zone', undef, undef, undef),
+      'CinderPowermaxSanIp'            => lookup('cinder::backend::dellemc_powermax::san_ip', undef, undef, undef),
+      'CinderPowermaxSanLogin'         => lookup('cinder::backend::dellemc_powermax::san_login', undef, undef, undef),
+      'CinderPowermaxSanPassword'      => lookup('cinder::backend::dellemc_powermax::san_password', undef, undef, undef),
+      'CinderPowermaxStorageProtocol'  => lookup('cinder::backend::dellemc_powermax::powermax_storage_protocol', undef, undef, undef),
+      'CinderPowermaxArray'            => lookup('cinder::backend::dellemc_powermax::powermax_array', undef, undef, undef),
+      'CinderPowermaxSrp'              => lookup('cinder::backend::dellemc_powermax::powermax_srp', undef, undef, undef),
+      'CinderPowermaxPortGroups'       => lookup('cinder::backend::dellemc_powermax::powermax_port_groups', undef, undef, undef),
     }
 
     any2array($backend_name).each |String $backend| {

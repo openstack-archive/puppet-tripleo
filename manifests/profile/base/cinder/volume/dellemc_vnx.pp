@@ -20,38 +20,38 @@
 #
 # [*backend_name*]
 #   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_dellemc_vnx'
+#   Defaults to lookup('cinder::backend::emc_vnx::volume_backend_name', undef, undef, 'tripleo_dellemc_vnx')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_vnx (
-  $backend_name = hiera('cinder::backend::emc_vnx::volume_backend_name', 'tripleo_dellemc_vnx'),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::emc_vnx::volume_backend_name', undef, undef, 'tripleo_dellemc_vnx'),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     # Accept recently deprecated 'storage_vnx_pool_name'
-    $storage_vnx_pool_names_real = pick(hiera('cinder::backend::emc_vnx::storage_vnx_pool_names',
-                                        hiera('cinder::backend::emc_vnx::storage_vnx_pool_name',
-                                        undef)))
+    $storage_vnx_pool_names_real = pick(lookup('cinder::backend::emc_vnx::storage_vnx_pool_names', undef, undef,
+                                        lookup('cinder::backend::emc_vnx::storage_vnx_pool_name',
+                                        undef, undef, undef)))
 
     create_resources('cinder::backend::emc_vnx', { $backend_name => delete_undef_values({
-      'backend_availability_zone'     => hiera('cinder::backend::emc_vnx::backend_availability_zone', undef),
-      'san_ip'                        => hiera('cinder::backend::emc_vnx::san_ip', undef),
-      'san_login'                     => hiera('cinder::backend::emc_vnx::san_login', undef),
-      'san_password'                  => hiera('cinder::backend::emc_vnx::san_password', undef),
-      'storage_protocol'              => hiera('cinder::backend::emc_vnx::storage_protocol', undef),
-      'storage_vnx_pool_names'        => hiera('cinder::backend::emc_vnx::storage_vnx_pool_names', undef),
-      'default_timeout'               => hiera('cinder::backend::emc_vnx::default_timeout', undef),
-      'max_luns_per_storage_group'    => hiera('cinder::backend::emc_vnx::max_luns_per_storage_group', undef),
-      'initiator_auto_registration'   => hiera('cinder::backend::emc_vnx::initiator_auto_registration', undef),
-      'storage_vnx_auth_type'         => hiera('cinder::backend::emc_vnx::storage_vnx_auth_type', undef),
-      'storage_vnx_security_file_dir' => hiera('cinder::backend::emc_vnx::storage_vnx_security_file_dir', undef),
-      'naviseccli_path'               => hiera('cinder::backend::emc_vnx::naviseccli_path', undef),
+      'backend_availability_zone'     => lookup('cinder::backend::emc_vnx::backend_availability_zone', undef, undef, undef),
+      'san_ip'                        => lookup('cinder::backend::emc_vnx::san_ip', undef, undef, undef),
+      'san_login'                     => lookup('cinder::backend::emc_vnx::san_login', undef, undef, undef),
+      'san_password'                  => lookup('cinder::backend::emc_vnx::san_password', undef, undef, undef),
+      'storage_protocol'              => lookup('cinder::backend::emc_vnx::storage_protocol', undef, undef, undef),
+      'storage_vnx_pool_names'        => lookup('cinder::backend::emc_vnx::storage_vnx_pool_names', undef, undef, undef),
+      'default_timeout'               => lookup('cinder::backend::emc_vnx::default_timeout', undef, undef, undef),
+      'max_luns_per_storage_group'    => lookup('cinder::backend::emc_vnx::max_luns_per_storage_group', undef, undef, undef),
+      'initiator_auto_registration'   => lookup('cinder::backend::emc_vnx::initiator_auto_registration', undef, undef, undef),
+      'storage_vnx_auth_type'         => lookup('cinder::backend::emc_vnx::storage_vnx_auth_type', undef, undef, undef),
+      'storage_vnx_security_file_dir' => lookup('cinder::backend::emc_vnx::storage_vnx_security_file_dir', undef, undef, undef),
+      'naviseccli_path'               => lookup('cinder::backend::emc_vnx::naviseccli_path', undef, undef, undef),
     })})
   }
 

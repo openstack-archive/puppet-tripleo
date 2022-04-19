@@ -23,11 +23,11 @@
 #
 # [*backend_name*]
 #   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_nfs'
+#   Defaults to lookup('cinder::backend::nfs::volume_backend_name', undef, undef, 'tripleo_nfs')
 #
 # [*backend_availability_zone*]
 #   (Optional) Availability zone for this volume backend
-#   Defaults to  hiera('cinder::backend::nfs::backend_availability_zone', undef)
+#   Defaults to  lookup('cinder::backend::nfs::backend_availability_zone', undef, undef, undef)
 #
 # [*cinder_nfs_mount_options*]
 #   (Optional) List of mount options for the NFS share
@@ -57,17 +57,17 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::nfs (
   $cinder_nfs_servers,
-  $backend_name                       = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs'),
-  $backend_availability_zone          = hiera('cinder::backend::nfs::backend_availability_zone', undef),
+  $backend_name                       = lookup('cinder::backend::nfs::volume_backend_name', undef, undef, 'tripleo_nfs'),
+  $backend_availability_zone          = lookup('cinder::backend::nfs::backend_availability_zone', undef, undef, undef),
   $cinder_nfs_mount_options           = '',
   $cinder_nfs_snapshot_support        = $::os_service_default,
   $cinder_nas_secure_file_operations  = $::os_service_default,
   $cinder_nas_secure_file_permissions = $::os_service_default,
-  $step                               = Integer(hiera('step')),
+  $step                               = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 

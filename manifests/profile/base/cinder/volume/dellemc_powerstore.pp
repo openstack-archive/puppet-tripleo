@@ -20,33 +20,33 @@
 #
 # [*backend_name*]
 #   (Optional) List of names given to the Cinder backend stanza.
-#   Defaults to hiera('cinder::backend:dellemc_powerstore::volume_backend_name,'
+#   Defaults to lookup('cinder::backend:dellemc_powerstore::volume_backend_name', undef, undef,
 #   ['tripleo_dellemc_powerstore'])
 #
 # [*multi_config*]
 #   (Optional) A config hash when multiple backends are used.
-#   Defaults to hiera('cinder::backend::dellemc_powerstore::volume_multi_config', {})
+#   Defaults to lookup('cinder::backend::dellemc_powerstore::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_powerstore (
-  $backend_name = hiera('cinder::backend::dellemc_powerstore::volume_backend_name', ['tripleo_dellemc_powerstore']),
-  $multi_config = hiera('cinder::backend::dellemc_powerstore::volume_multi_config', {}),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::dellemc_powerstore::volume_backend_name', undef, undef, ['tripleo_dellemc_powerstore']),
+  $multi_config = lookup('cinder::backend::dellemc_powerstore::volume_multi_config', undef, undef, {}),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     $backend_defaults = {
-      'CinderPowerStoreAvailabilityZone' => hiera('cinder::backend::dellemc_powerstore::backend_availability_zone', undef),
-      'CinderPowerStoreSanIp'            => hiera('cinder::backend::dellemc_powerstore::san_ip', undef),
-      'CinderPowerStoreSanLogin'         => hiera('cinder::backend::dellemc_powerstore::san_login', undef),
-      'CinderPowerStoreSanPassword'      => hiera('cinder::backend::dellemc_powerstore::san_password', undef),
-      'CinderPowerStoreStorageProtocol'  => hiera('cinder::backend::dellemc_powerstore::storage_protocol', undef),
-      'CinderPowerStorePorts'            => hiera('cinder::backend::dellemc_powerstore::powerstore_ports', undef),
+      'CinderPowerStoreAvailabilityZone' => lookup('cinder::backend::dellemc_powerstore::backend_availability_zone', undef, undef, undef),
+      'CinderPowerStoreSanIp'            => lookup('cinder::backend::dellemc_powerstore::san_ip', undef, undef, undef),
+      'CinderPowerStoreSanLogin'         => lookup('cinder::backend::dellemc_powerstore::san_login', undef, undef, undef),
+      'CinderPowerStoreSanPassword'      => lookup('cinder::backend::dellemc_powerstore::san_password', undef, undef, undef),
+      'CinderPowerStoreStorageProtocol'  => lookup('cinder::backend::dellemc_powerstore::storage_protocol', undef, undef, undef),
+      'CinderPowerStorePorts'            => lookup('cinder::backend::dellemc_powerstore::powerstore_ports', undef, undef, undef),
     }
 
     any2array($backend_name).each |String $backend| {

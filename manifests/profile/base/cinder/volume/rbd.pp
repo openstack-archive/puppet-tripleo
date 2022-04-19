@@ -20,15 +20,15 @@
 #
 # [*backend_name*]
 #   (Optional)  List of names given to the Cinder backend stanza.
-#   Defaults to hiera('cinder::backend::rbd::volume_backend_name', ['tripleo_ceph'])
+#   Defaults to lookup('cinder::backend::rbd::volume_backend_name', undef, undef, ['tripleo_ceph'])
 #
 # [*backend_availability_zone*]
 #   (Optional) Availability zone for this volume backend
-#   Defaults to hiera('cinder::backend::rbd::backend_availability_zone', undef)
+#   Defaults to lookup('cinder::backend::rbd::backend_availability_zone', undef, undef, undef)
 #
 # [*cinder_rbd_backend_host*]
 #   (Optional) String to use as backend_host in the backend stanza
-#   Defaults to hiera('cinder::backend_host', hiera('cinder::host', $::hostname))
+#   Defaults to lookup('cinder::backend_host', undef, undef, lookup('cinder::host', undef, undef, $::hostname))
 #
 # [*cinder_rbd_ceph_conf*]
 #   (Optional) The path to the Ceph cluster config file
@@ -54,7 +54,7 @@
 # [*cinder_rbd_flatten_volume_from_snapshot*]
 #   (Optional) Whether volumes created from a snapshot should be flattened
 #   in order to remove a dependency on the snapshot.
-#   Defaults to hiera('cinder::backend::rbd::flatten_volume_from_snapshot, undef)
+#   Defaults to lookup('cinder::backend::rbd::flatten_volume_from_snapshot, undef, undef, undef)
 #
 # [*multi_config*]
 #   (Optional) A config hash when multiple backends are used.
@@ -68,23 +68,24 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::rbd (
-  $backend_name                            = hiera('cinder::backend::rbd::volume_backend_name', ['tripleo_ceph']),
-  $backend_availability_zone               = hiera('cinder::backend::rbd::backend_availability_zone', undef),
+  $backend_name                            = lookup('cinder::backend::rbd::volume_backend_name', undef, undef, ['tripleo_ceph']),
+  $backend_availability_zone               = lookup('cinder::backend::rbd::backend_availability_zone', undef, undef, undef),
   # lint:ignore:parameter_documentation
-  $cinder_rbd_backend_host                 = hiera('cinder::backend_host', hiera('cinder::host', $::hostname)),
+  $cinder_rbd_backend_host                 = lookup('cinder::backend_host', undef, undef, lookup('cinder::host',
+                                                    undef, undef, $::hostname)),
   # lint:endignore
-  $cinder_rbd_ceph_conf                    = hiera('cinder::backend::rbd::rbd_ceph_conf', '/etc/ceph/ceph.conf'),
+  $cinder_rbd_ceph_conf                    = lookup('cinder::backend::rbd::rbd_ceph_conf', undef, undef, '/etc/ceph/ceph.conf'),
   $cinder_rbd_pool_name                    = 'volumes',
   $cinder_rbd_extra_pools                  = undef,
   $cinder_rbd_secret_uuid                  = undef,
   $cinder_rbd_user_name                    = 'openstack',
-  $cinder_rbd_flatten_volume_from_snapshot = hiera('cinder::backend::rbd::flatten_volume_from_snapshot', undef),
+  $cinder_rbd_flatten_volume_from_snapshot = lookup('cinder::backend::rbd::flatten_volume_from_snapshot', undef, undef, undef),
   $multi_config                            = {},
   $extra_options                           = {},
-  $step                                    = Integer(hiera('step')),
+  $step                                    = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 

@@ -76,7 +76,7 @@
 #
 # [*cinder_user_enabled_backends*]
 #   (Optional) List of additional backend stanzas to activate
-#   Defaults to hiera('cinder_user_enabled_backends')
+#   Defaults to lookup('cinder_user_enabled_backends', undef, undef, undef)
 #
 # [*cinder_volume_cluster*]
 #   (Optional) Name of the cluster when running in active-active mode
@@ -84,28 +84,28 @@
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*etcd_certificate_specs*]
 #   (optional) TLS certificate specs for the etcd service
-#   Defaults to hiera('tripleo::profile::base::etcd::certificate_specs', {})
+#   Defaults to lookup('tripleo::profile::base::etcd::certificate_specs', undef, undef, {})
 #
 # [*etcd_enabled*]
 #   (optional) Whether the etcd service is enabled or not
-#   Defaults to hiera('etcd_enabled', false)
+#   Defaults to lookup('etcd_enabled', undef, undef, false)
 #
 # [*etcd_host*]
 #   (optional) IP address (VIP) of the etcd service
-#   Defaults to hiera('etcd_vip', undef)
+#   Defaults to lookup('etcd_vip', undef, undef, undef)
 #
 # [*etcd_port*]
 #   (optional) Port used by the etcd service
-#   Defaults to hiera('tripleo::profile::base::etcd::client_port', '2379')
+#   Defaults to lookup('tripleo::profile::base::etcd::client_port', undef, undef, '2379')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # DEPRECATED PARAMETERS
 #
@@ -132,14 +132,14 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_nfs_backend                   = false,
   $cinder_enable_rbd_backend                   = false,
   $cinder_enable_nvmeof_backend                = false,
-  $cinder_user_enabled_backends                = hiera('cinder_user_enabled_backends', undef),
+  $cinder_user_enabled_backends                = lookup('cinder_user_enabled_backends', undef, undef, undef),
   $cinder_volume_cluster                       = '',
-  $enable_internal_tls                         = hiera('enable_internal_tls', false),
-  $etcd_certificate_specs                      = hiera('tripleo::profile::base::etcd::certificate_specs', {}),
-  $etcd_enabled                                = hiera('etcd_enabled', false),
-  $etcd_host                                   = hiera('etcd_vip', undef),
-  $etcd_port                                   = hiera('tripleo::profile::base::etcd::client_port', '2379'),
-  $step                                        = Integer(hiera('step')),
+  $enable_internal_tls                         = lookup('enable_internal_tls', undef, undef, false),
+  $etcd_certificate_specs                      = lookup('tripleo::profile::base::etcd::certificate_specs', undef, undef, {}),
+  $etcd_enabled                                = lookup('etcd_enabled', undef, undef, false),
+  $etcd_host                                   = lookup('etcd_vip', undef, undef, undef),
+  $etcd_port                                   = lookup('tripleo::profile::base::etcd::client_port', undef, undef, '2379'),
+  $step                                        = Integer(lookup('step')),
   # DEPRECATED PARAMETERS
   $cinder_rbd_ceph_conf_path                   = undef,
   $cinder_rbd_client_name                      = undef,
@@ -181,97 +181,100 @@ class tripleo::profile::base::cinder::volume (
 
     if $cinder_enable_pure_backend {
       include tripleo::profile::base::cinder::volume::pure
-      $cinder_pure_backend_name = hiera('cinder::backend::pure::volume_backend_name', 'tripleo_pure')
+      $cinder_pure_backend_name = lookup('cinder::backend::pure::volume_backend_name', undef, undef, 'tripleo_pure')
     } else {
       $cinder_pure_backend_name = undef
     }
 
     if $cinder_enable_dellsc_backend {
       include tripleo::profile::base::cinder::volume::dellsc
-      $cinder_dellsc_backend_name = hiera('cinder::backend::dellsc_iscsi::volume_backend_name', 'tripleo_dellsc')
+      $cinder_dellsc_backend_name = lookup('cinder::backend::dellsc_iscsi::volume_backend_name', undef, undef, 'tripleo_dellsc')
     } else {
       $cinder_dellsc_backend_name = undef
     }
 
     if $cinder_enable_dellemc_sc_backend {
       include tripleo::profile::base::cinder::volume::dellemc_sc
-      $cinder_dellemc_sc_backend_name = hiera('cinder::backend::dellemc_sc::volume_backend_name', 'tripleo_dellemc_sc')
+      $cinder_dellemc_sc_backend_name = lookup('cinder::backend::dellemc_sc::volume_backend_name', undef, undef, 'tripleo_dellemc_sc')
     } else {
       $cinder_dellemc_sc_backend_name = undef
     }
 
     if $cinder_enable_dellemc_unity_backend {
       include tripleo::profile::base::cinder::volume::dellemc_unity
-      $cinder_dellemc_unity_backend_name = hiera('cinder::backend::dellemc_unity::volume_backend_name', 'tripleo_dellemc_unity')
+      $cinder_dellemc_unity_backend_name = lookup('cinder::backend::dellemc_unity::volume_backend_name',
+                                                  undef, undef, 'tripleo_dellemc_unity')
     } else {
       $cinder_dellemc_unity_backend_name = undef
     }
 
     if $cinder_enable_dellemc_powerflex_backend {
       include tripleo::profile::base::cinder::volume::dellemc_powerflex
-      $cinder_dellemc_powerflex_backend_name = hiera('cinder::backend::dellemc_powerflex::volume_backend_name', 'tripleo_dellemc_powerflex')
+      $cinder_dellemc_powerflex_backend_name = lookup('cinder::backend::dellemc_powerflex::volume_backend_name',
+                                                      undef, undef, 'tripleo_dellemc_powerflex')
     } else {
       $cinder_dellemc_powerflex_backend_name = undef
     }
 
     if $cinder_enable_dellemc_powermax_backend {
       include tripleo::profile::base::cinder::volume::dellemc_powermax
-      $cinder_dellemc_powermax_backend_name = hiera('cinder::backend::dellemc_powermax::volume_backend_name', 'tripleo_dellemc_powermax')
+      $cinder_dellemc_powermax_backend_name = lookup('cinder::backend::dellemc_powermax::volume_backend_name',
+                                                    undef, undef, 'tripleo_dellemc_powermax')
     } else {
       $cinder_dellemc_powermax_backend_name = undef
     }
 
     if $cinder_enable_dellemc_powerstore_backend {
       include tripleo::profile::base::cinder::volume::dellemc_powerstore
-      $cinder_dellemc_powerstore_backend_name = hiera('cinder::backend::dellemc_powerstore::volume_backend_name',
-                                                      'tripleo_dellemc_powerstore')
+      $cinder_dellemc_powerstore_backend_name = lookup('cinder::backend::dellemc_powerstore::volume_backend_name',
+                                                      undef, undef, 'tripleo_dellemc_powerstore')
     } else {
       $cinder_dellemc_powerstore_backend_name = undef
     }
 
     if $cinder_enable_dellemc_vnx_backend {
       include tripleo::profile::base::cinder::volume::dellemc_vnx
-      $cinder_dellemc_vnx_backend_name = hiera('cinder::backend::emc_vnx::volume_backend_name',
-          'tripleo_dellemc_vnx')
+      $cinder_dellemc_vnx_backend_name = lookup('cinder::backend::emc_vnx::volume_backend_name',
+          undef, undef, 'tripleo_dellemc_vnx')
     } else {
       $cinder_dellemc_vnx_backend_name = undef
     }
 
     if $cinder_enable_dellemc_xtremio_backend {
       include tripleo::profile::base::cinder::volume::dellemc_xtremio
-      $cinder_dellemc_xtremio_backend_name = hiera('cinder::backend::dellemc_xtremio::volume_backend_name',
-          'tripleo_dellemc_xtremio')
+      $cinder_dellemc_xtremio_backend_name = lookup('cinder::backend::dellemc_xtremio::volume_backend_name',
+          undef, undef, 'tripleo_dellemc_xtremio')
     } else {
       $cinder_dellemc_xtremio_backend_name = undef
     }
 
     if $cinder_enable_iscsi_backend {
       include tripleo::profile::base::cinder::volume::iscsi
-      $cinder_iscsi_backend_name = hiera('cinder::backend::iscsi::volume_backend_name', 'tripleo_iscsi')
+      $cinder_iscsi_backend_name = lookup('cinder::backend::iscsi::volume_backend_name', undef, undef, 'tripleo_iscsi')
     } else {
       $cinder_iscsi_backend_name = undef
     }
 
     if $cinder_enable_netapp_backend {
       include tripleo::profile::base::cinder::volume::netapp
-      $cinder_netapp_backend_name = hiera('cinder::backend::netapp::volume_backend_name', 'tripleo_netapp')
+      $cinder_netapp_backend_name = lookup('cinder::backend::netapp::volume_backend_name', undef, undef, 'tripleo_netapp')
     } else {
       $cinder_netapp_backend_name = undef
     }
 
     if $cinder_enable_nfs_backend {
       include tripleo::profile::base::cinder::volume::nfs
-      $cinder_nfs_backend_name = hiera('cinder::backend::nfs::volume_backend_name', 'tripleo_nfs')
+      $cinder_nfs_backend_name = lookup('cinder::backend::nfs::volume_backend_name', undef, undef, 'tripleo_nfs')
     } else {
       $cinder_nfs_backend_name = undef
     }
 
     if $cinder_enable_rbd_backend {
       include tripleo::profile::base::cinder::volume::rbd
-      $cinder_rbd_backend_name = hiera('tripleo::profile::base::cinder::volume::rbd::backend_name',
-                                        ['tripleo_ceph'])
+      $cinder_rbd_backend_name = lookup('tripleo::profile::base::cinder::volume::rbd::backend_name',
+                                        undef, undef, ['tripleo_ceph'])
 
-      $extra_pools = hiera('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef)
+      $extra_pools = lookup('tripleo::profile::base::cinder::volume::rbd::cinder_rbd_extra_pools', undef, undef, undef)
       if empty($extra_pools) {
         $extra_backend_names = []
       } else {
@@ -282,7 +285,7 @@ class tripleo::profile::base::cinder::volume (
 
       # Each $multi_config backend can specify its own list of extra pools. The
       # backend names are the $multi_config hash keys.
-      $multi_config = hiera('tripleo::profile::base::cinder::volume::rbd::multi_config', {})
+      $multi_config = lookup('tripleo::profile::base::cinder::volume::rbd::multi_config', undef, undef, {})
       $extra_multiconfig_backend_names = $multi_config.map |$base_name, $backend_config| {
         $backend_extra_pools = $backend_config['CinderRbdExtraPools']
         any2array($backend_extra_pools).map |$pool_name| { "${base_name}_${pool_name}" }
@@ -296,7 +299,7 @@ class tripleo::profile::base::cinder::volume (
 
     if $cinder_enable_nvmeof_backend {
       include tripleo::profile::base::cinder::volume::nvmeof
-      $cinder_nvmeof_backend_name = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof')
+      $cinder_nvmeof_backend_name = lookup('cinder::backend::nvmeof::volume_backend_name', undef, undef, 'tripleo_nvmeof')
     } else {
       $cinder_nvmeof_backend_name = undef
     }

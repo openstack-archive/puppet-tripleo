@@ -29,12 +29,12 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::backup::gcs (
   $credentials,
   $credential_file = '/etc/cinder/gcs-backup.json',
-  $step            = Integer(hiera('step')),
+  $step            = Integer(lookup('step')),
 ) {
 
   include tripleo::profile::base::cinder::backup

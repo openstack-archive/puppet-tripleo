@@ -20,49 +20,49 @@
 #
 # [*backend_name*]
 #   (Optional) List of names given to the Cinder backend stanza.
-#   Defaults to  hiera('cinder::backend::netapp::volume_backend_name', ['tripleo_netapp'])
+#   Defaults to  lookup('cinder::backend::netapp::volume_backend_name', undef, undef, ['tripleo_netapp'])
 #
 # [*multi_config*]
 #   (Optional) A config hash when multiple backends are used.
-#   Defaults to hiera('cinder::backend::netapp::volume_multi_config', {})
+#   Defaults to lookup('cinder::backend::netapp::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::netapp (
-  $backend_name = hiera('cinder::backend::netapp::volume_backend_name', ['tripleo_netapp']),
-  $multi_config = hiera('cinder::backend::netapp::volume_multi_config', {}),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::netapp::volume_backend_name', undef, undef, ['tripleo_netapp']),
+  $multi_config = lookup('cinder::backend::netapp::volume_multi_config', undef, undef, {}),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     $backend_defaults = {
-      'CinderNetappAvailabilityZone'         => hiera('cinder::backend::netapp::backend_availability_zone', undef),
-      'CinderNetappLogin'                    => hiera('cinder::backend::netapp::netapp_login', undef),
-      'CinderNetappPassword'                 => hiera('cinder::backend::netapp::netapp_password', undef),
-      'CinderNetappServerHostname'           => hiera('cinder::backend::netapp::netapp_server_hostname', undef),
-      'CinderNetappServerPort'               => hiera('cinder::backend::netapp::netapp_server_port', undef),
-      'CinderNetappSizeMultiplier'           => hiera('cinder::backend::netapp::netapp_size_multiplier', undef),
-      'CinderNetappStorageFamily'            => hiera('cinder::backend::netapp::netapp_storage_family', undef),
-      'CinderNetappStorageProtocol'          => hiera('cinder::backend::netapp::netapp_storage_protocol', undef),
-      'CinderNetappTransportType'            => hiera('cinder::backend::netapp::netapp_transport_type', undef),
-      'CinderNetappVfiler'                   => hiera('cinder::backend::netapp::netapp_vfiler', undef),
-      'CinderNetappVserver'                  => hiera('cinder::backend::netapp::netapp_vserver', undef),
-      'CinderNetappPartnerBackendName'       => hiera('cinder::backend::netapp::netapp_partner_backend_name', undef),
-      'CinderNetappNfsShares'                => hiera('cinder::backend::netapp::nfs_shares', undef),
-      'CinderNetappNfsSharesConfig'          => hiera('cinder::backend::netapp::nfs_shares_config', undef),
-      'CinderNetappNfsMountOptions'          => hiera('cinder::backend::netapp::nfs_mount_options', undef),
-      'CinderNetappCopyOffloadToolPath'      => hiera('cinder::backend::netapp::netapp_copyoffload_tool_path', undef),
-      'CinderNetappControllerIps'            => hiera('cinder::backend::netapp::netapp_controller_ips', undef),
-      'CinderNetappSaPassword'               => hiera('cinder::backend::netapp::netapp_sa_password', undef),
-      'CinderNetappHostType'                 => hiera('cinder::backend::netapp::netapp_host_type', undef),
-      'CinderNetappWebservicePath'           => hiera('cinder::backend::netapp::netapp_webservice_path', undef),
-      'CinderNetappNasSecureFileOperations'  => hiera('cinder::backend::netapp::nas_secure_file_operations', undef),
-      'CinderNetappNasSecureFilePermissions' => hiera('cinder::backend::netapp::nas_secure_file_permissions', undef),
-      'CinderNetappPoolNameSearchPattern'    => hiera('cinder::backend::netapp::netapp_pool_name_search_pattern', undef),
+      'CinderNetappAvailabilityZone'         => lookup('cinder::backend::netapp::backend_availability_zone', undef, undef, undef),
+      'CinderNetappLogin'                    => lookup('cinder::backend::netapp::netapp_login', undef, undef, undef),
+      'CinderNetappPassword'                 => lookup('cinder::backend::netapp::netapp_password', undef, undef, undef),
+      'CinderNetappServerHostname'           => lookup('cinder::backend::netapp::netapp_server_hostname', undef, undef, undef),
+      'CinderNetappServerPort'               => lookup('cinder::backend::netapp::netapp_server_port', undef, undef, undef),
+      'CinderNetappSizeMultiplier'           => lookup('cinder::backend::netapp::netapp_size_multiplier', undef, undef, undef),
+      'CinderNetappStorageFamily'            => lookup('cinder::backend::netapp::netapp_storage_family', undef, undef, undef),
+      'CinderNetappStorageProtocol'          => lookup('cinder::backend::netapp::netapp_storage_protocol', undef, undef, undef),
+      'CinderNetappTransportType'            => lookup('cinder::backend::netapp::netapp_transport_type', undef, undef, undef),
+      'CinderNetappVfiler'                   => lookup('cinder::backend::netapp::netapp_vfiler', undef, undef, undef),
+      'CinderNetappVserver'                  => lookup('cinder::backend::netapp::netapp_vserver', undef, undef, undef),
+      'CinderNetappPartnerBackendName'       => lookup('cinder::backend::netapp::netapp_partner_backend_name', undef, undef, undef),
+      'CinderNetappNfsShares'                => lookup('cinder::backend::netapp::nfs_shares', undef, undef, undef),
+      'CinderNetappNfsSharesConfig'          => lookup('cinder::backend::netapp::nfs_shares_config', undef, undef, undef),
+      'CinderNetappNfsMountOptions'          => lookup('cinder::backend::netapp::nfs_mount_options', undef, undef, undef),
+      'CinderNetappCopyOffloadToolPath'      => lookup('cinder::backend::netapp::netapp_copyoffload_tool_path', undef, undef, undef),
+      'CinderNetappControllerIps'            => lookup('cinder::backend::netapp::netapp_controller_ips', undef, undef, undef),
+      'CinderNetappSaPassword'               => lookup('cinder::backend::netapp::netapp_sa_password', undef, undef, undef),
+      'CinderNetappHostType'                 => lookup('cinder::backend::netapp::netapp_host_type', undef, undef, undef),
+      'CinderNetappWebservicePath'           => lookup('cinder::backend::netapp::netapp_webservice_path', undef, undef, undef),
+      'CinderNetappNasSecureFileOperations'  => lookup('cinder::backend::netapp::nas_secure_file_operations', undef, undef, undef),
+      'CinderNetappNasSecureFilePermissions' => lookup('cinder::backend::netapp::nas_secure_file_permissions', undef, undef, undef),
+      'CinderNetappPoolNameSearchPattern'    => lookup('cinder::backend::netapp::netapp_pool_name_search_pattern', undef, undef, undef),
     }
 
     any2array($backend_name).each |String $backend| {
