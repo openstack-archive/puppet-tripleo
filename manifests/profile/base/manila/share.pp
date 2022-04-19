@@ -230,7 +230,7 @@ class tripleo::profile::base::manila::share (
         'emc_nas_login'                => hiera('manila::backend::dellemc_unity::emc_nas_login', undef),
         'emc_nas_password'             => hiera('manila::backend::dellemc_unity::emc_nas_password', undef),
         'emc_nas_server'               => hiera('manila::backend::dellemc_unity::emc_nas_server', undef),
-        'emc_share_backend'            => hiera('manila::backend::dellemc_unity::emc_share_backend','unity', undef),
+        'emc_share_backend'            => hiera('manila::backend::dellemc_unity::emc_share_backend', 'unity'),
         'unity_server_meta_pool'       => hiera('manila::backend::dellemc_unity::unity_server_meta_pool', undef),
         'unity_share_data_pools'       => hiera('manila::backend::dellemc_unity::unity_share_data_pools', undef),
         'unity_ethernet_ports'         => hiera('manila::backend::dellemc_unity::unity_ethernet_ports', undef),
