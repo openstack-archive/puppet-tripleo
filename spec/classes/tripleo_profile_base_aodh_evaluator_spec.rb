@@ -19,11 +19,20 @@ require 'spec_helper'
 describe 'tripleo::profile::base::aodh::evaluator' do
   shared_examples_for 'tripleo::profile::base::aodh::evaluator' do
     let(:pre_condition) do
-      "class { 'tripleo::profile::base::aodh': step => #{params[:step]}, oslomsg_rpc_hosts => ['localhost.localdomain'] }"
+      <<-eos
+      class { 'tripleo::profile::base::aodh':
+        step              => #{params[:step]},
+        oslomsg_rpc_hosts => ['localhost.localdomain']
+      }
+eos
     end
 
     context 'with step less than 4' do
-      let(:params) { { :step => 3 } }
+      let(:params) { {
+        :step                => 3,
+        :aodh_redis_password => 'password',
+        :redis_vip           => '127.0.0.1',
+      } }
 
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::aodh::evaluator')
