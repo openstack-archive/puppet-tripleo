@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to lookup('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*memcached_hosts*]
 #   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.

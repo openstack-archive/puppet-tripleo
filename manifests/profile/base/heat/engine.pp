@@ -20,12 +20,12 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to lookup('heat_engine_short_bootstrap_node_name')
+#   Defaults to lookup('heat_engine_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to lookup('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::heat::engine (
   $bootstrap_node = lookup('heat_engine_short_bootstrap_node_name', undef, undef, undef),

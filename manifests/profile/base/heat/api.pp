@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to lookup('heat_api_short_bootstrap_node_name')
+#   Defaults to lookup('heat_api_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -32,7 +32,7 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to lookup('apache_certificate_specs', undef, undef, {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
@@ -46,7 +46,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to lookup('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::heat::api (
   $bootstrap_node                = lookup('heat_api_short_bootstrap_node_name', undef, undef, undef),
