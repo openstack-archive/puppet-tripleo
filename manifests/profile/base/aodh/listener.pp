@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to lookup('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::aodh::listener (
   $step = Integer(lookup('step')),

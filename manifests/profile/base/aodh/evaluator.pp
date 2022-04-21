@@ -24,9 +24,11 @@
 #
 # [*aodh_redis_password*]
 #   (Optional) redis password to configure coordination url
+#   Defaults to lookup('aodh_redis_password', undef, undef, undef)
 #
 # [*redis_vip*]
 #   (Optional) redis vip to configure coordination url
+#   Defaults to lookup('redis_vip', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
