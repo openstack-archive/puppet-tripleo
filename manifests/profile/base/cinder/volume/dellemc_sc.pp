@@ -20,44 +20,44 @@
 #
 # [*backend_name*]
 #   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_dellemc_sc'
+#   Defaults to lookup('cinder::backend::dellemc_sc::volume_backend_name', undef, undef, ['tripleo_dellemc_sc'])
 #
 # [*multi_config*]
 #   (Optional) A config hash when multiple backends are used.
-#   Defaults to hiera('cinder::backend::dellemc_sc::volume_multi_config', {})
+#   Defaults to lookup('cinder::backend::dellemc_sc::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_sc (
-  $backend_name = hiera('cinder::backend::dellemc_sc::volume_backend_name', ['tripleo_dellemc_sc']),
-  $multi_config = hiera('cinder::backend::dellemc_sc::volume_multi_config', {}),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::dellemc_sc::volume_backend_name', undef, undef, ['tripleo_dellemc_sc']),
+  $multi_config = lookup('cinder::backend::dellemc_sc::volume_multi_config', undef, undef, {}),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
 
     $backend_defaults = {
-      'CinderSCAvailabilityZone'         => hiera('cinder::backend::dellemc_sc::backend_availability_zone', undef),
-      'CinderSCSanIp'                    => hiera('cinder::backend::dellemc_sc::san_ip', undef),
-      'CinderSCSanLogin'                 => hiera('cinder::backend::dellemc_sc::san_login', undef),
-      'CinderSCSanPassword'              => hiera('cinder::backend::dellemc_sc::san_password', undef),
-      'CinderSCStorageProtocol'          => hiera('cinder::backend::dellemc_sc::sc_storage_protocol', undef),
-      'CinderSCSSN'                      => hiera('cinder::backend::dellemc_sc::dell_sc_ssn', undef),
-      'CinderSCTargetIpAddress'          => hiera('cinder::backend::dellemc_sc::iscsi_ip_address', undef),
-      'CinderSCTargetPort'               => hiera('cinder::backend::dellemc_sc::iscsi_port', undef),
-      'CinderSCApiPort'                  => hiera('cinder::backend::dellemc_sc::dell_sc_api_port', undef),
-      'CinderSCServerFolder'             => hiera('cinder::backend::dellemc_sc::dell_sc_server_folder', undef),
-      'CinderSCVolumeFolder'             => hiera('cinder::backend::dellemc_sc::dell_sc_volume_folder', undef),
-      'CinderSCExcludedDomainIps'        => hiera('cinder::backend::dellemc_sc::excluded_domain_ips', undef),
-      'CinderSCSecondarySanIp'           => hiera('cinder::backend::dellemc_sc::secondary_san_ip', undef),
-      'CinderSCSecondarySanLogin'        => hiera('cinder::backend::dellemc_sc::secondary_san_login', undef),
-      'CinderSCSecondarySanPassword'     => hiera('cinder::backend::dellemc_sc::secondary_san_password', undef),
-      'CinderSCSecondaryApiPort'         => hiera('cinder::backend::dellemc_sc::secondary_sc_api_port', undef),
-      'CinderSCUseMultipathForImageXfer' => hiera('cinder::backend::dellemc_sc::use_multipath_for_image_xfer', undef),
+      'CinderSCAvailabilityZone'         => lookup('cinder::backend::dellemc_sc::backend_availability_zone', undef, undef, undef),
+      'CinderSCSanIp'                    => lookup('cinder::backend::dellemc_sc::san_ip', undef, undef, undef),
+      'CinderSCSanLogin'                 => lookup('cinder::backend::dellemc_sc::san_login', undef, undef, undef),
+      'CinderSCSanPassword'              => lookup('cinder::backend::dellemc_sc::san_password', undef, undef, undef),
+      'CinderSCStorageProtocol'          => lookup('cinder::backend::dellemc_sc::sc_storage_protocol', undef, undef, undef),
+      'CinderSCSSN'                      => lookup('cinder::backend::dellemc_sc::dell_sc_ssn', undef, undef, undef),
+      'CinderSCTargetIpAddress'          => lookup('cinder::backend::dellemc_sc::iscsi_ip_address', undef, undef, undef),
+      'CinderSCTargetPort'               => lookup('cinder::backend::dellemc_sc::iscsi_port', undef, undef, undef),
+      'CinderSCApiPort'                  => lookup('cinder::backend::dellemc_sc::dell_sc_api_port', undef, undef, undef),
+      'CinderSCServerFolder'             => lookup('cinder::backend::dellemc_sc::dell_sc_server_folder', undef, undef, undef),
+      'CinderSCVolumeFolder'             => lookup('cinder::backend::dellemc_sc::dell_sc_volume_folder', undef, undef, undef),
+      'CinderSCExcludedDomainIps'        => lookup('cinder::backend::dellemc_sc::excluded_domain_ips', undef, undef, undef),
+      'CinderSCSecondarySanIp'           => lookup('cinder::backend::dellemc_sc::secondary_san_ip', undef, undef, undef),
+      'CinderSCSecondarySanLogin'        => lookup('cinder::backend::dellemc_sc::secondary_san_login', undef, undef, undef),
+      'CinderSCSecondarySanPassword'     => lookup('cinder::backend::dellemc_sc::secondary_san_password', undef, undef, undef),
+      'CinderSCSecondaryApiPort'         => lookup('cinder::backend::dellemc_sc::secondary_sc_api_port', undef, undef, undef),
+      'CinderSCUseMultipathForImageXfer' => lookup('cinder::backend::dellemc_sc::use_multipath_for_image_xfer', undef, undef, undef),
     }
 
     any2array($backend_name).each |String $backend| {

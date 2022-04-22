@@ -23,11 +23,11 @@
 #
 # [*backend_name*]
 #   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_iscsi'
+#   Defaults to lookup('cinder::backend::iscsi::volume_backend_name', undef, undef, 'tripleo_iscsi')
 #
 # [*backend_availability_zone*]
 #   (Optional) Availability zone for this volume backend
-#   Defaults to hiera('cinder::backend::iscsi::backend_availability_zone', undef)
+#   Defaults to lookup('cinder::backend::iscsi::backend_availability_zone', undef, undef, undef)
 #
 # [*cinder_iscsi_helper*]
 #   (Optional) The iscsi helper to use
@@ -40,15 +40,15 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::iscsi (
   $cinder_iscsi_address,
-  $backend_name                = hiera('cinder::backend::iscsi::volume_backend_name', 'tripleo_iscsi'),
-  $backend_availability_zone   = hiera('cinder::backend::iscsi::backend_availability_zone', undef),
+  $backend_name                = lookup('cinder::backend::iscsi::volume_backend_name', undef, undef, 'tripleo_iscsi'),
+  $backend_availability_zone   = lookup('cinder::backend::iscsi::backend_availability_zone', undef, undef, undef),
   $cinder_iscsi_helper         = 'tgtadm',
   $cinder_iscsi_protocol       = 'iscsi',
-  $step                        = Integer(hiera('step')),
+  $step                        = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 

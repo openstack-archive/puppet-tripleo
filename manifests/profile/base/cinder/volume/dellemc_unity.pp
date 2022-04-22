@@ -20,28 +20,28 @@
 #
 # [*backend_name*]
 #   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_dellemc_unity'
+#   Defaults to lookup('cinder::backend::dellemc_unity::volume_backend_name', undef, undef, 'tripleo_dellemc_unity')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_unity (
-  $backend_name = hiera('cinder::backend::dellemc_unity::volume_backend_name', 'tripleo_dellemc_unity'),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::dellemc_unity::volume_backend_name', undef, undef, 'tripleo_dellemc_unity'),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     create_resources('cinder::backend::dellemc_unity', { $backend_name => delete_undef_values({
-      'backend_availability_zone' => hiera('cinder::backend::dellemc_unity::backend_availability_zone', undef),
-      'san_ip'                    => hiera('cinder::backend::dellemc_unity::san_ip', undef),
-      'san_login'                 => hiera('cinder::backend::dellemc_unity::san_login', undef),
-      'san_password'              => hiera('cinder::backend::dellemc_unity::san_password', undef),
-      'storage_protocol'          => hiera('cinder::backend::dellemc_unity::storage_protocol', undef),
-      'unity_io_ports'            => hiera('cinder::backend::dellemc_unity::unity_io_ports', undef),
-      'unity_storage_pool_names'  => hiera('cinder::backend::dellemc_unity::unity_storage_pool_names', undef),
+      'backend_availability_zone' => lookup('cinder::backend::dellemc_unity::backend_availability_zone', undef, undef, undef),
+      'san_ip'                    => lookup('cinder::backend::dellemc_unity::san_ip', undef, undef, undef),
+      'san_login'                 => lookup('cinder::backend::dellemc_unity::san_login', undef, undef, undef),
+      'san_password'              => lookup('cinder::backend::dellemc_unity::san_password', undef, undef, undef),
+      'storage_protocol'          => lookup('cinder::backend::dellemc_unity::storage_protocol', undef, undef, undef),
+      'unity_io_ports'            => lookup('cinder::backend::dellemc_unity::unity_io_ports', undef, undef, undef),
+      'unity_storage_pool_names'  => lookup('cinder::backend::dellemc_unity::unity_storage_pool_names', undef, undef, undef),
     })})
   }
 

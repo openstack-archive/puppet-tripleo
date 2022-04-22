@@ -31,11 +31,11 @@
 #
 # [*volume_backend_name*]
 #   (Optional) Name given to the Cinder backend
-#   Defaults to 'tripleo_nvmeof'
+#   Defaults to lookup('cinder::backend::nvmeof::volume_backend_name', undef, undef, 'tripleo_nvmeof')
 #
 # [*backend_availability_zone*]
 #   (Optional) Availability zone for this volume backend
-#   Defaults to hiera('cinder::backend::nvmeof::backend_availability_zone', undef)
+#   Defaults to lookup('cinder::backend::nvmeof::backend_availability_zone', undef, undef, undef)
 #
 # [*volume_driver*]
 #   (Optional) Driver to use for volume creation
@@ -44,7 +44,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::nvmeof (
   $target_ip_address,
@@ -54,10 +54,10 @@ class tripleo::profile::base::cinder::volume::nvmeof (
   $target_prefix             = 'nvme-subsystem',
   $nvmet_port_id             = '1',
   $nvmet_ns_id               = '10',
-  $volume_backend_name       = hiera('cinder::backend::nvmeof::volume_backend_name', 'tripleo_nvmeof'),
-  $backend_availability_zone = hiera('cinder::backend::nvmeof::backend_availability_zone', undef),
+  $volume_backend_name       = lookup('cinder::backend::nvmeof::volume_backend_name', undef, undef, 'tripleo_nvmeof'),
+  $backend_availability_zone = lookup('cinder::backend::nvmeof::backend_availability_zone', undef, undef, undef),
   $volume_driver             = 'cinder.volume.drivers.lvm.LVMVolumeDriver',
-  $step                      = Integer(hiera('step')),
+  $step                      = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 

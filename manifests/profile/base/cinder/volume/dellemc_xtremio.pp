@@ -20,37 +20,40 @@
 #
 # [*backend_name*]
 #   (Optional) Name given to the Cinder backend stanza
-#   Defaults to 'tripleo_dellemc_xtremio'
+#   Defaults to lookup('cinder::backend::dellemc_xtremio::volume_backend_name', undef, undef, ['tripleo_dellemc_xtremio'])
 #
 # [*multi_config*]
 #   (Optional) A config hash when multiple backends are used.
-#   Defaults to hiera('cinder::backend::dellemc_xtremio::volume_multi_config', {})
+#   Defaults to lookup('cinder::backend::dellemc_xtremio::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_xtremio (
-  $backend_name = hiera('cinder::backend::dellemc_xtremio::volume_backend_name', ['tripleo_dellemc_xtremio']),
-  $multi_config = hiera('cinder::backend::dellemc_xtremio::volume_multi_config', {}),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::dellemc_xtremio::volume_backend_name', undef, undef, ['tripleo_dellemc_xtremio']),
+  $multi_config = lookup('cinder::backend::dellemc_xtremio::volume_multi_config', undef, undef, {}),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
 
     $backend_defaults = {
-      'CinderXtremioAvailabilityZone'      => hiera('cinder::backend::dellemc_xtremio::backend_availability_zone', undef),
-      'CinderXtremioSanIp'                 => hiera('cinder::backend::dellemc_xtremio::san_ip', undef),
-      'CinderXtremioSanLogin'              => hiera('cinder::backend::dellemc_xtremio::san_login', undef),
-      'CinderXtremioSanPassword'           => hiera('cinder::backend::dellemc_xtremio::san_password', undef),
-      'CinderXtremioStorageProtocol'       => hiera('cinder::backend::dellemc_xtremio::xtremio_storage_protocol', undef),
-      'CinderXtremioClusterName'           => hiera('cinder::backend::dellemc_xtremio::xtremio_cluster_name', undef),
-      'CinderXtremioArrayBusyRetryCount'   => hiera('cinder::backend::dellemc_xtremio::xtremio_array_busy_retry_count', undef),
-      'CinderXtremioArrayBusyRetryInterval'=> hiera('cinder::backend::dellemc_xtremio::xtremio_array_busy_retry_interval', undef),
-      'CinderXtremioVolumesPerGlanceCache' => hiera('cinder::backend::dellemc_xtremio::xtremio_volumes_per_glance_cache', undef),
-      'CinderXtremioPorts'                 => hiera('cinder::backend::dellemc_xtremio::xtremio_ports', undef),
+      'CinderXtremioAvailabilityZone'      => lookup('cinder::backend::dellemc_xtremio::backend_availability_zone', undef, undef, undef),
+      'CinderXtremioSanIp'                 => lookup('cinder::backend::dellemc_xtremio::san_ip', undef, undef, undef),
+      'CinderXtremioSanLogin'              => lookup('cinder::backend::dellemc_xtremio::san_login', undef, undef, undef),
+      'CinderXtremioSanPassword'           => lookup('cinder::backend::dellemc_xtremio::san_password', undef, undef, undef),
+      'CinderXtremioStorageProtocol'       => lookup('cinder::backend::dellemc_xtremio::xtremio_storage_protocol', undef, undef, undef),
+      'CinderXtremioClusterName'           => lookup('cinder::backend::dellemc_xtremio::xtremio_cluster_name', undef, undef, undef),
+      'CinderXtremioArrayBusyRetryCount'   => lookup('cinder::backend::dellemc_xtremio::xtremio_array_busy_retry_count',
+                                                    undef, undef, undef),
+      'CinderXtremioArrayBusyRetryInterval'=> lookup('cinder::backend::dellemc_xtremio::xtremio_array_busy_retry_interval',
+                                                    undef, undef, undef),
+      'CinderXtremioVolumesPerGlanceCache' => lookup('cinder::backend::dellemc_xtremio::xtremio_volumes_per_glance_cache',
+                                                    undef, undef, undef),
+      'CinderXtremioPorts'                 => lookup('cinder::backend::dellemc_xtremio::xtremio_ports', undef, undef, undef),
     }
 
     any2array($backend_name).each |String $backend| {

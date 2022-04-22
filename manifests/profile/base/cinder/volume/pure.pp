@@ -20,36 +20,36 @@
 #
 # [*backend_name*]
 #   (Optional) List of names given to the Cinder backend stanza.
-#   Defaults to hiera('cinder::backend::pure::volume_backend_name', ['tripleo_pure'])
+#   Defaults to lookup('cinder::backend::pure::volume_backend_name', undef, undef, ['tripleo_pure'])
 #
 # [*multi_config*]
 #   (Optional) A config hash when multiple backends are used.
-#   Defaults to hiera('cinder::backend::pure::volume_multi_config', {})
+#   Defaults to lookup('cinder::backend::pure::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::pure (
-  $backend_name = hiera('cinder::backend::pure::volume_backend_name', ['tripleo_pure']),
-  $multi_config = hiera('cinder::backend::pure::volume_multi_config', {}),
-  $step         = Integer(hiera('step')),
+  $backend_name = lookup('cinder::backend::pure::volume_backend_name', undef, undef, ['tripleo_pure']),
+  $multi_config = lookup('cinder::backend::pure::volume_multi_config', undef, undef, {}),
+  $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     $backend_defaults = {
-      'CinderPureAvailabilityZone'   => hiera('cinder::backend::pure::backend_availability_zone', undef),
-      'CinderPureSanIp'              => hiera('cinder::backend::pure::san_ip', undef),
-      'CinderPureAPIToken'           => hiera('cinder::backend::pure::pure_api_token', undef),
-      'CinderPureStorageProtocol'    => hiera('cinder::backend::pure::pure_storage_protocol', undef),
-      'CinderPureUseChap'            => hiera('cinder::backend::pure::use_chap_auth', undef),
-      'CinderPureMultipathXfer'      => hiera('cinder::backend::pure::use_multipath_for_image_xfer', undef),
-      'CinderPureImageCache'         => hiera('cinder::backend::pure::image_volume_cache_enabled', undef),
-      'CinderPureIscsiCidr'          => hiera('cinder::backend::pure::pure_iscsi_cidr', undef),
-      'CinderPureHostPersonality'    => hiera('cinder::backend::pure::pure_host_personality', undef),
-      'CinderPureEradicateOnDelete'  => hiera('cinder::backend::pure::pure_eradicate_on_delete', undef),
+      'CinderPureAvailabilityZone'   => lookup('cinder::backend::pure::backend_availability_zone', undef, undef, undef),
+      'CinderPureSanIp'              => lookup('cinder::backend::pure::san_ip', undef, undef, undef),
+      'CinderPureAPIToken'           => lookup('cinder::backend::pure::pure_api_token', undef, undef, undef),
+      'CinderPureStorageProtocol'    => lookup('cinder::backend::pure::pure_storage_protocol', undef, undef, undef),
+      'CinderPureUseChap'            => lookup('cinder::backend::pure::use_chap_auth', undef, undef, undef),
+      'CinderPureMultipathXfer'      => lookup('cinder::backend::pure::use_multipath_for_image_xfer', undef, undef, undef),
+      'CinderPureImageCache'         => lookup('cinder::backend::pure::image_volume_cache_enabled', undef, undef, undef),
+      'CinderPureIscsiCidr'          => lookup('cinder::backend::pure::pure_iscsi_cidr', undef, undef, undef),
+      'CinderPureHostPersonality'    => lookup('cinder::backend::pure::pure_host_personality', undef, undef, undef),
+      'CinderPureEradicateOnDelete'  => lookup('cinder::backend::pure::pure_eradicate_on_delete', undef, undef, undef),
     }
 
     $backend_name.each |String $backend| {
