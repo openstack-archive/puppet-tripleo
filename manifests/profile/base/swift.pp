@@ -21,20 +21,20 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*memcache_port*]
 #   (Optional) Memcached port to use.
-#   Defaults to hiera('memcached_port', 11211)
+#   Defaults to lookup('memcached_port', undef, undef, 11211)
 #
 # [*memcache_servers*]
 #   (Optional) List of memcache servers
-#   Defaults to hiera('memcached_node_names', [])
+#   Defaults to lookup('memcached_node_names', undef, undef, [])
 #
 class tripleo::profile::base::swift (
-  $step                 = Integer(hiera('step')),
-  $memcache_port        = hiera('memcached_port', 11211),
-  $memcache_servers     = hiera('memcached_node_names', []),
+  $step                 = Integer(lookup('step')),
+  $memcache_port        = lookup('memcached_port', undef, undef, 11211),
+  $memcache_servers     = lookup('memcached_node_names', undef, undef, []),
 ) {
   if $step >= 4 {
     $swift_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcache_servers)), ":${memcache_port}")
