@@ -27,8 +27,8 @@ class tripleo::packages (
   $enable_install = false,
 ) {
 
-  # if both enable_install is false *or* if we're in containers we noop package installations
-  if (!str2bool($enable_install)) or $::deployment_type == 'containers' {
+  # if both enable_install is false
+  if (!str2bool($enable_install)) {
     case $::osfamily {
       'RedHat': {
         Package <| |> { provider => 'norpm' }
