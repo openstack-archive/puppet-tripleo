@@ -23,20 +23,12 @@
 #  Whether to enable package installation via Puppet.
 #  Defaults to false
 #
-# [*enable_upgrade*]
-#  Upgrades all puppet managed packages to latest.
-#  Defaults to false
-#
 class tripleo::packages (
   $enable_install = false,
-  $enable_upgrade = false,
 ) {
 
-  # required for stages
-  include stdlib
-
-  # if both enable_install and enabled_upgrade are false *or* if we're in containers we noop package installations
-  if (!str2bool($enable_install) and !str2bool($enable_upgrade)) or $::deployment_type == 'containers' {
+  # if both enable_install is false *or* if we're in containers we noop package installations
+  if (!str2bool($enable_install)) or $::deployment_type == 'containers' {
     case $::osfamily {
       'RedHat': {
         Package <| |> { provider => 'norpm' }
@@ -46,15 +38,4 @@ class tripleo::packages (
       }
     }
   }
-
-  if str2bool($enable_upgrade) {
-    Package <| |> { ensure => 'latest' }
-    # Running the package upgrade before managing Services in the main stage.
-    # So we're sure that services will be able to restart with the new version
-    # of the package.
-    ensure_resource('class', 'tripleo::packages::upgrades', {
-      'stage' => 'setup',
-    })
-  }
-
 }
