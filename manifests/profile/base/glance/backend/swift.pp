@@ -27,54 +27,54 @@
 #
 #  [*swift_store_user*]
 #    (Optional) Swift store user.
-#    Defaults to hiera('glance::backend::swift::swift_store_user').
+#    Defaults to lookup('glance::backend::swift::swift_store_user').
 #
 #  [*swift_store_key*]
 #    (Optional) Swift store key.
-#    Defaults to hiera('glance::backend::swift::swift_store_key').
+#    Defaults to lookup('glance::backend::swift::swift_store_key').
 #
 #  [*swift_store_container*]
 #    (Optional) Swift store container.
-#    Defaults to hiera('glance::backend::swift::swift_store_container', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_container', undef, undef, undef).
 #
 #  [*swift_store_auth_address*]
 #    (Optional) Swift store auth address.
-#    Defaults to hiera('glance::backend::swift::swift_store_auth_address', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_auth_address', undef, undef, undef).
 #
 #  [*swift_store_auth_version*]
 #    (Optional) Swift store auth version.
-#    Defaults to hiera('glance::backend::swift::swift_store_auth_version', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_auth_version', undef, undef, undef).
 #
 #  [*swift_store_auth_project_domain_id*]
 #    (Optional) Useful when keystone auth is version 3.
-#    Defaults to hiera('glance::backend::swift::swift_store_auth_project_domain_id', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_auth_project_domain_id', undef, undef, undef).
 #
 #  [*swift_store_auth_user_domain_id*]
 #    (Optional) Useful when keystone auth is version 3.
-#    Defaults to hiera('glance::backend::swift::swift_store_auth_user_domain_id', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_auth_user_domain_id', undef, undef, undef).
 #
 #  [*swift_store_large_object_size*]
 #    (Optional) What size, in MB, should Glance start chunking image files
 #    and do a large object manifest in Swift?
-#    Defaults to hiera('glance::backend::swift::swift_store_large_object_size', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_large_object_size', undef, undef, undef).
 #
 #  [*swift_store_large_object_chunk_size*]
 #    (Optional) When doing a large object manifest, what size, in MB, should
 #    Glance write chunks to Swift? This amount of data is written
 #    to a temporary disk buffer during the process of chunking.
-#    Defaults to hiera('glance::backend::swift::swift_store_large_object_chunk_size', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_large_object_chunk_size', undef, undef, undef).
 #
 #  [*swift_store_create_container_on_put*]
 #    (Optional) Whether to create the swift container if it's missing.
-#    Defaults to  hiera('glance::backend::swift::swift_store_create_container_on_put', undef).
+#    Defaults to  lookup('glance::backend::swift::swift_store_create_container_on_put', undef, undef, undef).
 #
 #  [*swift_store_endpoint_type*]
 #    (Optional) Swift store endpoint type.
-#    Defaults to hiera('glance::backend::swift::swift_store_endpoint_type', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_endpoint_type', undef, undef, undef).
 #
 #  [*swift_store_region*]
 #    (Optional) Swift store region.
-#    Defaults to hiera('glance::backend::swift::swift_store_region', undef).
+#    Defaults to lookup('glance::backend::swift::swift_store_region', undef, undef, undef).
 #
 #  [*default_swift_reference*]
 #    (Optional) The reference to the default swift
@@ -85,12 +85,12 @@
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
-#   Defaults to hiera('tripleo::profile::base::glance::api::glance_store_description', 'Swift store').
+#   Defaults to lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'Swift store').
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # DEPRECATED PARAMETERS
 #
@@ -101,21 +101,22 @@
 class tripleo::profile::base::glance::backend::swift (
   $backend_names,
   $multistore_config                   = {},
-  $swift_store_user                    = hiera('glance::backend::swift::swift_store_user'),
-  $swift_store_key                     = hiera('glance::backend::swift::swift_store_key'),
-  $swift_store_container               = hiera('glance::backend::swift::swift_store_container', undef),
-  $swift_store_auth_address            = hiera('glance::backend::swift::swift_store_auth_address', undef),
-  $swift_store_auth_version            = hiera('glance::backend::swift::swift_store_auth_version', undef),
-  $swift_store_auth_project_domain_id  = hiera('glance::backend::swift::swift_store_auth_project_domain_id', undef),
-  $swift_store_auth_user_domain_id     = hiera('glance::backend::swift::swift_store_auth_user_domain_id', undef),
-  $swift_store_large_object_size       = hiera('glance::backend::swift::swift_store_large_object_size', undef),
-  $swift_store_large_object_chunk_size = hiera('glance::backend::swift::swift_store_large_object_chunk_size', undef),
-  $swift_store_create_container_on_put = hiera('glance::backend::swift::swift_store_create_container_on_put', undef),
-  $swift_store_endpoint_type           = hiera('glance::backend::swift::swift_store_endpoint_type', undef),
-  $swift_store_region                  = hiera('glance::backend::swift::swift_store_region', undef),
+  $swift_store_user                    = lookup('glance::backend::swift::swift_store_user'),
+  $swift_store_key                     = lookup('glance::backend::swift::swift_store_key'),
+  $swift_store_container               = lookup('glance::backend::swift::swift_store_container', undef, undef, undef),
+  $swift_store_auth_address            = lookup('glance::backend::swift::swift_store_auth_address', undef, undef, undef),
+  $swift_store_auth_version            = lookup('glance::backend::swift::swift_store_auth_version', undef, undef, undef),
+  $swift_store_auth_project_domain_id  = lookup('glance::backend::swift::swift_store_auth_project_domain_id', undef, undef, undef),
+  $swift_store_auth_user_domain_id     = lookup('glance::backend::swift::swift_store_auth_user_domain_id', undef, undef, undef),
+  $swift_store_large_object_size       = lookup('glance::backend::swift::swift_store_large_object_size', undef, undef, undef),
+  $swift_store_large_object_chunk_size = lookup('glance::backend::swift::swift_store_large_object_chunk_size', undef, undef, undef),
+  $swift_store_create_container_on_put = lookup('glance::backend::swift::swift_store_create_container_on_put', undef, undef, undef),
+  $swift_store_endpoint_type           = lookup('glance::backend::swift::swift_store_endpoint_type', undef, undef, undef),
+  $swift_store_region                  = lookup('glance::backend::swift::swift_store_region', undef, undef, undef),
   $default_swift_reference             = 'ref1',
-  $store_description                   = hiera('tripleo::profile::base::glance::api::glance_store_description', 'Swift store'),
-  $step                                = Integer(hiera('step')),
+  $store_description                   = lookup('tripleo::profile::base::glance::api::glance_store_description',
+                                                undef, undef, 'Swift store'),
+  $step                                = Integer(lookup('step')),
   # DEPRECATED PARAMETERS
   $swift_store_config_file             = undef,
 ) {

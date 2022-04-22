@@ -27,89 +27,89 @@
 #
 # [*cinder_ca_certificates_file*]
 #   (Optional) Location of ca certicate file to use for cinder client requests.
-#   Defaults to hiera('glance::backend::cinder::cinder_ca_certificates_file', undef).
+#   Defaults to lookup('glance::backend::cinder::cinder_ca_certificates_file', undef, undef, undef).
 #
 # [*cinder_api_insecure*]
 #   (Optional) Allow to perform insecure SSL requests to cinder.
-#   Defaults to hiera('glance::backend::cinder::cinder_api_insecure', undef).
+#   Defaults to lookup('glance::backend::cinder::cinder_api_insecure', undef, undef, undef).
 #
 # [*cinder_catalog_info*]
 #   (Optional) Info to match when looking for cinder in the service catalog.
-#   Defaults to hiera('glance::backend::cinder::cinder_catalog_info', undef).
+#   Defaults to lookup('glance::backend::cinder::cinder_catalog_info', undef, undef, undef).
 #
 # [*cinder_endpoint_template*]
 #   (Optional) Override service catalog lookup with template for cinder endpoint.
-#   Defaults to hiera('glance::backend::cinder::cinder_endpoint_template', undef).
+#   Defaults to lookup('glance::backend::cinder::cinder_endpoint_template', undef, undef, undef).
 #
 # [*cinder_http_retries*]
 #   (Optional) Number of cinderclient retries on failed http calls.
-#   Defaults to hiera('glance::backend::cinder::cinder_http_retries', undef).
+#   Defaults to lookup('glance::backend::cinder::cinder_http_retries', undef, undef, undef).
 #
 # [*cinder_store_auth_address*]
 #   (Optional) A valid authentication service address.
-#   Defaults to hiera('glance::backend::cinder::cinder_store_auth_address', undef).
+#   Defaults to lookup('glance::backend::cinder::cinder_store_auth_address', undef, undef, undef).
 #
 # [*cinder_store_project_name*]
 #   (Optional) Project name where the image volume is stored in cinder.
-#   Defaults to hiera('glance::backend::cinder::cinder_store_project_name', undef).
+#   Defaults to lookup('glance::backend::cinder::cinder_store_project_name', undef, undef, undef).
 #
 # [*cinder_store_user_name*]
 #   (Optional) User name to authenticate against cinder.
-#   Defaults to hiera('glance::backend::cinder::cinder_store_user_name', undef)
+#   Defaults to lookup('glance::backend::cinder::cinder_store_user_name', undef, undef, undef)
 #
 # [*cinder_store_password*]
 #   (Optional) A valid password for the user specified by `cinder_store_user_name'
-#   Defaults to hiera('glance::backend::cinder::cinder_store_password', undef)
+#   Defaults to lookup('glance::backend::cinder::cinder_store_password', undef, undef, undef)
 #
 # [*cinder_os_region_name*]
 #   (optional) Sets the keystone region to use.
-#   Defaults to hiera('glance::backend::cinder::cinder_os_region_name', undef)
+#   Defaults to lookup('glance::backend::cinder::cinder_os_region_name', undef, undef, undef)
 #
 # [*cinder_enforce_multipath*]
 #   (Optional) Set to True when multipathd is enabled
-#   Defaults to hiera('glance::backend::cinder::cinder_enforce_multipath', undef)
+#   Defaults to lookup('glance::backend::cinder::cinder_enforce_multipath', undef, undef, undef)
 #
 # [*cinder_use_multipath*]
 #   (Optional) Set to True when multipathd is enabled
-#   Defaults to hiera('glance::backend::cinder::cinder_use_multipath', undef)
+#   Defaults to lookup('glance::backend::cinder::cinder_use_multipath', undef, undef, undef)
 #
 # [*cinder_mount_point_base*]
 #   (Optional) Directory where the NFS volume is mounted on the glance node.
-#   Defaults to hiera('glance::backend::cinder::cinder_mount_point_base', undef)
+#   Defaults to lookup('glance::backend::cinder::cinder_mount_point_base', undef, undef, undef)
 #
 # [*cinder_volume_type*]
 #  (Optional) The volume type to be used to create image volumes in cinder.
-#   Defaults to hiera('glance::backend::cinder::cinder_volume_type', undef)
+#   Defaults to lookup('glance::backend::cinder::cinder_volume_type', undef, undef, undef)
 #
 # [*store_description*]
 #   (Optional) Provides constructive information about the store backend to
 #   end users.
-#   Defaults to hiera('tripleo::profile::base::glance::api::glance_store_description', 'Cinder store').
+#   Defaults to lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'Cinder store').
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::glance::backend::cinder (
   $backend_names,
   $multistore_config           = {},
-  $cinder_ca_certificates_file = hiera('glance::backend::cinder::cinder_ca_certificates_file', undef),
-  $cinder_api_insecure         = hiera('glance::backend::cinder::cinder_api_insecure', undef),
-  $cinder_catalog_info         = hiera('glance::backend::cinder::cinder_catalog_info', undef),
-  $cinder_endpoint_template    = hiera('glance::backend::cinder::cinder_endpoint_template', undef),
-  $cinder_http_retries         = hiera('glance::backend::cinder::cinder_http_retries', undef),
-  $cinder_store_auth_address   = hiera('glance::backend::cinder::cinder_store_auth_address', undef),
-  $cinder_store_project_name   = hiera('glance::backend::cinder::cinder_store_project_name', undef),
-  $cinder_store_user_name      = hiera('glance::backend::cinder::cinder_store_user_name', undef),
-  $cinder_store_password       = hiera('glance::backend::cinder::cinder_store_password', undef),
-  $cinder_os_region_name       = hiera('glance::backend::cinder::cinder_os_region_name', undef),
-  $cinder_enforce_multipath    = hiera('glance::backend::cinder::cinder_enforce_multipath', undef),
-  $cinder_use_multipath        = hiera('glance::backend::cinder::cinder_use_multipath', undef),
-  $cinder_mount_point_base     = hiera('glance::backend::cinder::cinder_mount_point_base', undef),
-  $cinder_volume_type          = hiera('glance::backend::cinder::cinder_volume_type', undef),
-  $store_description           = hiera('tripleo::profile::base::glance::api::glance_store_description', 'Cinder store'),
-  $step                        = Integer(hiera('step')),
+  $cinder_ca_certificates_file = lookup('glance::backend::cinder::cinder_ca_certificates_file', undef, undef, undef),
+  $cinder_api_insecure         = lookup('glance::backend::cinder::cinder_api_insecure', undef, undef, undef),
+  $cinder_catalog_info         = lookup('glance::backend::cinder::cinder_catalog_info', undef, undef, undef),
+  $cinder_endpoint_template    = lookup('glance::backend::cinder::cinder_endpoint_template', undef, undef, undef),
+  $cinder_http_retries         = lookup('glance::backend::cinder::cinder_http_retries', undef, undef, undef),
+  $cinder_store_auth_address   = lookup('glance::backend::cinder::cinder_store_auth_address', undef, undef, undef),
+  $cinder_store_project_name   = lookup('glance::backend::cinder::cinder_store_project_name', undef, undef, undef),
+  $cinder_store_user_name      = lookup('glance::backend::cinder::cinder_store_user_name', undef, undef, undef),
+  $cinder_store_password       = lookup('glance::backend::cinder::cinder_store_password', undef, undef, undef),
+  $cinder_os_region_name       = lookup('glance::backend::cinder::cinder_os_region_name', undef, undef, undef),
+  $cinder_enforce_multipath    = lookup('glance::backend::cinder::cinder_enforce_multipath', undef, undef, undef),
+  $cinder_use_multipath        = lookup('glance::backend::cinder::cinder_use_multipath', undef, undef, undef),
+  $cinder_mount_point_base     = lookup('glance::backend::cinder::cinder_mount_point_base', undef, undef, undef),
+  $cinder_volume_type          = lookup('glance::backend::cinder::cinder_volume_type', undef, undef, undef),
+  $store_description           = lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'Cinder store'),
+  $step                        = Integer(lookup('step')),
 ) {
 
 

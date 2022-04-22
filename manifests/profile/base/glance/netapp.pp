@@ -34,13 +34,13 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 
 class tripleo::profile::base::glance::netapp (
   $netapp_share,
   $netapp_nfs_mount               = '/var/lib/glance/images',
   $filesystem_store_metadata_file = '/etc/glance/glance-metadata-file.json',
-  $step                           = Integer(hiera('step')),
+  $step                           = Integer(lookup('step')),
 ) {
 
 
