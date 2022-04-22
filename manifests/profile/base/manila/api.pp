@@ -20,47 +20,47 @@
 #
 # [*enabled_share_protocols*]
 #   (Optional) Share protocols enabled on the manila API service.
-#   Defaults to hiera('manila_enabled_share_protocols', undef)
+#   Defaults to lookup('manila_enabled_share_protocols', undef, undef, undef)
 #
 # [*backend_generic_enabled*]
 #   (Optional) Whether or not the generic backend is enabled
-#   Defaults to hiera('manila_backend_generic_enabled', false)
+#   Defaults to lookup('manila_backend_generic_enabled', undef, undef, false)
 #
 # [*backend_netapp_enabled*]
 #   (Optional) Whether or not the netapp backend is enabled
-#   Defaults to hiera('manila_backend_netapp_enabled', false)
+#   Defaults to lookup('manila_backend_netapp_enabled', undef, undef, false)
 #
 # [*backend_vmax_enabled*]
 #   (Optional) Whether or not the vmax backend is enabled
-#   Defaults to hiera('manila_backend_vmax_enabled', false)
+#   Defaults to lookup('manila_backend_vmax_enabled', undef, undef, false)
 #
 # [*backend_powermax_enabled*]
 #   (Optional) Whether or not the powermax backend is enabled
-#   Defaults to hiera('manila_backend_powermax_enabled', false)
+#   Defaults to lookup('manila_backend_powermax_enabled', undef, undef, false)
 #
 # [*backend_isilon_enabled*]
 #   (Optional) Whether or not the isilon backend is enabled
-#   Defaults to hiera('manila_backend_isilon_enabled', false)
+#   Defaults to lookup('manila_backend_isilon_enabled', undef, undef, false)
 #
 # [*backend_unity_enabled*]
 #   (Optional) Whether or not the unity backend is enabled
-#   Defaults to hiera('manila_backend_unity_enabled', false)
+#   Defaults to lookup('manila_backend_unity_enabled', undef, undef, false)
 #
 # [*backend_vnx_enabled*]
 #   (Optional) Whether or not the vnx backend is enabled
-#   Defaults to hiera('manila_backend_vnx_enabled', false)
+#   Defaults to lookup('manila_backend_vnx_enabled', undef, undef, false)
 #
 # [*backend_flashblade_enabled*]
 #   (Optional) Whether or not the flashblade backend is enabled
-#   Defaults to hiera('manila_backend_flashblade_enabled', false)
+#   Defaults to lookup('manila_backend_flashblade_enabled', undef, undef, false)
 #
 # [*backend_cephfs_enabled*]
 #   (Optional) Whether or not the cephfs backend is enabled
-#   Defaults to hiera('manila_backend_cephfs_enabled', false)
+#   Defaults to lookup('manila_backend_cephfs_enabled', undef, undef, false)
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('manila_api_short_bootstrap_node_name')
+#   Defaults to lookup('manila_api_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -72,42 +72,42 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*manila_api_network*]
 #   (Optional) The network name where the manila API endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('manila_api_network', undef)
+#   Defaults to lookup('manila_api_network', undef, undef, undef)
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*manila_enable_db_purge*]
 #   (Optional) Whether to enable db purging
 #   Defaults to true
 #
 class tripleo::profile::base::manila::api (
-  $enabled_share_protocols    = hiera('manila_enabled_share_protocols', undef),
-  $backend_generic_enabled    = hiera('manila_backend_generic_enabled', false),
-  $backend_netapp_enabled     = hiera('manila_backend_netapp_enabled', false),
-  $backend_vmax_enabled       = hiera('manila_backend_vmax_enabled', false),
-  $backend_powermax_enabled   = hiera('manila_backend_powermax_enabled', false),
-  $backend_isilon_enabled     = hiera('manila_backend_isilon_enabled', false),
-  $backend_unity_enabled      = hiera('manila_backend_unity_enabled', false),
-  $backend_vnx_enabled        = hiera('manila_backend_vnx_enabled', false),
-  $backend_flashblade_enabled = hiera('manila_backend_flashblade_enabled', false),
-  $backend_cephfs_enabled     = hiera('manila_backend_cephfs_enabled', false),
-  $bootstrap_node             = hiera('manila_api_short_bootstrap_node_name', undef),
-  $certificates_specs         = hiera('apache_certificates_specs', {}),
-  $manila_api_network         = hiera('manila_api_network', undef),
-  $enable_internal_tls        = hiera('enable_internal_tls', false),
-  $step                       = Integer(hiera('step')),
+  $enabled_share_protocols    = lookup('manila_enabled_share_protocols', undef, undef, undef),
+  $backend_generic_enabled    = lookup('manila_backend_generic_enabled', undef, undef, false),
+  $backend_netapp_enabled     = lookup('manila_backend_netapp_enabled', undef, undef, false),
+  $backend_vmax_enabled       = lookup('manila_backend_vmax_enabled', undef, undef, false),
+  $backend_powermax_enabled   = lookup('manila_backend_powermax_enabled', undef, undef, false),
+  $backend_isilon_enabled     = lookup('manila_backend_isilon_enabled', undef, undef, false),
+  $backend_unity_enabled      = lookup('manila_backend_unity_enabled', undef, undef, false),
+  $backend_vnx_enabled        = lookup('manila_backend_vnx_enabled', undef, undef, false),
+  $backend_flashblade_enabled = lookup('manila_backend_flashblade_enabled', undef, undef, false),
+  $backend_cephfs_enabled     = lookup('manila_backend_cephfs_enabled', undef, undef, false),
+  $bootstrap_node             = lookup('manila_api_short_bootstrap_node_name', undef, undef, undef),
+  $certificates_specs         = lookup('apache_certificates_specs', undef, undef, {}),
+  $manila_api_network         = lookup('manila_api_network', undef, undef, undef),
+  $enable_internal_tls        = lookup('enable_internal_tls', undef, undef, false),
+  $step                       = Integer(lookup('step')),
   $manila_enable_db_purge     = true,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -147,8 +147,8 @@ class tripleo::profile::base::manila::api (
           $cifs_protocol = undef
       }
       if $backend_cephfs_enabled {
-        $cephfs_protocol = hiera(
-          'manila::backend::cephfs::cephfs_protocol_helper_type', 'CEPHFS')
+        $cephfs_protocol = lookup(
+          'manila::backend::cephfs::cephfs_protocol_helper_type', undef, undef, 'CEPHFS')
       } else {
         $cephfs_protocol = undef
       }
