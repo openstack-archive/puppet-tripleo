@@ -21,28 +21,28 @@
 # [*simple_crypto_backend_enabled*]
 #   (Optional) Whether the simple crypto backend is enabled or not. This is
 #   dynamically set via t-h-t.
-#   Defaults to hiera('barbican_backend_simple_crypto_enabled', false)
+#   Defaults to lookup('barbican_backend_simple_crypto_enabled', undef, undef, false)
 #
 # [*dogtag_backend_enabled*]
 #   (Optional) Whether the Dogtag backend is enabled or not. This is
 #   dynamically set via t-h-t.
-#   Defaults to hiera('barbican_backend_dogtag_enabled', false)
+#   Defaults to lookup('barbican_backend_dogtag_enabled', undef, undef, false)
 #
 # [*p11_crypto_backend_enabled*]
 #   (Optional) Whether the pkcs11 crypto backend is enabled or not. This is
 #   dynamically set via t-h-t.
-#   Defaults to hiera('barbican_backend_pkcs11_crypto_enabled', false)
+#   Defaults to lookup('barbican_backend_pkcs11_crypto_enabled', undef, undef, false)
 #
 # [*kmip_backend_enabled*]
 #   (Optional) Whether the KMIP backend is enabled or not. This is
 #   dynamically set via t-h-t.
-#   Defaults to hiera('barbican_backend_kmip_enabled', false)
+#   Defaults to lookup('barbican_backend_kmip_enabled', undef, undef, false)
 #
 class tripleo::profile::base::barbican::backends (
-  $simple_crypto_backend_enabled = hiera('barbican_backend_simple_crypto_enabled', false),
-  $dogtag_backend_enabled        = hiera('barbican_backend_dogtag_enabled', false),
-  $p11_crypto_backend_enabled    = hiera('barbican_backend_pkcs11_crypto_enabled', false),
-  $kmip_backend_enabled          = hiera('barbican_backend_kmip_enabled', false),
+  $simple_crypto_backend_enabled = lookup('barbican_backend_simple_crypto_enabled', undef, undef, false),
+  $dogtag_backend_enabled        = lookup('barbican_backend_dogtag_enabled', undef, undef, false),
+  $p11_crypto_backend_enabled    = lookup('barbican_backend_pkcs11_crypto_enabled', undef, undef, false),
+  $kmip_backend_enabled          = lookup('barbican_backend_kmip_enabled', undef, undef, false),
 ) {
   if $simple_crypto_backend_enabled {
     include barbican::plugins::simple_crypto
