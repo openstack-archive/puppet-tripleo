@@ -58,21 +58,16 @@
 #   for more details.
 #   Defaults to hiera('step')
 #
-# [*ovn_remote_probe_interval*]
-#  (optional) Set probe interval, based on user configuration, value is in ms
-#  Defaults to 60000
-#
 class tripleo::profile::base::neutron::ovn_metadata (
-  $ovn_db_host               = hiera('ovn_dbs_vip', undef),
-  $ovn_db_node_ips           = hiera('ovn_dbs_node_ips', undef),
-  $ovn_db_clustered          = hiera('ovn_db_clustered', false),
-  $ovn_sb_port               = hiera('ovn::southbound::port'),
-  $ovn_sb_private_key        = $::os_service_default,
-  $ovn_sb_certificate        = $::os_service_default,
-  $ovn_sb_ca_cert            = $::os_service_default,
-  $protocol                  = 'tcp',
-  $step                      = Integer(hiera('step')),
-  $ovn_remote_probe_interval = 60000,
+  $ovn_db_host        = hiera('ovn_dbs_vip', undef),
+  $ovn_db_node_ips    = hiera('ovn_dbs_node_ips', undef),
+  $ovn_db_clustered   = hiera('ovn_db_clustered', false),
+  $ovn_sb_port        = hiera('ovn::southbound::port'),
+  $ovn_sb_private_key = $::os_service_default,
+  $ovn_sb_certificate = $::os_service_default,
+  $ovn_sb_ca_cert     = $::os_service_default,
+  $protocol           = 'tcp',
+  $step               = Integer(hiera('step')),
 ) {
   if $step >= 4 {
     include tripleo::profile::base::neutron
@@ -85,11 +80,10 @@ class tripleo::profile::base::neutron::ovn_metadata (
     $sb_conn = $db_hosts.map |$h| { join([$protocol, normalize_ip_for_uri($h), "${ovn_sb_port}"], ':') }
 
     class { 'neutron::agents::ovn_metadata':
-        ovn_sb_connection         => join(any2array($sb_conn), ','),
-        ovn_sb_private_key        => $ovn_sb_private_key,
-        ovn_sb_certificate        => $ovn_sb_certificate,
-        ovn_sb_ca_cert            => $ovn_sb_ca_cert,
-        ovn_remote_probe_interval => $ovn_remote_probe_interval,
+      ovn_sb_connection  => join(any2array($sb_conn), ','),
+      ovn_sb_private_key => $ovn_sb_private_key,
+      ovn_sb_certificate => $ovn_sb_certificate,
+      ovn_sb_ca_cert     => $ovn_sb_ca_cert,
     }
     Service<| title == 'controller' |> -> Service<| title == 'ovn-metadata' |>
   }
