@@ -36,11 +36,11 @@
 #
 # [*ceilometer_redis_password*]
 #   (Optional) redis password to configure coordination url
-#   Defaults to lookup('ceilometer_redis_password', undef, undef, undef)
+#   Defaults to lookup('ceilometer_redis_password')
 #
 # [*redis_vip*]
 #   (Optional) redis vip to configure coordination url
-#   Defaults to lookup('redis_vip', undef, undef, undef)
+#   Defaults to lookup('redis_vip')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -52,8 +52,8 @@ class tripleo::profile::base::ceilometer::agent::polling (
   $compute_namespace         = lookup('compute_namespace', undef, undef, false),
   $enable_internal_tls       = lookup('enable_internal_tls', undef, undef, false),
   $ipmi_namespace            = lookup('ipmi_namespace', undef, undef, false),
-  $ceilometer_redis_password = lookup('ceilometer_redis_password', undef, undef, undef),
-  $redis_vip                 = lookup('redis_vip', undef, undef, undef),
+  $ceilometer_redis_password = lookup('ceilometer_redis_password'),
+  $redis_vip                 = lookup('redis_vip'),
   $step                      = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::ceilometer
