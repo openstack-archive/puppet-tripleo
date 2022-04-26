@@ -61,6 +61,4 @@ define tripleo::stunnel::service_proxy (
     order   => "20-${name}",
     content => template('tripleo/stunnel/service.erb'),
   }
-
-  Concat::Fragment["stunnel-service-${name}"] ~> Service<| title == 'stunnel' |>
 }

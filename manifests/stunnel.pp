@@ -17,14 +17,6 @@
 #
 # Installs and starts stunnel
 #
-# [*manage_service*]
-#   (Optional) Whether we'll be managing the stunnel service or not.
-#   Defaults to true
-#
-# [*service_ensure*]
-#   (Optional) Ensure the service be running or stopped
-#   Defaults to 'running'
-#
 # [*foreground*]
 #   (Optional) Sets the configuration for stunnel to run the process in
 #   the foreground. This is useful when trying to run stunnel in a
@@ -36,10 +28,8 @@
 #   Defaults to '4' which translates to 'warning'.
 #
 class tripleo::stunnel (
-  $manage_service = true,
-  $service_ensure = 'running',
-  $foreground     = 'no',
-  $debug          = 'warning',
+  $foreground = 'no',
+  $debug      = 'warning',
 ){
   package { 'stunnel':
     ensure => 'present'
@@ -52,14 +42,5 @@ class tripleo::stunnel (
     target  => '/etc/stunnel/stunnel.conf',
     order   => '10-foreground-config',
     content => template('tripleo/stunnel/foreground.erb'),
-  }
-  if $manage_service {
-    Concat['/etc/stunnel/stunnel.conf'] ~> Service['stunnel']
-
-    include tripleo::stunnel::systemd_unit
-
-    service { 'stunnel':
-      ensure => $service_ensure
-    }
   }
 }
