@@ -66,7 +66,6 @@ class tripleo::profile::base::ceilometer::agent::notification (
   $event_pipeline_publishers = undef,
 ) {
   include tripleo::profile::base::ceilometer
-  include tripleo::profile::base::ceilometer::upgrade
 
   if $step >= 4 {
     include ceilometer::agent::service_credentials

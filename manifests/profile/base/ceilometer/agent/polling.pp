@@ -56,10 +56,6 @@ class tripleo::profile::base::ceilometer::agent::polling (
 ) {
   include tripleo::profile::base::ceilometer
 
-  if $central_namespace {
-    include tripleo::profile::base::ceilometer::upgrade
-  }
-
   if $enable_internal_tls {
     $tls_query_param = '?ssl=true'
   } else {
