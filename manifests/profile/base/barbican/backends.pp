@@ -72,6 +72,6 @@ class tripleo::profile::base::barbican::backends (
     $backend4 = undef
   }
 
-  $enabled_backends_list = [$backend1, $backend2, $backend3, $backend4].filter |$items| { $items != undef }
+  $enabled_backends_list = delete_undef_values([$backend1, $backend2, $backend3, $backend4])
   $enabled_secret_stores = join($enabled_backends_list, ',')
 }
