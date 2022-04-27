@@ -38,12 +38,12 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::memcached (
   $enable_internal_memcached_tls = false,
   $certificate_specs             = {},
-  $step                          = Integer(hiera('step')),
+  $step                          = Integer(lookup('step')),
 ) {
   if $step >= 1 {
     if $enable_internal_memcached_tls {
