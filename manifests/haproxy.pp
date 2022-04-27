@@ -53,11 +53,6 @@
 #  The syslog facility for HAProxy.
 #  Defaults to 'local0'
 #
-# [*activate_httplog*]
-#  Globally activate "httplog" option (in defaults section)
-#  In case the listener is NOT set to "http" mode, HAProxy will fallback to "tcplog".
-#  Defaults to false
-#
 # [*haproxy_globals_override*]
 #  HAProxy global option we can append to the default base set in this class.
 #  If you enter an already existing key, it will override the default.
@@ -522,6 +517,12 @@
 #    'ceph_dashboard_ssl_port' (Defaults to 8444)
 #  Defaults to {}
 #
+# DEPRECATED PARAMETERS
+#
+# [*activate_httplog*]
+#  This parameter has been deprecated and has no effect.
+#  Defaults to undef
+#
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
@@ -534,7 +535,6 @@ class tripleo::haproxy (
   $haproxy_member_options        = [ 'check', 'inter 2000', 'rise 2', 'fall 5' ],
   $haproxy_log_address           = '/dev/log',
   $haproxy_log_facility          = 'local0',
-  $activate_httplog              = false,
   $haproxy_globals_override      = {},
   $haproxy_defaults_override     = {},
   $haproxy_lb_mode_longrunning   = 'leastconn',
@@ -625,8 +625,15 @@ class tripleo::haproxy (
   $ovn_dbs_network               = hiera('ovn_dbs_network', undef),
   $etcd_network                  = hiera('etcd_network', undef),
   $swift_proxy_server_network    = hiera('swift_proxy_network', undef),
-  $service_ports                 = {}
+  $service_ports                 = {},
+  # DEPRECATED PARAMETERS
+  $activate_httplog              = undef
 ) {
+
+  if $activate_httplog != undef {
+    warning('The activate_httplog parameter has been deprecated and has no effect')
+  }
+
   $default_service_ports = {
     aodh_api_port => 8042,
     aodh_api_ssl_port => 13042,
@@ -748,16 +755,11 @@ class tripleo::haproxy (
     'timeout' => $haproxy_default_timeout,
     'maxconn' => $haproxy_default_maxconn,
   }
-  if $activate_httplog {
-    $httplog = {'option' => 'httplog'}
-  } else {
-    $httplog = {}
-  }
 
   class { 'haproxy':
     service_manage   => $haproxy_service_manage,
     global_options   => merge($haproxy_global_options, $haproxy_daemonize, $haproxy_globals_override),
-    defaults_options => merge($haproxy_defaults_options, $httplog, $haproxy_defaults_override),
+    defaults_options => merge($haproxy_defaults_options, $haproxy_defaults_override),
   }
 
 

@@ -135,33 +135,6 @@ describe 'tripleo::haproxy' do
       end
     end
 
-    describe "activate httplog" do
-      before :each do
-        params.merge!({
-          :activate_httplog => true,
-        })
-      end
-      it 'should activate httplog' do
-        is_expected.to contain_class('haproxy').with(
-          :defaults_options => {
-            "mode"=>"tcp",
-            "log"=>"global",
-            "retries"=>"3",
-            "timeout"=> [
-              "http-request 10s",
-              "queue 2m",
-              "connect 10s",
-              "client 2m",
-              "server 2m",
-              "check 30s",
-            ],
-            "maxconn"=>4096,
-            "option"=>"httplog",
-          }
-        )
-      end
-    end
-
     describe "set log facility" do
       before :each do
         params.merge!({
