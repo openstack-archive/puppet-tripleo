@@ -21,11 +21,11 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('horizon_short_bootstrap_node_name')
+#   Defaults to lookup('horizon_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -37,48 +37,48 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*horizon_network*]
 #   (Optional) The network name where the horizon endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('horizon_network', undef)
+#   Defaults to lookup('horizon_network', undef, undef, undef)
 #
 # [*neutron_options*]
 #   (Optional) A hash of parameters to enable features specific to Neutron
-#   Defaults to hiera('horizon::neutron_options', {})
+#   Defaults to lookup('horizon::neutron_options', undef, undef, {})
 #
 # [*memcached_ips*]
 #   (Optional) Array of ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_ips', [])
+#   Defaults to lookup('memcached_node_ips', undef, undef, [])
 #
 # [*heat_api_enabled*]
 #   (Optional) Indicate whether Heat is available in the deployment.
-#   Defaults to hiera('heat_api_enabled') or false
+#   Defaults to lookup('heat_api_enabled', undef, undef, false)
 #
 # [*octavia_api_enabled*]
 #   (Optional) Indicate whether Octavia is available in the deployment.
-#   Defaults to hiera('octavia_api_enabled') or false
+#   Defaults to lookup('octavia_api_enabled', undef, undef, false)
 #
 # [*manila_api_enabled*]
 #   (Optional) Indicate whether Manila is available in the deployment.
-#   Defaults to hiera('manila_api_enabled') or false
+#   Defaults to lookup('manila_api_enabled', undef, undef, false)
 #
 class tripleo::profile::base::horizon (
-  $step                = Integer(hiera('step')),
-  $bootstrap_node      = hiera('horizon_short_bootstrap_node_name', undef),
-  $certificates_specs  = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $horizon_network     = hiera('horizon_network', undef),
-  $neutron_options     = hiera('horizon::neutron_options', {}),
-  $memcached_ips       = hiera('memcached_node_ips', []),
-  $heat_api_enabled    = hiera('heat_api_enabled', false),
-  $octavia_api_enabled = hiera('octavia_api_enabled', false),
-  $manila_api_enabled  = hiera('manila_api_enabled', false),
+  $step                = Integer(lookup('step')),
+  $bootstrap_node      = lookup('horizon_short_bootstrap_node_name', undef, undef, undef),
+  $certificates_specs  = lookup('apache_certificates_specs', undef, undef, {}),
+  $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
+  $horizon_network     = lookup('horizon_network', undef, undef, undef),
+  $neutron_options     = lookup('horizon::neutron_options', undef, undef, {}),
+  $memcached_ips       = lookup('memcached_node_ips', undef, undef, []),
+  $heat_api_enabled    = lookup('heat_api_enabled', undef, undef, false),
+  $octavia_api_enabled = lookup('octavia_api_enabled', undef, undef, false),
+  $manila_api_enabled  = lookup('manila_api_enabled', undef, undef, false),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
