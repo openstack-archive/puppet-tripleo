@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('gnocchi_api_short_bootstrap_node_name')
+#   Defaults to lookup('gnocchi_api_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -32,11 +32,11 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*gnocchi_backend*]
 #   (Optional) Gnocchi backend string file, swift or rbd
@@ -45,35 +45,35 @@
 # [*gnocchi_network*]
 #   (Optional) The network name where the gnocchi endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('gnocchi_api_network', undef)
+#   Defaults to lookup('gnocchi_api_network', undef, undef, undef)
 #
 # [*gnocchi_redis_password*]
 #  (Required) Password for the gnocchi redis user for the coordination url
-#  Defaults to hiera('gnocchi_redis_password')
+#  Defaults to lookup('gnocchi_redis_password')
 #
 # [*redis_vip*]
 #  (Required) Redis ip address for the coordination url
-#  Defaults to hiera('redis_vip')
+#  Defaults to lookup('redis_vip')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*incoming_storage_driver*]
 #   (Optional)  Storage driver to use for incoming metric data
-#   Defaults to hiera('incoming_storage_driver', undef)
+#   Defaults to lookup('incoming_storage_driver', undef, undef, undef)
 #
 class tripleo::profile::base::gnocchi::api (
-  $bootstrap_node                = hiera('gnocchi_api_short_bootstrap_node_name', undef),
-  $certificates_specs            = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $gnocchi_backend               = downcase(hiera('gnocchi_backend', 'swift')),
-  $gnocchi_network               = hiera('gnocchi_api_network', undef),
-  $gnocchi_redis_password        = hiera('gnocchi_redis_password'),
-  $redis_vip                     = hiera('redis_vip'),
-  $step                          = Integer(hiera('step')),
-  $incoming_storage_driver       = hiera('incoming_storage_driver', undef),
+  $bootstrap_node                = lookup('gnocchi_api_short_bootstrap_node_name', undef, undef, undef),
+  $certificates_specs            = lookup('apache_certificates_specs', undef, undef, {}),
+  $enable_internal_tls           = lookup('enable_internal_tls', undef, undef, false),
+  $gnocchi_backend               = downcase(lookup('gnocchi_backend', undef, undef, 'swift')),
+  $gnocchi_network               = lookup('gnocchi_api_network', undef, undef, undef),
+  $gnocchi_redis_password        = lookup('gnocchi_redis_password'),
+  $redis_vip                     = lookup('redis_vip'),
+  $step                          = Integer(lookup('step')),
+  $incoming_storage_driver       = lookup('incoming_storage_driver', undef, undef, undef),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
