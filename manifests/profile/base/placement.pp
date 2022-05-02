@@ -20,15 +20,15 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('nova_api_short_bootstrap_node_name')
+#   Defaults to lookup('nova_api_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 
 class tripleo::profile::base::placement (
-  $bootstrap_node          = hiera('placement_api_short_bootstrap_node_name', undef),
-  $step                    = Integer(hiera('step')),
+  $bootstrap_node = lookup('placement_api_short_bootstrap_node_name', undef, undef, undef),
+  $step           = Integer(lookup('step')),
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {

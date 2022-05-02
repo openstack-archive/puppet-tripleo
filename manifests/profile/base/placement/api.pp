@@ -18,7 +18,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('placement_short_bootstrap_node_name')
+#   Defaults to lookup('placement_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -30,28 +30,28 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*placement_network*]
 #   (Optional) The network name where the nova placement endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('placement_network', undef)
+#   Defaults to lookup('placement_network', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::placement::api (
-  $bootstrap_node                = hiera('placement_short_bootstrap_node_name', undef),
-  $certificates_specs            = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $placement_network             = hiera('placement_network', undef),
-  $step                          = Integer(hiera('step')),
+  $bootstrap_node      = lookup('placement_short_bootstrap_node_name', undef, undef, undef),
+  $certificates_specs  = lookup('apache_certificates_specs', undef, undef, {}),
+  $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
+  $placement_network   = lookup('placement_network', undef, undef, undef),
+  $step                = Integer(lookup('step')),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
