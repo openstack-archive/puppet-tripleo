@@ -22,18 +22,6 @@
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   Defaults to hiera('gnocchi_api_short_bootstrap_node_name')
 #
-# [*certificates_specs*]
-#   (Optional) The specifications to give to certmonger for the certificate(s)
-#   it will create.
-#   Example with hiera:
-#     apache_certificates_specs:
-#       httpd-internal_api:
-#         hostname: <overcloud controller fqdn>
-#         service_certificate: <service certificate path>
-#         service_key: <service key path>
-#         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
-#
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
 #   Defaults to hiera('enable_internal_tls', false)
@@ -53,7 +41,6 @@
 #
 class tripleo::profile::base::gnocchi (
   $bootstrap_node         = hiera('gnocchi_api_short_bootstrap_node_name', undef),
-  $certificates_specs     = hiera('apache_certificates_specs', {}),
   $enable_internal_tls    = hiera('enable_internal_tls', false),
   $gnocchi_redis_password = hiera('gnocchi_redis_password'),
   $redis_vip              = hiera('redis_vip'),
