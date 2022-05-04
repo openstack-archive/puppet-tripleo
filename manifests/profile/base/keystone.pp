@@ -21,11 +21,11 @@
 # [*admin_endpoint_network*]
 #   (Optional) The network name where the admin endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('keystone_admin_api_network', undef)
+#   Defaults to lookup('keystone_admin_api_network', undef, undef, undef)
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('keystone_short_bootstrap_node_name')
+#   Defaults to lookup('keystone_short_bootstrap_node_name')
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -37,11 +37,11 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*ldap_backends_config*]
 #   Configuration for keystone::ldap_backend. This takes a hash that will
@@ -54,60 +54,60 @@
 #
 # [*manage_db_purge*]
 #   (Optional) Whether keystone token flushing should be enabled
-#   Defaults to hiera('keystone_enable_db_purge', false)
+#   Defaults to lookup('keystone_enable_db_purge', undef, undef, false)
 #
 # [*public_endpoint_network*]
 #   (Optional) The network name where the admin endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('keystone_public_api_network', undef)
+#   Defaults to lookup('keystone_public_api_network', undef, undef, undef)
 #
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_scheme', rabbit)
+#   Defaults to lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit')
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('oslo_messaging_rpc_node_names')
+#   Defaults to any2array(lookup('oslo_messaging_rpc_node_names', undef, undef, undef))
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_port', 5672)
+#   Defaults to lookup('oslo_messaging_rpc_port', undef, undef, '5672')
 #
 # [*oslomsg_rpc_username*]
 #   Username for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_user_name', 'guest')
+#   Defaults to lookup('oslo_messaging_rpc_user_name', undef, undef, 'guest')
 #
 # [*oslomsg_rpc_password*]
 #   Password for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_password')
+#   Defaults to lookup('oslo_messaging_rpc_password')
 #
 # [*oslomsg_rpc_use_ssl*]
 #   Enable ssl oslo messaging services
-#   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
+#   Defaults to lookup('oslo_messaging_rpc_use_ssl', undef, undef, '0')
 #
 # [*oslomsg_notify_proto*]
 #   Protocol driver for the oslo messaging notify service
-#   Defaults to hiera('oslo_messaging_notify_scheme', rabbit)
+#   Defaults to lookup('oslo_messaging_notify_scheme', undef, undef, 'rabbit')
 #
 # [*oslomsg_notify_hosts*]
 #   list of the oslo messaging notify host fqdns
-#   Defaults to hiera('oslo_messaging_notify_node_names')
+#   Defaults to any2array(lookup('oslo_messaging_notify_node_names', undef, undef, undef))
 #
 # [*oslomsg_notify_port*]
 #   IP port for oslo messaging notify service
-#   Defaults to hiera('oslo_messaging_notify_port', 5672)
+#   Defaults to lookup('oslo_messaging_notify_port', undef, undef, '5672')
 #
 # [*oslomsg_notify_username*]
 #   Username for oslo messaging notify service
-#   Defaults to hiera('oslo_messaging_notify_user_name', 'guest')
+#   Defaults to lookup('oslo_messaging_notify_user_name', undef, undef, 'guest')
 #
 # [*oslomsg_notify_password*]
 #   Password for oslo messaging notify service
-#   Defaults to hiera('oslo_messaging_notify_password')
+#   Defaults to lookup('oslo_messaging_notify_password')
 #
 # [*oslomsg_notify_use_ssl*]
 #   Enable ssl oslo messaging services
-#   Defaults to hiera('oslo_messaging_notify_use_ssl', '0')
+#   Defaults to lookup('oslo_messaging_notify_use_ssl', undef, undef, '0')
 #
 # [*ceilometer_notification_topics*]
 #   Notification topics that keystone should use for ceilometer to consume.
@@ -124,31 +124,31 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*keystone_federation_enabled*]
 #   (Optional) Enable federated identity support
-#   Defaults to hiera('keystone_federation_enabled', false)
+#   Defaults to lookup('keystone_federation_enabled', undef, undef, false)
 #
 # [*keystone_openidc_enabled*]
 #   (Optional) Enable OpenIDC federation
-#   Defaults to hiera('keystone_openidc_enabled', false)
+#   Defaults to lookup('keystone_openidc_enabled', undef, undef, false)
 #
 # [*memcached_hosts*]
 #   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_names', [])
+#   Defaults to lookup('memcached_node_names', undef, undef, [])
 #
 # [*memcached_port*]
 #   (Optional) Memcached port to use.
-#   Defaults to hiera('memcached_port', 11211)
+#   Defaults to lookup('memcached_port', undef, undef, 11211)
 #
 # [*memcached_ipv6*]
 #   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
-#   Defauls to hiera('memcached_ipv6', false)
+#   Defauls to lookup('memcached_ipv6', undef, undef, false)
 #
 # [*cache_backend*]
 #   (Optional) oslo.cache backend used for caching.
-#   Defaults to hiera('keystone::cache::backend', false)
+#   Defaults to lookup('keystone::cache::backend', undef, undef, false)
 #
 # DEPRECATED PARAMETERS
 #
@@ -157,36 +157,36 @@
 #   Defaults to undef
 #
 class tripleo::profile::base::keystone (
-  $admin_endpoint_network         = hiera('keystone_admin_api_network', undef),
-  $bootstrap_node                 = hiera('keystone_short_bootstrap_node_name', undef),
-  $certificates_specs             = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls            = hiera('enable_internal_tls', false),
+  $admin_endpoint_network         = lookup('keystone_admin_api_network', undef, undef, undef),
+  $bootstrap_node                 = lookup('keystone_short_bootstrap_node_name', undef, undef, undef),
+  $certificates_specs             = lookup('apache_certificates_specs', undef, undef, {}),
+  $enable_internal_tls            = lookup('enable_internal_tls', undef, undef, false),
   $ldap_backends_config           = undef,
   $ldap_backend_enable            = false,
-  $manage_db_purge                = hiera('keystone_enable_db_purge', false),
-  $public_endpoint_network        = hiera('keystone_public_api_network', undef),
-  $oslomsg_rpc_proto              = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
-  $oslomsg_rpc_hosts              = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
-  $oslomsg_rpc_password           = hiera('oslo_messaging_rpc_password'),
-  $oslomsg_rpc_port               = hiera('oslo_messaging_rpc_port', '5672'),
-  $oslomsg_rpc_username           = hiera('oslo_messaging_rpc_user_name', 'guest'),
-  $oslomsg_rpc_use_ssl            = hiera('oslo_messaging_rpc_use_ssl', '0'),
-  $oslomsg_notify_proto           = hiera('oslo_messaging_notify_scheme', 'rabbit'),
-  $oslomsg_notify_hosts           = any2array(hiera('oslo_messaging_notify_node_names', undef)),
-  $oslomsg_notify_password        = hiera('oslo_messaging_notify_password'),
-  $oslomsg_notify_port            = hiera('oslo_messaging_notify_port', '5672'),
-  $oslomsg_notify_username        = hiera('oslo_messaging_notify_user_name', 'guest'),
-  $oslomsg_notify_use_ssl         = hiera('oslo_messaging_notify_use_ssl', '0'),
+  $manage_db_purge                = lookup('keystone_enable_db_purge', undef, undef, false),
+  $public_endpoint_network        = lookup('keystone_public_api_network', undef, undef, undef),
+  $oslomsg_rpc_proto              = lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit'),
+  $oslomsg_rpc_hosts              = any2array(lookup('oslo_messaging_rpc_node_names', undef, undef, undef)),
+  $oslomsg_rpc_password           = lookup('oslo_messaging_rpc_password'),
+  $oslomsg_rpc_port               = lookup('oslo_messaging_rpc_port', undef, undef, '5672'),
+  $oslomsg_rpc_username           = lookup('oslo_messaging_rpc_user_name', undef, undef, 'guest'),
+  $oslomsg_rpc_use_ssl            = lookup('oslo_messaging_rpc_use_ssl', undef, undef, '0'),
+  $oslomsg_notify_proto           = lookup('oslo_messaging_notify_scheme', undef, undef, 'rabbit'),
+  $oslomsg_notify_hosts           = any2array(lookup('oslo_messaging_notify_node_names', undef, undef, undef)),
+  $oslomsg_notify_password        = lookup('oslo_messaging_notify_password'),
+  $oslomsg_notify_port            = lookup('oslo_messaging_notify_port', undef, undef, '5672'),
+  $oslomsg_notify_username        = lookup('oslo_messaging_notify_user_name', undef, undef, 'guest'),
+  $oslomsg_notify_use_ssl         = lookup('oslo_messaging_notify_use_ssl', undef, undef, '0'),
   $ceilometer_notification_topics = [],
   $barbican_notification_topics   = [],
   $extra_notification_topics      = [],
-  $step                           = Integer(hiera('step')),
-  $keystone_federation_enabled    = hiera('keystone_federation_enabled', false),
-  $keystone_openidc_enabled       = hiera('keystone_openidc_enabled', false),
-  $memcached_hosts                = hiera('memcached_node_names', []),
-  $memcached_port                 = hiera('memcached_port', 11211),
-  $memcached_ipv6                 = hiera('memcached_ipv6', false),
-  $cache_backend                  = hiera('keystone::cache::backend', false),
+  $step                           = Integer(lookup('step')),
+  $keystone_federation_enabled    = lookup('keystone_federation_enabled', undef, undef, false),
+  $keystone_openidc_enabled       = lookup('keystone_openidc_enabled', undef, undef, false),
+  $memcached_hosts                = lookup('memcached_node_names', undef, undef, []),
+  $memcached_port                 = lookup('memcached_port', undef, undef, 11211),
+  $memcached_ipv6                 = lookup('memcached_ipv6', undef, undef, false),
+  $cache_backend                  = lookup('keystone::cache::backend', undef, undef, false),
   # DEPRECATED PARAMETERS
   $memcached_ips                  = undef
 ) {
