@@ -29,7 +29,6 @@ describe 'tripleo::profile::base::ceilometer::agent::notification' do
 
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer::agent::notification')
-        is_expected.to contain_class('tripleo::profile::base::ceilometer::upgrade')
         is_expected.to_not contain_class('ceilometer::agent::service_credentials')
         is_expected.to_not contain_class('ceilometer::agent::notification')
       end
@@ -46,7 +45,6 @@ describe 'tripleo::profile::base::ceilometer::agent::notification' do
 
       it 'should trigger complete configuration' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer::agent::notification')
-        is_expected.to contain_class('tripleo::profile::base::ceilometer::upgrade')
         is_expected.to contain_class('ceilometer::agent::service_credentials')
         is_expected.to contain_class('ceilometer::agent::notification').with(
           :event_pipeline_publishers => ["notifier://127.0.0.1:5666/?driver=amqp&topic=ceilometer/event.sample"],
