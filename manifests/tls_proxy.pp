@@ -19,19 +19,20 @@
 # === Parameters
 #
 # [*ip*]
-#   The IP address that the proxy will be listening on.
+#   (Required) The IP address that the proxy will be listening on.
 #
 # [*port*]
-#   The port that the proxy will be listening on.
+#   (Required) The port that the proxy will be listening on.
 #
 # [*servername*]
-#   The vhost servername that contains the FQDN to identify the virtual host.
+#   (Required) The vhost servername that contains the FQDN to identify
+#   the virtual host.
 #
 # [*tls_cert*]
-#   The path to the TLS certificate that the proxy will be serving.
+#   (Required) The path to the TLS certificate that the proxy will be serving.
 #
 # [*tls_key*]
-#   The path to the key used for the specified certificate.
+#   (Required) The path to the key used for the specified certificate.
 #
 # [*preserve_host*]
 #   (Optional) Whether the Host header is perserved in proxied requests.
@@ -39,17 +40,17 @@
 #   Defaults to false
 #
 # [*proxy_pass_host*]
-#   The host to connect to.
-#   Defaults to hiera('localhost_address', 'localhost')
-
+#   (Optional) The host to connect to.
+#   Defaults to lookup('localhost_address', undef, undef, 'localhost')
+#
 define tripleo::tls_proxy(
   $ip,
   $port,
   $servername,
   $tls_cert,
   $tls_key,
-  $preserve_host = false,
-  $proxy_pass_host = hiera('localhost_address', 'localhost')
+  $preserve_host   = false,
+  $proxy_pass_host = lookup('localhost_address', undef, undef, 'localhost')
 ) {
   include apache
   ::apache::vhost { "${title}-proxy":
