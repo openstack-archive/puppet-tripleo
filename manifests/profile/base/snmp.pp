@@ -34,27 +34,27 @@
 #
 # [*snmpd_auth_type*]
 #   The SNMP auth type
-#   Defaults to hiera('snmpd_readonly_user_authtype') if set else 'MD5'
+#   Defaults to lookup('snmpd_readonly_user_authtype', undef, undef, 'MD5')
 #
 # [*snmpd_password*]
 #   The SNMP password
-#   Defaults to hiera('snmpd_readonly_user_password')
+#   Defaults to lookup('snmpd_readonly_user_password')
 #
 # [*snmpd_user*]
 #   The SNMP username
-#   Defaults to hiera('snmpd_readonly_user_name')
+#   Defaults to lookup('snmpd_readonly_user_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::snmp (
   $snmpd_config    = undef,
-  $snmpd_auth_type = hiera('snmpd_readonly_user_authtype', 'MD5'),
-  $snmpd_password  = hiera('snmpd_readonly_user_password'),
-  $snmpd_user      = hiera('snmpd_readonly_user_name'),
-  $step            = Integer(hiera('step')),
+  $snmpd_auth_type = lookup('snmpd_readonly_user_authtype', undef, undef, 'MD5'),
+  $snmpd_password  = lookup('snmpd_readonly_user_password'),
+  $snmpd_user      = lookup('snmpd_readonly_user_name'),
+  $step            = Integer(lookup('step')),
 ) {
   if $step >= 4 {
     snmp::snmpv3_user { $snmpd_user:
