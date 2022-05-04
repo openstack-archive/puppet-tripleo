@@ -19,94 +19,94 @@
 #
 # === Parameters
 #
-# [*step*]
-#   (Optional) String. The current step of the deployment
-#   Defaults to hiera('step')
+#  [*step*]
+#    (Optional) String. The current step of the deployment
+#    Defaults to Integer(lookup('step'))
 #
 #  [*ensure*]
-#    (optional) Defaults to present.
-#    Valid values are present, absent.
+#    (Optional) Status of the cron job. Valid values are present, absent.
+#    Defaults to present.
 #
 #  [*minute*]
-#    (optional) Defaults to '0'. Configures cron job for logrotate.
+#    (Optional) Defaults to '0'. Configures cron job for logrotate.
 #
 #  [*hour*]
-#    (optional) Defaults to '*'. Configures cron job for logrotate.
+#    (Optional) Defaults to '*'. Configures cron job for logrotate.
 #
 #  [*monthday*]
-#    (optional) Defaults to '*'. Configures cron job for logrotate.
+#    (Optional) Defaults to '*'. Configures cron job for logrotate.
 #
 #  [*month*]
-#    (optional) Defaults to '*'. Configures cron job for logrotate.
+#    (Optional) Defaults to '*'. Configures cron job for logrotate.
 #
 #  [*weekday*]
-#    (optional) Defaults to '*'. Configures cron job for logrotate.
+#    (Optional) Defaults to '*'. Configures cron job for logrotate.
 #
 #  [*maxdelay*]
-#    (optional) Seconds. Defaults to 90. Should be a positive integer.
+#    (Optional) Seconds. Defaults to 90. Should be a positive integer.
 #    Induces a random delay before running the cronjob to avoid running all
 #    cron jobs at the same time on all hosts this job is configured.
 #
 #  [*user*]
-#    (optional) Defaults to 'root'. Configures cron job for logrotate.
+#    (Optional) Defaults to 'root'. Configures cron job for logrotate.
 #
 #  [*copytruncate*]
-#    (optional) Defaults to True.
+#    (Optional) Defaults to True.
 #    Configures the logrotate copytruncate parameter.
 #
 #  [*delaycompress*]
-#    (optional) Defaults to True.
+#    (Optional) Defaults to True.
 #    Configures the logrotate delaycompress parameter.
 #
 #  [*compress*]
-#    (optional) Defaults to True.
+#    (Optional) Defaults to True.
 #    Configures the logrotate compress parameter.
 #
 #  [*minsize*]
-#    (optional) Defaults to '1'.
+#    (Optional) Defaults to '1'.
 #    Configures the logrotate minsize parameter.
 #
 #  [*maxsize*]
-#    (optional) Defaults to '10M'.
+#    (Optional) Defaults to '10M'.
 #    Configures the logrotate maxsize parameter.
 #
 #  [*notifempty*]
-#    (optional) Defaults to True.
+#    (Optional) Defaults to True.
 #    Configures the logrotate notifempty parameter.
 #
 #  [*rotation*]
-#    (optional) Defaults to 'daily'.
+#    (Optional) Defaults to 'daily'.
 #    Configures the logrotate rotation interval.
 #
 #  [*rotate*]
-#    (optional) Defaults to 14.
+#    (Optional) Defaults to 14.
 #    Configures the logrotate rotate parameter.
 #
 #  [*purge_after_days*]
-#    (optional) Defaults to 14.
+#    (Optional) Defaults to 14.
 #    Configures forced purge period for rotated logs.
 #    Overrides the rotation and rotate settings.
 #
 #  [*dateext*]
-#    (optional) Defaults to undef.
+#    (Optional) Defaults to undef.
 #    Configures the dateext parameter.
 #
 #  [*dateformat*]
-#    (optional) Defaults to undef.
+#    (Optional) Defaults to undef.
 #    Configures the dateformat parameter used with dateext parameter.
 #
 #  [*dateyesterday*]
-#    (optional) Defaults to undef.
+#    (Optional) Defaults to undef.
 #    Configures the dateyesterday parameter used with dateext parameter.
 #
 # DEPRECATED PARAMETERS
 #
 #  [*size*]
-#    DEPRECATED: (optional) Defaults to '10M'.
+#    DEPRECATED: (Optional) Defaults to '10M'.
 #    Configures the logrotate size parameter.
 #
 class tripleo::profile::base::logging::logrotate (
-  $step             = Integer(hiera('step')),
+  $step             = Integer(lookup('step')),
   $ensure           = present,
   $minute           = 0,
   $hour             = '*',

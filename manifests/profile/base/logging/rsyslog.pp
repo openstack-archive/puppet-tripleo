@@ -20,12 +20,12 @@
 #
 # [*step*]
 #   (Optional) String. The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*service_names*]
 #   (Optional) List of services enabled on the current role. This is used
 #   to obtain per-service configuration information.
-#   Defaults to hiera('service_names', [])
+#   Defaults to lookup('service_names', undef, undef, [])
 #
 # [*elasticsearch*]
 #   (Optional) Hash. Configuration for output plugin omelasticsearch.
@@ -56,8 +56,8 @@
 #   Defaults to undef
 #
 class tripleo::profile::base::logging::rsyslog (
-  $step                          = Integer(hiera('step')),
-  $service_names                 = hiera('service_names', []),
+  $step                          = Integer(lookup('step')),
+  $service_names                 = lookup('service_names', undef, undef, []),
   $elasticsearch                 = undef,
   $elasticsearch_tls_ca_cert     = undef,
   $elasticsearch_tls_client_cert = undef,
@@ -68,7 +68,7 @@ class tripleo::profile::base::logging::rsyslog (
   if $step >= 2 {
     # NOTE: puppet-rsyslog does not have params manifest, so we don't have any
     #       other choice than using hiera currently.
-    $rsyslog_confdir = hiera('rsyslog::confdir', '/etc/rsyslog.d')
+    $rsyslog_confdir = lookup('rsyslog::confdir', undef, undef, '/etc/rsyslog.d')
 
     if $elasticsearch != undef {
       if $elasticsearch_tls_ca_cert {
