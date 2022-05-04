@@ -21,11 +21,11 @@
 #
 # [*bannertext*]
 #   The text used within /etc/issue and /etc/issue.net
-#   Defaults to hiera('BannerText')
+#   Defaults to lookup('BannerText', undef, undef, undef)
 #
 # [*motd*]
 #   The text used within SSH Banner
-#   Defaults to hiera('MOTD')
+#   Defaults to lookup('MOTD', undef, undef, undef)
 #
 # [*options*]
 #   Hash of SSHD options to set. See the puppet-ssh module documentation for
@@ -41,10 +41,10 @@
 #   Defaults to 'no'
 
 class tripleo::profile::base::sshd (
-  $bannertext = hiera('BannerText', undef),
-  $motd = hiera('MOTD', undef),
-  $options = {},
-  $port = [22],
+  $bannertext              = lookup('BannerText', undef, undef, undef),
+  $motd                    = lookup('MOTD', undef, undef, undef),
+  $options                 = {},
+  $port                    = [22],
   $password_authentication = 'no',
 ) {
 
@@ -108,7 +108,7 @@ class tripleo::profile::base::sshd (
 
   # NB (owalsh) in puppet-ssh hiera takes precedence over the class param
   # we need to control this, so error if it's set in hiera
-  if hiera('ssh:server::options', undef) {
+  if lookup('ssh:server::options', undef, undef, undef) {
     err('ssh:server::options must not be set, use tripleo::profile::base::sshd::options')
   }
   class { 'ssh':
