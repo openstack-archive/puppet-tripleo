@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to downcase(lookup('heat_engine_short_bootstrap_node_name'))
+#   Defaults to lookup('heat_engine_short_bootstrap_node_name')
 #
 # [*manage_db_purge*]
 #   (Optional) Whether to enable db purging
@@ -29,19 +29,19 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to lookup('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
-#   Defaults to lookup('oslo_messaging_rpc_scheme', undef, undef, rabbit)
+#   Defaults to lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit')
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to lookup('oslo_messaging_rpc_node_names')
+#   Defaults to any2array(lookup('oslo_messaging_rpc_node_names', undef, undef, undef))
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
-#   Defaults to lookup('oslo_messaging_rpc_port', undef, undef, 5672)
+#   Defaults to lookup('oslo_messaging_rpc_port', undef, undef, '5672')
 #
 # [*oslomsg_rpc_username*]
 #   Username for oslo messaging rpc service
@@ -57,15 +57,15 @@
 #
 # [*oslomsg_notify_proto*]
 #   Protocol driver for the oslo messaging notify service
-#   Defaults to lookup('oslo_messaging_notify_scheme', undef, undef, rabbit)
+#   Defaults to lookup('oslo_messaging_notify_scheme', undef, undef, 'rabbit')
 #
 # [*oslomsg_notify_hosts*]
 #   list of the oslo messaging notify host fqdns
-#   Defaults to lookup('oslo_messaging_notify_node_names')
+#   Defaults to any2array(lookup('oslo_messaging_notify_node_names', undef, undef, undef))
 #
 # [*oslomsg_notify_port*]
 #   IP port for oslo messaging notify service
-#   Defaults to lookup('oslo_messaging_notify_port', undef, undef, 5672)
+#   Defaults to lookup('oslo_messaging_notify_port', undef, undef, '5672')
 #
 # [*oslomsg_notify_username*]
 #   Username for oslo messaging notify service
@@ -102,7 +102,7 @@
 #   Defaults to undef
 #
 class tripleo::profile::base::heat (
-  $bootstrap_node          = downcase(lookup('heat_engine_short_bootstrap_node_name')),
+  $bootstrap_node          = lookup('heat_engine_short_bootstrap_node_name'),
   $manage_db_purge         = lookup('heat_enable_db_purge', undef, undef, true),
   $step                    = Integer(lookup('step')),
   $oslomsg_rpc_proto       = lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit'),
