@@ -64,7 +64,17 @@ define tripleo::certmonger::qemu (
   include ::certmonger
   include ::nova::params
 
-  certmonger_certificate { $name :
+  file { $service_key :
+    group => 'qemu',
+    mode  => '0640',
+    audit => [content],
+  }
+  ~> exec { "Purge ${service_certificate}" :
+    command     => "rm -f ${service_certificate}",
+    refreshonly => true,
+    path        => '/usr/bin:/bin',
+  }
+  -> certmonger_certificate { $name :
     ensure       => 'present',
     certfile     => $service_certificate,
     keyfile      => $service_key,
@@ -101,13 +111,26 @@ define tripleo::certmonger::qemu (
     }
   }
 
+  exec { $service_certificate :
+    require   => Certmonger_certificate[$name],
+    command   => "test -f ${service_certificate}",
+    unless    => "test -f ${service_certificate}",
+    tries     => 60,
+    try_sleep => 1,
+    timeout   => 60,
+    path      => '/usr/bin:/bin',
+  }
+  -> exec { "Change permissions and owner of ${service_key} and ${service_certificate}":
+    command     => "chgrp qemu ${service_key} && chmod 0640 ${service_key} && chgrp qemu ${service_certificate} && chmod 0640 ${service_certificate}", # lint:ignore:140chars
+    refreshonly => true,
+    path        => '/usr/bin:/bin',
+  }
+
   file { $service_certificate :
-    require => Certmonger_certificate[$name],
-    mode    => '0644'
-  }
-  file { $service_key :
     group => 'qemu',
-    mode  => '0640',
-    audit => [content],
+    mode  => '0644'
   }
+
+  Certmonger_certificate[$name] ~> Exec["Change permissions and owner of ${service_key} and ${service_certificate}"]
+  Exec["Purge ${service_certificate}"] -> File[$service_certificate]
 }
