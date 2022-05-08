@@ -21,6 +21,7 @@
 # prefetch, etc.
 class Puppet::Provider::Noop < Puppet::Provider
 
+  # generic resource interfaces
   def create
     true
   end
@@ -33,6 +34,32 @@ class Puppet::Provider::Noop < Puppet::Provider
     false
   end
 
+  # package resource
+  def install
+    true
+  end
+
+  def uninstall
+    true
+  end
+
+  def latest
+    true
+  end
+
+  def update
+    true
+  end
+
+  def purge
+    true
+  end
+
+  def self.instances
+    []
+  end
+
+  # service resource
   def status
     0
   end
@@ -44,6 +71,7 @@ class Puppet::Provider::Noop < Puppet::Provider
   def stop
     true
   end
+
   # some puppet-keystone resources require this
   def self.resource_to_name(domain, name, check_for_default = true)
     return name
