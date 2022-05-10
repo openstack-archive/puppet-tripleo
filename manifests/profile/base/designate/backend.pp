@@ -21,15 +21,15 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*backend*]
 #   (Optional) Specify a backend used.
-#   Defaults to 'bind9'
+#   Defaults to lookup('designate_backend', undef, undef, 'bind9'),
 #
 class tripleo::profile::base::designate::backend (
-  $step    = Integer(hiera('step')),
-  $backend = hiera('designate_backend', 'bind9'),
+  $step    = Integer(lookup('step')),
+  $backend = lookup('designate_backend', undef, undef, 'bind9'),
 ) {
   if $step >= 4 {
     if $backend == 'bind9' {

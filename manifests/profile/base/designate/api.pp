@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -33,16 +33,16 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*designate_network*]
 #   (Optional) The network name where the designate endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('designate_api_network', undef)
+#   Defaults to lookup('designate_api_network', undef, undef, undef)
 #
 # DEPRECATED PARAMETERS
 #
@@ -57,10 +57,10 @@
 #   Defaults to undef
 #
 class tripleo::profile::base::designate::api (
-  $step                = Integer(hiera('step')),
-  $certificates_specs  = hiera('apache_certificates_specs', {}),
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $designate_network   = hiera('designate_api_network', undef),
+  $step                = Integer(lookup('step')),
+  $certificates_specs  = lookup('apache_certificates_specs', undef, undef, {}),
+  $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
+  $designate_network   = lookup('designate_api_network', undef, undef, undef),
   $listen_ip           = undef,
   $listen_port         = undef
 ) {

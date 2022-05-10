@@ -22,25 +22,25 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*designate_redis_password*]
 #  (Optional) Password for the neutron redis user for the coordination url
-#   Defaults to hiera('designate_redis_password', undef),
+#   Defaults to lookup('designate_redis_password', undef, undef, undef),
 #
 # [*redis_vip*]
 #  (Optional) Redis ip address for the coordination url
-#   Defaults to hiera('redis_vip', undef),
+#   Defaults to lookup('redis_vip', undef, undef, undef),
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 class tripleo::profile::base::designate::coordination (
-  $step                     = Integer(hiera('step')),
-  $designate_redis_password = hiera('designate_redis_password', undef),
-  $redis_vip                = hiera('redis_vip', undef),
-  $enable_internal_tls      = hiera('enable_internal_tls', false),
+  $step                     = Integer(lookup('step')),
+  $designate_redis_password = lookup('designate_redis_password', undef, undef, undef),
+  $redis_vip                = lookup('redis_vip', undef, undef, undef),
+  $enable_internal_tls      = lookup('enable_internal_tls', undef, undef, false),
 ) {
   if $step >= 4 {
     if $redis_vip {

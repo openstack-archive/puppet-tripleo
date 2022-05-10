@@ -20,12 +20,12 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('designate_central_short_bootstrap_node_name')
+#   Defaults to lookup('designate_central_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # DEPRECATED PARAMETERS
 #
@@ -34,8 +34,8 @@
 #   Defaults to the content of templates/designate/pools.yaml.erb
 #
 class tripleo::profile::base::designate::central (
-  $bootstrap_node = hiera('designate_central_short_bootstrap_node_name', undef),
-  $step = Integer(hiera('step')),
+  $bootstrap_node = lookup('designate_central_short_bootstrap_node_name', undef, undef, undef),
+  $step           = Integer(lookup('step')),
   # DEPRECATED PARAMETERS
   $pools_file_content = undef,
 ) {
