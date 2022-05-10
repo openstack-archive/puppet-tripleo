@@ -20,44 +20,44 @@
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*oslomsg_rpc_proto*]
 #   Protocol driver for the oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_scheme', rabbit)
+#   Defaults to lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit')
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('oslo_messaging_rpc_node_names')
+#   Defaults to any2array(lookup('oslo_messaging_rpc_node_names', undef, undef, undef))
 #
 # [*oslomsg_rpc_port*]
 #   IP port for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_port', 5672)
+#   Defaults to lookup('oslo_messaging_rpc_port', undef, undef, '5672')
 #
 # [*oslomsg_rpc_username*]
 #   Username for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_user_name', 'guest')
+#   Defaults to lookup('oslo_messaging_rpc_user_name', undef, undef, 'guest')
 #
 # [*oslomsg_rpc_password*]
 #   Password for oslo messaging rpc service
-#   Defaults to hiera('oslo_messaging_rpc_password')
+#   Defaults to lookup('oslo_messaging_rpc_password')
 #
 # [*oslomsg_rpc_use_ssl*]
 #   Enable ssl oslo messaging services
-#   Defaults to hiera('oslo_messaging_rpc_use_ssl', '0')
+#   Defaults to lookup('oslo_messaging_rpc_use_ssl', undef, undef, '0')
 #
 # [*enable_driver_agent*]
 #   Enable the driver agent
 #   Defaults to false
 #
 class tripleo::profile::base::octavia (
-  $step                 = Integer(hiera('step')),
-  $oslomsg_rpc_proto    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
-  $oslomsg_rpc_hosts    = any2array(hiera('oslo_messaging_rpc_node_names', undef)),
-  $oslomsg_rpc_password = hiera('oslo_messaging_rpc_password'),
-  $oslomsg_rpc_port     = hiera('oslo_messaging_rpc_port', '5672'),
-  $oslomsg_rpc_username = hiera('oslo_messaging_rpc_user_name', 'guest'),
-  $oslomsg_rpc_use_ssl  = hiera('oslo_messaging_rpc_use_ssl', '0'),
+  $step                 = Integer(lookup('step')),
+  $oslomsg_rpc_proto    = lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit'),
+  $oslomsg_rpc_hosts    = any2array(lookup('oslo_messaging_rpc_node_names', undef, undef, undef)),
+  $oslomsg_rpc_password = lookup('oslo_messaging_rpc_password'),
+  $oslomsg_rpc_port     = lookup('oslo_messaging_rpc_port', undef, undef, '5672'),
+  $oslomsg_rpc_username = lookup('oslo_messaging_rpc_user_name', undef, undef, 'guest'),
+  $oslomsg_rpc_use_ssl  = lookup('oslo_messaging_rpc_use_ssl', undef, undef, '0'),
   $enable_driver_agent  = false
 ) {
   if $step >= 3 {
