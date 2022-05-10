@@ -73,12 +73,12 @@
 #
 # [*interior_mesh_nodes*]
 #   (optional) Comma separated list of controller nodes' fqdns
-#   Defaults to hiera('controller_node_names', '')
+#   Defaults to lookup('controller_node_names', undef, undef, '')
 #
 # [*interior_ip*]
 #   (optional) IP address which should be used for internal communication.
 #   Has to be member of interior_mesh_nodes
-#   Defaults to hiera('ctlplane', undef)
+#   Defaults to lookup('ctlplane', undef, undef, undef)
 #
 # [*connectors*]
 #   (optional) List of hashes containing configuration for outgoing connections
@@ -108,7 +108,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*ssl_cert_dir*]
 #   (Optional) Path to directory where SSL certificate files should be created.
@@ -128,15 +128,15 @@ class tripleo::profile::base::metrics::qdr (
   $listener_ssl_pw_file      = undef,
   $listener_ssl_password     = undef,
   $listener_trusted_certs    = undef,
-  $interior_mesh_nodes       = hiera('controller_node_ips', ''),
-  $interior_ip               = hiera('ctlplane', undef),
+  $interior_mesh_nodes       = lookup('controller_node_ips', undef, undef, ''),
+  $interior_ip               = lookup('ctlplane', undef, undef, undef),
   $connectors                = [],
   $ssl_profiles              = [],
   $ssl_internal_profile_name = undef,
   $addresses                 = [],
   $autolink_addresses        = [],
   $router_mode               = 'edge',
-  $step                      = Integer(hiera('step')),
+  $step                      = Integer(lookup('step')),
   $ssl_cert_dir              = '/etc/pki/tls/certs/',
 ) {
   if $step >= 1 {

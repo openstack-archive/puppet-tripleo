@@ -53,12 +53,12 @@
 #
 # [*oslomsg_rpc_hosts*]
 #   list of the oslo messaging rpc host fqdns
-#   Defaults to hiera('oslo_messaging_rpc_node_names', undef)
+#   Defaults to lookup('oslo_messaging_rpc_node_names', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::qdr (
   $qdr_username      = undef,
@@ -69,8 +69,8 @@ class tripleo::profile::base::qdr (
   $listener_ssl_cert_file    = undef,
   $listener_ssl_key_file     = undef,
   $qdr_log_enable    = 'info+',
-  $oslomsg_rpc_hosts = hiera('oslo_messaging_rpc_node_names', undef),
-  $step              = Integer(hiera('step')),
+  $oslomsg_rpc_hosts = lookup('oslo_messaging_rpc_node_names', undef, undef, undef),
+  $step              = Integer(lookup('step')),
 ) {
   $qdr_node_names = $oslomsg_rpc_hosts
 
