@@ -71,6 +71,11 @@
 #  fetching the certificate for that specific network.
 #  Defaults to undef
 #
+# [*hsts_header_value*]
+#   (optional) Adds the HTTP Strict Transport Securiy (HSTS) header to
+#   response. This takes effect only when public_certificate is set.
+#   Defaults to undef
+#
 class tripleo::haproxy::horizon_endpoint (
   $internal_ip,
   $ip_addresses,
@@ -83,6 +88,7 @@ class tripleo::haproxy::horizon_endpoint (
   $use_internal_certificates   = false,
   $internal_certificates_specs = {},
   $service_network             = undef,
+  $hsts_header_value           = undef,
 ) {
   # Let users override the options on a per-service basis
   $custom_options = hiera('tripleo::haproxy::horizon::options', undef)
@@ -122,8 +128,18 @@ class tripleo::haproxy::horizon_endpoint (
       "${public_virtual_ip}:80"  => union($haproxy_listen_bind_param, $custom_bind_options_public),
       "${public_virtual_ip}:443" => union($haproxy_listen_bind_param, ['ssl', 'crt', $public_certificate], $custom_bind_options_public),
     }
+
+    if $hsts_header_value != undef {
+      $hsts_header_value_real = join(any2array($hsts_header_value), '; ')
+      $hsts_response = "set-header Strict-Transport-Security \"${hsts_header_value_real};\""
+    } else {
+      $hsts_response = undef
+    }
+
     $horizon_frontend_options = {
-      'http-response' => 'replace-header Location http://(.*) https://\\1',
+      'http-response' => delete_undef_values([
+          'replace-header Location http://(.*) https://\\1',
+          $hsts_response]),
       # NOTE(jaosorior): We always redirect to https for the public_virtual_ip.
       'redirect'      => 'scheme https code 301 if !{ ssl_fc }',
       'option'        => [ 'forwardfor' ],
