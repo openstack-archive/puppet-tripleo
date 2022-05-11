@@ -158,44 +158,27 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   } else {
     $log_file_real = ''
   }
-  if $enable_internal_tls {
-    if !$redis_network {
-      fail('redis_network is not set in the hieradata.')
-    }
-    if !$tls_proxy_bind_ip {
-      fail('tls_proxy_bind_ip is not set in the hieradata.')
-    }
-    if !$tls_proxy_fqdn {
-      fail('tls_proxy_fqdn is required if internal TLS is enabled.')
-    }
 
-    $redis_node_names = hiera('redis_short_node_names', [$::hostname])
-    $redis_node_ips   = hiera('redis_node_ips', [$tls_proxy_bind_ip])
-
-    # keep a mapping of [node name, node ip, replication port]
-    $replication_tuples = zip($redis_node_names, $redis_node_ips).map |$index, $pair| {
-      $pair.concat($tls_tunnel_base_port+$index)
-    }
-  } else {
-    $replication_tuples = []
+  class { 'tripleo::profile::base::database::redis':
+    pacemaker_managed     => true,
+    tls_tunnel_local_name => $tls_tunnel_local_name,
+    tls_proxy_bind_ip     => $tls_proxy_bind_ip,
+    tls_proxy_fqdn        => $tls_proxy_fqdn,
+    tls_proxy_port        => $tls_proxy_port,
   }
 
   if $step >= 1 {
     if $enable_internal_tls {
+      # certificate_specs is validated by the base redis class
       $tls_certfile = $certificate_specs['service_certificate']
       $tls_keyfile = $certificate_specs['service_key']
 
-      include tripleo::stunnel
+      $redis_node_names = hiera('redis_short_node_names', [$::hostname])
+      $redis_node_ips   = hiera('redis_node_ips', [$tls_proxy_bind_ip])
 
-      # encrypted endpoint for incoming redis service
-      tripleo::stunnel::service_proxy { 'redis':
-        accept_host  => $tls_proxy_bind_ip,
-        accept_port  => $tls_proxy_port,
-        connect_host => $tls_tunnel_local_name,
-        connect_port => $tls_proxy_port,
-        certificate  => $tls_certfile,
-        key          => $tls_keyfile,
-        notify       => Class['redis'],
+      # keep a mapping of [node name, node ip, replication port]
+      $replication_tuples = zip($redis_node_names, $redis_node_ips).map |$index, $pair| {
+        $pair.concat($tls_tunnel_base_port+$index)
       }
 
       # encrypted endpoints for outgoing redis replication traffic
@@ -238,17 +221,8 @@ slave-announce-ip ${tls_tunnel_local_name}
 slave-announce-port ${local_tuple[0][2]}
 ",
       }
-    }
-    # If the old hiera key exists we use that to set the ulimit in order not to break
-    # operators which set it. We might remove this in a later release (post pike anyway)
-    $old_redis_file_limit = hiera('redis_file_limit', undef)
-    if $old_redis_file_limit != undef {
-      warning('redis_file_limit parameter is deprecated, use redis::ulimit in hiera.')
-      class { 'redis':
-        ulimit => $old_redis_file_limit,
-      }
     } else {
-      include redis
+      $replication_tuples = []
     }
   }
 

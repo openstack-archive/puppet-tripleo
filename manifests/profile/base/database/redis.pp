@@ -43,6 +43,16 @@
 #   for more details.
 #   Defaults to Integer(lookup('step'))
 #
+# [*pacemaker_managed*]
+#   (Optional) Whether the redis service is managed by Pacemaker
+#   Defaults to false
+#
+# [*tls_tunnel_local_name*]
+#   (Optional) When TLS proxy is in use, name of the localhost to forward
+#   unencryption Redis traffic to.
+#   This is set by t-h-t.
+#   Defaults to 'localhost'
+#
 # [*tls_proxy_bind_ip*]
 #   IP on which the TLS proxy will listen on. Required only if
 #   enable_internal_tls is set.
@@ -59,15 +69,25 @@
 #   defaults to 6379
 #
 class tripleo::profile::base::database::redis (
-  $certificate_specs   = lookup('redis_certificate_specs', undef, undef, {}),
-  $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
-  $redis_network       = lookup('redis_network', undef, undef, undef),
-  $step                = Integer(lookup('step')),
-  $tls_proxy_bind_ip   = undef,
-  $tls_proxy_fqdn      = undef,
-  $tls_proxy_port      = 6379,
+  $certificate_specs     = lookup('redis_certificate_specs', undef, undef, {}),
+  $enable_internal_tls   = lookup('enable_internal_tls', undef, undef, false),
+  $redis_network         = lookup('redis_network', undef, undef, undef),
+  $step                  = Integer(lookup('step')),
+  $pacemaker_managed     = false,
+  $tls_tunnel_local_name = 'localhost',
+  $tls_proxy_bind_ip     = undef,
+  $tls_proxy_fqdn        = undef,
+  $tls_proxy_port        = 6379,
 ) {
-  if $step >= 2 {
+
+  # When Redis is managed by pacemaker then the configuration is generated
+  # before cluster is being set up.
+  if $pacemaker_managed {
+    $redis_step = 1
+  } else {
+    $redis_step = 2
+  }
+  if $step >= $redis_step {
     if $enable_internal_tls {
       if !$redis_network {
         fail('redis_network is not set in the hieradata.')
@@ -86,12 +106,14 @@ class tripleo::profile::base::database::redis (
       tripleo::stunnel::service_proxy { 'redis':
         accept_host  => $tls_proxy_bind_ip,
         accept_port  => $tls_proxy_port,
+        connect_host => $tls_tunnel_local_name,
         connect_port => $tls_proxy_port,
         certificate  => $tls_certfile,
         key          => $tls_keyfile,
         notify       => Class['redis'],
       }
     }
+
     include redis
   }
 }
