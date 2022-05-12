@@ -34,6 +34,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::authtoken')
         is_expected.to_not contain_class('heat::keystone::domain')
         is_expected.to_not contain_class('heat')
+        is_expected.to_not contain_class('heat::clients')
         is_expected.to_not contain_class('heat::config')
         is_expected.to_not contain_class('heat::cors')
         is_expected.to_not contain_class('heat::db')
@@ -70,6 +71,7 @@ eos
           :default_transport_url      => 'rabbit://heat1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://heat2:baa@192.168.0.2:5678/?ssl=0'
         )
+        is_expected.to contain_class('heat::clients')
         is_expected.to contain_class('heat::config')
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::db')
@@ -108,6 +110,7 @@ eos
           :default_transport_url      => 'rabbit://heat1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://heat2:baa@192.168.0.2:5678/?ssl=0'
         )
+        is_expected.to contain_class('heat::clients')
         is_expected.to contain_class('heat::config')
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::db')
@@ -148,6 +151,7 @@ eos
           :default_transport_url      => 'rabbit://heat1:foo@192.168.0.1:1234/?ssl=0',
           :notification_transport_url => 'rabbit://heat2:baa@192.168.0.2:5678/?ssl=0'
         )
+        is_expected.to contain_class('heat::clients')
         is_expected.to contain_class('heat::config')
         is_expected.to contain_class('heat::cors')
         is_expected.to contain_class('heat::db')

@@ -158,6 +158,7 @@ class tripleo::profile::base::heat (
       }),
     }
 
+    include heat::clients
     include heat::config
     include heat::cors
     include heat::db
