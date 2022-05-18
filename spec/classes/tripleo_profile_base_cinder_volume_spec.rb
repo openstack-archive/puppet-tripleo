@@ -288,6 +288,15 @@ describe 'tripleo::profile::base::cinder::volume' do
             :enabled_backends => ['tripleo_nfs']
           )
         end
+        context 'with multiple nfs backends' do
+          # Step 5's hiera specifies two nfs backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_nfs_1', 'tripleo_nfs_2']
+            )
+          end
+        end
       end
 
       context 'with only rbd' do

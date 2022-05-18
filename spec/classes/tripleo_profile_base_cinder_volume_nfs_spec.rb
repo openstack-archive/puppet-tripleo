@@ -74,6 +74,27 @@ describe 'tripleo::profile::base::cinder::volume::nfs' do
           )
         end
       end
+      context 'with multiple backends' do
+        let(:params) { {
+          :backend_name => ['tripleo_nfs_1', 'tripleo_nfs_2'],
+          :multi_config => { 'tripleo_nfs_1' => {
+                              'CinderNfsSnapshotSupport' => 'true',
+                             },
+                             'tripleo_nfs_2' => {
+                              'CinderNfsSharesConfig' => '/etc/cinder/shares-nfs_2.conf',
+                             },
+                           },
+          :step         => 4,
+        } }
+        it 'should configure each backend' do
+          is_expected.to contain_cinder__backend__nfs('tripleo_nfs_1')
+          is_expected.to contain_cinder_config('tripleo_nfs_1/nfs_snapshot_support').with_value('true')
+          is_expected.to contain_cinder_config('tripleo_nfs_1/nfs_shares_config').with_value('/etc/cinder/shares-nfs.conf')
+          is_expected.to contain_cinder__backend__nfs('tripleo_nfs_2')
+          is_expected.to contain_cinder_config('tripleo_nfs_2/nfs_snapshot_support').with_value('<SERVICE DEFAULT>')
+          is_expected.to contain_cinder_config('tripleo_nfs_2/nfs_shares_config').with_value('/etc/cinder/shares-nfs_2.conf')
+        end
+      end
 
       context 'with selinux' do
         before :each do

@@ -31,3 +31,11 @@ cinder::backend::netapp::volume_backend_name:
 tripleo::profile::base::cinder::volume::netapp::multi_config:
   tripleo_netapp_2:
     CinderNetappNfsSharesConfig: '/etc/cinder/shares_2.conf'
+tripleo::profile::base::cinder::volume::nfs::backend_name:
+  - 'tripleo_nfs_1'
+  - 'tripleo_nfs_2'
+tripleo::profile::base::cinder::volume::nfs::cinder_nfs_servers:
+  - '127.0.0.1'
+tripleo::profile::base::cinder::volume::nfs::multi_config:
+  tripleo_nfs_2:
+    CinderNfsSharesConfig: '/etc/cinder/shares-nfs_2.conf'
