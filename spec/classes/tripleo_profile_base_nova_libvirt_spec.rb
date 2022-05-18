@@ -49,9 +49,6 @@ eos
         is_expected.to_not contain_class('nova::compute::libvirt::virtsecretd')
         is_expected.to_not contain_class('nova::compute::libvirt::virtstoraged')
         is_expected.to_not contain_class('nova::compute::libvirt::services')
-        is_expected.to_not contain_file('/etclibvirt/qemu/networks/autostart/default.xml')
-        is_expected.to_not contain_file('/etclibvirt/qemu/networks/default.xml')
-        is_expected.to_not contain_exec('libvirt-default-net-destroy')
         is_expected.to_not contain_exec('set libvirt sasl credentials')
       }
     end
@@ -90,9 +87,6 @@ eos
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_class('nova::compute::libvirt::qemu')
         is_expected.to contain_class('nova::migration::qemu')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
-        is_expected.to contain_exec('libvirt-default-net-destroy')
         is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config(
           libvirt_daemon_config_default)
         is_expected.to contain_package('cyrus-sasl-scram')
@@ -138,9 +132,6 @@ eos
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_class('nova::compute::libvirt::qemu')
         is_expected.to contain_class('nova::migration::qemu')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
-        is_expected.to contain_exec('libvirt-default-net-destroy')
         is_expected.to contain_class('nova::compute::libvirt::config').with_virtnodedevd_config(libvirt_daemon_config_default)
         is_expected.to contain_class('nova::compute::libvirt::config').with_virtqemud_config(libvirt_daemon_config_default)
         is_expected.to contain_class('nova::compute::libvirt::config').with_virtproxyd_config(libvirt_daemon_config_default)
@@ -186,9 +177,6 @@ eos
         is_expected.to_not contain_class('nova::compute::libvirt::virtsecretd')
         is_expected.to_not contain_class('nova::compute::libvirt::virtstoraged')
         is_expected.to contain_class('nova::compute::libvirt::services')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
-        is_expected.to contain_exec('libvirt-default-net-destroy')
         is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config(
           libvirt_daemon_config_default.merge(params[:libvirtd_config]))
         is_expected.to contain_package('cyrus-sasl-scram')
@@ -229,9 +217,6 @@ eos
         is_expected.to contain_class('nova::compute::libvirt::services')
         is_expected.to contain_class('nova::compute::libvirt::qemu')
         is_expected.to contain_class('nova::migration::qemu')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/autostart/default.xml').with_ensure('absent')
-        is_expected.to contain_file('/etc/libvirt/qemu/networks/default.xml').with_ensure('absent')
-        is_expected.to contain_exec('libvirt-default-net-destroy')
         is_expected.to contain_class('nova::compute::libvirt::config').with_libvirtd_config(
           libvirt_daemon_config_default)
         is_expected.to contain_package('cyrus-sasl-scram')
