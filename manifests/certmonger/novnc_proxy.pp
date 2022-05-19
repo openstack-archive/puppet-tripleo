@@ -71,7 +71,17 @@ class tripleo::certmonger::novnc_proxy (
     notify  => Service['certmonger']
   })
 
-  certmonger_certificate { 'novnc-proxy' :
+  file { $service_key :
+    group => 'qemu',
+    mode  => '0640',
+    audit => [content],
+  }
+  ~> exec { "Purge ${service_certificate}" :
+    command     => "rm -f ${service_certificate}",
+    refreshonly => true,
+    path        => '/usr/bin:/bin',
+  }
+  -> certmonger_certificate { 'novnc-proxy' :
     ensure       => 'present',
     certfile     => $service_certificate,
     keyfile      => $service_key,
@@ -87,15 +97,27 @@ class tripleo::certmonger::novnc_proxy (
     subscribe    => File[$service_key],
   }
 
-  file { $service_certificate :
-    require => Certmonger_certificate['novnc-proxy'],
-    mode    => '0644'
+  exec { $service_certificate :
+    require   => Certmonger_certificate['novnc-proxy'],
+    command   => "test -f ${service_certificate}",
+    unless    => "test -f ${service_certificate}",
+    tries     => 60,
+    try_sleep => 1,
+    timeout   => 60,
+    path      => '/usr/bin:/bin',
   }
-  file { $service_key :
-    mode  => '0640',
-    audit => [content],
+  -> exec { "Change permissions and owner of ${service_key} and ${service_certificate}":
+    command     => "chgrp qemu ${service_key} && chmod 0640 ${service_key} && chgrp qemu ${service_certificate} && chmod 0640 ${service_certificate}", # lint:ignore:140chars
+    refreshonly => true,
+    path        => '/usr/bin:/bin',
   }
 
-  File[$service_certificate] ~> Service<| title == $notify_service_real |>
+  file { $service_certificate :
+    group => 'qemu',
+    mode  => '0644'
+  }
+
+  Certmonger_certificate['novnc-proxy'] ~> Exec["Change permissions and owner of ${service_key} and ${service_certificate}"]
+  Exec["Purge ${service_certificate}"] -> File[$service_certificate] ~> Service<| title == $notify_service_real |>
   File[$service_key] ~> Service<| title == $notify_service_real |>
 }

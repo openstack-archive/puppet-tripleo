@@ -127,8 +127,8 @@ define tripleo::certmonger::libvirt_vnc (
     timeout   => 60,
     path      => '/usr/bin:/bin',
   }
-  -> exec { "Change permissions and owner of ${service_key}":
-    command     => "chgrp qemu ${service_key} && chmod 0640 ${service_key}",
+  -> exec { "Change permissions and owner of ${service_key} and ${service_certificate}":
+    command     => "chgrp qemu ${service_key} && chmod 0640 ${service_key} && chgrp qemu ${service_certificate} && chmod 0640 ${service_certificate}", # lint:ignore:140chars
     refreshonly => true,
     path        => '/usr/bin:/bin',
   }
@@ -138,7 +138,7 @@ define tripleo::certmonger::libvirt_vnc (
     mode  => '0644'
   }
 
-  Certmonger_certificate[$name] ~> Exec["Change permissions and owner of ${service_key}"]
+  Certmonger_certificate[$name] ~> Exec["Change permissions and owner of ${service_key} and ${service_certificate}"]
   Exec["Purge ${service_certificate}"] -> File[$service_certificate] ~> Service<| title == $notify_service_real |>
   File[$service_key] ~> Service<| title == $notify_service_real |>
 }
