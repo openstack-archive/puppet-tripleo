@@ -103,7 +103,6 @@ eos
             'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
           }
         )
-        is_expected.to_not contain_ssh__server__match_block('nova_migration deny')
         is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
           :content => 'ssh-rsa bar\nssh-rsa baz',
           :mode => '0640',
@@ -114,132 +113,6 @@ eos
           :shell => '/bin/bash'
         )
       }
-    end
-
-    context 'with step 4 with ssh_localaddrs' do
-      let(:pre_condition) {
-        <<-eos
-        class { 'tripleo::profile::base::nova::migration':
-          step => #{params[:step]}
-        }
-        class { 'ssh':
-          storeconfigs_enabled => false,
-          server_options       => {}
-        }
-eos
-      }
-
-      let(:params) { {
-        :step                => 4,
-        :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :ssh_localaddrs      => ['127.0.0.1', '127.0.0.2']
-      } }
-
-      it {
-        is_expected.to contain_class('tripleo::profile::base::nova::migration')
-        is_expected.to contain_ssh__server__match_block('nova_migration allow').with(
-          :type  => 'LocalAddress 127.0.0.1,127.0.0.2 User',
-          :name  => 'nova_migration',
-          :options => {
-            'AllowUsers'             => 'nova_migration',
-            'ForceCommand'           => '/bin/nova-migration-wrapper',
-            'PasswordAuthentication' => 'no',
-            'AllowTcpForwarding'     => 'no',
-            'X11Forwarding'          => 'no',
-            'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
-          }
-        )
-        is_expected.to contain_ssh__server__match_block('nova_migration deny').with(
-          :type  => 'LocalAddress',
-          :name  => '!127.0.0.1,!127.0.0.2',
-          :options => {
-            'DenyUsers' => 'nova_migration'
-          }
-        )
-        is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
-          :content => 'ssh-rsa bar\nssh-rsa baz',
-          :mode => '0640',
-          :owner => 'root',
-          :group => 'nova_migration',
-        )
-        is_expected.to contain_user('nova_migration').with(
-          :shell => '/bin/bash'
-        )
-      }
-    end
-
-    context 'with step 4 with duplicate ssh_localaddrs' do
-      let(:pre_condition) {
-        <<-eos
-        class { 'tripleo::profile::base::nova::migration':
-          step => #{params[:step]}
-        }
-        class { 'ssh':
-          storeconfigs_enabled => false,
-          server_options       => {}
-        }
-eos
-      }
-
-      let(:params) { {
-        :step                => 4,
-        :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :ssh_localaddrs      => ['127.0.0.1', '127.0.0.1']
-      } }
-
-      it {
-        is_expected.to contain_class('tripleo::profile::base::nova::migration')
-        is_expected.to contain_ssh__server__match_block('nova_migration allow').with(
-          :type  => 'LocalAddress 127.0.0.1 User',
-          :name  => 'nova_migration',
-          :options => {
-            'AllowUsers'             => 'nova_migration',
-            'ForceCommand'           => '/bin/nova-migration-wrapper',
-            'PasswordAuthentication' => 'no',
-            'AllowTcpForwarding'     => 'no',
-            'X11Forwarding'          => 'no',
-            'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
-          }
-        )
-        is_expected.to contain_ssh__server__match_block('nova_migration deny').with(
-          :type  => 'LocalAddress',
-          :name  => '!127.0.0.1',
-          :options => {
-            'DenyUsers' => 'nova_migration'
-          }
-        )
-        is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
-          :content => 'ssh-rsa bar\nssh-rsa baz',
-          :mode => '0640',
-          :owner => 'root',
-          :group => 'nova_migration',
-        )
-        is_expected.to contain_user('nova_migration').with(
-          :shell => '/bin/bash'
-        )
-      }
-    end
-
-    context 'with step 4 with invalid ssh_localaddrs' do
-      let(:pre_condition) {
-        <<-eos
-        class { 'tripleo::profile::base::nova::migration':
-          step => #{params[:step]}
-        }
-        class { 'ssh':
-          storeconfigs_enabled => false,
-          server_options       => {}
-        }
-eos
-      }
-
-      let(:params) { {
-        :step                => 4,
-        :ssh_authorized_keys => ['ssh-rsa bar', 'ssh-rsa baz'],
-        :ssh_localaddrs      => ['127.0.0.1', '']
-      } }
-
-      it { is_expected.to_not compile }
     end
 
     context 'with step 4 with wrapper_command' do
@@ -275,7 +148,6 @@ eos
             'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
           }
         )
-        is_expected.to_not contain_ssh__server__match_block('nova_migration deny')
         is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
           :content => 'ssh-rsa bar\nssh-rsa baz',
           :mode => '0640',
