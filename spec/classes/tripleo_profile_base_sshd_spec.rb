@@ -37,31 +37,6 @@ describe 'tripleo::profile::base::sshd' do
           },
           'client_options' => {},
         })
-        is_expected.to_not contain_file('/etc/issue')
-        is_expected.to_not contain_file('/etc/issue.net')
-        is_expected.to_not contain_file('/etc/motd')
-      end
-    end
-
-    context 'it should do nothing with empty strings' do
-      let(:params) {{ :bannertext => '', :motd => '' }}
-      it do
-        is_expected.to contain_class('ssh').with({
-          'storeconfigs_enabled' => false,
-          'server_options' => {
-            'Port' => [22],
-            'HostKey' => [
-              '/etc/ssh/ssh_host_rsa_key',
-              '/etc/ssh/ssh_host_ecdsa_key',
-              '/etc/ssh/ssh_host_ed25519_key',
-            ],
-            'PasswordAuthentication' => 'no',
-          },
-          'client_options' => {},
-        })
-        is_expected.to_not contain_file('/etc/issue')
-        is_expected.to_not contain_file('/etc/issue.net')
-        is_expected.to_not contain_file('/etc/motd')
       end
     end
 
@@ -122,67 +97,6 @@ describe 'tripleo::profile::base::sshd' do
       end
     end
 
-    context 'with issue and issue.net configured' do
-      let(:params) {{ :bannertext => 'foo' }}
-      it do
-        is_expected.to contain_class('ssh').with({
-          'storeconfigs_enabled' => false,
-          'server_options' => {
-            'Banner' => '/etc/issue.net',
-            'Port' => [22],
-            'HostKey' => [
-              '/etc/ssh/ssh_host_rsa_key',
-              '/etc/ssh/ssh_host_ecdsa_key',
-              '/etc/ssh/ssh_host_ed25519_key',
-            ],
-            'PasswordAuthentication' => 'no',
-          },
-          'client_options' => {},
-        })
-        is_expected.to contain_file('/etc/issue').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-        is_expected.to contain_file('/etc/issue.net').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-        is_expected.to_not contain_file('/etc/motd')
-      end
-    end
-
-    context 'with motd configured' do
-      let(:params) {{ :motd => 'foo' }}
-      it do
-        is_expected.to contain_class('ssh').with({
-          'storeconfigs_enabled' => false,
-          'server_options' => {
-            'Port' => [22],
-            'PrintMotd' => 'yes',
-            'HostKey' => [
-              '/etc/ssh/ssh_host_rsa_key',
-              '/etc/ssh/ssh_host_ecdsa_key',
-              '/etc/ssh/ssh_host_ed25519_key',
-            ],
-            'PasswordAuthentication' => 'no',
-          },
-          'client_options' => {},
-        })
-        is_expected.to contain_file('/etc/motd').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-        is_expected.to_not contain_file('/etc/issue')
-        is_expected.to_not contain_file('/etc/issue.net')
-      end
-    end
-
     context 'with options configured' do
       let(:params) {{ :options => {'X11Forwarding' => 'no'} }}
       it do
@@ -200,99 +114,6 @@ describe 'tripleo::profile::base::sshd' do
           },
           'client_options' => {},
         })
-        is_expected.to_not contain_file('/etc/motd')
-        is_expected.to_not contain_file('/etc/issue')
-        is_expected.to_not contain_file('/etc/issue.net')
-      end
-    end
-
-    context 'with motd and issue configured' do
-      let(:params) {{
-        :bannertext => 'foo',
-        :motd => 'foo'
-      }}
-      it do
-        is_expected.to contain_class('ssh').with({
-          'storeconfigs_enabled' => false,
-          'server_options' => {
-            'Banner' => '/etc/issue.net',
-            'Port' => [22],
-            'PrintMotd' => 'yes',
-            'HostKey' => [
-              '/etc/ssh/ssh_host_rsa_key',
-              '/etc/ssh/ssh_host_ecdsa_key',
-              '/etc/ssh/ssh_host_ed25519_key',
-            ],
-            'PasswordAuthentication' => 'no',
-          },
-          'client_options' => {},
-        })
-        is_expected.to contain_file('/etc/motd').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-        is_expected.to contain_file('/etc/issue').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-        is_expected.to contain_file('/etc/issue.net').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-      end
-    end
-
-    context 'with motd and issue and options configured' do
-      let(:params) {{
-        :bannertext => 'foo',
-        :motd => 'foo',
-        :options => {
-          'Port' => [22],
-          'PrintMotd' => 'no', # this should be overridden
-          'X11Forwarding' => 'no',
-        }
-      }}
-      it do
-        is_expected.to contain_class('ssh').with({
-          'storeconfigs_enabled' => false,
-          'server_options' => {
-            'Banner' => '/etc/issue.net',
-            'Port' => [22],
-            'PrintMotd' => 'yes',
-            'X11Forwarding' => 'no',
-            'HostKey' => [
-              '/etc/ssh/ssh_host_rsa_key',
-              '/etc/ssh/ssh_host_ecdsa_key',
-              '/etc/ssh/ssh_host_ed25519_key',
-            ],
-            'PasswordAuthentication' => 'no',
-          },
-          'client_options' => {},
-        })
-        is_expected.to contain_file('/etc/motd').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-        is_expected.to contain_file('/etc/issue').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
-        is_expected.to contain_file('/etc/issue.net').with({
-          'content' => 'foo',
-          'owner'   => 'root',
-          'group'   => 'root',
-          'mode'    => '0644',
-          })
       end
     end
   end
