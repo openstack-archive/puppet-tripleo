@@ -24,24 +24,36 @@
 #   details.
 #   Defaults to {}
 #
+# [*listen*]
+#   List of addresses to which sshd daemon listens.
+#   Defaults to []
+#
 # [*port*]
 #   SSH port or list of ports to bind to
 #   Defaults to [22]
-
+#
 # [*password_authentication*]
 #   Whether or not disable password authentication
 #   Defaults to 'no'
 
 class tripleo::profile::base::sshd (
   $options                 = {},
+  $listen                  = [],
   $port                    = [22],
   $password_authentication = 'no',
 ) {
 
+  if $options['ListenAddress'] {
+    $sshd_options_listen = {'ListenAddress' => unique(concat(any2array($options['ListenAddress']), $listen))}
+  } elsif !empty($listen) {
+    $sshd_options_listen = {'ListenAddress' => unique(any2array($listen))}
+  } else {
+    $sshd_options_listen = {}
+  }
+
   if $options['Port'] {
     $sshd_options_port = {'Port' => unique(concat(any2array($options['Port']), $port))}
-  }
-  else {
+  } else {
     $sshd_options_port = {'Port' => unique(any2array($port))}
   }
 
@@ -62,6 +74,7 @@ class tripleo::profile::base::sshd (
     $options,
     $basic_options,
     $sshd_options_port,
+    $sshd_options_listen,
     $password_auth_options,
   )
 

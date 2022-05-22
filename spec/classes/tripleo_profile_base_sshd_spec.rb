@@ -22,12 +22,12 @@ describe 'tripleo::profile::base::sshd' do
 
   shared_examples_for 'tripleo::profile::base::sshd' do
 
-    context 'it should do nothing' do
+    context 'with defaults' do
       it do
         is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
           'server_options' => {
-            'Port'    => [22],
+            'Port' => [22],
             'HostKey' => [
               '/etc/ssh/ssh_host_rsa_key',
               '/etc/ssh/ssh_host_ecdsa_key',
@@ -40,12 +40,17 @@ describe 'tripleo::profile::base::sshd' do
       end
     end
 
-    context 'with port and paswword_authentification configured' do
-      let(:params) {{ :port => 123, :password_authentication => 'yes' }}
+    context 'with all parameters configured' do
+      let(:params) {{
+        :listen                  => '192.0.2.1',
+        :port                    => 123,
+        :password_authentication => 'yes'
+      }}
       it do
         is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
           'server_options' => {
+            'ListenAddress' => ['192.0.2.1'],
             'Port' => [123],
             'HostKey' => [
               '/etc/ssh/ssh_host_rsa_key',
@@ -59,8 +64,57 @@ describe 'tripleo::profile::base::sshd' do
       end
     end
 
+    context 'with listen configured and listen option' do
+      let(:params) {{
+        :listen  => ['192.0.2.1'],
+        :options => { 'ListenAddress' => ['192.0.2.2'] }
+      }}
+      it do
+        is_expected.to contain_class('ssh').with({
+          'storeconfigs_enabled' => false,
+          'server_options' => {
+            'ListenAddress' => ['192.0.2.2', '192.0.2.1'],
+            'Port' => [22],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
+            'PasswordAuthentication' => 'no',
+          },
+          'client_options' => {},
+        })
+      end
+    end
+
+    context 'with listen configured and same listen option' do
+      let(:params) {{
+        :listen  => ['192.0.2.1'],
+        :options => { 'ListenAddress' => ['192.0.2.1'] }
+      }}
+      it do
+        is_expected.to contain_class('ssh').with({
+          'storeconfigs_enabled' => false,
+          'server_options' => {
+            'ListenAddress' => ['192.0.2.1'],
+            'Port' => [22],
+            'HostKey' => [
+              '/etc/ssh/ssh_host_rsa_key',
+              '/etc/ssh/ssh_host_ecdsa_key',
+              '/etc/ssh/ssh_host_ed25519_key',
+            ],
+            'PasswordAuthentication' => 'no',
+          },
+          'client_options' => {},
+        })
+      end
+    end
+
     context 'with port configured and port option' do
-      let(:params) {{ :port => 123, :options => {'Port' => 456}  }}
+      let(:params) {{
+        :port    => 123,
+        :options => { 'Port' => 456 }
+      }}
       it do
         is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
@@ -79,7 +133,10 @@ describe 'tripleo::profile::base::sshd' do
     end
 
     context 'with port configured and same port option' do
-      let(:params) {{ :port => 123, :options => {'Port' => 123}  }}
+      let(:params) {{
+        :port    => 123,
+        :options => { 'Port' => 123 }
+      }}
       it do
         is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
@@ -98,7 +155,9 @@ describe 'tripleo::profile::base::sshd' do
     end
 
     context 'with options configured' do
-      let(:params) {{ :options => {'X11Forwarding' => 'no'} }}
+      let(:params) {{
+        :options => { 'X11Forwarding' => 'no' }
+      }}
       it do
         is_expected.to contain_class('ssh').with({
           'storeconfigs_enabled' => false,
