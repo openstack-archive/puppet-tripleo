@@ -1736,7 +1736,6 @@ class tripleo::haproxy (
       mode                      => 'http',
       haproxy_listen_bind_param => [],  # We don't use a transparent proxy here
       listen_options            => {
-        'option'       => [ 'httpchk', 'httplog', ],
         # NOTE(jaosorior): Websockets have more overhead in establishing
         # connections than regular HTTP connections. Also, since it begins
         # as an HTTP connection and then "upgrades" to a TCP connection, some
