@@ -25,11 +25,11 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::iscsid (
   $chap_algs = 'SHA3-256,SHA256,SHA1,MD5',
-  $step      = Integer(hiera('step')),
+  $step      = Integer(lookup('step')),
 ) {
 
   if $step >= 2 {
