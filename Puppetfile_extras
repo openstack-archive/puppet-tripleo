@@ -13,10 +13,6 @@ mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
   :ref => 'master'
 
-mod 'ptp',
-  :git => 'https://github.com/redhat-nfvpe/ptp',
-  :ref => 'master'
-
 # NOTE(aschultz): Pinned due to LP#1755211
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
