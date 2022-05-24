@@ -21,11 +21,11 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*pcs_user*]
 #   (Optional) The user to set up pcsd with
@@ -35,15 +35,15 @@
 #   (Optional) The password to be used for the pcs_user. While it is
 #   optional as a parameter, the hiera key 'hacluster_pwd' *must* not
 #   be undefined or an error will be generated.
-#   Defaults to hiera('hacluster_pwd', undef)
+#   Defaults to lookup('hacluster_pwd', undef, undef, undef)
 #
 # [*remote_short_node_names*]
 #   (Optional) List of short node names for pacemaker remote nodes
-#   Defaults to hiera('pacemaker_remote_short_node_names', [])
+#   Defaults to lookup('pacemaker_remote_short_node_names', undef, undef, [])
 #
 # [*remote_node_ips*]
 #   (Optional) List of node ips for pacemaker remote nodes
-#   Defaults to hiera('pacemaker_remote_node_ips', [])
+#   Defaults to lookup('pacemaker_remote_node_ips', undef, undef, [])
 #
 # [*remote_authkey*]
 #   (Optional) Authkey for pacemaker remote nodes
@@ -51,19 +51,19 @@
 #
 # [*remote_reconnect_interval*]
 #   (Optional) Reconnect interval for the remote
-#   Defaults to hiera('pacemaker_remote_reconnect_interval', 60)
+#   Defaults to lookup('pacemaker_remote_reconnect_interval', undef, undef, 60)
 #
 # [*remote_monitor_interval*]
 #   (Optional) Monitor interval for the remote
-#   Defaults to hiera('pacemaker_monitor_reconnect_interval', 20)
+#   Defaults to lookup('pacemaker_monitor_reconnect_interval', undef, undef, 20)
 #
 # [*remote_tries*]
 #   (Optional) Number of tries for the remote resource creation
-#   Defaults to hiera('pacemaker_remote_tries', 5)
+#   Defaults to lookup('pacemaker_remote_tries', undef, undef, 5)
 #
 # [*remote_try_sleep*]
 #   (Optional) Number of seconds to sleep between remote creation tries
-#   Defaults to hiera('pacemaker_remote_try_sleep', 60)
+#   Defaults to lookup('pacemaker_remote_try_sleep', undef, undef, 60)
 #
 # [*cluster_recheck_interval*]
 #   (Optional) Set the cluster-wide cluster-recheck-interval property
@@ -71,7 +71,7 @@
 #   won't be changed from its default value when there are no pacemaker_remote
 #   nodes. In presence of pacemaker_remote nodes and an undef value it will
 #   be set to 60s.
-#   Defaults to hiera('pacemaker_cluster_recheck_interval', undef)
+#   Defaults to lookup('pacemaker_cluster_recheck_interval', undef, undef, undef)
 #
 # [*encryption*]
 #   (Optional) Whether or not to enable encryption of the pacemaker traffic
@@ -83,7 +83,7 @@
 #
 # [*enable_instanceha*]
 #  (Optional) Boolean driving the Instance HA controlplane configuration
-#  Defaults to false
+#  Defaults to lookup('tripleo::instanceha', undef, undef, false)
 #
 # [*pcsd_bind_addr*]
 #   (Optional) List of IP addresses pcsd should bind to
@@ -91,30 +91,30 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*cluster_properties*]
 #   (optional) Cluster-wide properties that can be set by an operator via hiera
 #   Defaults to {}
 
 class tripleo::profile::base::pacemaker (
-  $step                      = Integer(hiera('step')),
-  $pcs_tries                 = hiera('pcs_tries', 20),
+  $step                      = Integer(lookup('step')),
+  $pcs_tries                 = lookup('pcs_tries', undef, undef, 20),
   $pcs_user                  = 'hacluster',
-  $pcs_password              = hiera('hacluster_pwd', undef),
-  $remote_short_node_names   = hiera('pacemaker_remote_short_node_names', []),
-  $remote_node_ips           = hiera('pacemaker_remote_node_ips', []),
+  $pcs_password              = lookup('hacluster_pwd', undef, undef, undef),
+  $remote_short_node_names   = lookup('pacemaker_remote_short_node_names', undef, undef, []),
+  $remote_node_ips           = lookup('pacemaker_remote_node_ips', undef, undef, []),
   $remote_authkey            = undef,
-  $remote_reconnect_interval = hiera('pacemaker_remote_reconnect_interval', 60),
-  $remote_monitor_interval   = hiera('pacemaker_remote_monitor_interval', 20),
-  $remote_tries              = hiera('pacemaker_remote_tries', 5),
-  $remote_try_sleep          = hiera('pacemaker_remote_try_sleep', 60),
-  $cluster_recheck_interval  = hiera('pacemaker_cluster_recheck_interval', undef),
+  $remote_reconnect_interval = lookup('pacemaker_remote_reconnect_interval', undef, undef, 60),
+  $remote_monitor_interval   = lookup('pacemaker_remote_monitor_interval', undef, undef, 20),
+  $remote_tries              = lookup('pacemaker_remote_tries', undef, undef, 5),
+  $remote_try_sleep          = lookup('pacemaker_remote_try_sleep', undef, undef, 60),
+  $cluster_recheck_interval  = lookup('pacemaker_cluster_recheck_interval', undef, undef, undef),
   $encryption                = true,
   $resource_op_defaults      = undef,
-  $enable_instanceha         = hiera('tripleo::instanceha', false),
+  $enable_instanceha         = lookup('tripleo::instanceha', undef, undef, false),
   $pcsd_bind_addr            = undef,
-  $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities            = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $cluster_properties        = {},
 ) {
 
@@ -128,7 +128,7 @@ class tripleo::profile::base::pacemaker (
   }
   # During FFU when override keys are set we need to use the old authkey style
   # This should be kept until FFU from CentOS 7->8 is being supported
-  if count(hiera('pacemaker_node_ips_override', [])) > 0 {
+  if count(lookup('pacemaker_node_ips_override', undef, undef, [])) > 0 {
     $force_old_style_remotes_real = true
   } else {
     $force_old_style_remotes_real = false
@@ -140,7 +140,7 @@ class tripleo::profile::base::pacemaker (
     try_sleep => 3,
   }
 
-  if $::hostname == downcase(hiera('pacemaker_short_bootstrap_node_name')) {
+  if $::hostname == downcase(lookup('pacemaker_short_bootstrap_node_name')) {
     $pacemaker_master = true
   } else {
     $pacemaker_master = false
@@ -152,23 +152,24 @@ class tripleo::profile::base::pacemaker (
   # During step1 the cluster is created (and also the pcmk remote resources in case of IHA)
   # Since stonith resources are created on each node separately we need to have the guarantee that
   # all cluster nodes + remote exist before creating stonith resources for them
-  $enable_fencing = str2bool(hiera('enable_fencing', false)) and $step >= 5
-  $enable_stonith_resources = str2bool(hiera('enable_fencing', false)) and $step >= 2
+  $enable_fencing = str2bool(lookup('enable_fencing', undef, undef, false)) and $step >= 5
+  $enable_stonith_resources = str2bool(lookup('enable_fencing', undef, undef, false)) and $step >= 2
 
   if $step >= 1 {
-    if (hiera('pacemaker_short_node_names_override', undef)) {
-      $pacemaker_short_node_names = join(hiera('pacemaker_short_node_names_override'), ',')
+    if (lookup('pacemaker_short_node_names_override', undef, undef, undef)) {
+      $pacemaker_short_node_names = join(lookup('pacemaker_short_node_names_override'), ',')
     } else {
-      $pacemaker_short_node_names = join(hiera('pacemaker_short_node_names'), ',')
+      $pacemaker_short_node_names = join(lookup('pacemaker_short_node_names'), ',')
     }
 
     $pacemaker_cluster_members = downcase(regsubst($pacemaker_short_node_names, ',', ' ', 'G'))
     $cluster_setup_extras = {
-      "totem token=${hiera('corosync_token_timeout', 1000)}" => '',
+      "totem token=${lookup('corosync_token_timeout', undef, undef, 1000)}" => '',
     }
     # If pacemaker_node_ips is not empty we want to create the array
     # for puppet pacemaker to use as addresses list which is an array of arrays.
-    $pacemaker_node_ips = hiera('pacemaker_node_ips_override', hiera('pacemaker_node_ips', []))
+    $pacemaker_node_ips = lookup('pacemaker_node_ips_override', undef, undef,
+                                  lookup('pacemaker_node_ips', undef, undef, []))
     if count($pacemaker_node_ips) > 0 {
       $pacemaker_node_ips_real = $pacemaker_node_ips.map |$x| { Array([$x]) }
     } else {
@@ -192,7 +193,7 @@ class tripleo::profile::base::pacemaker (
       pcsd_bind_addr       => $pcsd_bind_addr,
       tls_priorities       => $tls_priorities,
     }
-    if str2bool(hiera('docker_enabled', false)) {
+    if str2bool(lookup('docker_enabled', undef, undef, false)) {
       include systemd::systemctl::daemon_reload
 
       Package<| name == 'docker' |>

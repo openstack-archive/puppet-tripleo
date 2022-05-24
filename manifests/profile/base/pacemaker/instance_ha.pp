@@ -22,77 +22,77 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*keystone_endpoint_url*]
 #   The keystone public endpoint url
-#   Defaults to hiera('keystone::endpoint::public_url')
+#   Defaults to lookup('keystone::endpoint::public_url')
 #
 # [*keystone_password*]
 #   The keystone admin password
-#   Defaults to hiera('keystone::admin_password')
+#   Defaults to lookup('keystone::admin_password')
 #
 # [*keystone_admin*]
 #   The keystone admin username
-#   Defaults to hiera('keystone::roles::admin::admin_tenant', 'admin')
+#   Defaults to lookup('keystone::roles::admin::admin_tenant', undef, undef, 'admin')
 #
 # [*keystone_tenant*]
 #   The keystone tenant
-#   Defaults to hiera('keystone::roles::admin::admin_tenant', 'admin')
+#   Defaults to lookup('keystone::roles::admin::admin_tenant', undef, undef, 'admin')
 #
 # [*keystone_domain*]
 #   The keystone domain
-#   Defaults to hiera('tripleo::clouddomain', 'localdomain')
+#   Defaults to lookup('tripleo::clouddomain', undef, undef, 'localdomain')
 #
 # [*user_domain*]
 #   The keystone user domain for nova
-#   Defaults to hiera('nova::keystone::authtoken::user_domain_name', 'Default')
+#   Defaults to lookup('nova::keystone::authtoken::user_domain_name', undef, undef, 'Default')
 #
 # [*project_domain*]
 #   The keystone project domain for nova
-#   Defaults to hiera('nova::keystone::authtoken::project_domain_name', 'Default')
+#   Defaults to lookup('nova::keystone::authtoken::project_domain_name', undef, undef, 'Default')
 #
 # [*region_name*]
 #   (Optional) String. Region name for authenticating to Keystone.
-#   Defaults to hiera('nova::keystone::authtoken::region_name', 'regionOne')
+#   Defaults to lookup('nova::keystone::authtoken::region_name', undef, undef, 'regionOne')
 #
 # [*no_shared_storage*]
 #   Variable that defines the no_shared_storage for the nova evacuate resource
-#   Defaults to hiera('tripleo::instanceha::no_shared_storage', true)
+#   Defaults to lookup('tripleo::instanceha::no_shared_storage', undef, undef, true)
 #
 # [*evacuate_delay*]
 #   (Optional) Integer, seconds to wait before starting the nova evacuate
-#   Defaults to hiera('tripleo::instanceha::evacuate_delay', 0)
+#   Defaults to lookup('tripleo::instanceha::evacuate_delay', undef, undef, 0)
 #
 # [*deep_compare_fencing*]
 #   (Optional) Boolean, should fence_compute be deep compared in order to
 #   update the existing fencing resource when puppet is being rerun
-#   Defaults to hiera('tripleo::fencing', true)
+#   Defaults to lookup('tripleo::fencing', undef, undef, true)
 #
 # [*deep_compare_ocf*]
 #   (Optional) Boolean, should the IHA ocf resource nova evacuate be deep
 #   compared in order to update the resource when puppet is being rerun
-#   Defaults to hiera('pacemaker::resource::ocf::deep_compare', true)
+#   Defaults to lookup('pacemaker::resource::ocf::deep_compare', undef, undef, true)
 #
 class tripleo::profile::base::pacemaker::instance_ha (
-  $step                  = Integer(hiera('step')),
-  $pcs_tries             = hiera('pcs_tries', 20),
-  $keystone_endpoint_url = hiera('keystone::endpoint::public_url'),
-  $keystone_password     = hiera('keystone::admin_password'),
-  $keystone_admin        = hiera('keystone::roles::admin::admin_tenant', 'admin'),
-  $keystone_tenant       = hiera('keystone::roles::admin::admin_tenant', 'admin'),
-  $keystone_domain       = hiera('tripleo::clouddomain', 'localdomain'),
-  $user_domain           = hiera('nova::keystone::authtoken::user_domain_name', 'Default'),
-  $project_domain        = hiera('nova::keystone::authtoken::project_domain_name', 'Default'),
-  $region_name           = hiera('nova::keystone::authtoken::region_name', 'regionOne'),
-  $no_shared_storage     = hiera('tripleo::instanceha::no_shared_storage', true),
-  $evacuate_delay        = hiera('tripleo::instanceha::evacuate_delay', 0),
-  $deep_compare_fencing  = hiera('tripleo::fencing', true),
-  $deep_compare_ocf      = hiera('pacemaker::resource::ocf::deep_compare', true),
+  $step                  = Integer(lookup('step')),
+  $pcs_tries             = lookup('pcs_tries', undef, undef, 20),
+  $keystone_endpoint_url = lookup('keystone::endpoint::public_url'),
+  $keystone_password     = lookup('keystone::admin_password'),
+  $keystone_admin        = lookup('keystone::roles::admin::admin_tenant', undef, undef, 'admin'),
+  $keystone_tenant       = lookup('keystone::roles::admin::admin_tenant', undef, undef, 'admin'),
+  $keystone_domain       = lookup('tripleo::clouddomain', undef, undef, 'localdomain'),
+  $user_domain           = lookup('nova::keystone::authtoken::user_domain_name', undef, undef, 'Default'),
+  $project_domain        = lookup('nova::keystone::authtoken::project_domain_name', undef, undef, 'Default'),
+  $region_name           = lookup('nova::keystone::authtoken::region_name', undef, undef, 'regionOne'),
+  $no_shared_storage     = lookup('tripleo::instanceha::no_shared_storage', undef, undef, true),
+  $evacuate_delay        = lookup('tripleo::instanceha::evacuate_delay', undef, undef, 0),
+  $deep_compare_fencing  = lookup('tripleo::fencing', undef, undef, true),
+  $deep_compare_ocf      = lookup('pacemaker::resource::ocf::deep_compare', undef, undef, true),
 ) {
   if $step >= 2 {
     class { 'pacemaker::resource_defaults':
@@ -109,7 +109,7 @@ class tripleo::profile::base::pacemaker::instance_ha (
   if $step >= 4 {
     # This passes the explicit host list of compute nodes that the fence_compute stonith device
     # is in charge of
-    $compute_list = downcase(join(any2array(hiera('compute_instanceha_short_node_names', '')), ','))
+    $compute_list = downcase(join(any2array(lookup('compute_instanceha_short_node_names', undef, undef, '')), ','))
     pacemaker::stonith::fence_compute { 'fence-nova':
       auth_url       => $keystone_endpoint_url,
       login          => $keystone_admin,
