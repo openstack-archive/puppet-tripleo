@@ -75,6 +75,7 @@ class tripleo::profile::base::octavia (
     include octavia::config
     include octavia::db
     include octavia::logging
+    include octavia::networking
     include octavia::service_auth
 
     if $enable_driver_agent {

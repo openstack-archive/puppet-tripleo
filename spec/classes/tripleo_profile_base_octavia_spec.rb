@@ -36,6 +36,7 @@ describe 'tripleo::profile::base::octavia' do
         is_expected.to_not contain_class('octavia::config')
         is_expected.to_not contain_class('octavia::db')
         is_expected.to_not contain_class('octavia::logging')
+        is_expected.to_not contain_class('octavia::networking')
         is_expected.to_not contain_class('octavia::service_auth')
         is_expected.to_not contain_class('octavia::driver_agent')
       end
@@ -53,6 +54,7 @@ describe 'tripleo::profile::base::octavia' do
         is_expected.to contain_class('octavia::config')
         is_expected.to contain_class('octavia::db')
         is_expected.to contain_class('octavia::logging')
+        is_expected.to contain_class('octavia::networking')
         is_expected.to contain_class('octavia::service_auth')
         is_expected.to_not contain_class('octavia::driver_agent')
       end
@@ -136,6 +138,7 @@ describe 'tripleo::profile::base::octavia' do
         is_expected.to contain_class('octavia::config')
         is_expected.to contain_class('octavia::db')
         is_expected.to contain_class('octavia::logging')
+        is_expected.to contain_class('octavia::networking')
         is_expected.to contain_class('octavia::service_auth')
         is_expected.to contain_class('octavia::driver_agent')
       end
