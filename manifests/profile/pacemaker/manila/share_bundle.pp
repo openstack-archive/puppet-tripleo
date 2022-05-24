@@ -20,7 +20,7 @@
 #
 # [*ceph_nfs_enabled*]
 #   (Optional) Whether or not the ceph_nfs service is enabled
-#   Defaults to hiera('ceph_nfs_enabled', false)
+#   Defaults to lookup('ceph_nfs_enabled', undef, undef, false)
 #
 # [*manila_share_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
@@ -36,16 +36,16 @@
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('redis_short_bootstrap_node_name')
+#   Defaults to lookup('redis_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*container_backend*]
 #   (optional) Container backend to use when creating the bundle
@@ -66,26 +66,26 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*bundle_user*]
 #   (optional) Set the --user= switch to be passed to pcmk
 #   Defaults to 'root'
 #
 class tripleo::profile::pacemaker::manila::share_bundle (
-  $bootstrap_node             = hiera('manila_share_short_bootstrap_node_name'),
+  $bootstrap_node             = lookup('manila_share_short_bootstrap_node_name'),
   $manila_share_docker_image  = undef,
   $docker_volumes             = [],
   $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
-  $ceph_nfs_enabled           = hiera('ceph_nfs_enabled', false),
+  $ceph_nfs_enabled           = lookup('ceph_nfs_enabled', undef, undef, false),
   $container_backend          = 'podman',
   $ceph_conf_path             = '/etc/ceph',
-  $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities             = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $bundle_user                = 'root',
   $log_driver                 = 'k8s-file',
   $log_file                   = '/var/log/containers/stdouts/openstack-manila-share.log',
-  $pcs_tries                  = hiera('pcs_tries', 20),
-  $step                       = Integer(hiera('step')),
+  $pcs_tries                  = lookup('pcs_tries', undef, undef, 20),
+  $step                       = Integer(lookup('step')),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -101,12 +101,12 @@ class tripleo::profile::pacemaker::manila::share_bundle (
   include tripleo::profile::base::manila::share
 
   if $step >= 2 and $pacemaker_master {
-    $manila_share_short_node_names = hiera('manila_share_short_node_names')
+    $manila_share_short_node_names = lookup('manila_share_short_node_names')
 
-    if (hiera('pacemaker_short_node_names_override', undef)) {
-      $pacemaker_short_node_names = hiera('pacemaker_short_node_names_override')
+    if (lookup('pacemaker_short_node_names_override', undef, undef, undef)) {
+      $pacemaker_short_node_names = lookup('pacemaker_short_node_names_override')
     } else {
-      $pacemaker_short_node_names = hiera('pacemaker_short_node_names')
+      $pacemaker_short_node_names = lookup('pacemaker_short_node_names')
     }
 
     $pcmk_cinder_volume_nodes = intersection($manila_share_short_node_names, $pacemaker_short_node_names)
@@ -123,7 +123,7 @@ class tripleo::profile::pacemaker::manila::share_bundle (
 
   if $step >= 5 {
     if $pacemaker_master {
-      $manila_cephfs_protocol_helper_type = hiera('manila::backend::cephfs::cephfs_protocol_helper_type', '')
+      $manila_cephfs_protocol_helper_type = lookup('manila::backend::cephfs::cephfs_protocol_helper_type', undef, undef, '')
       $docker_vol_arr = delete(any2array($docker_volumes), '').flatten()
 
       unless empty($docker_vol_arr) {

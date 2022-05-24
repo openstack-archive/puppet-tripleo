@@ -20,21 +20,21 @@
 #
 # [*pacemaker_master*]
 #   (Optional) The hostname of the pacemaker master
-#   Defaults to hiera('ovn_dbs_short_bootstrap_node_name')
+#   Defaults to lookup('ovn_dbs_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*pcs_tries*]
 #  (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*ovn_dbs_vip*]
 #   (Optional) The vip to be used for OVN DB servers. It is expected that
 #   the vip resource to be created before calling this class.
-#   Defaults to hiera('ovn_dbs_vip')
+#   Defaults to lookup('ovn_dbs_vip')
 #
 # [*nb_db_port*]
 #   The TCP port in which the OVN Northbound DB listens to.
@@ -46,10 +46,10 @@
 #
 
 class tripleo::profile::pacemaker::ovn_northd (
-  $pacemaker_master = hiera('ovn_dbs_short_bootstrap_node_name'),
-  $step             = Integer(hiera('step')),
-  $pcs_tries        = hiera('pcs_tries', 20),
-  $ovn_dbs_vip      = hiera('ovn_dbs_vip'),
+  $pacemaker_master = lookup('ovn_dbs_short_bootstrap_node_name'),
+  $step             = Integer(lookup('step')),
+  $pcs_tries        = lookup('pcs_tries', undef, undef, 20),
+  $ovn_dbs_vip      = lookup('ovn_dbs_vip'),
   $nb_db_port       = 6641,
   $sb_db_port       = 6642
 ) {

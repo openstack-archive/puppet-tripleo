@@ -28,7 +28,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('mysql_short_bootstrap_node_name')
+#   Defaults to lookup('mysql_short_bootstrap_node_name')
 #
 # [*bind_address*]
 #   (Optional) The address that the local mysql instance should bind to.
@@ -49,23 +49,23 @@
 #       service_certificate: <service certificate path>
 #       service_key: <service key path>
 #       principal: "mysql/<overcloud controller fqdn>"
-#   Defaults to hiera('tripleo::profile::base::database::mysql::certificate_specs', {}).
+#   Defaults to lookup('tripleo::profile::base::database::mysql::certificate_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*gmcast_listen_addr*]
 #   (Optional) This variable defines the address on which the node listens to
 #   connections from other nodes in the cluster.
-#   Defaults to hiera('mysql_bind_host')
+#   Defaults to lookup('mysql_bind_host')
 #
 # [*innodb_flush_log_at_trx_commit*]
 #   (Optional) Disk flush behavior for MySQL under Galera.  A value of
 #   '1' indicates flush to disk per transaction.   A value of '2' indicates
 #   flush to disk every second, flushing all unflushed transactions in
 #   one step.
-#   Defaults to hiera('innodb_flush_log_at_trx_commit', '1')
+#   Defaults to lookup('innodb_flush_log_at_trx_commit', undef, undef, '1')
 #
 # [*clustercheck_user*]
 #   (Optional) The name of the clustercheck user.
@@ -73,7 +73,7 @@
 #
 # [*clustercheck_password*]
 #   (Optional) The password for the clustercheck user.
-#   Defaults to hiera('mysql_clustercheck_password')
+#   Defaults to lookup('mysql_clustercheck_password')
 #
 # [*sst_method*]
 #   (Optional) Method used by galera to perform State Snapshot Transfers
@@ -117,26 +117,26 @@
 #
 # [*ipv6*]
 #   (Optional) Whether to deploy MySQL on IPv6 network.
-#   Defaults to str2bool(hiera('mysql_ipv6', false))
+#   Defaults to str2bool(lookup('mysql_ipv6', undef, undef, false))
 #
 # [*mysql_server_options*]
 #   (Optional) Extras options to deploy MySQL. Useful when deploying Galera cluster.
 #   Should be an hash.
-#   Defaults to hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}
+#   Defaults to lookup('tripleo::profile::base::database::mysql::mysql_server_options', {}
 #
 # [*mysql_auth_ed25519*]
 #   (Optional) Use MariaDB's ed25519 authentication plugin to authenticate
 #   a user when connecting to the server
-#   Defaults to hiera('mysql_auth_ed25519', false)
+#   Defaults to lookup('mysql_auth_ed25519', undef, undef, false)
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*container_backend*]
 #   (optional) Container backend to use when creating the bundle
@@ -153,7 +153,7 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*bundle_user*]
 #   (optional) Set the --user= switch to be passed to pcmk
@@ -203,33 +203,33 @@
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = undef,
   $control_port                   = 3123,
-  $bootstrap_node                 = hiera('mysql_short_bootstrap_node_name'),
+  $bootstrap_node                 = lookup('mysql_short_bootstrap_node_name'),
   $bind_address                   = $::hostname,
   $ca_file                        = undef,
   $cipher_list                    = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1',
   $gcomm_cipher                   = 'AES128-SHA256',
-  $certificate_specs              = hiera('tripleo::profile::base::database::mysql::certificate_specs', {}),
-  $enable_internal_tls            = hiera('enable_internal_tls', false),
-  $gmcast_listen_addr             = hiera('mysql_bind_host'),
-  $innodb_flush_log_at_trx_commit = hiera('innodb_flush_log_at_trx_commit', '1'),
+  $certificate_specs              = lookup('tripleo::profile::base::database::mysql::certificate_specs', undef, undef, {}),
+  $enable_internal_tls            = lookup('enable_internal_tls', undef, undef, false),
+  $gmcast_listen_addr             = lookup('mysql_bind_host'),
+  $innodb_flush_log_at_trx_commit = lookup('innodb_flush_log_at_trx_commit', undef, undef, '1'),
   $clustercheck_user              = 'clustercheck',
-  $clustercheck_password          = hiera('mysql_clustercheck_password'),
+  $clustercheck_password          = lookup('mysql_clustercheck_password'),
   $sst_method                     = 'rsync',
   $mariabackup_user               = 'mariabackup',
   $mariabackup_password           = '',
   $sst_tls_cipher                 = undef,
   $sst_tls_options                = undef,
-  $ipv6                           = str2bool(hiera('mysql_ipv6', false)),
-  $mysql_server_options           = hiera('tripleo::profile::base::database::mysql::mysql_server_options', {}),
-  $mysql_auth_ed25519             = hiera('mysql_auth_ed25519', false),
+  $ipv6                           = str2bool(lookup('mysql_ipv6', undef, undef, false)),
+  $mysql_server_options           = lookup('tripleo::profile::base::database::mysql::mysql_server_options', undef, undef, {}),
+  $mysql_auth_ed25519             = lookup('mysql_auth_ed25519', undef, undef, false),
   $two_node_mode                  = false,
   $container_backend              = 'podman',
   $log_driver                     = 'k8s-file',
   $log_file                       = '/var/log/containers/stdouts/galera-bundle.log',
-  $tls_priorities                 = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities                 = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $bundle_user                    = 'root',
-  $pcs_tries                      = hiera('pcs_tries', 20),
-  $step                           = Integer(hiera('step')),
+  $pcs_tries                      = lookup('pcs_tries', undef, undef, 20),
+  $step                           = Integer(lookup('step')),
   $open_files_limit               = 16384,
   $start_timeout                  = undef,
   $promote_timeout                = 300,
@@ -252,16 +252,17 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $log_file_real = ''
   }
   # FQDN are lowercase in /etc/hosts, so are pacemaker node names
-  $galera_node_names_lookup = downcase(hiera('mysql_short_node_names_override',
-                                              hiera('mysql_short_node_names', $::hostname)))
-  if (hiera('mysql_node_names_override', undef)) {
-    $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names_override'))
+  $galera_node_names_lookup = downcase(
+    lookup('mysql_short_node_names_override', undef, undef,
+      lookup('mysql_short_node_names', undef, undef, $::hostname)))
+  if (lookup('mysql_node_names_override', undef, undef, undef)) {
+    $galera_fqdns_names_lookup = downcase(lookup('mysql_node_names_override'))
   } else {
     # is this an additional nova cell?
-    if hiera('nova_is_additional_cell', undef) {
-      $galera_fqdns_names_lookup = downcase(hiera('mysql_cell_node_names', $::hostname))
+    if lookup('nova_is_additional_cell', undef, undef, undef) {
+      $galera_fqdns_names_lookup = downcase(lookup('mysql_cell_node_names', undef, undef, $::hostname))
     } else {
-      $galera_fqdns_names_lookup = downcase(hiera('mysql_node_names', $::hostname))
+      $galera_fqdns_names_lookup = downcase(lookup('mysql_node_names', undef, undef, $::hostname))
     }
   }
 
@@ -403,7 +404,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
     $remove_default_accounts = false
   }
 
-  $mysql_root_password = hiera('mysql::server::root_password')
+  $mysql_root_password = lookup('mysql::server::root_password')
 
   if $step >= 1 {
     # Kolla sets the root password, expose it to the MySQL package
@@ -448,10 +449,10 @@ MYSQL_HOST=localhost\n",
     }
 
     if $pacemaker_master {
-      if (hiera('mysql_short_node_names_override', undef)) {
-        $mysql_short_node_names = hiera('mysql_short_node_names_override')
+      if (lookup('mysql_short_node_names_override', undef, undef, undef)) {
+        $mysql_short_node_names = lookup('mysql_short_node_names_override')
       } else {
-        $mysql_short_node_names = hiera('mysql_short_node_names')
+        $mysql_short_node_names = lookup('mysql_short_node_names')
       }
 
       $mysql_short_node_names.each |String $node_name| {

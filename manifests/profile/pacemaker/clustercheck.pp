@@ -20,11 +20,11 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*bind_address*]
 #   (Optional) The address that the local mysql instance should bind to.
-#   Defaults to hiera('mysql_bind_host')
+#   Defaults to lookup('mysql_bind_host')
 #
 # [*clustercheck_user*]
 #   (Optional) The name of the clustercheck user.
@@ -32,14 +32,14 @@
 #
 # [*clustercheck_password*]
 #   (Optional) The password for the clustercheck user.
-#   Defaults to hiera('mysql_clustercheck_password')
+#   Defaults to lookup('mysql_clustercheck_password')
 #
 #
 class tripleo::profile::pacemaker::clustercheck (
-  $step                  = Integer(hiera('step')),
+  $step                  = Integer(lookup('step')),
   $clustercheck_user     = 'clustercheck',
-  $clustercheck_password = hiera('mysql_clustercheck_password'),
-  $bind_address          = hiera('mysql_bind_host'),
+  $clustercheck_password = lookup('mysql_clustercheck_password'),
+  $bind_address          = lookup('mysql_bind_host'),
 ) {
 
   if $step >= 1 {

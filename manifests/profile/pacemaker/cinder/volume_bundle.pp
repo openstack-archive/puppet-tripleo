@@ -32,16 +32,16 @@
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('redis_short_bootstrap_node_name')
+#   Defaults to lookup('redis_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*container_backend*]
 #   (optional) Container backend to use when creating the bundle
@@ -62,24 +62,24 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*bundle_user*]
 #   (optional) Set the --user= switch to be passed to pcmk
 #   Defaults to 'root'
 #
 class tripleo::profile::pacemaker::cinder::volume_bundle (
-  $bootstrap_node             = hiera('cinder_volume_short_bootstrap_node_name'),
+  $bootstrap_node             = lookup('cinder_volume_short_bootstrap_node_name'),
   $cinder_volume_docker_image = undef,
   $docker_volumes             = [],
   $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
-  $pcs_tries                  = hiera('pcs_tries', 20),
-  $step                       = Integer(hiera('step')),
+  $pcs_tries                  = lookup('pcs_tries', undef, undef, 20),
+  $step                       = Integer(lookup('step')),
   $container_backend          = 'podman',
   $ceph_conf_path             = '/etc/ceph',
   $log_driver                 = 'k8s-file',
   $log_file                   = '/var/log/containers/stdouts/openstack-cinder-volume.log',
-  $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities             = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $bundle_user                = 'root',
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -96,12 +96,12 @@ class tripleo::profile::pacemaker::cinder::volume_bundle (
   include tripleo::profile::base::cinder::volume
 
   if $step >= 2 and $pacemaker_master {
-    $cinder_volume_short_node_names = hiera('cinder_volume_short_node_names')
+    $cinder_volume_short_node_names = lookup('cinder_volume_short_node_names')
 
-    if (hiera('pacemaker_short_node_names_override', undef)) {
-      $pacemaker_short_node_names = hiera('pacemaker_short_node_names_override')
+    if (lookup('pacemaker_short_node_names_override', undef, undef, undef)) {
+      $pacemaker_short_node_names = lookup('pacemaker_short_node_names_override')
     } else {
-      $pacemaker_short_node_names = hiera('pacemaker_short_node_names')
+      $pacemaker_short_node_names = lookup('pacemaker_short_node_names')
     }
 
     $pcmk_cinder_volume_nodes = intersection($cinder_volume_short_node_names, $pacemaker_short_node_names)
