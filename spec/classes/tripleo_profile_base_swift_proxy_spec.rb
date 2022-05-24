@@ -41,9 +41,36 @@ describe 'tripleo::profile::base::swift::proxy' do
       } }
 
       it 'configure swift proxy cache with ipv4 ips' do
+        is_expected.to contain_class('swift::config')
+        is_expected.to contain_class('swift::proxy')
+        is_expected.to contain_class('swift::proxy::catch_errors')
+        is_expected.to contain_class('swift::proxy::gatekeeper')
+        is_expected.to contain_class('swift::proxy::healthcheck')
+        is_expected.to contain_class('swift::proxy::proxy_logging')
         is_expected.to contain_class('swift::proxy::cache').with({
           :memcache_servers => ['192.168.0.1:11211', '192.168.0.2:11211']
         })
+        is_expected.to contain_class('swift::proxy::listing_formats')
+        is_expected.to contain_class('swift::proxy::ratelimit')
+        is_expected.to contain_class('swift::proxy::bulk')
+        is_expected.to contain_class('swift::proxy::tempurl')
+        is_expected.to contain_class('swift::proxy::formpost')
+        is_expected.to contain_class('swift::proxy::authtoken')
+        is_expected.to contain_class('swift::proxy::s3api')
+        is_expected.to contain_class('swift::proxy::s3token')
+        is_expected.to contain_class('swift::proxy::keystone')
+        is_expected.to contain_class('swift::proxy::staticweb')
+        is_expected.to contain_class('swift::proxy::copy')
+        is_expected.to contain_class('swift::proxy::container_quotas')
+        is_expected.to contain_class('swift::proxy::account_quotas')
+        is_expected.to contain_class('swift::proxy::slo')
+        is_expected.to contain_class('swift::proxy::dlo')
+        is_expected.to contain_class('swift::proxy::versioned_writes')
+        is_expected.to contain_class('swift::proxy::ceilometer')
+        is_expected.to contain_class('swift::proxy::kms_keymaster')
+        is_expected.to contain_class('swift::proxy::encryption')
+        is_expected.to contain_class('swift::keymaster')
+        is_expected.to_not contain_class('swift::proxy::audit')
       end
     end
 
@@ -70,6 +97,30 @@ describe 'tripleo::profile::base::swift::proxy' do
         is_expected.to contain_class('swift::proxy::cache').with({
           :memcache_servers => ['192.168.0.1:11211', '[::2]:11211', 'myserver.com:11211']
         })
+      end
+    end
+
+    context 'with ceilometer middleare disabled' do
+      let(:params) { {
+        :step               => 4,
+        :memcache_servers   => ['192.168.0.1', '192.168.0.2'],
+        :ceilometer_enabled => false
+      } }
+
+      it 'does not configure the ceilometer middleware' do
+        is_expected.to_not contain_class('swift::proxy::ceilometer')
+      end
+    end
+
+    context 'with audit middleare enabled' do
+      let(:params) { {
+        :step             => 4,
+        :memcache_servers => ['192.168.0.1', '192.168.0.2'],
+        :audit_enabled    => true
+      } }
+
+      it 'configures audit middleware' do
+        is_expected.to contain_class('swift::proxy::audit')
       end
     end
 
