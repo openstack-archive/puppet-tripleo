@@ -32,7 +32,7 @@
 #
 # [*config_variables*]
 #   (Optional) RabbitMQ environment.
-#   Defaults to hiera('rabbitmq_config_variables').
+#   Defaults to lookup('rabbitmq_config_variables').
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
@@ -54,7 +54,7 @@
 #
 # [*rabbitmq_cacert*]
 #   (Optional) When internal tls is enabled this should point to the CA file
-#   Defaults to hiera('rabbitmq::ssl_cacert', undef)
+#   Defaults to lookup('rabbitmq::ssl_cacert', undef, undef, undef)
 #
 # [*verify_server_peer*]
 #   (Optional) Server verify peer
@@ -66,7 +66,7 @@
 #
 # [*environment*]
 #   (Optional) RabbitMQ environment.
-#   Defaults to hiera('rabbitmq_environment').
+#   Defaults to lookup('rabbitmq_environment').
 #
 # [*additional_erl_args*]
 #   (Optional) Additional string to be passed to RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
@@ -75,77 +75,77 @@
 # [*inet_dist_interface*]
 #   (Optional) Address to bind the inter-cluster interface
 #   to. It is the inet_dist_use_interface option in the kernel variables
-#   Defaults to hiera('rabbitmq::interface', undef).
+#   Defaults to lookup('rabbitmq::interface', undef, undef, undef).
 #
 # [*ipv6*]
 #   (Optional) Whether to deploy RabbitMQ on IPv6 network.
-#   Defaults to str2bool(hiera('rabbit_ipv6', false)).
+#   Defaults to str2bool(lookup('rabbit_ipv6', undef, undef, false)).
 #
 # [*kernel_variables*]
 #   (Optional) RabbitMQ environment.
-#   Defaults to hiera('rabbitmq_environment').
+#   Defaults to lookup('rabbitmq_environment').
 #
 # [*rpc_scheme*]
 #   (Optional) Protocol for oslo messaging rpc backend.
-#   Defaults to hiera('oslo_messaging_rpc_scheme', 'rabbit').
+#   Defaults to lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit').
 #
 # [*rpc_nodes*]
 #   (Optional) Array of host(s) for oslo messaging rpc nodes.
-#   Defaults to hiera('oslo_messaging_rpc_node_names', []).
+#   Defaults to lookup('oslo_messaging_rpc_node_names', undef, undef, []).
 #
 # [*rpc_bootstrap_node*]
 #   (Optional) The hostname of the rpc node for bootstrapping tasks
-#   Defaults to hiera('oslo_messaging_rpc_short_bootstrap_node_name')
+#   Defaults to lookup('oslo_messaging_rpc_short_bootstrap_node_name')
 #
 # [*notify_scheme*]
 #   (Optional) oslo messaging notify backend indicator.
-#   Defaults to hiera('oslo_messaging_notify_scheme', 'rabbit').
+#   Defaults to lookup('oslo_messaging_notify_scheme', undef, undef, 'rabbit').
 #
 # [*notify_nodes*]
 #   (Optional) Array of host(s) for oslo messaging notify nodes.
-#   Defaults to hiera('oslo_messaging_notify_node_names', []).
+#   Defaults to lookup('oslo_messaging_notify_node_names', undef, undef, []).
 #
 # [*notify_bootstrap_node*]
 #   (Optional) The hostname of the notify node for bootstrapping tasks
-#   Defaults to hiera('oslo_messaging_notify_short_bootstrap_node_name')
+#   Defaults to lookup('oslo_messaging_notify_short_bootstrap_node_name')
 #
 # [*rabbitmq_pass*]
 #   (Optional) RabbitMQ Default Password.
-#   Defaults to hiera('rabbitmq::default_pass')
+#   Defaults to lookup('rabbitmq::default_pass')
 #
 # [*rabbitmq_user*]
 #   (Optional) RabbitMQ Default User.
-#   Defaults to hiera('rabbitmq::default_user')
+#   Defaults to lookup('rabbitmq::default_user')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::rabbitmq (
   $certificate_specs             = {},
-  $config_variables              = hiera('rabbitmq_config_variables'),
+  $config_variables              = lookup('rabbitmq_config_variables'),
   $enable_internal_tls           = undef,
   $fips_mode                     = false,
-  $environment                   = hiera('rabbitmq_environment'),
+  $environment                   = lookup('rabbitmq_environment'),
   $additional_erl_args           = undef,
   $ssl_versions                  = ['tlsv1.2', 'tlsv1.3'],
   $inter_node_ciphers            = '',
-  $rabbitmq_cacert               = hiera('rabbitmq::ssl_cacert', undef),
+  $rabbitmq_cacert               = lookup('rabbitmq::ssl_cacert', undef, undef, undef),
   $verify_server_peer            = 'verify_none',
   $verify_client_peer            = 'verify_peer',
-  $inet_dist_interface           = hiera('rabbitmq::interface', undef),
-  $ipv6                          = str2bool(hiera('rabbit_ipv6', false)),
-  $kernel_variables              = hiera('rabbitmq_kernel_variables'),
-  $rpc_scheme                    = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
-  $rpc_nodes                     = hiera('oslo_messaging_rpc_node_names', []),
-  $rpc_bootstrap_node            = hiera('oslo_messaging_rpc_short_bootstrap_node_name'),
-  $notify_scheme                 = hiera('oslo_messaging_notify_scheme', 'rabbit'),
-  $notify_nodes                  = hiera('oslo_messaging_notify_node_names', []),
-  $notify_bootstrap_node         = hiera('oslo_messaging_notify_short_bootstrap_node_name'),
-  $rabbitmq_pass                 = hiera('rabbitmq::default_pass'),
-  $rabbitmq_user                 = hiera('rabbitmq::default_user'),
-  $step                          = Integer(hiera('step')),
+  $inet_dist_interface           = lookup('rabbitmq::interface', undef, undef, undef),
+  $ipv6                          = str2bool(lookup('rabbit_ipv6', undef, undef, false)),
+  $kernel_variables              = lookup('rabbitmq_kernel_variables'),
+  $rpc_scheme                    = lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit'),
+  $rpc_nodes                     = lookup('oslo_messaging_rpc_node_names', undef, undef, []),
+  $rpc_bootstrap_node            = lookup('oslo_messaging_rpc_short_bootstrap_node_name'),
+  $notify_scheme                 = lookup('oslo_messaging_notify_scheme', undef, undef, 'rabbit'),
+  $notify_nodes                  = lookup('oslo_messaging_notify_node_names', undef, undef, []),
+  $notify_bootstrap_node         = lookup('oslo_messaging_notify_short_bootstrap_node_name'),
+  $rabbitmq_pass                 = lookup('rabbitmq::default_pass'),
+  $rabbitmq_user                 = lookup('rabbitmq::default_user'),
+  $step                          = Integer(lookup('step')),
 ) {
   if $rpc_scheme == 'rabbit' {
     $nodes = $rpc_nodes
@@ -206,7 +206,7 @@ class tripleo::profile::base::rabbitmq (
     $real_kernel_variables = $kernel_variables
   }
 
-  $manage_service = hiera('rabbitmq::service_manage', true)
+  $manage_service = lookup('rabbitmq::service_manage', undef, undef, true)
   if $step >= 1 {
     file { '/etc/rabbitmq/ssl-dist.conf':
       ensure  => file,
