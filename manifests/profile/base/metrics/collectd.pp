@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*enable_file_logging*]
 #   (Optional) Boolean. Whether to enable logfile plugin.
@@ -63,6 +63,7 @@
 #   (Optional) List of strings.  A list of active services in this tripleo
 #   deployment. This is used to look up service-specific plugins that
 #   need to be installed.
+#   Defaults to lookup('service_names', undef, undef, [])
 #
 # [*collectd_manage_repo*]
 #   (Optional) Boolean. Whether let collectd enable manage repositories.
@@ -123,7 +124,7 @@
 # [*qdr_mode*]
 #  (Optional) String. Mode in which the QDR service, to which collectd
 #  should be connected, is running.
-#  Defaults to hiera('tripleo::profile::base::metrics::qdr::router_mode', 'edge')
+#  Defaults to lookup('tripleo::profile::base::metrics::qdr::router_mode', undef, undef, 'edge')
 #
 # [*python_read_plugins*]
 #  (Optional) List of strings. List of third party python packages to install.
@@ -139,7 +140,7 @@
 #  Defaults to false.
 #
 class tripleo::profile::base::metrics::collectd (
-  $step = Integer(hiera('step')),
+  $step = Integer(lookup('step')),
   $enable_file_logging = false,
   $collectd_server = undef,
   $collectd_port = undef,
@@ -159,8 +160,8 @@ class tripleo::profile::base::metrics::collectd (
   $amqp_retry_delay = undef,
   $amqp_interval = undef,
   $amqp_send_queue_limit = undef,
-  $qdr_mode = hiera('tripleo::profile::base::metrics::qdr::router_mode', 'edge'),
-  $service_names = hiera('service_names', []),
+  $qdr_mode = lookup('tripleo::profile::base::metrics::qdr::router_mode', undef, undef, 'edge'),
+  $service_names = lookup('service_names', undef, undef, []),
   $collectd_manage_repo = false,
   $python_read_plugins = [],
   $enable_sensubility = false,

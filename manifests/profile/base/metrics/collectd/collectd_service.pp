@@ -2,7 +2,7 @@
 # in the hiera data provided by THT.
 define tripleo::profile::base::metrics::collectd::collectd_service (
 ) {
-  $plugins = hiera("'tripleo.collectd.plugins.${title}'", [])
+  $plugins = lookup("'tripleo.collectd.plugins.${title}'", undef, undef, [])
 
   if $plugins {
     ::tripleo::profile::base::metrics::collectd::collectd_plugin {
