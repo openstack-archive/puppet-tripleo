@@ -47,16 +47,16 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('ironic_inspector_short_bootstrap_node_name')
+#   Defaults to lookup('ironic_inspector_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 
 class tripleo::profile::base::ironic_inspector (
   $inspection_subnets = [],
-  $bootstrap_node     = hiera('ironic_inspector_short_bootstrap_node_name', undef),
-  $step               = Integer(hiera('step')),
+  $bootstrap_node     = lookup('ironic_inspector_short_bootstrap_node_name', undef, undef, undef),
+  $step               = Integer(lookup('step')),
 ) {
 
   include tripleo::profile::base::ironic_inspector::authtoken
