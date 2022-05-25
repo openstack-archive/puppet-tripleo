@@ -111,11 +111,6 @@
 #  fetching the certificate for that specific network.
 #  Defaults to undef
 #
-# [*manage_firewall*]
-#  (optional) Enable or disable firewall settings for ports exposed by HAProxy
-#  (false means disabled, and true means enabled)
-#  Defaults to hiera('tripleo::firewall::manage_firewall', true)
-#
 # [*authorized_userlist*]
 #  (optional) Userlist that may access the endpoint. Activate Basic Authentication.
 #  You'll need to create a tripleo::haproxy::userlist in order to use that option.
@@ -154,7 +149,6 @@ define tripleo::haproxy::endpoint (
   $use_internal_certificates   = false,
   $internal_certificates_specs = {},
   $service_network             = undef,
-  $manage_firewall             = hiera('tripleo::firewall::manage_firewall', true),
   $authorized_userlist         = undef,
   $sticky_sessions             = false,
   $session_cookie              = 'STICKYSESSION',
@@ -318,43 +312,6 @@ define tripleo::haproxy::endpoint (
       ipaddresses       => $ip_addresses_real,
       server_names      => $server_names_real,
       options           => $member_options,
-    }
-  }
-
-  if $manage_firewall {
-    include tripleo::firewall
-    # This block will construct firewall rules only when we specify
-    # a port for the regular service and also the ssl port for the service.
-    # It makes sure we're not trying to create TCP iptables rules where no port
-    # is specified.
-    if $service_port_real {
-      $service_firewall_rules = {
-        "100 ${name}_haproxy"     => {
-          'dport' => $service_port_real,
-        },
-      }
-    }
-    if $service_port_real != $haproxy_port_real {
-      $haproxy_firewall_rules = {
-        "100 ${name}_haproxy_frontend"     => {
-          'dport' => $haproxy_port_real,
-        },
-      }
-    } else {
-      $haproxy_firewall_rules = {}
-    }
-    if $public_ssl_port {
-      $haproxy_ssl_firewall_rules = {
-        "100 ${name}_haproxy_ssl" => {
-          'dport' => $public_ssl_port,
-        },
-      }
-    } else {
-      $haproxy_ssl_firewall_rules = {}
-    }
-    $firewall_rules = merge($service_firewall_rules, $haproxy_firewall_rules, $haproxy_ssl_firewall_rules)
-    if $service_port_real or $public_ssl_port {
-      create_resources('tripleo::firewall::rule', $firewall_rules)
     }
   }
 }

@@ -78,11 +78,6 @@
 #  Can be "user" or "admin"
 #  Defaults to "user"
 #
-# [*manage_firewall*]
-#  (optional) Enable or disable firewall settings for ports exposed by HAProxy
-#  (false means disabled, and true means enabled)
-#  Defaults to hiera('tripleo::firewall::manage_firewall', true)
-#
 # [*controller_hosts*]
 #  IPs of host or group of hosts to load-balance the services
 #  Can be a string or an array.
@@ -543,7 +538,6 @@ class tripleo::haproxy (
   $haproxy_stats_user            = 'admin',
   $haproxy_stats_password        = undef,
   $haproxy_stats_bind_address    = undef,
-  $manage_firewall               = hiera('tripleo::firewall::manage_firewall', true),
   $controller_hosts              = hiera('controller_node_ips'),
   $controller_hosts_names        = hiera('controller_node_names', undef),
   $service_certificate           = undef,
@@ -787,7 +781,6 @@ class tripleo::haproxy (
     listen_options              => $default_listen_options,
     frontend_options            => $default_frontend_options,
     backend_options             => $default_backend_options,
-    manage_firewall             => $manage_firewall,
   }
 
   $service_names = hiera('enabled_services', [])
@@ -1314,7 +1307,6 @@ class tripleo::haproxy (
       use_internal_certificates   => $use_internal_certificates,
       internal_certificates_specs => $internal_certificates_specs,
       service_network             => $horizon_network,
-      manage_firewall             => $manage_firewall,
     }
   }
 
@@ -1510,15 +1502,6 @@ class tripleo::haproxy (
       server_names      => $mysql_server_names_real,
       options           => $mysql_member_options_real,
     }
-    if $manage_firewall {
-      include tripleo::firewall
-      $mysql_firewall_rules = {
-        '100 mysql_haproxy' => {
-          'dport' => 3306,
-        }
-      }
-      create_resources('tripleo::firewall::rule', $mysql_firewall_rules)
-    }
   }
 
   if $rabbitmq {
@@ -1655,15 +1638,6 @@ class tripleo::haproxy (
       server_names      => hiera('redis_node_names', $controller_hosts_names_real),
       options           => union($haproxy_member_options, ['on-marked-down shutdown-sessions'], $redis_ssl_member_options),
       verifyhost        => false,
-    }
-    if $manage_firewall {
-      include tripleo::firewall
-      $redis_firewall_rules = {
-        '100 redis_haproxy' => {
-          'dport' => 6379,
-        }
-      }
-      create_resources('tripleo::firewall::rule', $redis_firewall_rules)
     }
   }
 
