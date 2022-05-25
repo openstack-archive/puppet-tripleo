@@ -26,20 +26,21 @@ describe 'tripleo::profile::base::designate::producer' do
         oslomsg_rpc_username => 'designate',
         oslomsg_rpc_password => 'foo'
       }
+      class { 'tripleo::profile::base::designate::coordination':
+        step => #{params[:step]},
+      }
 eos
     end
 
     context 'with step less than 4' do
       let(:params) { {
-        :designate_redis_password => 'password',
-        :redis_vip                => '127.0.0.1',
-        :step                     => 1,
+        :step => 1,
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::producer')
         is_expected.to contain_class('tripleo::profile::base::designate')
-        is_expected.to_not contain_class('designate::coordination')
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
         is_expected.to_not contain_class('designate::producer')
         is_expected.to_not contain_class('designate::producer_task::delayed_notify')
         is_expected.to_not contain_class('designate::producer_task::periodic_exists')
@@ -51,37 +52,13 @@ eos
 
     context 'with step 4' do
       let(:params) { {
-        :designate_redis_password => 'password',
-        :redis_vip                => '127.0.0.1',
-        :step                     => 4,
+        :step => 4,
       } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::designate::producer')
         is_expected.to contain_class('tripleo::profile::base::designate')
-        is_expected.to contain_class('designate::coordination').with(
-          :backend_url => 'redis://:password@127.0.0.1:6379/',
-        )
-        is_expected.to contain_class('designate::producer')
-        is_expected.to contain_class('designate::producer_task::delayed_notify')
-        is_expected.to contain_class('designate::producer_task::periodic_exists')
-        is_expected.to contain_class('designate::producer_task::periodic_secondary_refresh')
-        is_expected.to contain_class('designate::producer_task::worker_periodic_recovery')
-        is_expected.to contain_class('designate::producer_task::zone_purge')
-      }
-    end
-
-    context 'with step 4 without redis_vip' do
-      let(:params) { {
-        :designate_redis_password => 'password',
-        :redis_vip                => false,
-        :step                     => 4,
-      } }
-
-      it {
-        is_expected.to contain_class('tripleo::profile::base::designate::producer')
-        is_expected.to contain_class('tripleo::profile::base::designate')
-        is_expected.to_not contain_class('designate::coordination')
+        is_expected.to contain_class('tripleo::profile::base::designate::coordination')
         is_expected.to contain_class('designate::producer')
         is_expected.to contain_class('designate::producer_task::delayed_notify')
         is_expected.to contain_class('designate::producer_task::periodic_exists')
@@ -91,7 +68,6 @@ eos
       }
     end
   end
-
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do
