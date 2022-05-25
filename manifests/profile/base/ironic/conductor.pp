@@ -20,11 +20,11 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('cinder_backup_short_bootstrap_node_name')
+#   Defaults to lookup('cinder_backup_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*manage_pxe*]
 #   (Optional) Whether to manage the PXE/iPXE environment for the conductor.
@@ -35,8 +35,8 @@
 #   Defaults to false
 #
 class tripleo::profile::base::ironic::conductor (
-  $bootstrap_node = hiera('ironic_api_short_bootstrap_node_name', undef),
-  $step           = Integer(hiera('step')),
+  $bootstrap_node = lookup('ironic_api_short_bootstrap_node_name', undef, undef, undef),
+  $step           = Integer(lookup('step')),
   $manage_pxe     = true,
   $enable_staging = false,
 ) {
