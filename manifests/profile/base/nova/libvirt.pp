@@ -121,26 +121,6 @@ class tripleo::profile::base::nova::libvirt (
       }
     }
 
-    # This removal of files in /etc/libvirt/qemu should not happen inside containers
-    # Avoids LP#1819482
-    if $::deployment_type != 'containers' {
-      file { ['/etc/libvirt/qemu/networks/autostart/default.xml',
-              '/etc/libvirt/qemu/networks/default.xml']:
-        ensure  => absent,
-        require => Package['libvirt'],
-        before  => Service['libvirt'],
-      }
-    }
-
-    # in case libvirt has been already running before the Puppet run, make
-    # sure the default network is destroyed
-    exec { 'libvirt-default-net-destroy':
-      command => '/usr/bin/virsh net-destroy default',
-      onlyif  => '/usr/bin/virsh net-info default | /bin/grep -i "^active:\s*yes"',
-      require => Package['libvirt'],
-      before  => Service['libvirt'],
-    }
-
     include nova::compute::libvirt::qemu
     include nova::migration::qemu
 
