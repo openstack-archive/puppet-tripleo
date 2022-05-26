@@ -19,10 +19,10 @@
 # === Parameters
 #
 # [*step*]
-#   Defaults to hiera('step')
+#   Defaults to lookup('step')
 #
 class tripleo::profile::base::auditd (
-  $step  = Integer(hiera('step')),
+  $step  = Integer(lookup('step')),
 ) {
   if $step >= 4 {
       include auditd
