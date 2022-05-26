@@ -27,23 +27,73 @@ describe 'tripleo::profile::base::nova::conductor' do
 eos
     end
 
-    context 'with step less than 4' do
-      let(:params) { { :step => 1, } }
+    context 'with step less than 3' do
+      let(:params) { { :step => 3, } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::conductor')
         is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to_not contain_class('nova::db::sync')
         is_expected.to_not contain_class('nova::conductor')
         is_expected.to_not contain_class('nova::network::neutron')
       }
     end
 
-    context 'with step 4' do
-      let(:params) { { :step => 4, } }
+    context 'with step 3 on bootstap node' do
+      let(:params) { {
+        :step           => 3,
+        :bootstrap_node => 'node.example.com',
+      } }
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::conductor')
         is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::db::sync')
+        is_expected.to_not contain_class('nova::conductor')
+        is_expected.to_not contain_class('nova::network::neutron')
+      }
+    end
+
+    context 'with step 3 not on bootstap node' do
+      let(:params) { {
+        :step           => 3,
+        :bootstrap_node => 'other.example.com',
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::conductor')
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to_not contain_class('nova::db::sync')
+        is_expected.to_not contain_class('nova::conductor')
+        is_expected.to_not contain_class('nova::network::neutron')
+      }
+    end
+
+    context 'with step 4 on bootstap node' do
+      let(:params) { {
+        :step           => 4,
+        :bootstrap_node => 'node.example.com',
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::conductor')
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to contain_class('nova::db::sync')
+        is_expected.to contain_class('nova::conductor')
+        is_expected.to contain_class('nova::network::neutron')
+      }
+    end
+
+    context 'with step 4 not on bootstap node' do
+      let(:params) { {
+        :step           => 4,
+        :bootstrap_node => 'other.example.com',
+      } }
+
+      it {
+        is_expected.to contain_class('tripleo::profile::base::nova::conductor')
+        is_expected.to contain_class('tripleo::profile::base::nova')
+        is_expected.to_not contain_class('nova::db::sync')
         is_expected.to contain_class('nova::conductor')
         is_expected.to contain_class('nova::network::neutron')
       }
