@@ -19,14 +19,6 @@
 #
 # === Parameters
 #
-# [*bannertext*]
-#   The text used within /etc/issue and /etc/issue.net
-#   Defaults to lookup('BannerText', undef, undef, undef)
-#
-# [*motd*]
-#   The text used within SSH Banner
-#   Defaults to lookup('MOTD', undef, undef, undef)
-#
 # [*options*]
 #   Hash of SSHD options to set. See the puppet-ssh module documentation for
 #   details.
@@ -41,41 +33,10 @@
 #   Defaults to 'no'
 
 class tripleo::profile::base::sshd (
-  $bannertext              = lookup('BannerText', undef, undef, undef),
-  $motd                    = lookup('MOTD', undef, undef, undef),
   $options                 = {},
   $port                    = [22],
   $password_authentication = 'no',
 ) {
-
-  if $bannertext and $bannertext != '' {
-    $sshd_options_banner = {'Banner' => '/etc/issue.net'}
-    $filelist = [ '/etc/issue', '/etc/issue.net', ]
-    file { $filelist:
-      ensure  => file,
-      backup  => false,
-      content => $bannertext,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644'
-    }
-  } else {
-    $sshd_options_banner = {}
-  }
-
-  if $motd and $motd != '' {
-    $sshd_options_motd = {'PrintMotd' => 'yes'}
-    file { '/etc/motd':
-      ensure  => file,
-      backup  => false,
-      content => $motd,
-      owner   => 'root',
-      group   => 'root',
-      mode    => '0644'
-    }
-  } else {
-    $sshd_options_motd = {}
-  }
 
   if $options['Port'] {
     $sshd_options_port = {'Port' => unique(concat(any2array($options['Port']), $port))}
@@ -87,9 +48,9 @@ class tripleo::profile::base::sshd (
   # Prevent error messages on sshd startup
   $basic_options = {
     'HostKey' => [
-    '/etc/ssh/ssh_host_rsa_key',
-    '/etc/ssh/ssh_host_ecdsa_key',
-    '/etc/ssh/ssh_host_ed25519_key',
+      '/etc/ssh/ssh_host_rsa_key',
+      '/etc/ssh/ssh_host_ecdsa_key',
+      '/etc/ssh/ssh_host_ed25519_key',
     ]
   }
 
@@ -100,8 +61,6 @@ class tripleo::profile::base::sshd (
   $sshd_options = merge(
     $options,
     $basic_options,
-    $sshd_options_banner,
-    $sshd_options_motd,
     $sshd_options_port,
     $password_auth_options,
   )
