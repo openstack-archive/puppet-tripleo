@@ -21,18 +21,18 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # DEPRECATED PARAMETERS
 #
 # [*rndc_key*]
 #   (Optional) The base64-encoded key secret for /etc/rndc.key.
-#   Defaults to hiera('designate_rndc_key')
+#   Defaults to lookup('designate_rndc_key', undef, undef, false)
 #
 class tripleo::profile::base::designate::worker (
-  $step = Integer(hiera('step')),
+  $step = Integer(lookup('step')),
   # DEPRECATED PARAMETERS
-  $rndc_key = hiera('designate_rndc_key', false),
+  $rndc_key = lookup('designate_rndc_key', undef, undef, false),
 ) {
   include tripleo::profile::base::designate
 
