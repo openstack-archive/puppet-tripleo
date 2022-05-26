@@ -89,6 +89,7 @@ manila_api_short_bootstrap_node_name: node
 mistral::keystone::authtoken::password: 'password'
 # nova related items
 nova_api_short_bootstrap_node_name: node
+nova_conductor_short_bootstrap_node_name: node
 nova_metadata_short_bootstrap_node_name: node
 nova_placement_short_bootstrap_node_name: node
 nova::rabbit_password: 'password'
