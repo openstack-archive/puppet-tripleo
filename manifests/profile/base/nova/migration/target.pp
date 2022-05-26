@@ -20,7 +20,7 @@
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*ssh_authorized_keys*]
 #   (Optional) List of SSH public keys authorized for migration.
@@ -37,7 +37,7 @@
 #   Defaults to /bin/nova-migration-wrapper
 #
 class tripleo::profile::base::nova::migration::target (
-  $step                = Integer(hiera('step')),
+  $step                = Integer(lookup('step')),
   $ssh_authorized_keys = [],
   $ssh_localaddrs      = [],
   $wrapper_command     = '/bin/nova-migration-wrapper',

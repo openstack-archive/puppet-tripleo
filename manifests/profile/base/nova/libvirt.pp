@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*libvirtd_config*]
 #   (Optional) Overrides for libvirtd config options
@@ -62,7 +62,7 @@
 #   Defaults to false
 #
 class tripleo::profile::base::nova::libvirt (
-  $step = Integer(hiera('step')),
+  $step = Integer(lookup('step')),
   $libvirtd_config = {},
   $virtlogd_config = {},
   $virtproxyd_config = {},

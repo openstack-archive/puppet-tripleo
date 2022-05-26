@@ -21,14 +21,14 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*enabled*]
 #   (Optional) Whether libvirt-guests should be configured and enabled or not.
 #   Defaults to undef
 #
 class tripleo::profile::base::nova::compute::libvirt_guests (
-  $step                          = Integer(hiera('step')),
+  $step                          = Integer(lookup('step')),
   $enabled                       = undef,
 ) {
   # only configure libvirt-guests if enabled

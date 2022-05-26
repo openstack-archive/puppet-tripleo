@@ -21,25 +21,25 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*rbd_ephemeral_storage*]
 #   (Optional) Use Ceph as ephmeral disk backend.
-#   Defaults to hiera('nova::compute::rbd::ephemeral_storage', false)
+#   Defaults to lookup('nova::compute::rbd::ephemeral_storage', undef, undef, false)
 #
 # [*rbd_persistent_storage*]
 #   (Optional) Use Ceph as volume backend.
-#   Defaults to hiera('rbd_persistent_storage', false)
+#   Defaults to lookup('rbd_persistent_storage', undef, undef, false)
 #
 # [*rbd_disk_cachemodes*]
 #   (Optional) Cache mode of rbd volumes.
-#   Defaults to hiera('rbd_disk_cachemodes', ['network=writeback'])
+#   Defaults to lookup('rbd_disk_cachemodes', undef, undef, ['network=writeback'])
 #
 class tripleo::profile::base::nova::compute_libvirt_shared (
-  $step                   = Integer(hiera('step')),
-  $rbd_ephemeral_storage  = hiera('nova::compute::rbd::ephemeral_storage', false),
-  $rbd_persistent_storage = hiera('rbd_persistent_storage', false),
-  $rbd_disk_cachemodes    = hiera('rbd_disk_cachemodes', ['network=writeback']),
+  $step                   = Integer(lookup('step')),
+  $rbd_ephemeral_storage  = lookup('nova::compute::rbd::ephemeral_storage', undef, undef, false),
+  $rbd_persistent_storage = lookup('rbd_persistent_storage', undef, undef, false),
+  $rbd_disk_cachemodes    = lookup('rbd_disk_cachemodes', undef, undef, ['network=writeback']),
 ) {
   if $step >= 4 {
     # Ceph + Libvirt

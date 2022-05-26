@@ -21,20 +21,20 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*cinder_nfs_backend*]
 #   (Optional) Whether or not Cinder is backed by NFS.
-#   Defaults to hiera('cinder_enable_nfs_backend', false)
+#   Defaults to lookup('cinder_enable_nfs_backend', undef, undef, false)
 #
 # [*nova_nfs_enabled*]
 #   (Optional) Whether or not Nova is backed by NFS.
-#   Defaults to false
+#   Defaults to lookup('nova_nfs_enabled', undef, undef, false)
 #
 class tripleo::profile::base::nova::compute (
-  $step               = Integer(hiera('step')),
-  $cinder_nfs_backend = hiera('cinder_enable_nfs_backend', false),
-  $nova_nfs_enabled   = hiera('nova_nfs_enabled', false),
+  $step               = Integer(lookup('step')),
+  $cinder_nfs_backend = lookup('cinder_enable_nfs_backend', undef, undef, false),
+  $nova_nfs_enabled   = lookup('nova_nfs_enabled', undef, undef, false),
 ) {
 
   if $step >= 4 {

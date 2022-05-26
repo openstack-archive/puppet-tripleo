@@ -21,10 +21,10 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::nova::scheduler (
-  $step = Integer(hiera('step')),
+  $step = Integer(lookup('step')),
 ) {
   if $step >= 4 {
     include tripleo::profile::base::nova

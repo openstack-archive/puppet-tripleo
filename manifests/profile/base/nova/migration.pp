@@ -20,11 +20,11 @@
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 
 class tripleo::profile::base::nova::migration (
-  $step = Integer(hiera('step')),
+  $step = Integer(lookup('step')),
 ) {
   if $step >= 3 {
     package { 'openstack-nova-migration':
