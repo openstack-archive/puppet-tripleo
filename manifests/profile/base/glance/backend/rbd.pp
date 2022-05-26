@@ -25,10 +25,6 @@
 #   (Optional) Hash containing multistore data for configuring multiple backends.
 #   Defaults to {}
 #
-# [*glance_rbd_ceph_conf_path*]
-#   (Optional) The path where the Ceph Cluster config files are stored on the host.
-#   Defaults to '/etc/ceph'
-#
 # [*rbd_store_ceph_conf*]
 #   (Optional) Ceph cluster config file.
 #   Defaults to lookup('glance::backend::rbd::rbd_store_ceph_conf', undef, undef, '/etc/ceph/ceph.conf').
@@ -65,16 +61,15 @@
 #
 class tripleo::profile::base::glance::backend::rbd (
   $backend_names,
-  $multistore_config         = {},
-  $glance_rbd_ceph_conf_path = '/etc/ceph',
-  $rbd_store_ceph_conf       = lookup('glance::backend::rbd::rbd_store_ceph_conf', undef, undef, '/etc/ceph/ceph.conf'),
-  $rbd_store_user            = lookup('glance::backend::rbd::rbd_store_user', undef, undef, 'openstack'),
-  $rbd_store_pool            = lookup('glance::backend::rbd::rbd_store_pool', undef, undef, 'images'),
-  $rbd_store_chunk_size      = lookup('glance::backend::rbd::rbd_store_chunk_size', undef, undef, undef),
-  $rbd_thin_provisioning     = lookup('glance::backend::rbd::rbd_thin_provisioning', undef, undef, undef),
-  $rados_connect_timeout     = lookup('glance::backend::rbd::rados_connect_timeout', undef, undef, undef),
-  $store_description         = lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'RBD store'),
-  $step                      = Integer(lookup('step')),
+  $multistore_config     = {},
+  $rbd_store_ceph_conf   = lookup('glance::backend::rbd::rbd_store_ceph_conf', undef, undef, '/etc/ceph/ceph.conf'),
+  $rbd_store_user        = lookup('glance::backend::rbd::rbd_store_user', undef, undef, 'openstack'),
+  $rbd_store_pool        = lookup('glance::backend::rbd::rbd_store_pool', undef, undef, 'images'),
+  $rbd_store_chunk_size  = lookup('glance::backend::rbd::rbd_store_chunk_size', undef, undef, undef),
+  $rbd_thin_provisioning = lookup('glance::backend::rbd::rbd_thin_provisioning', undef, undef, undef),
+  $rados_connect_timeout = lookup('glance::backend::rbd::rados_connect_timeout', undef, undef, undef),
+  $store_description     = lookup('tripleo::profile::base::glance::api::glance_store_description', undef, undef, 'RBD store'),
+  $step                  = Integer(lookup('step')),
 ) {
 
   if $step >= 4 {
@@ -88,24 +83,9 @@ class tripleo::profile::base::glance::backend::rbd (
       $ceph_cluster_name = $backend_config['CephClusterName']
 
       if $ceph_cluster_name {
-        $ceph_cluster_name_real = $ceph_cluster_name
         $rbd_store_ceph_conf_real = "/etc/ceph/${ceph_cluster_name}.conf"
       } else {
-        $ceph_cluster_name_real = $rbd_store_ceph_conf.match(/(\w+)(\.conf$)/)[1]
         $rbd_store_ceph_conf_real = $rbd_store_ceph_conf
-      }
-
-      $ceph_client_keyring = "${glance_rbd_ceph_conf_path}/${ceph_cluster_name_real}.client.${rbd_store_user_real}.keyring"
-
-      exec { "exec-setfacl-${ceph_cluster_name_real}-${rbd_store_user_real}-glance":
-        path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m u:glance:r-- ${ceph_client_keyring}",
-        unless  => "getfacl ${ceph_client_keyring} | grep -q user:glance:r--",
-      }
-      -> exec { "exec-setfacl-${ceph_cluster_name_real}-${rbd_store_user_real}-glance-mask":
-        path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m m::r ${ceph_client_keyring}",
-        unless  => "getfacl ${ceph_client_keyring} | grep -q mask::r",
       }
 
       create_resources('glance::backend::multistore::rbd', { $backend_name => delete_undef_values({

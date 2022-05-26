@@ -117,7 +117,6 @@ class tripleo::profile::base::manila::share (
       $cephfs_ganesha_server_ip = lookup('manila::backend::cephfs::cephfs_ganesha_server_ip', undef, undef, undef)
       $manila_cephfs_protocol_helper_type = lookup('manila::backend::cephfs::cephfs_protocol_helper_type', undef, undef, false)
       $manila_cephfs_pool_name = lookup('manila::backend::cephfs::pool_name', undef, undef, 'manila_data')
-      $manila_cephfs_ceph_conf_path = lookup('manila_cephfs_ceph_conf_path', undef, undef, '/etc/ceph')
 
       if $cephfs_ganesha_server_ip == undef {
         $cephfs_ganesha_server_ip_real = lookup('ganesha_vip', undef, undef, undef)
@@ -149,18 +148,6 @@ class tripleo::profile::base::manila::share (
           ganesha_rados_store_enable    => true,
           ganesha_rados_store_pool_name => $manila_cephfs_pool_name,
         }
-      }
-
-      $keyring_local_path = "${manila_cephfs_ceph_conf_path}/ceph.client.${cephfs_auth_id}.keyring"
-      exec{ "exec-setfacl-${cephfs_auth_id}":
-        path    => ['/bin', '/usr/bin' ],
-        command => "setfacl -m u:manila:r-- ${keyring_local_path}",
-        unless  => "getfacl ${keyring_local_path} | grep -q user:manila:r--",
-      }
-      -> exec{ "exec-setfacl-${cephfs_auth_id}-mask":
-        path    => ['/bin', '/usr/bin' ],
-        command => "setfacl -m m::r ${keyring_local_path}",
-        unless  => "getfacl ${keyring_local_path} | grep -q mask::r",
       }
     }
 

@@ -18,41 +18,33 @@
 #
 # === Parameters
 #
-# [*nova_rbd_client_name*]
-#   (optional) name of RBD client
-#   defaults to hiera('nova::compute::rbd::libvirt_rbd_user')
-#
-# [*nova_rbd_ceph_conf_path*]
-#   (Optional) The path where the Ceph Cluster config files are stored on the host
-#   defaults to '/etc/ceph'
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to hiera('step')
 #
+# [*rbd_ephemeral_storage*]
+#   (Optional) Use Ceph as ephmeral disk backend.
+#   Defaults to hiera('nova::compute::rbd::ephemeral_storage', false)
+#
+# [*rbd_persistent_storage*]
+#   (Optional) Use Ceph as volume backend.
+#   Defaults to hiera('rbd_persistent_storage', false)
+#
+# [*rbd_disk_cachemodes*]
+#   (Optional) Cache mode of rbd volumes.
+#   Defaults to hiera('rbd_disk_cachemodes', ['network=writeback'])
+#
 class tripleo::profile::base::nova::compute_libvirt_shared (
-  $nova_rbd_client_name    = hiera('nova::compute::rbd::libvirt_rbd_user','openstack'),
-  $nova_rbd_ceph_conf_path = '/etc/ceph',
-  $step                    = Integer(hiera('step')),
+  $step                   = Integer(hiera('step')),
+  $rbd_ephemeral_storage  = hiera('nova::compute::rbd::ephemeral_storage', false),
+  $rbd_persistent_storage = hiera('rbd_persistent_storage', false),
+  $rbd_disk_cachemodes    = hiera('rbd_disk_cachemodes', ['network=writeback']),
 ) {
   if $step >= 4 {
     # Ceph + Libvirt
-    $rbd_ephemeral_storage  = hiera('nova::compute::rbd::ephemeral_storage', false)
-    $rbd_persistent_storage = hiera('rbd_persistent_storage', false)
-    $rbd_disk_cachemodes    = hiera('rbd_disk_cachemodes', ['network=writeback'])
     if $rbd_ephemeral_storage or $rbd_persistent_storage {
       include nova::compute::rbd
-      exec{ "exec-setfacl-${nova_rbd_client_name}-nova":
-        path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m u:nova:r-- ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring",
-        unless  => "getfacl ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring | grep -q user:nova:r--",
-      }
-      -> exec{ "exec-setfacl-${nova_rbd_client_name}-nova-mask":
-        path    => ['/bin', '/usr/bin'],
-        command => "setfacl -m m::r ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring",
-        unless  => "getfacl ${nova_rbd_ceph_conf_path}/ceph.client.${nova_rbd_client_name}.keyring | grep -q mask::r",
-      }
     }
 
     if $rbd_ephemeral_storage {
