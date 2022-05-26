@@ -21,10 +21,10 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to lookup('step')
 #
 class tripleo::profile::base::vpp (
-  $step        = Integer(hiera('step')),
+  $step        = Integer(lookup('step')),
 ) {
   if $step >= 1 {
     include fdio
