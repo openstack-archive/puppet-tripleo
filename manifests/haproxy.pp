@@ -866,11 +866,13 @@ class tripleo::haproxy (
 
   if $neutron {
     $neutron_frontend_opts = {
-      'option'  => [ 'httplog', 'forwardfor' ]
+      'timeout client' => '10m',
+      'option'         => [ 'httplog', 'forwardfor' ]
     }
     $neutron_backend_opts = {
-      'balance' => $haproxy_lb_mode_longrunning,
-      'option'  => [ 'httpchk GET /healthcheck' ]
+      'timeout server' => '10m',
+      'balance'        => $haproxy_lb_mode_longrunning,
+      'option'         => [ 'httpchk GET /healthcheck' ]
     }
     $neutron_listen_opts = merge_hash_values($neutron_frontend_opts,
                                                 $neutron_backend_opts)
