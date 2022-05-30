@@ -22,7 +22,7 @@
 #   Filename for virtlogd wrapper script.
 #
 # [*virtlogd_image*]
-#   Docker image name for virtlogd.
+#   Container image name for virtlogd.
 #
 # [*debug*]
 #   Enable debug messages for the wrapper script.

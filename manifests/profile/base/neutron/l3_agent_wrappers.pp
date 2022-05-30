@@ -19,8 +19,7 @@
 # === Parameters
 #
 # [*enable_haproxy_wrapper*]
-#  (Optional) If true, generates a wrapper for running haproxy in
-#  a docker container.
+#  (Optional) If true, generates a wrapper for running haproxy in a container.
 #  Defaults to false
 #
 # [*haproxy_process_wrapper*]
@@ -28,13 +27,13 @@
 #   Defaults to undef
 #
 # [*haproxy_image*]
-#   (Optional) Docker image name for haproxy. Required if
+#   (Optional) Container image name for haproxy. Required if
 #   haproxy_process_wrapper is set.
 #   Defaults to undef
 #
 # [*enable_radvd_wrapper*]
 #  (Optional) If true, generates a wrapper for running radvd in
-#  a docker container.
+#  a container.
 #  Defaults to false
 #
 # [*radvd_process_wrapper*]
@@ -42,13 +41,13 @@
 #   Defaults to undef
 #
 # [*radvd_image*]
-#   (Optional) Docker image name for haproxy. Required if radvd_process_wrapper
+#   (Optional) Container image name for haproxy. Required if radvd_process_wrapper
 #   is set.
 #   Defaults to undef
 #
 # [*enable_keepalived_wrapper*]
 #  (Optional) If true, generates a wrapper for running keepalived in
-#  a docker container.
+#  a container.
 #  Defaults to false
 #
 # [*keepalived_process_wrapper*]
@@ -56,7 +55,7 @@
 #   Defaults to undef
 #
 # [*keepalived_image*]
-#   (Optional) Docker image name for keepalived. Required if
+#   (Optional) Container image name for keepalived. Required if
 #   keepalived_process_wrapper is set.
 #   Defaults to undef
 #
@@ -67,8 +66,7 @@
 #   Defaults to undef
 #
 # [*enable_dibbler_wrapper*]
-#  (Optional) If true, generates a wrapper for running dibbler in
-#  a docker container.
+#  (Optional) If true, generates a wrapper for running dibbler in a container.
 #  Defaults to false
 #
 # [*dibbler_process_wrapper*]
@@ -76,13 +74,8 @@
 #   Defaults to undef
 #
 # [*dibbler_image*]
-#   (Optional) Docker image name for dibbler. Required if dibbler_process_wrapper is set.
+#   (Optional) Container image name for dibbler. Required if dibbler_process_wrapper is set.
 #   Defaults to undef
-#
-# [*bind_sockets*]
-#   (Deprecated) Domain sockets that the wrappers should use for accessing
-#   the docker daemon.
-#   Defaults to hiera('docker_additional_sockets', ['/var/lib/openstack/docker.sock'])
 #
 # [*debug*]
 #   (Optional) Debug messages for the wrapper scripts.
@@ -103,25 +96,15 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
   $dibbler_process_wrapper         = undef,
   $dibbler_image                   = undef,
   Boolean $debug                   = false,
-
-  # Deprecated
-  $bind_sockets                    = hiera('docker_additional_sockets', ['/var/lib/openstack/docker.sock']),
 ) {
-  $container_cli = hiera('tripleo::profile::base::neutron::container_cli', 'docker')
-  if $bind_sockets and $container_cli == 'docker' {
-    warning('Docker runtime is deprecated. Consider switching container_cli to podman')
-    $bind_socket = join(['unix://', $bind_sockets[0]], '')
-  } else {
-    $bind_socket = ''
-  }
+  $container_cli = hiera('tripleo::profile::base::neutron::container_cli', 'podman')
   if $enable_haproxy_wrapper {
     unless $haproxy_image and $haproxy_process_wrapper{
-      fail('The docker image for haproxy and wrapper filename must be provided when generating haproxy wrappers')
+      fail('The container image for haproxy and wrapper filename must be provided when generating haproxy wrappers')
     }
     tripleo::profile::base::neutron::wrappers::haproxy{'l3_haproxy_process_wrapper':
       haproxy_process_wrapper => $haproxy_process_wrapper,
       haproxy_image           => $haproxy_image,
-      bind_socket             => $bind_socket,
       debug                   => $debug,
       container_cli           => $container_cli,
     }
@@ -129,12 +112,11 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
 
   if $enable_radvd_wrapper {
     unless $radvd_image and $radvd_process_wrapper{
-      fail('The docker image for radvd and wrapper filename must be provided when generating radvd wrappers')
+      fail('The container image for radvd and wrapper filename must be provided when generating radvd wrappers')
     }
     tripleo::profile::base::neutron::wrappers::radvd{'l3_radvd_process_wrapper':
       radvd_process_wrapper => $radvd_process_wrapper,
       radvd_image           => $radvd_image,
-      bind_socket           => $bind_socket,
       debug                 => $debug,
       container_cli         => $container_cli,
     }
@@ -142,12 +124,11 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
 
   if $enable_keepalived_wrapper {
     unless $keepalived_image and $keepalived_process_wrapper{
-      fail('The docker image for keepalived and wrapper filename must be provided when generating keepalived wrappers')
+      fail('The container image for keepalived and wrapper filename must be provided when generating keepalived wrappers')
     }
     tripleo::profile::base::neutron::wrappers::keepalived{'l3_keepalived':
       keepalived_process_wrapper => $keepalived_process_wrapper,
       keepalived_image           => $keepalived_image,
-      bind_socket                => $bind_socket,
       debug                      => $debug,
       container_cli              => $container_cli,
     }
@@ -156,7 +137,6 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
     }
     tripleo::profile::base::neutron::wrappers::keepalived_state_change{'l3_keepalived_state_change':
       keepalived_state_change_wrapper => $keepalived_state_change_wrapper,
-      bind_socket                     => $bind_socket,
       debug                           => $debug,
       container_cli                   => $container_cli,
     }
@@ -164,12 +144,11 @@ class tripleo::profile::base::neutron::l3_agent_wrappers (
 
   if $enable_dibbler_wrapper {
     unless $dibbler_image and $dibbler_process_wrapper{
-      fail('The docker image for dibbler and wrapper filename must be provided when generating dibbler wrappers')
+      fail('The container image for dibbler and wrapper filename must be provided when generating dibbler wrappers')
     }
     tripleo::profile::base::neutron::wrappers::dibbler_client{'l3_dibbler_daemon':
       dibbler_process_wrapper => $dibbler_process_wrapper,
       dibbler_image           => $dibbler_image,
-      bind_socket             => $bind_socket,
       debug                   => $debug,
       container_cli           => $container_cli,
     }

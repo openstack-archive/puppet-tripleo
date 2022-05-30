@@ -22,10 +22,7 @@
 #   Filename for keepalived wrapper script.
 #
 # [*keepalived_image*]
-#   Docker image name for keepalived.
-#
-# [*bind_socket*]
-#   Socket for accessing the docker daemon.
+#   Container image name for keepalived.
 #
 # [*debug*]
 #   Enable debug messages for the wrapper script.
@@ -38,14 +35,12 @@ define tripleo::profile::base::neutron::wrappers::keepalived (
   $keepalived_image,
   Boolean $debug,
   $container_cli,
-  $bind_socket = undef,
 ) {
     file { $keepalived_process_wrapper:
       ensure  => file,
       mode    => '0755',
       content => epp('tripleo/neutron/keepalived.epp', {
           'image_name'    => $keepalived_image,
-          'bind_socket'   => $bind_socket,
           'debug'         => $debug,
           'container_cli' => $container_cli,
         })
