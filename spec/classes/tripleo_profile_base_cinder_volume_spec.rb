@@ -205,6 +205,34 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
+      context 'with only unity' do
+        before :each do
+          params.merge!({
+            :cinder_enable_dellemc_unity_backend => true,
+            :cinder_enable_iscsi_backend         => false,
+          })
+        end
+        it 'should configure only unity' do
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_unity')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume')
+          is_expected.to contain_class('tripleo::profile::base::cinder')
+          is_expected.to contain_class('cinder::volume')
+          is_expected.to contain_class('cinder::backends').with(
+            :enabled_backends => ['tripleo_dellemc_unity']
+          )
+        end
+        context 'with multiple unity backends' do
+          # Step 5's hiera specifies multiple unity backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_dellemc_unity_1', 'tripleo_dellemc_unity_2']
+            )
+          end
+        end
+      end
+
       context 'with only dellsc' do
         before :each do
           params.merge!({
