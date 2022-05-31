@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*protocol*]
 #   (optional) Protocol use in communication with dbs
@@ -29,11 +29,11 @@
 #
 # [*ovn_db_host*]
 #   (Optional) The IP-Address where OVN DBs are listening.
-#   Defaults to hiera('ovn_dbs_vip')
+#   Defaults to lookup('ovn_dbs_vip')
 #
 # [*ovn_nb_port*]
 #   (Optional) Port number on which northbound database is listening
-#   Defaults to hiera('ovn::northbound::port')
+#   Defaults to lookup('ovn::northbound::port')
 #
 # [*ovn_nb_private_key*]
 #   (optional) The PEM file with private key for SSL connection to OVN-NB-DB
@@ -50,10 +50,10 @@
 #   Defaults to $::os_service_default
 #
 class tripleo::profile::base::octavia::provider::ovn (
-  $step               = Integer(hiera('step')),
-  $protocol           = hiera('ovn_nb_connection_protocol', 'tcp'),
-  $ovn_db_host        = hiera('ovn_dbs_vip', undef),
-  $ovn_nb_port        = hiera('ovn::northbound::port', undef),
+  $step               = Integer(lookup('step')),
+  $protocol           = lookup('ovn_nb_connection_protocol', undef, undef, 'tcp'),
+  $ovn_db_host        = lookup('ovn_dbs_vip', undef, undef, undef),
+  $ovn_nb_port        = lookup('ovn::northbound::port', undef, undef, undef),
   $ovn_nb_private_key = $::os_service_default,
   $ovn_nb_certificate = $::os_service_default,
   $ovn_nb_ca_cert     = $::os_service_default
