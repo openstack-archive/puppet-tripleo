@@ -167,11 +167,6 @@ keystone::endpoint::public_url: 'localhost:5000'
 keystone::admin_password: 'password'
 keystone::admin_token: 'admintoken'
 keystone::roles::admin::password: 'password'
-# tripleo firewall service_rules
-tripleo::dynamic_rules::firewall_rules:
-  '11-neutron':
-    port: 1138
-# HAProxy endpoints
 tripleo::dynamic_stuff::haproxy_endpoints:
   neutron:
     public_virtual_ip: '192.168.0.1'
