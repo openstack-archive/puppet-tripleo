@@ -19,8 +19,12 @@
 # === Parameters
 #
 # [*backend_name*]
-#   (Optional) Name given to the Cinder backend stanza
-#   Defaults to lookup('cinder::backend::dellemc_unity::volume_backend_name', undef, undef, 'tripleo_dellemc_unity')
+#   (Optional) List of names given to the Cinder backend stanza.
+#   Defaults to lookup('cinder::backend::dellemc_unity::volume_backend_name', undef, undef, ['tripleo_dellemc_unity'])
+#
+# [*multi_config*]
+#   (Optional) A config hash when multiple backends are used.
+#   Defaults to lookup('cinder::backend::dellemc_unity::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,21 +32,35 @@
 #   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_unity (
-  $backend_name = lookup('cinder::backend::dellemc_unity::volume_backend_name', undef, undef, 'tripleo_dellemc_unity'),
+  $backend_name = lookup('cinder::backend::dellemc_unity::volume_backend_name', undef, undef, ['tripleo_dellemc_unity']),
+  $multi_config = lookup('cinder::backend::dellemc_unity::volume_multi_config', undef, undef, {}),
   $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    create_resources('cinder::backend::dellemc_unity', { $backend_name => delete_undef_values({
-      'backend_availability_zone' => lookup('cinder::backend::dellemc_unity::backend_availability_zone', undef, undef, undef),
-      'san_ip'                    => lookup('cinder::backend::dellemc_unity::san_ip', undef, undef, undef),
-      'san_login'                 => lookup('cinder::backend::dellemc_unity::san_login', undef, undef, undef),
-      'san_password'              => lookup('cinder::backend::dellemc_unity::san_password', undef, undef, undef),
-      'storage_protocol'          => lookup('cinder::backend::dellemc_unity::storage_protocol', undef, undef, undef),
-      'unity_io_ports'            => lookup('cinder::backend::dellemc_unity::unity_io_ports', undef, undef, undef),
-      'unity_storage_pool_names'  => lookup('cinder::backend::dellemc_unity::unity_storage_pool_names', undef, undef, undef),
-    })})
+    $backend_defaults = {
+      'CinderDellEMCUnityAvailabilityZone' => lookup('cinder::backend::dellemc_unity::backend_availability_zone', undef, undef, undef),
+      'CinderDellEMCUnitySanIp'            => lookup('cinder::backend::dellemc_unity::san_ip', undef, undef, undef),
+      'CinderDellEMCUnitySanLogin'         => lookup('cinder::backend::dellemc_unity::san_login', undef, undef, undef),
+      'CinderDellEMCUnitySanPassword'      => lookup('cinder::backend::dellemc_unity::san_password', undef, undef, undef),
+      'CinderDellEMCUnityStorageProtocol'  => lookup('cinder::backend::dellemc_unity::storage_protocol', undef, undef, undef),
+      'CinderDellEMCUnityIoPorts'          => lookup('cinder::backend::dellemc_unity::unity_io_ports', undef, undef, undef),
+      'CinderDellEMCUnityStoragePoolNames' => lookup('cinder::backend::dellemc_unity::unity_storage_pool_names', undef, undef, undef),
+    }
+    any2array($backend_name).each |String $backend| {
+      $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
+
+      create_resources('cinder::backend::dellemc_unity', { $backend => delete_undef_values({
+        'backend_availability_zone' => $backend_config['CinderDellEMCUnityAvailabilityZone'],
+        'san_ip'                    => $backend_config['CinderDellEMCUnitySanIp'],
+        'san_login'                 => $backend_config['CinderDellEMCUnitySanLogin'],
+        'san_password'              => $backend_config['CinderDellEMCUnitySanPassword'],
+        'storage_protocol'          => $backend_config['CinderDellEMCUnityStorageProtocol'],
+        'unity_io_ports'            => $backend_config['CinderDellEMCUnityIoPorts'],
+        'unity_storage_pool_names'  => $backend_config['CinderDellEMCUnityStoragePoolNames'],
+      })})
+    }
   }
 
 }

@@ -41,9 +41,25 @@ describe 'tripleo::profile::base::cinder::volume::dellemc_unity' do
         # TODO(aschultz): check hiera parameters
         is_expected.to contain_cinder__backend__dellemc_unity('tripleo_dellemc_unity')
       end
+      context 'with multiple backends' do
+        let(:params) { {
+          :backend_name => ['tripleo_dellemc_unity_1', 'tripleo_dellemc_unity_2'],
+          :multi_config => { 'tripleo_dellemc_unity_2' => { 'CinderDellEMCUnityStorageProtocol' => 'FC' }},
+          :step         => 4,
+        } }
+        it 'should configure each backend' do
+          is_expected.to contain_cinder__backend__dellemc_unity('tripleo_dellemc_unity_1')
+          is_expected.to contain_cinder_config('tripleo_dellemc_unity_1/volume_driver')
+             .with_value('cinder.volume.drivers.dell_emc.unity.Driver')
+          is_expected.to contain_cinder_config('tripleo_dellemc_unity_1/storage_protocol')
+             .with_value('iSCSI')
+          is_expected.to contain_cinder__backend__dellemc_unity('tripleo_dellemc_unity_2')
+          is_expected.to contain_cinder_config('tripleo_dellemc_unity_2/storage_protocol')
+             .with_value('FC')
+        end
+      end
     end
   end
-
 
   on_supported_os.each do |os, facts|
     context "on #{os}" do
