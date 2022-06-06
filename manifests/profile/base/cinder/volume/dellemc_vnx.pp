@@ -19,8 +19,12 @@
 # === Parameters
 #
 # [*backend_name*]
-#   (Optional) Name given to the Cinder backend stanza
-#   Defaults to lookup('cinder::backend::emc_vnx::volume_backend_name', undef, undef, 'tripleo_dellemc_vnx')
+#   (Optional) List of names given to the Cinder backend stanza
+#   Defaults to lookup('cinder::backend::emc_vnx::volume_backend_name', undef, undef, ['tripleo_dellemc_vnx'])
+#
+# [*multi_config*]
+#   (Optional) A config hash when multiple backends are used.
+#   Defaults to lookup('cinder::backend::emc_vnx::volume_multi_config', undef, undef, {})
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -28,31 +32,45 @@
 #   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::cinder::volume::dellemc_vnx (
-  $backend_name = lookup('cinder::backend::emc_vnx::volume_backend_name', undef, undef, 'tripleo_dellemc_vnx'),
+  $backend_name = lookup('cinder::backend::emc_vnx::volume_backend_name', undef, undef, ['tripleo_dellemc_vnx']),
+  $multi_config = lookup('cinder::backend::emc_vnx::volume_multi_config', undef, undef, {}),
   $step         = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
-    # Accept recently deprecated 'storage_vnx_pool_name'
-    $storage_vnx_pool_names_real = pick(lookup('cinder::backend::emc_vnx::storage_vnx_pool_names', undef, undef,
-                                        lookup('cinder::backend::emc_vnx::storage_vnx_pool_name',
-                                        undef, undef, undef)))
+    $backend_defaults = {
+      'CinderDellEMCVNXAvailabilityZone'          => lookup('cinder::backend::emc_vnx::backend_availability_zone', undef, undef, undef),
+      'CinderDellEMCVNXSanIp'                     => lookup('cinder::backend::emc_vnx::san_ip', undef, undef, undef),
+      'CinderDellEMCVNXSanLogin'                  => lookup('cinder::backend::emc_vnx::san_login', undef, undef, undef),
+      'CinderDellEMCVNXSanPassword'               => lookup('cinder::backend::emc_vnx::san_password', undef, undef, undef),
+      'CinderDellEMCVNXStorageProtocol'           => lookup('cinder::backend::emc_vnx::storage_protocol', undef, undef, undef),
+      'CinderDellEMCVNXStoragePoolNames'          => lookup('cinder::backend::emc_vnx::storage_vnx_pool_names', undef, undef, undef),
+      'CinderDellEMCVNXDefaultTimeout'            => lookup('cinder::backend::emc_vnx::default_timeout', undef, undef, undef),
+      'CinderDellEMCVNXMaxLunsPerStorageGroup'    => lookup('cinder::backend::emc_vnx::max_luns_per_storage_group', undef, undef, undef),
+      'CinderDellEMCVNXInitiatorAutoRegistration' => lookup('cinder::backend::emc_vnx::initiator_auto_registration', undef, undef, undef),
+      'CinderDellEMCVNXAuthType'                  => lookup('cinder::backend::emc_vnx::storage_vnx_auth_type', undef, undef, undef),
+      'CinderDellEMCVNXStorageSecurityFileDir'    => lookup('cinder::backend::emc_vnx::storage_vnx_security_file_dir', undef, undef, undef),
+      'CinderDellEMCVNXNaviseccliPath'            => lookup('cinder::backend::emc_vnx::naviseccli_path', undef, undef, undef),
+    }
+    any2array($backend_name).each |String $backend| {
+      $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
-    create_resources('cinder::backend::emc_vnx', { $backend_name => delete_undef_values({
-      'backend_availability_zone'     => lookup('cinder::backend::emc_vnx::backend_availability_zone', undef, undef, undef),
-      'san_ip'                        => lookup('cinder::backend::emc_vnx::san_ip', undef, undef, undef),
-      'san_login'                     => lookup('cinder::backend::emc_vnx::san_login', undef, undef, undef),
-      'san_password'                  => lookup('cinder::backend::emc_vnx::san_password', undef, undef, undef),
-      'storage_protocol'              => lookup('cinder::backend::emc_vnx::storage_protocol', undef, undef, undef),
-      'storage_vnx_pool_names'        => lookup('cinder::backend::emc_vnx::storage_vnx_pool_names', undef, undef, undef),
-      'default_timeout'               => lookup('cinder::backend::emc_vnx::default_timeout', undef, undef, undef),
-      'max_luns_per_storage_group'    => lookup('cinder::backend::emc_vnx::max_luns_per_storage_group', undef, undef, undef),
-      'initiator_auto_registration'   => lookup('cinder::backend::emc_vnx::initiator_auto_registration', undef, undef, undef),
-      'storage_vnx_auth_type'         => lookup('cinder::backend::emc_vnx::storage_vnx_auth_type', undef, undef, undef),
-      'storage_vnx_security_file_dir' => lookup('cinder::backend::emc_vnx::storage_vnx_security_file_dir', undef, undef, undef),
-      'naviseccli_path'               => lookup('cinder::backend::emc_vnx::naviseccli_path', undef, undef, undef),
-    })})
+      create_resources('cinder::backend::emc_vnx', { $backend => delete_undef_values({
+        'backend_availability_zone'     => $backend_config['CinderDellEMCVNXAvailabilityZone'],
+        'san_ip'                        => $backend_config['CinderDellEMCVNXSanIp'],
+        'san_login'                     => $backend_config['CinderDellEMCVNXSanLogin'],
+        'san_password'                  => $backend_config['CinderDellEMCVNXSanPassword'],
+        'storage_protocol'              => $backend_config['CinderDellEMCVNXStorageProtocol'],
+        'storage_vnx_pool_names'        => $backend_config['CinderDellEMCVNXStoragePoolNames'],
+        'default_timeout'               => $backend_config['CinderDellEMCVNXDefaultTimeout'],
+        'max_luns_per_storage_group'    => $backend_config['CinderDellEMCVNXMaxLunsPerStorageGroup'],
+        'initiator_auto_registration'   => $backend_config['CinderDellEMCVNXInitiatorAutoRegistration'],
+        'storage_vnx_auth_type'         => $backend_config['CinderDellEMCVNXAuthType'],
+        'storage_vnx_security_file_dir' => $backend_config['CinderDellEMCVNXStorageSecurityFileDir'],
+        'naviseccli_path'               => $backend_config['CinderDellEMCVNXNaviseccliPath'],
+      })})
+    }
   }
 
 }

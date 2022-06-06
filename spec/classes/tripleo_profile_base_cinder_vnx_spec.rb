@@ -41,6 +41,23 @@ describe 'tripleo::profile::base::cinder::volume::dellemc_vnx' do
         # TODO(aschultz): check hiera parameters
         is_expected.to contain_cinder__backend__emc_vnx('tripleo_dellemc_vnx')
       end
+      context 'with multiple backends' do
+        let(:params) { {
+          :backend_name => ['tripleo_dellemc_vnx_1', 'tripleo_dellemc_vnx_2'],
+          :multi_config => { 'tripleo_dellemc_vnx_2' => { 'CinderDellEMCVNXStorageProtocol' => 'FC' }},
+          :step         => 4,
+        } }
+        it 'should configure each backend' do
+          is_expected.to contain_cinder__backend__emc_vnx('tripleo_dellemc_vnx_1')
+          is_expected.to contain_cinder_config('tripleo_dellemc_vnx_1/volume_driver')
+            .with_value('cinder.volume.drivers.dell_emc.vnx.driver.VNXDriver')
+          is_expected.to contain_cinder_config('tripleo_dellemc_vnx_1/storage_protocol')
+             .with_value('iscsi')
+          is_expected.to contain_cinder__backend__emc_vnx('tripleo_dellemc_vnx_2')
+          is_expected.to contain_cinder_config('tripleo_dellemc_vnx_2/storage_protocol')
+             .with_value('FC')
+         end
+      end
     end
   end
 

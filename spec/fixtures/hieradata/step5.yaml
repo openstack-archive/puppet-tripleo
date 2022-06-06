@@ -25,6 +25,9 @@ cinder::backend::dellemc_sc::volume_backend_name:
 cinder::backend::dellemc_unity::volume_backend_name:
   - 'tripleo_dellemc_unity_1'
   - 'tripleo_dellemc_unity_2'
+cinder::backend::emc_vnx::volume_backend_name:
+  - 'tripleo_dellemc_vnx_1'
+  - 'tripleo_dellemc_vnx_2'
 cinder::backend::dellemc_xtremio::volume_backend_name:
   - 'tripleo_dellemc_xtremio_1'
   - 'tripleo_dellemc_xtremio_2'

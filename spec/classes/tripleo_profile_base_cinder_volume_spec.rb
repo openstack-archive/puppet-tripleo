@@ -233,6 +233,34 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
+      context 'with only vnx' do
+        before :each do
+          params.merge!({
+            :cinder_enable_dellemc_vnx_backend => true,
+            :cinder_enable_iscsi_backend       => false,
+          })
+        end
+        it 'should configure only vnx' do
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_vnx')
+          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
+          is_expected.to contain_class('tripleo::profile::base::cinder::volume')
+          is_expected.to contain_class('tripleo::profile::base::cinder')
+          is_expected.to contain_class('cinder::volume')
+          is_expected.to contain_class('cinder::backends').with(
+            :enabled_backends => ['tripleo_dellemc_vnx']
+          )
+        end
+        context 'with multiple vnx backends' do
+          # Step 5's hiera specifies multiple vnx backend names
+          let(:params) { { :step => 5 } }
+          it 'should enable each backend' do
+            is_expected.to contain_class('cinder::backends').with(
+              :enabled_backends => ['tripleo_dellemc_vnx_1', 'tripleo_dellemc_vnx_2']
+            )
+          end
+        end
+      end
+
       context 'with only dellsc' do
         before :each do
           params.merge!({
