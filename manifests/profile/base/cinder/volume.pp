@@ -264,7 +264,9 @@ class tripleo::profile::base::cinder::volume (
 
     if $cinder_enable_nfs_backend {
       include tripleo::profile::base::cinder::volume::nfs
-      $cinder_nfs_backend_name = lookup('cinder::backend::nfs::volume_backend_name', undef, undef, 'tripleo_nfs')
+      $cinder_nfs_backend_name = lookup('tripleo::profile::base::cinder::volume::nfs::backend_name',
+                                        undef, undef, lookup('cinder::backend::nfs::volume_backend_name',
+                                        undef, undef, 'tripleo_nfs'))
     } else {
       $cinder_nfs_backend_name = undef
     }

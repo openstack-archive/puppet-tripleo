@@ -22,8 +22,8 @@
 #   List of NFS shares to mount
 #
 # [*backend_name*]
-#   (Optional) Name given to the Cinder backend stanza
-#   Defaults to lookup('cinder::backend::nfs::volume_backend_name', undef, undef, 'tripleo_nfs')
+#   (Optional) List of names given to the Cinder backend stanza.
+#   Defaults to lookup('cinder::backend::nfs::volume_backend_name', undef, undef, ['tripleo_nfs'])
 #
 # [*backend_availability_zone*]
 #   (Optional) Availability zone for this volume backend
@@ -32,6 +32,10 @@
 # [*cinder_nfs_mount_options*]
 #   (Optional) List of mount options for the NFS share
 #   Defaults to ''
+#
+# [*cinder_nfs_shares_config*]
+#   (Optional) NFS shares configuration file
+#   Defaults to '/etc/cinder/shares-nfs.conf'
 #
 # [*cinder_nfs_snapshot_support*]
 #   (Optional) Whether to enable support for snapshots in the NFS driver.
@@ -54,6 +58,10 @@
 #   used if so, otherwise False. Default is auto.
 #   Defaults to $::os_service_default
 #
+# [*multi_config*]
+#   (Optional) A config hash when multiple backends are used.
+#   Defaults to {}
+#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -61,30 +69,42 @@
 #
 class tripleo::profile::base::cinder::volume::nfs (
   $cinder_nfs_servers,
-  $backend_name                       = lookup('cinder::backend::nfs::volume_backend_name', undef, undef, 'tripleo_nfs'),
+  $backend_name                       = lookup('cinder::backend::nfs::volume_backend_name', undef, undef, ['tripleo_nfs']),
   $backend_availability_zone          = lookup('cinder::backend::nfs::backend_availability_zone', undef, undef, undef),
   $cinder_nfs_mount_options           = '',
+  $cinder_nfs_shares_config           = '/etc/cinder/shares-nfs.conf',
   $cinder_nfs_snapshot_support        = $::os_service_default,
   $cinder_nas_secure_file_operations  = $::os_service_default,
   $cinder_nas_secure_file_permissions = $::os_service_default,
+  $multi_config                       = {},
   $step                               = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::cinder::volume
 
   if $step >= 4 {
     package {'nfs-utils': }
-
-    create_resources('cinder::backend::nfs', { $backend_name => delete_undef_values({
-      'backend_availability_zone'   => $backend_availability_zone,
-      'nfs_servers'                 => $cinder_nfs_servers,
-      'nfs_mount_options'           => $cinder_nfs_mount_options,
-      'nfs_shares_config'           => '/etc/cinder/shares-nfs.conf',
-      'nfs_snapshot_support'        => $cinder_nfs_snapshot_support,
-      'nas_secure_file_operations'  => $cinder_nas_secure_file_operations,
-      'nas_secure_file_permissions' => $cinder_nas_secure_file_permissions,
-    })})
-    Package['nfs-utils'] -> Cinder::Backend::Nfs[$backend_name]
-
+    $backend_defaults = {
+      'CinderNfsAvailabilityZone'      => $backend_availability_zone,
+      'CinderNfsServers'               => $cinder_nfs_servers,
+      'CinderNfsMountOptions'          => $cinder_nfs_mount_options,
+      'CinderNfsSharesConfig'          => $cinder_nfs_shares_config,
+      'CinderNfsSnapshotSupport'       => $cinder_nfs_snapshot_support,
+      'CinderNasSecureFileOperations'  => $cinder_nas_secure_file_operations,
+      'CinderNasSecureFilePermissions' => $cinder_nas_secure_file_permissions,
+    }
+    any2array($backend_name).each |String $backend| {
+      $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
+      create_resources('cinder::backend::nfs', { $backend => delete_undef_values({
+        'backend_availability_zone'   => $backend_config['CinderNfsAvailabilityZone'],
+        'nfs_servers'                 => $backend_config['CinderNfsServers'],
+        'nfs_mount_options'           => $backend_config['CinderNfsMountOptions'],
+        'nfs_shares_config'           => $backend_config['CinderNfsSharesConfig'],
+        'nfs_snapshot_support'        => $backend_config['CinderNfsSnapshotSupport'],
+        'nas_secure_file_operations'  => $backend_config['CinderNasSecureFileOperations'],
+        'nas_secure_file_permissions' => $backend_config['CinderNasSecureFilePermissions'],
+      })})
+      Package['nfs-utils'] -> Cinder::Backend::Nfs[$backend]
+    }
     if str2bool($::selinux) {
       selboolean { 'virt_use_nfs':
         value      => on,
@@ -93,5 +113,4 @@ class tripleo::profile::base::cinder::volume::nfs (
       }
     }
   }
-
 }
