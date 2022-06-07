@@ -27,11 +27,6 @@
 #   If no keys are provided then migration over ssh will be disabled.
 #   Defaults to []
 #
-# [*ssh_localaddrs*]
-#   (Optional) Restrict ssh migration to clients connecting via this list of
-#   IPs.
-#   Defaults to [] (no restriction)
-#
 # [*wrapper_command*]
 #   (Internal) Used to override the wrapper command when proxying
 #   Defaults to /bin/nova-migration-wrapper
@@ -39,43 +34,17 @@
 class tripleo::profile::base::nova::migration::target (
   $step                = Integer(hiera('step')),
   $ssh_authorized_keys = [],
-  $ssh_localaddrs      = [],
   $wrapper_command     = '/bin/nova-migration-wrapper',
 ) {
 
   include tripleo::profile::base::nova::migration
 
-  validate_legacy(Array, 'validate_array', $ssh_localaddrs)
-
-  $ssh_localaddrs.each |$x| {
-    validate_legacy(Stdlib::IP::Address, 'validate_ip_address', $x)
-  }
-
-  $ssh_localaddrs_real = unique($ssh_localaddrs)
   validate_legacy(Array, 'validate_array', $ssh_authorized_keys)
   $ssh_authorized_keys_real = join($ssh_authorized_keys, '\n')
 
   if $step >= 4 {
     if !empty($ssh_authorized_keys_real) {
-      if !empty($ssh_localaddrs_real) {
-        $allow_type = sprintf('LocalAddress %s User', join($ssh_localaddrs_real,','))
-        $deny_type = 'LocalAddress'
-        $deny_name = sprintf('!%s', join($ssh_localaddrs_real,',!'))
-
-        ssh::server::match_block { 'nova_migration deny':
-          name    => $deny_name,
-          type    => $deny_type,
-          order   => 2,
-          options => {
-            'DenyUsers' => 'nova_migration'
-          },
-          notify  => Service['sshd']
-        }
-      }
-      else {
-        $allow_type = 'User'
-      }
-
+      $allow_type = 'User'
       $allow_name = 'nova_migration'
 
       ssh::server::match_block { 'nova_migration allow':
