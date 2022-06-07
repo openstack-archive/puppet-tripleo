@@ -117,6 +117,7 @@ manila_share_short_node_names:
 manila_api_short_bootstrap_node_name: node
 # nova related items
 nova_api_short_bootstrap_node_name: node
+nova_conductor_short_bootstrap_node_name: node
 nova_metadata_short_bootstrap_node_name: node
 nova_placement_short_bootstrap_node_name: node
 nova::rabbit_password: 'password'
