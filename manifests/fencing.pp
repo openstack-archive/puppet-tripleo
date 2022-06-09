@@ -57,7 +57,7 @@
 #
 # [*enable_instanceha*]
 #  (Optional) Boolean driving the Instance HA controlplane configuration
-#  Defaults to false
+#  Defaults to lookup('tripleo::instanceha', undef, undef, false),
 #
 class tripleo::fencing(
   $config             = {},
@@ -65,7 +65,7 @@ class tripleo::fencing(
   $try_sleep          = 3,
   $deep_compare       = false,
   $update_settle_secs = 600,
-  $enable_instanceha  = hiera('tripleo::instanceha', false),
+  $enable_instanceha  = lookup('tripleo::instanceha', undef, undef, false),
 ) {
   $common_params = {
     'tries' => $tries,
@@ -75,7 +75,7 @@ class tripleo::fencing(
   }
 
   # check if instanceha is enabled
-  if member(hiera('compute_instanceha_short_node_names', []), downcase($::hostname)) {
+  if member(lookup('compute_instanceha_short_node_names', undef, undef, []), downcase($::hostname)) {
     $is_compute_instanceha_node = true
   } else {
     $is_compute_instanceha_node = false
