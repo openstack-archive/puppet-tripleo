@@ -21,28 +21,28 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*memcached_hosts*]
 #   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
-#   Defaults to hiera('memcached_node_names', [])
+#   Defaults to lookup('memcached_node_names', undef, undef, [])
 #
 # [*memcached_port*]
 #   (Optional) Memcached port to use.
-#   Defaults to hiera('memcached_authtoken_port', 11211)
+#   Defaults to lookup('memcached_authtoken_port', undef, undef, 11211)
 #
 # [*memcached_ipv6*]
 #   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
-#   Defauls to hiera('memcached_ipv6', false)
+#   Defauls to lookup('memcached_ipv6', undef, undef, false)
 #
 # [*security_strategy*]
 #   (Optional) Memcached (authtoken) security strategy.
-#   Defaults to hiera('memcached_authtoken_security_strategy', undef)
+#   Defaults to lookup('memcached_authtoken_security_strategy', undef, undef, undef)
 #
 # [*secret_key*]
 #   (Optional) Memcached (authtoken) secret key, used with security_strategy.
 #   The key is hashed with a salt, to isolate services.
-#   Defaults to hiera('memcached_authtoken_secret_key', undef)
+#   Defaults to lookup('memcached_authtoken_secret_key', undef, undef, undef)
 #
 # DEPRECATED PARAMETERS
 #
@@ -51,12 +51,12 @@
 #   Defaults to undef
 #
 class tripleo::profile::base::nova::authtoken (
-  $step                = Integer(hiera('step')),
-  $memcached_hosts     = hiera('memcached_node_names', []),
-  $memcached_port      = hiera('memcached_authtoken_port', 11211),
-  $memcached_ipv6      = hiera('memcached_ipv6', false),
-  $security_strategy   = hiera('memcached_authtoken_security_strategy', undef),
-  $secret_key          = hiera('memcached_authtoken_secret_key', undef),
+  $step                = Integer(lookup('step')),
+  $memcached_hosts     = lookup('memcached_node_names', undef, undef, []),
+  $memcached_port      = lookup('memcached_authtoken_port', undef, undef, 11211),
+  $memcached_ipv6      = lookup('memcached_ipv6', undef, undef, false),
+  $security_strategy   = lookup('memcached_authtoken_security_strategy', undef, undef, undef),
+  $secret_key          = lookup('memcached_authtoken_secret_key', undef, undef, undef),
   # DEPRECATED PARAMETERS
   $memcached_ips       = undef
 ) {

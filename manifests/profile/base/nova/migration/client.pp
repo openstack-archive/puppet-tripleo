@@ -28,7 +28,7 @@
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*ssh_private_key*]
 #   (Optional) SSH private_key for migration SSH tunnel.
@@ -45,7 +45,7 @@
 class tripleo::profile::base::nova::migration::client (
   $libvirt_enabled          = false,
   $nova_compute_enabled     = false,
-  $step                     = Integer(hiera('step')),
+  $step                     = Integer(lookup('step')),
   $ssh_private_key          = '',
   $ssh_port                 = 22,
   $libvirt_tls              = false,
