@@ -40,6 +40,8 @@ describe 'tripleo::profile::base::cinder::volume' do
         is_expected.to contain_class('tripleo::profile::base::cinder::volume')
         is_expected.to contain_class('tripleo::profile::base::cinder')
         is_expected.to_not contain_class('cinder::volume')
+        is_expected.to_not contain_class('cinder::backends')
+        is_expected.to_not contain_class('cinder::backend::defaults')
       end
     end
 
@@ -54,6 +56,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           is_expected.to contain_class('cinder::backends').with(
             :enabled_backends => ['tripleo_iscsi']
           )
+          is_expected.to contain_class('cinder::backend::defaults')
         end
         it 'should not configure cinder-volume for A/A mode' do
           is_expected.to contain_class('cinder::volume').with(

@@ -329,6 +329,7 @@ class tripleo::profile::base::cinder::volume (
     class { 'cinder::backends' :
       enabled_backends => $cinder_enabled_backends,
     }
+    include cinder::backend::defaults
   }
 
 }
