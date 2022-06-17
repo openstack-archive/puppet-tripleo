@@ -52,7 +52,7 @@
 #   Defaults to undef
 #
 # [*listener_ssl_cert_file*]
-#   (optional) Path to certificat file
+#   (optional) Path to certificate file
 #   Defaults to undef
 #
 # [*listener_ssl_key_file*]

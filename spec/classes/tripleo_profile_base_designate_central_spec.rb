@@ -83,7 +83,7 @@ eos
         # TODO(tkajinam): tripleo::profile::base::designate includes
         #                 the designate class in all nodes when step>=3,
         #                 and the designate class now includes this class.
-        #                 Fix this once the designate class stopps including
+        #                 Fix this once the designate class stops including
         #                 the neutron class when puppet-designate drops
         #                 the deprecated parameters.
         #is_expected.to_not contain_class('designate::network_api::neutron')

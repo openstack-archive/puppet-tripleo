@@ -110,7 +110,7 @@ describe 'tripleo::profile::base::metrics::collectd' do
         { :step => 3,
           :enable_libpodstats => true }
       end
-      it 'has lobpodstats' do
+      it 'has libpodstats' do
         is_expected.to compile.with_all_deps
         is_expected.to contain_package('collectd-libpod-stats').with(:ensure => 'present')
         is_expected.to contain_class('collectd').with({

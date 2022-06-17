@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::profile::base::neutron::ovn_metadata_agent_wrappers
 #
-# Generates wrapper scripts for running OVN metadata agent subprocesess in containers.
+# Generates wrapper scripts for running OVN metadata agent subprocesses in containers.
 #
 # === Parameters
 #

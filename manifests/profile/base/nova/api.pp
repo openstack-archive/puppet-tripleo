@@ -47,11 +47,11 @@
 #   Defaults to Integer(lookup('step'))
 #
 # [*nova_enable_db_archive*]
-#   (Optional) Wheter to enable db archiving
+#   (Optional) Whether to enable db archiving
 #   Defaults to lookup('nova_enable_db_archive', undef, undef, true)
 #
 # [*nova_enable_db_purge*]
-#   (Optional) Wheter to enable db purging
+#   (Optional) Whether to enable db purging
 #   Defaults to lookup('nova_enable_db_purge', undef, undef, true)
 #
 # [*configure_apache*]

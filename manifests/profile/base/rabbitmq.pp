@@ -268,7 +268,7 @@ class tripleo::profile::base::rabbitmq (
     #    which is applied only on the bootstrap node (because enforcing the readiness on all nodes can be problematic
     #    in situations like controller replacement)
     # Required for changing password on update scenario. Password will be changed only when
-    # called explicity, THT enforces that the rabbitmq service is already running when we call this.
+    # called explicitly, THT enforces that the rabbitmq service is already running when we call this.
     rabbitmq_user { $rabbitmq_user :
       password => $rabbitmq_pass,
       admin    => true,

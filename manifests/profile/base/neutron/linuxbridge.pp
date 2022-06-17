@@ -5,7 +5,7 @@
 # === Parameters
 #
 # [*step*]
-#   (Optional) The current step in deployment. See tripleo-heat-templatee
+#   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
 #   Defaults to Integer(lookup('step'))
 #

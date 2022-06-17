@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::profile::base::neutron::dhcp_agent_wrappers
 #
-# Generates wrapper scripts for running dhcp agent subprocesess in containers.
+# Generates wrapper scripts for running dhcp agent subprocesses in containers.
 #
 # === Parameters
 #

@@ -33,7 +33,7 @@
 #
 # [*public_virtual_ip*]
 #  Address in which the proxy endpoint will be listening in the public network.
-#  If this service is internal only this should be ommitted.
+#  If this service is internal only this should be omitted.
 #  Defaults to undef.
 #
 # [*use_backend_syntax*]
@@ -72,7 +72,7 @@
 #  Defaults to undef
 #
 # [*hsts_header_value*]
-#   (optional) Adds the HTTP Strict Transport Securiy (HSTS) header to
+#   (optional) Adds the HTTP Strict Transport Security (HSTS) header to
 #   response. This takes effect only when public_certificate is set.
 #   Defaults to undef
 #
@@ -109,7 +109,7 @@ class tripleo::haproxy::horizon_endpoint (
       }
       # NOTE(jaosorior): The key of the internal_certificates_specs hash must
       # must match the convention haproxy-<network name> or else this
-      # will fail. Futherly, it must contain the path that we'll use under
+      # will fail. Further, it must contain the path that we'll use under
       # 'service_pem'.
       $internal_cert_path = $internal_certificates_specs["haproxy-${service_network}"]['service_pem']
       $internal_bind_opts = union($haproxy_listen_bind_param, ['ssl', 'crt', $internal_cert_path])

@@ -89,7 +89,7 @@
 #
 # [*memcached_ipv6*]
 #   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
-#   Defauls to lookup('memcached_ipv6', undef, undef, false)
+#   Defaults to lookup('memcached_ipv6', undef, undef, false)
 #
 # [*cache_backend*]
 #   (Optional) oslo.cache backend used for caching.

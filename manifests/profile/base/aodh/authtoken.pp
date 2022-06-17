@@ -33,7 +33,7 @@
 #
 # [*memcached_ipv6*]
 #   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
-#   Defauls to lookup('memcached_ipv6', undef, undef, false)
+#   Defaults to lookup('memcached_ipv6', undef, undef, false)
 #
 # [*security_strategy*]
 #   (Optional) Memcached (authtoken) security strategy.

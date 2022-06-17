@@ -104,7 +104,7 @@ heat_api_cfn_short_bootstrap_node_name: node
 heat_engine_short_bootstrap_node_name: node
 heat::keystone::authtoken::password: 'password'
 heat::keystone::domain::domain_password: 'password'
-heat::engine::auth_encryption_key: 'heat_auth_encrpytion_key'
+heat::engine::auth_encryption_key: 'heat_auth_encryption_key'
 # mysql related items
 mysql_short_bootstrap_node_name: node
 # manila related items

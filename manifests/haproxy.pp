@@ -260,7 +260,7 @@
 #  Defaults to lookup('ironic_inspector_enabled', undef, undef, false)
 #
 # [*octavia*]
-#  (optional) Enable or not Octavia APII binding
+#  (optional) Enable or not Octavia API binding
 #  Defaults to lookup('octavia_api_enabled', undef, undef, false)
 #
 # [*mysql*]

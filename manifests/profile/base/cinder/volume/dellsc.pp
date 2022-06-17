@@ -33,7 +33,7 @@ class tripleo::profile::base::cinder::volume::dellsc (
 ) {
   include tripleo::profile::base::cinder::volume
 
-  warning('The tripleo_dellsc class will be removed in V-Release, please use the triplo_dellemc_sc resource instead.')
+  warning('The tripleo_dellsc class will be removed in V-Release, please use the tripleo_dellemc_sc resource instead.')
 
   if $step >= 4 {
 
