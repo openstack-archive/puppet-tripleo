@@ -24,7 +24,6 @@ describe 'tripleo::profile::base::ceilometer' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer')
         is_expected.to_not contain_class('ceilometer')
         is_expected.to_not contain_class('ceilometer::config')
-        is_expected.to_not contain_class('ceilometer::db')
       end
     end
 
@@ -41,7 +40,6 @@ describe 'tripleo::profile::base::ceilometer' do
           :default_transport_url => 'rabbit://ceilometer:foo@127.0.0.1:5672/?ssl=0'
         )
         is_expected.to contain_class('ceilometer::config')
-        is_expected.to contain_class('ceilometer::db')
       end
     end
 
