@@ -12,6 +12,7 @@
         - puppet-openstack-unit-6.0-ubuntu-bionic
 
 - project:
+    queue: tripleo
     templates:
       - puppet-openstack-check-jobs
       - puppet-tripleo-module-unit-jobs
@@ -37,5 +38,3 @@
               - ^manifests/profile/(base|pacemaker)/neutron/agents/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/ovn.*$
               - ^manifests/profile/(base|pacemaker)/tacker.*$
-    gate:
-      queue: tripleo
