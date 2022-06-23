@@ -1,4 +1,5 @@
 - project:
+    queue: tripleo
     templates:
       - puppet-openstack-check-jobs
       - puppet-openstack-module-unit-jobs
@@ -31,7 +32,6 @@
                 - tripleo-ci-centos-9-content-provider
             files: *scen7_files
     gate:
-      queue: tripleo
       jobs:
         - tripleo-ci-centos-8-content-provider
         - tripleo-ci-centos-8-scenario007-multinode-oooq-container: *c8_consumer
