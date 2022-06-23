@@ -26,11 +26,11 @@
 # [*mysql_auth_ed25519*]
 #   (Optional) Use MariaDB's ed25519 authentication plugin to authenticate
 #   a user when connecting to the server
-#   Defaults to hiera('mysql_auth_ed25519', false)
+#   Defaults to lookup('mysql_auth_ed25519', undef, undef, false)
 #
 define tripleo::profile::base::database::mysql::include_and_check_auth(
   $module = $title,
-  $mysql_auth_ed25519 = hiera('mysql_auth_ed25519', false),
+  $mysql_auth_ed25519 = lookup('mysql_auth_ed25519', undef, undef, false),
 ) {
   include $module
   if ($mysql_auth_ed25519) {
@@ -43,7 +43,7 @@ define tripleo::profile::base::database::mysql::include_and_check_auth(
     $password_key = "${stripped_module_name}::password"
     Openstacklib::Db::Mysql<| tag == $stripped_module_name |> {
       plugin => 'ed25519',
-      password_hash => mysql_ed25519_password(hiera($password_key))
+      password_hash => mysql_ed25519_password(lookup($password_key))
     }
   }
 }

@@ -42,7 +42,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::database::mysql::client (
   $enable_ssl                = false,
@@ -50,7 +50,7 @@ class tripleo::profile::base::database::mysql::client (
   $mysql_read_default_group  = 'tripleo',
   $mysql_client_bind_address = undef,
   $ssl_ca                    = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
-  $step                      = Integer(hiera('step')),
+  $step                      = Integer(lookup('step')),
 ) {
   if $step >= 1 {
     if $mysql_client_bind_address =~ Stdlib::Compat::Ip_address {
