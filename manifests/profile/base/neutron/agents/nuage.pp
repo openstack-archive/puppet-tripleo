@@ -20,19 +20,19 @@
 #
 # [*nova_auth_ip*]
 #   (Optional) Nova auth IP
-#   Defaults to hiera('keystone_public_api_virtual_ip')
+#   Defaults to lookup('keystone_public_api_virtual_ip')
 #
 # [*nova_metadata_ip*]
 #   (Optional) Nova metadata node IPs
-#   Defaults to hiera('nova_metadata_node_ips')
+#   Defaults to lookup('nova_metadata_node_ips')
 #
 # [*nova_os_password*]
 #   (Optional) Nova password
-#   Defaults to hiera('nova_password')
+#   Defaults to lookup('nova_password')
 #
 # [*nova_os_tenant_name*]
 #   (Optional) Nova tenant name
-#   Defaults to hiera('nova_os_tenant_name')
+#   Defaults to lookup('nova_os_tenant_name')
 #
 # [*enable_metadata_agent*]
 #   (Optional) Enable metadata agent
@@ -40,15 +40,15 @@
 #
 # [*step*]
 #   (Optional) The current step of the deployment
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::neutron::agents::nuage (
-  $nova_auth_ip            = hiera('keystone_public_api_virtual_ip', ''),
-  $nova_metadata_ip        = hiera('nova_metadata_node_ips', ''),
-  $nova_os_password        = hiera('nova_password', ''),
-  $nova_os_tenant_name     = hiera('nova::api::admin_tenant_name', ''),
+  $nova_auth_ip            = lookup('keystone_public_api_virtual_ip', undef, undef, ''),
+  $nova_metadata_ip        = lookup('nova_metadata_node_ips', undef, undef, ''),
+  $nova_os_password        = lookup('nova_password', undef, undef, ''),
+  $nova_os_tenant_name     = lookup('nova::api::admin_tenant_name', undef, undef, ''),
   $enable_metadata_agent   = true,
-  $step                    = Integer(hiera('step')),
+  $step                    = Integer(lookup('step')),
 ) {
   if $step >= 4 {
     include nuage::vrs

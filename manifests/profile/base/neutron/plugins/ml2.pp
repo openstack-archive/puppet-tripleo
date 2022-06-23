@@ -20,29 +20,29 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('neutron_plugin_ml2_short_bootstrap_node_name')
+#   Defaults to lookup('neutron_plugin_ml2_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*mechanism_drivers*]
 #   (Optional) The mechanism drivers to use with the Ml2 plugin
-#   Defaults to hiera('neutron::plugins::ml2::mechanism_drivers')
+#   Defaults to lookup('neutron::plugins::ml2::mechanism_drivers')
 #
 # [*service_names*]
 #   (Optional) List of services enabled on the current role.
 #   We may not want to configure a ml2 plugin for a role,
 #   in spite of the fact that it is in the drivers list.
 #   Check if the required service is enabled from the service list.
-#   Defaults to hiera('service_names')
+#   Defaults to lookup('service_names')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::neutron::plugins::ml2 (
-  $bootstrap_node    = hiera('neutron_plugin_ml2_short_bootstrap_node_name', undef),
-  $mechanism_drivers = hiera('neutron::plugins::ml2::mechanism_drivers'),
-  $service_names     = hiera('service_names'),
-  $step              = Integer(hiera('step')),
+  $bootstrap_node    = lookup('neutron_plugin_ml2_short_bootstrap_node_name', undef, undef, undef),
+  $mechanism_drivers = lookup('neutron::plugins::ml2::mechanism_drivers'),
+  $service_names     = lookup('service_names'),
+  $step              = Integer(lookup('step')),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true

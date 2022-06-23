@@ -7,14 +7,14 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templatee
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::neutron::linuxbridge(
-    $step           = Integer(hiera('step')),
+  $step = Integer(lookup('step')),
 ) {
-    include tripleo::profile::base::neutron
+  include tripleo::profile::base::neutron
 
-    if $step >= 5 {
-        include neutron::agents::ml2::linuxbridge
-    }
+  if $step >= 5 {
+    include neutron::agents::ml2::linuxbridge
+  }
 }

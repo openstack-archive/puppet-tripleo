@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*neutron_dns_integration*]
 #   (Optional) Configure neutron to use the supplied unbound resolver nodes.
@@ -29,12 +29,12 @@
 #
 # [*unbound_resolvers*]
 #   (Optional) Unbound resolvers if configured.
-#   Defaults to hiera('unbound_node_ips', undef)
+#   Defaults to lookup('unbound_node_ips', undef, undef, undef)
 #
 class tripleo::profile::base::neutron::dhcp (
-  $step                     = Integer(hiera('step')),
+  $step                     = Integer(lookup('step')),
   $neutron_dns_integration  = false,
-  $unbound_resolvers        = hiera('unbound_node_ips', undef),
+  $unbound_resolvers        = lookup('unbound_node_ips', undef, undef, undef),
 ) {
   if $step >= 4 {
     include tripleo::profile::base::neutron

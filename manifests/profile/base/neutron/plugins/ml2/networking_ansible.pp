@@ -20,27 +20,27 @@
 #
 # [*neutron_redis_password*]
 #  (Required) Password for the neutron redis user for the coordination url
-#   Defaults to hiera('neutron_redis_password'),
+#   Defaults to lookup('neutron_redis_password'),
 #
 # [*redis_vip*]
 #  (Required) Redis ip address for the coordination url
-#   Defaults to hiera('redis_vip'),
+#   Defaults to lookup('redis_vip'),
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 
 class tripleo::profile::base::neutron::plugins::ml2::networking_ansible(
-  $neutron_redis_password = hiera('neutron_redis_password'),
-  $redis_vip              = hiera('redis_vip'),
-  $enable_internal_tls    = hiera('enable_internal_tls', false),
-  $step                   = Integer(hiera('step'))
+  $neutron_redis_password = lookup('neutron_redis_password'),
+  $redis_vip              = lookup('redis_vip'),
+  $enable_internal_tls    = lookup('enable_internal_tls', undef, undef, false),
+  $step                   = Integer(lookup('step'))
 ) {
 
   include tripleo::profile::base::neutron

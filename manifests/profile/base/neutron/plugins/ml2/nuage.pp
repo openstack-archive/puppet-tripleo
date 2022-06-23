@@ -19,15 +19,15 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*enable_vrs*]
 #   (Optional) Enable VRS or not
 #   Defaults to false
 #
 class tripleo::profile::base::neutron::plugins::ml2::nuage (
-  $step              = hiera('step'),
-  $enable_vrs        = false,
+  $step       = Integer(lookup('step')),
+  $enable_vrs = false,
 ) {
 
   if $step >= 4 {

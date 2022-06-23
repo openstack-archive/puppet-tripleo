@@ -18,20 +18,20 @@
 #
 # [*ovn_db_host*]
 #   (Optional) The IP-Address where OVN DBs are listening.
-#   Defaults to hiera('ovn_dbs_vip')
+#   Defaults to lookup('ovn_dbs_vip', undef, undef, undef)
 #
 # [*ovn_db_node_ips*]
 #   (Optional) The OVN DBs node ip addresses are listening.
-#   Defaults to hiera('ovn_dbs_node_ips')
+#   Defaults to lookup('ovn_dbs_node_ips', undef, undef, undef)
 #
 # [*ovn_db_clustered*]
 #   (Optional) Boolean indicating if we're running with ovn db clustering
 #   or pacemaker. Defaults to false for backwards compatibility
-#   Defaults to hiera('ovn_db_clustered', false)
+#   Defaults to lookup('ovn_db_clustered', undef, undef, false)
 #
 # [*ovn_sbdb_port*]
 #   (Optional) Port number on which southbound database is listening
-#   Defaults to hiera('ovn::southbound::port')
+#   Defaults to lookup('ovn::southbound::port')
 #
 # [*protocol*]
 #   (optional) Protocol use in communication with dbs
@@ -40,7 +40,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*ovn_chassis_mac_map*]
 #  (optional) A list of key-value pairs that map a chassis specific mac to
@@ -50,16 +50,16 @@
 #  These are the macs that ovn-controller will replace a router port
 #  mac with, if packet is going from a distributed router port on
 #  vlan type logical switch.
-#  Defaults to hiera('ovn_chassis_mac_map')
+#  Defaults to lookup('ovn_chassis_mac_map', undef, undef, undef)
 #
 class tripleo::profile::base::neutron::agents::ovn (
-  $ovn_db_host          = hiera('ovn_dbs_vip', undef),
-  $ovn_db_node_ips      = hiera('ovn_dbs_node_ips', undef),
-  $ovn_db_clustered     = hiera('ovn_db_clustered', false),
-  $ovn_sbdb_port        = hiera('ovn::southbound::port'),
+  $ovn_db_host          = lookup('ovn_dbs_vip', undef, undef, undef),
+  $ovn_db_node_ips      = lookup('ovn_dbs_node_ips', undef, undef, undef),
+  $ovn_db_clustered     = lookup('ovn_db_clustered', undef, undef, false),
+  $ovn_sbdb_port        = lookup('ovn::southbound::port'),
   $protocol             = 'tcp',
-  $step                 = Integer(hiera('step')),
-  $ovn_chassis_mac_map  = hiera('ovn_chassis_mac_map', undef),
+  $step                 = Integer(lookup('step')),
+  $ovn_chassis_mac_map  = lookup('ovn_chassis_mac_map', undef, undef, undef),
 ) {
   if $step >= 4 {
     if $ovn_db_clustered {

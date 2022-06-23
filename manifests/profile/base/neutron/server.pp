@@ -20,7 +20,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('neutron_api_short_bootstrap_node_name')
+#   Defaults to lookup('neutron_api_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*certificates_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -32,16 +32,16 @@
 #         service_certificate: <service certificate path>
 #         service_key: <service key path>
 #         principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('apache_certificate_specs', {}).
+#   Defaults to lookup('apache_certificates_specs', undef, undef, {}).
 #
 # [*dvr_enabled*]
 #   (Optional) Is dvr enabled, used when no override is passed to
 #   l3_ha_override to calculate enabling l3 HA.
-#   Defaults to  hiera('neutron::server::router_distributed') or false
+#   Defaults to lookup('neutron::server::router_distributed', undef, undef, false)
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*l3_ha_override*]
 #   (Optional) Override the calculated value for neutron::server::l3_ha
@@ -53,19 +53,19 @@
 # [*l3_nodes*]
 #   (Optional) List of nodes running the l3 agent, used when no override
 #   is passed to l3_ha_override to calculate enabling l3 HA.
-#   Defaults to hiera('neutron_l3_short_node_names') or []
+#   Defaults to lookup('neutron_l3_short_node_names', undef, undef, [])
 #   (we need to default neutron_l3_short_node_names to an empty list
 #   because some neutron backends disable the l3 agent)
 #
 # [*neutron_network*]
 #   (Optional) The network name where the neutron endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('neutron_api_network', undef)
+#   Defaults to lookup('neutron_api_network', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*tls_proxy_bind_ip*]
 #   IP on which the TLS proxy will listen on. Required only if
@@ -84,21 +84,21 @@
 #
 # [*designate_api_enabled*]
 #   (Optional) Indicate whether Designate is available in the deployment.
-#   Defaults to hiera('designate_api_enabled') or false
+#   Defaults to lookup('designate_api_enabled', undef, undef, false)
 #
 class tripleo::profile::base::neutron::server (
-  $bootstrap_node                = hiera('neutron_api_short_bootstrap_node_name', undef),
-  $certificates_specs            = hiera('apache_certificates_specs', {}),
-  $dvr_enabled                   = hiera('neutron::server::router_distributed', false),
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $l3_ha_override                = '',
-  $l3_nodes                      = hiera('neutron_l3_short_node_names', []),
-  $neutron_network               = hiera('neutron_api_network', undef),
-  $step                          = Integer(hiera('step')),
-  $tls_proxy_bind_ip             = undef,
-  $tls_proxy_fqdn                = undef,
-  $tls_proxy_port                = 9696,
-  $designate_api_enabled   = hiera('designate_api_enabled', false),
+  $bootstrap_node        = lookup('neutron_api_short_bootstrap_node_name', undef, undef, undef),
+  $certificates_specs    = lookup('apache_certificates_specs', undef, undef, {}),
+  $dvr_enabled           = lookup('neutron::server::router_distributed', undef, undef, false),
+  $enable_internal_tls   = lookup('enable_internal_tls', undef, undef, false),
+  $l3_ha_override        = '',
+  $l3_nodes              = lookup('neutron_l3_short_node_names', undef, undef, []),
+  $neutron_network       = lookup('neutron_api_network', undef, undef, undef),
+  $step                  = Integer(lookup('step')),
+  $tls_proxy_bind_ip     = undef,
+  $tls_proxy_fqdn        = undef,
+  $tls_proxy_port        = 9696,
+  $designate_api_enabled = lookup('designate_api_enabled', undef, undef, false),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true

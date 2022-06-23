@@ -20,20 +20,20 @@
 #
 # [*ovn_db_host*]
 #   The IP-Address where OVN DBs are listening.
-#   Defaults to hiera('ovn_dbs_vip')
+#   Defaults to lookup('ovn_dbs_vip', undef, undef, undef)
 #
 # [*ovn_db_node_ips*]
 #   (Optional) The OVN DBs node ip addresses are listening.
-#   Defaults to hiera('ovn_dbs_node_ips')
+#   Defaults to lookup('ovn_dbs_node_ips', undef, undef, undef)
 #
 # [*ovn_db_clustered*]
 #   (Optional) Boolean indicating if we're running with ovn db clustering
 #   or pacemaker. Defaults to false for backwards compatibility
-#   Defaults to hiera('ovn_db_clustered', false)
+#   Defaults to lookup('ovn_db_clustered', undef, undef, false)
 #
 # [*ovn_sb_port*]
 #   (Optional) Port number on which southbound database is listening
-#   Defaults to hiera('ovn::southbound::port')
+#   Defaults to lookup('ovn::southbound::port')
 #
 # [*ovn_sb_private_key*]
 #   (optional) The PEM file with private key for SSL connection to OVN-SB-DB
@@ -51,23 +51,23 @@
 #
 # [*protocol*]
 #   (optional) Protocol use in communication with dbs
-#   Defaults to tcp
+#   Defaults to 'tcp'
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::neutron::ovn_metadata (
-  $ovn_db_host        = hiera('ovn_dbs_vip', undef),
-  $ovn_db_node_ips    = hiera('ovn_dbs_node_ips', undef),
-  $ovn_db_clustered   = hiera('ovn_db_clustered', false),
-  $ovn_sb_port        = hiera('ovn::southbound::port'),
+  $ovn_db_host        = lookup('ovn_dbs_vip', undef, undef, undef),
+  $ovn_db_node_ips    = lookup('ovn_dbs_node_ips', undef, undef, undef),
+  $ovn_db_clustered   = lookup('ovn_db_clustered', undef, undef, false),
+  $ovn_sb_port        = lookup('ovn::southbound::port'),
   $ovn_sb_private_key = $::os_service_default,
   $ovn_sb_certificate = $::os_service_default,
   $ovn_sb_ca_cert     = $::os_service_default,
   $protocol           = 'tcp',
-  $step               = Integer(hiera('step')),
+  $step               = Integer(lookup('step')),
 ) {
   if $step >= 4 {
     include tripleo::profile::base::neutron

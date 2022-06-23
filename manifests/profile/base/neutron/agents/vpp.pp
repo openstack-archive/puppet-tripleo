@@ -21,19 +21,19 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*etcd_host*]
 #   (Optional) etcd server VIP.
-#   Defaults to hiera('etcd_vip')
+#   Defaults to lookup('etcd_vip')
 #
 # [*etcd_port*]
 #   (Optional) etcd server listening port.
 #   Defaults to 2379
 #
 class tripleo::profile::base::neutron::agents::vpp(
-  $step      = Integer(hiera('step')),
-  $etcd_host = hiera('etcd_vip'),
+  $step      = Integer(lookup('step')),
+  $etcd_host = lookup('etcd_vip'),
   $etcd_port = 2379,
 ) {
   if empty($etcd_host) {

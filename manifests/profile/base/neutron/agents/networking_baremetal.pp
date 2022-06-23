@@ -21,11 +21,11 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 
 class tripleo::profile::base::neutron::agents::networking_baremetal(
-  $step               = Integer(hiera('step'))
+  $step = Integer(lookup('step'))
 ) {
 
   include tripleo::profile::base::neutron
