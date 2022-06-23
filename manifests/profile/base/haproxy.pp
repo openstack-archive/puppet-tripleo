@@ -51,20 +51,6 @@ class tripleo::profile::base::haproxy (
       class {'tripleo::haproxy':
         internal_certificates_specs => $certificates_specs,
       }
-
-      unless hiera('tripleo::haproxy::haproxy_service_manage', true) {
-        # Reload HAProxy configuration if the haproxy class has refreshed or any
-        # HAProxy frontend endpoint has changed.
-        exec { 'haproxy-reload':
-          command     => 'systemctl reload haproxy',
-          path        => ['/usr/bin', '/usr/sbin'],
-          refreshonly => true,
-          onlyif      => 'systemctl is-active haproxy | grep -q active',
-          subscribe   => Class['haproxy']
-        }
-        Haproxy::Listen<||> ~> Exec['haproxy-reload']
-        Haproxy::Balancermember<||> ~> Exec['haproxy-reload']
-      }
     }
   }
 
