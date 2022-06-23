@@ -31,6 +31,7 @@ describe 'tripleo::profile::base::designate' do
         is_expected.to_not contain_class('designate')
         is_expected.to_not contain_class('designate::config')
         is_expected.to_not contain_class('designate::logging')
+        is_expected.to_not contain_class('designate::network_api::neutron')
       }
     end
 
@@ -49,6 +50,7 @@ describe 'tripleo::profile::base::designate' do
         )
         is_expected.to contain_class('designate::config')
         is_expected.to contain_class('designate::logging')
+        is_expected.to contain_class('designate::network_api::neutron')
       }
     end
 
