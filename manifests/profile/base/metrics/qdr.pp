@@ -209,7 +209,7 @@ class tripleo::profile::base::metrics::qdr (
 
     file { $ssl_cert_dir:
       ensure => directory,
-      mode   => '0700'
+      mode   => '0755'
     }
     $prep_ssl_profiles = qdr_ssl_certificate($ssl_profiles, $ssl_cert_dir)
     $final_ssl_profiles = $prep_ssl_profiles.reduce( [] ) |$memo, $prf| {
@@ -217,7 +217,7 @@ class tripleo::profile::base::metrics::qdr (
         file { $prf['caCertFile']:
           ensure  => present,
           content => $prf['caCertFileContent'],
-          mode    => '0600',
+          mode    => '0644',
           require => File[$ssl_cert_dir]
         }
         $memo << delete($prf, 'caCertFileContent')
