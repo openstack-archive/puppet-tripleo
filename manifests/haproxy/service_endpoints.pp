@@ -30,14 +30,14 @@ define tripleo::haproxy::service_endpoints ($service_name = $title) {
   # creating its own flat hiera key named:
   #   tripleo.<service name with underscores>.haproxy_endpoints
   #   tripleo.<service name with underscores>.haproxy_userlists
-  $dots_endpoints = hiera("'tripleo.${underscore_name}.haproxy_endpoints'", {})
-  $dots_userlists = hiera("'tripleo.${underscore_name}.haproxy_userlists'", {})
+  $dots_endpoints = lookup("'tripleo.${underscore_name}.haproxy_endpoints'", undef, undef, {})
+  $dots_userlists = lookup("'tripleo.${underscore_name}.haproxy_userlists'", undef, undef, {})
 
   # Supports standard "::" notation
   #   tripleo::<service name with underscores>::haproxy_endpoints
   #   tripleo::<service name with underscores>::haproxy_userlists
-  $colons_endpoints = hiera("tripleo::${underscore_name}::haproxy_endpoints", {})
-  $colons_userlists = hiera("tripleo::${underscore_name}::haproxy_userlists", {})
+  $colons_endpoints = lookup("tripleo::${underscore_name}::haproxy_endpoints", undef, undef, {})
+  $colons_userlists = lookup("tripleo::${underscore_name}::haproxy_userlists", undef, undef, {})
 
   # Merge hashes
   $service_endpoints = merge($colons_endpoints, $dots_endpoints)

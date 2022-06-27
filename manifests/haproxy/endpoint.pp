@@ -31,7 +31,7 @@
 # [*use_backend_syntax*]
 #  (optional) When set to true, generate a config with frontend and
 #  backend sections, otherwise use listen sections.
-#  Defaults to hiera('haproxy_backend_syntax', false)
+#  Defaults to lookup('haproxy_backend_syntax', undef, undef, false)
 #
 # [*haproxy_port*]
 #  An alternative port, on which haproxy will listen for incoming requests.
@@ -45,11 +45,11 @@
 #
 # [*ip_addresses*]
 #  The ordered list of IPs to be used to contact the balancer member.
-#  Defaults to hiera("${name}_node_ips", undef)
+#  Defaults to lookup("${name}_node_ips", undef, undef, undef)
 #
 # [*server_names*]
 #  The names of the balancer members, which usually should be the hostname.
-#  Defaults to hiera("${name}_node_names", undef)
+#  Defaults to lookup("${name}_node_names", undef, undef, undef)
 #
 # [*public_virtual_ip*]
 #  Address in which the proxy endpoint will be listening in the public network.
@@ -127,11 +127,11 @@ define tripleo::haproxy::endpoint (
   $internal_ip,
   $service_port,
   $member_options,
-  $use_backend_syntax          = hiera('haproxy_backend_syntax', false),
+  $use_backend_syntax          = lookup('haproxy_backend_syntax', undef, undef, false),
   $haproxy_port                = undef,
   $base_service_name           = undef,
-  $ip_addresses                = hiera("${name}_node_ips", undef),
-  $server_names                = hiera("${name}_node_names", undef),
+  $ip_addresses                = lookup("${name}_node_ips", undef, undef, undef),
+  $server_names                = lookup("${name}_node_names", undef, undef, undef),
   $public_virtual_ip           = undef,
   $mode                        = undef,
   $haproxy_listen_bind_param   = undef,
@@ -163,21 +163,25 @@ define tripleo::haproxy::endpoint (
   }
 
   if $base_service_name {
-    $ip_addresses_real = hiera("${base_service_name}_node_ips", undef)
+    $ip_addresses_real = lookup("${base_service_name}_node_ips", undef, undef, undef)
   } else {
     $ip_addresses_real = $ip_addresses
   }
   if $base_service_name {
-    $server_names_real = hiera("${base_service_name}_node_names", undef)
+    $server_names_real = lookup("${base_service_name}_node_names", undef, undef, undef)
   } else {
     $server_names_real = $server_names
   }
   # Let users override the options on a per-service basis
-  $custom_options = hiera("tripleo::haproxy::${name}::options", undef)
-  $custom_frontend_options = hiera("tripleo::haproxy::${name}::frontend_options", undef)
-  $custom_backend_options = hiera("tripleo::haproxy::${name}::backend_options", undef)
-  $custom_bind_options_public = delete(any2array(hiera("tripleo::haproxy::${name}::public_bind_options", undef)), undef).flatten()
-  $custom_bind_options_internal = delete(any2array(hiera("tripleo::haproxy::${name}::internal_bind_options", undef)), undef).flatten()
+  $custom_options = lookup("tripleo::haproxy::${name}::options", undef, undef, undef)
+  $custom_frontend_options = lookup("tripleo::haproxy::${name}::frontend_options", undef, undef, undef)
+  $custom_backend_options = lookup("tripleo::haproxy::${name}::backend_options", undef, undef, undef)
+  $custom_bind_options_public = delete(
+    any2array(lookup("tripleo::haproxy::${name}::public_bind_options", undef, undef, undef)),
+    undef).flatten()
+  $custom_bind_options_internal = delete(
+    any2array(lookup("tripleo::haproxy::${name}::internal_bind_options", undef, undef, undef)),
+    undef).flatten()
   if $public_virtual_ip {
     # service exposed to the public network
 
