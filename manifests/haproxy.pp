@@ -961,6 +961,11 @@ class tripleo::haproxy (
   }
 
   if $ceph_grafana {
+    if $enable_internal_tls {
+      $ceph_grafana_tls_member_options = ['ssl check verify none']
+    } else {
+      $ceph_grafana_tls_member_options = []
+    }
     ::tripleo::haproxy::endpoint { 'ceph_grafana':
       internal_ip      => hiera('ceph_dashboard_vip', $controller_virtual_ip),
       service_port     => $ports[ceph_grafana_port],
@@ -978,7 +983,7 @@ class tripleo::haproxy (
         'balance' => 'source',
       }),
       service_network  => $ceph_grafana_network,
-      member_options   => union($haproxy_member_options, $internal_tls_member_options),
+      member_options   => union($haproxy_member_options, $ceph_grafana_tls_member_options),
     }
     ::tripleo::haproxy::endpoint { 'ceph_prometheus':
       internal_ip      => hiera('ceph_grafana_vip', $controller_virtual_ip),
