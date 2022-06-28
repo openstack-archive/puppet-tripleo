@@ -1,0 +1,14 @@
+---
+upgrade:
+  - |
+    When support for CentOS stream  9 and rhel 9 was being developed the
+    nova migration wrapper script in the RDO distgit repo did not support
+    the virt-ssh-helper command for live migration. To work around that
+    the netcat proxy was hardcoded in 04a97f92e4d944ce51492011584e2ec1126042a1.
+    Since then the nova-distgit repo has been updated with support for
+    virt-ssh-helper and netcat has been removed from the nova live migration
+    target container. As a result its not currently possible to live migrate
+    with rhel9 images As reported in `bugzilla 2089520`_. To support upgrades
+    this has now been reverted and we no longer hardcode the proxy to netcat.
+
+    .. _`bugzilla 2089520`: https://bugzilla.redhat.com/show_bug.cgi?id=2089520
