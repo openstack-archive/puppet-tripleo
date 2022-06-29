@@ -117,10 +117,6 @@
 #   (Optional) RabbitMQ Default User.
 #   Defaults to hiera('rabbitmq::default_user')
 #
-# [*stack_action*]
-#   (Optional) Action of the stack deployment.
-#   Defaults to hiera('stack_action')
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -149,7 +145,6 @@ class tripleo::profile::base::rabbitmq (
   $notify_bootstrap_node         = hiera('oslo_messaging_notify_short_bootstrap_node_name'),
   $rabbitmq_pass                 = hiera('rabbitmq::default_pass'),
   $rabbitmq_user                 = hiera('rabbitmq::default_user'),
-  $stack_action                  = hiera('stack_action'),
   $step                          = Integer(hiera('step')),
 ) {
   if $rpc_scheme == 'rabbit' {
