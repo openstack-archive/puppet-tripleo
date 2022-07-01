@@ -27,21 +27,21 @@
 #       service_certificate: <service certificate path>
 #       service_key: <service key path>
 #       principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('redis_certificate_specs', {}).
+#   Defaults to lookup('redis_certificate_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*redis_network*]
 #   (Optional) The network name where the redis endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('redis_network', undef)
+#   Defaults to lookup('redis_network', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*tls_proxy_bind_ip*]
 #   IP on which the TLS proxy will listen on. Required only if
@@ -59,10 +59,10 @@
 #   defaults to 6379
 #
 class tripleo::profile::base::database::redis (
-  $certificate_specs   = hiera('redis_certificate_specs', {}),
-  $enable_internal_tls = hiera('enable_internal_tls', false),
-  $redis_network       = hiera('redis_network', undef),
-  $step                = Integer(hiera('step')),
+  $certificate_specs   = lookup('redis_certificate_specs', undef, undef, {}),
+  $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
+  $redis_network       = lookup('redis_network', undef, undef, undef),
+  $step                = Integer(lookup('step')),
   $tls_proxy_bind_ip   = undef,
   $tls_proxy_fqdn      = undef,
   $tls_proxy_port      = 6379,

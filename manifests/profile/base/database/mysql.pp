@@ -24,7 +24,7 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('mysql_short_bootstrap_node_name')
+#   Defaults to lookup('mysql_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate
@@ -45,11 +45,11 @@
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*innodb_buffer_pool_size*]
 #   (Optional) Configure the size of the MySQL buffer pool.
-#   Defaults to hiera('innodb_buffer_pool_size', undef)
+#   Defaults to lookup('innodb_buffer_pool_size', undef, undef, undef)
 #
 # [*innodb_log_file_size*]
 #   (Optional) Configure the size in bytes of each log file in a log group.
@@ -69,7 +69,7 @@
 #   performs validity checks on DDL statements such as table creation,
 #   or table row size. When set to 'OFF', the same checks only return
 #   warnings rather than error.
-#   Defaults to hiera('innodb_strict_mode', 'OFF')
+#   Defaults to lookup('innodb_strict_mode', undef, undef, 'OFF')
 #
 # [*table_open_cache*]
 #   (Optional) Configure the number of open tables for all threads.
@@ -87,12 +87,12 @@
 #
 # [*mysql_max_connections*]
 #   (Optional) Maximum number of connections to MySQL.
-#   Defaults to hiera('mysql_max_connections', undef)
+#   Defaults to lookup('mysql_max_connections', undef, undef, undef)
 #
 # [*mysql_auth_ed25519*]
 #   (Optional) Use MariaDB's ed25519 authentication plugin to authenticate
 #   a user when connecting to the server
-#   Defaults to hiera('mysql_auth_ed25519', false)
+#   Defaults to lookup('mysql_auth_ed25519', undef, undef, false)
 #
 # [*remove_default_accounts*]
 #   (Optional) Whether or not remove default MySQL accounts.
@@ -101,27 +101,27 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 #
 class tripleo::profile::base::database::mysql (
   $bind_address                  = $::hostname,
-  $bootstrap_node                = hiera('mysql_short_bootstrap_node_name', undef),
+  $bootstrap_node                = lookup('mysql_short_bootstrap_node_name', undef, undef, undef),
   $certificate_specs             = {},
   $cipher_list                   = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES:!SSLv3:!TLSv1',
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
-  $innodb_buffer_pool_size       = hiera('innodb_buffer_pool_size', undef),
+  $enable_internal_tls           = lookup('enable_internal_tls', undef, undef, false),
+  $innodb_buffer_pool_size       = lookup('innodb_buffer_pool_size', undef, undef, undef),
   $innodb_log_file_size          = undef,
-  $innodb_lock_wait_timeout      = hiera('innodb_lock_wait_timeout', undef),
-  $innodb_strict_mode            = hiera('innodb_strict_mode', 'OFF'),
+  $innodb_lock_wait_timeout      = lookup('innodb_lock_wait_timeout', undef, undef, undef),
+  $innodb_strict_mode            = lookup('innodb_strict_mode', undef, undef, 'OFF'),
   $table_open_cache              = undef,
   $innodb_flush_method           = undef,
   $manage_resources              = true,
   $mysql_server_options          = {},
-  $mysql_max_connections         = hiera('mysql_max_connections', undef),
-  $mysql_auth_ed25519            = hiera('mysql_auth_ed25519', false),
+  $mysql_max_connections         = lookup('mysql_max_connections', undef, undef, undef),
+  $mysql_auth_ed25519            = lookup('mysql_auth_ed25519', undef, undef, false),
   $remove_default_accounts       = true,
-  $step                          = Integer(hiera('step')),
+  $step                          = Integer(lookup('step')),
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -154,7 +154,7 @@ class tripleo::profile::base::database::mysql (
     $mysql_step = 1
   }
   if $step >= $mysql_step {
-    if str2bool(hiera('enable_galera', true)) {
+    if str2bool(lookup('enable_galera', undef, undef, true)) {
       $mysql_config_file = '/etc/my.cnf.d/galera.cnf'
     } else {
       $mysql_config_file = '/etc/my.cnf.d/server.cnf'
@@ -199,7 +199,7 @@ class tripleo::profile::base::database::mysql (
     }
   }
 
-  $service_names = hiera('enabled_services', undef)
+  $service_names = lookup('enabled_services', undef, undef, undef)
 
   if $service_names {
     tripleo::profile::base::database::mysql::users { $service_names: }
@@ -213,68 +213,68 @@ class tripleo::profile::base::database::mysql (
       # as well by creating a resource appropriately.
       mysql_user { 'root@%':
         ensure        => present,
-        password_hash => mysql::password(hiera('mysql::server::root_password')),
+        password_hash => mysql::password(lookup('mysql::server::root_password')),
       }
     }
     if ($mysql_auth_ed25519) {
       ['root@localhost', 'root@%'].each |$user| {
         Mysql_user<| title == $user |> {
           plugin        => 'ed25519',
-          password_hash => mysql_ed25519_password(hiera('mysql::server::root_password'))
+          password_hash => mysql_ed25519_password(lookup('mysql::server::root_password'))
         }
       }
     }
     # Note: use 'include_and_check_auth' below rather than 'include'
     # to support ed25519 authentication
-    if hiera('aodh_api_enabled', false) {
+    if lookup('aodh_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'aodh::db::mysql':}
     }
-    if hiera('ceilometer_collector_enabled', false) {
+    if lookup('ceilometer_collector_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'ceilometer::db::mysql':}
     }
-    if hiera('cinder_api_enabled', false) {
+    if lookup('cinder_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'cinder::db::mysql':}
     }
-    if hiera('barbican_api_enabled', false) {
+    if lookup('barbican_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'barbican::db::mysql':}
     }
-    if hiera('designate_api_enabled', false) {
+    if lookup('designate_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'designate::db::mysql':}
     }
-    if hiera('glance_api_enabled', false) {
+    if lookup('glance_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'glance::db::mysql':}
     }
-    if hiera('gnocchi_api_enabled', false) {
+    if lookup('gnocchi_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'gnocchi::db::mysql':}
     }
-    if hiera('heat_engine_enabled', false) {
+    if lookup('heat_engine_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'heat::db::mysql':}
     }
-    if hiera('ironic_api_enabled', false) {
+    if lookup('ironic_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'ironic::db::mysql':}
     }
-    if hiera('ironic_inspector_enabled', false) {
+    if lookup('ironic_inspector_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'ironic::inspector::db::mysql':}
     }
-    if hiera('keystone_enabled', false) {
+    if lookup('keystone_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'keystone::db::mysql':}
     }
-    if hiera('manila_api_enabled', false) {
+    if lookup('manila_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'manila::db::mysql':}
     }
-    if hiera('neutron_api_enabled', false) {
+    if lookup('neutron_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'neutron::db::mysql':}
     }
-    if hiera('nova_conductor_enabled', false) {
+    if lookup('nova_conductor_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'nova::db::mysql':}
     }
-    if hiera('nova_api_enabled', false) {
+    if lookup('nova_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'nova::db::mysql_api':}
     }
-    if hiera('placement_enabled', false) {
+    if lookup('placement_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'placement::db::mysql':}
     }
-    if hiera('octavia_api_enabled', false) {
+    if lookup('octavia_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'octavia::db::mysql':}
     }
   }

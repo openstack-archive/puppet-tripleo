@@ -29,7 +29,7 @@ define tripleo::profile::base::database::mysql::users ($service_name = $title) {
   # This allows each composable service to load its own custom rules by
   # creating its own flat hiera key named:
   #   tripleo::<service name with underscores>::mysql_user
-  $mysql_users = hiera("tripleo::${underscore_name}::mysql_user", undef)
+  $mysql_users = lookup("tripleo::${underscore_name}::mysql_user", undef, undef, undef)
 
   if $mysql_users {
     ensure_resource('tripleo::profile::base::database::mysql::user', $service_name, $mysql_users)
