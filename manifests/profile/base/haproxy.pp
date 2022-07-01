@@ -34,17 +34,17 @@
 #
 # [*enable_load_balancer*]
 #   (Optional) Whether or not loadbalancer is enabled.
-#   Defaults to hiera('enable_load_balancer', true).
+#   Defaults to lookup('enable_load_balancer', undef, undef, true).
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::haproxy (
-  $certificates_specs            = {},
-  $enable_load_balancer          = hiera('enable_load_balancer', true),
-  $step                          = Integer(hiera('step')),
+  $certificates_specs   = {},
+  $enable_load_balancer = lookup('enable_load_balancer', undef, undef, true),
+  $step                 = Integer(lookup('step')),
 ) {
   if $step >= 1 {
     if $enable_load_balancer {
