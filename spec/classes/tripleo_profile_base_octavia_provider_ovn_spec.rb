@@ -110,6 +110,24 @@ eos
       end
     end
 
+    context 'with step 4 with clustered ovn db' do
+      before do
+        params.merge!({
+          :step             => 4,
+          :ovn_db_host      => '127.0.0.1',
+          :ovn_db_node_ips  => ['192.0.2.11', '192.0.2.12'],
+          :ovn_db_clustered => true,
+          :ovn_nb_port      => '6641',
+        })
+      end
+
+      it 'should set octavia provider ovn nb connection using tcp' do
+        is_expected.to contain_class('octavia::provider::ovn').with(
+          :ovn_nb_connection  => 'tcp:192.0.2.11:6641,tcp:192.0.2.12:6641'
+        )
+      end
+    end
+
     context 'with step 4 with ovn and unix socket (no ovn_nb_port)' do
       before do
         params.merge!({
