@@ -91,16 +91,12 @@ eos
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::migration')
-        is_expected.to contain_ssh__server__match_block('nova_migration allow').with(
+        is_expected.to contain_ssh__server__match_block('nova_migration').with(
           :type  => 'User',
           :name  => 'nova_migration',
           :options => {
-            'AllowUsers'             => 'nova_migration',
-            'ForceCommand'           => '/bin/nova-migration-wrapper',
-            'PasswordAuthentication' => 'no',
-            'AllowTcpForwarding'     => 'no',
-            'X11Forwarding'          => 'no',
-            'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
+            'ForceCommand'       => '/bin/nova-migration-wrapper',
+            'AuthorizedKeysFile' => '/etc/nova/migration/authorized_keys'
           }
         )
         is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(
@@ -136,16 +132,12 @@ eos
 
       it {
         is_expected.to contain_class('tripleo::profile::base::nova::migration')
-        is_expected.to contain_ssh__server__match_block('nova_migration allow').with(
+        is_expected.to contain_ssh__server__match_block('nova_migration').with(
           :type  => 'User',
           :name  => 'nova_migration',
           :options => {
-            'AllowUsers'             => 'nova_migration',
-            'ForceCommand'           => '/bin/true',
-            'PasswordAuthentication' => 'no',
-            'AllowTcpForwarding'     => 'no',
-            'X11Forwarding'          => 'no',
-            'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
+            'ForceCommand'       => '/bin/true',
+            'AuthorizedKeysFile' => '/etc/nova/migration/authorized_keys'
           }
         )
         is_expected.to contain_file('/etc/nova/migration/authorized_keys').with(

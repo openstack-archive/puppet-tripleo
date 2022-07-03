@@ -44,27 +44,19 @@ class tripleo::profile::base::nova::migration::target (
 
   if $step >= 4 {
     if !empty($ssh_authorized_keys_real) {
-      $allow_type = 'User'
-      $allow_name = 'nova_migration'
-
-      ssh::server::match_block { 'nova_migration allow':
-        name    => $allow_name,
-        type    => $allow_type,
+      ssh::server::match_block { 'nova_migration':
+        name    => 'nova_migration',
+        type    => 'User',
         order   => 1,
         options => {
-          'AllowUsers'             => $allow_name,
-          'ForceCommand'           => $wrapper_command,
-          'PasswordAuthentication' => 'no',
-          'AllowTcpForwarding'     => 'no',
-          'X11Forwarding'          => 'no',
-          'AuthorizedKeysFile'     => '/etc/nova/migration/authorized_keys'
+          'ForceCommand'       => $wrapper_command,
+          'AuthorizedKeysFile' => '/etc/nova/migration/authorized_keys'
         },
         notify  => Service['sshd']
       }
 
       $migration_authorized_keys = $ssh_authorized_keys_real
       $migration_user_shell = '/bin/bash'
-
     }
     else {
       # Remove the keys and prevent login when migration over SSH is not enabled
