@@ -1408,8 +1408,8 @@ class tripleo::haproxy (
       # it seems like it would require more intrusive changes on a
       # shared and critical bit of haproxy related code.
       #
-      if $use_backend_syntax {
-        $mdns_nodes.each |$index, $mdns_node| {
+      $mdns_nodes.each |$index, $mdns_node| {
+        if $use_backend_syntax {
           haproxy::frontend { "designate_mdns_${index}":
             ipaddress => $public_virtual_ip,
             ports     => String($designate_mdns_proxy_baseport + $index),
@@ -1426,17 +1426,25 @@ class tripleo::haproxy (
               'option' => [ 'tcplog' ],
               },
           }
-
-          haproxy::balancermember { "designate_mdns_${index}":
-            listening_service => "designate_mdns_${index}_be",
-            ports             => '5354',
-            ipaddresses       => $mdns_node[0],
-            server_names      => $mdns_node[1],
-            verifyhost        => false,
+          $designate_minidns_service = "designate_mdns_${index}_be"
+        } else {
+          haproxy::listen { "designate_mdns_${index}":
+            ipaddress => $public_virtual_ip,
+            ports     => String($designate_mdns_proxy_baseport + $index),
+            mode      => 'tcp',
+            options   => {
+              'option' => [ 'tcplog']
+            }
           }
+          $designate_minidns_service = "designate_mdns_${index}"
         }
-      } else {
-        fail('Designate miniDNS haproxy configuration requires enabling backend syntax')
+        haproxy::balancermember { "designate_mdns_${index}":
+          listening_service => $designate_minidns_service,
+          ports             => '5354',
+          ipaddresses       => $mdns_node[0],
+          server_names      => $mdns_node[1],
+          verifyhost        => false,
+        }
       }
     }
   }
