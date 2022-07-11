@@ -64,6 +64,7 @@ eos
           :step        => 4,
           :protocol    => 'tcp',
           :ovn_nb_port => '6641',
+          :ovn_sb_port => '6642',
         })
       end
 
@@ -78,14 +79,19 @@ eos
           :step        => 4,
           :ovn_db_host => '127.0.0.1',
           :ovn_nb_port => '6641',
+          :ovn_sb_port => '6642',
         })
       end
 
       it 'should set octavia provider ovn nb connection using tcp' do
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_connection  => 'tcp:127.0.0.1:6641')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_connection  => 'tcp:127.0.0.1:6642')
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_private_key => '<SERVICE DEFAULT>')
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_certificate => '<SERVICE DEFAULT>')
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_ca_cert     => '<SERVICE DEFAULT>')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_private_key => '<SERVICE DEFAULT>')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_certificate => '<SERVICE DEFAULT>')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_ca_cert     => '<SERVICE DEFAULT>')
       end
     end
 
@@ -96,17 +102,25 @@ eos
           :protocol           => 'ssl',
           :ovn_db_host        => '192.168.123.111',
           :ovn_nb_port        => '6641',
+          :ovn_sb_port        => '6642',
           :ovn_nb_private_key => '/foo.key',
           :ovn_nb_certificate => '/foo.pem',
           :ovn_nb_ca_cert     => '/ca_foo.pem',
+          :ovn_sb_private_key => '/bar.key',
+          :ovn_sb_certificate => '/bar.pem',
+          :ovn_sb_ca_cert     => '/ca_bar.pem',
         })
       end
 
       it 'should set octavia provider ovn nb connection using ssl' do
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_connection  => 'ssl:192.168.123.111:6641')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_connection  => 'ssl:192.168.123.111:6642')
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_private_key => '/foo.key')
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_certificate => '/foo.pem')
         is_expected.to contain_class('octavia::provider::ovn').with(:ovn_nb_ca_cert     => '/ca_foo.pem')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_private_key => '/bar.key')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_certificate => '/bar.pem')
+        is_expected.to contain_class('octavia::provider::ovn').with(:ovn_sb_ca_cert     => '/ca_bar.pem')
       end
     end
 
