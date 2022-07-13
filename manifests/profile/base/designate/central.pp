@@ -48,7 +48,10 @@ class tripleo::profile::base::designate::central (
   if $pools_file_content {
     warning('pool file content is no longer manually configurable')
   }
+
   include tripleo::profile::base::designate
+  include tripleo::profile::base::designate::coordination
+
   if ($step >= 4 or ($step >= 3 and $sync_db)) {
     class { 'designate::db':
       sync_db => $sync_db,
