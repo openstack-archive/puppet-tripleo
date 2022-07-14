@@ -42,7 +42,11 @@
 #
 # [*ovn_nb_port*]
 #   (Optional) Port number on which northbound database is listening
-#   Defaults to lookup('ovn::northbound::port')
+#   Defaults to lookup('ovn::northbound::port', undef, undef, undef)
+#
+# [*ovn_sb_port*]
+#   (Optional) Port number on which southbound database is listening
+#   Defaults to lookup('ovn::southbound::port', undef, undef, undef)
 #
 # [*ovn_nb_private_key*]
 #   (optional) The PEM file with private key for SSL connection to OVN-NB-DB
@@ -58,6 +62,20 @@
 #   verify certificates presented to it by SSL peers
 #   Defaults to $::os_service_default
 #
+# [*ovn_sb_private_key*]
+#   (optional) The PEM file with private key for SSL connection to OVN-SB-DB
+#   Defaults to $::os_service_default
+#
+# [*ovn_sb_certificate*]
+#   (optional) The PEM file with certificate that certifies the
+#   private key specified in ovn_sb_private_key
+#   Defaults to $::os_service_default
+#
+# [*ovn_sb_ca_cert*]
+#   (optional) The PEM file with CA certificate that OVN should use to
+#   verify certificates presented to it by SSL peers
+#   Defaults to $::os_service_default
+#
 class tripleo::profile::base::octavia::provider::ovn (
   $step               = Integer(lookup('step')),
   $protocol           = lookup('ovn_nb_connection_protocol', undef, undef, 'tcp'),
@@ -65,9 +83,13 @@ class tripleo::profile::base::octavia::provider::ovn (
   $ovn_db_node_ips    = lookup('ovn_dbs_node_ips', undef, undef, undef),
   $ovn_db_clustered   = lookup('ovn_db_clustered', undef, undef, false),
   $ovn_nb_port        = lookup('ovn::northbound::port', undef, undef, undef),
+  $ovn_sb_port        = lookup('ovn::southbound::port', undef, undef, undef),
   $ovn_nb_private_key = $::os_service_default,
   $ovn_nb_certificate = $::os_service_default,
-  $ovn_nb_ca_cert     = $::os_service_default
+  $ovn_nb_ca_cert     = $::os_service_default,
+  $ovn_sb_private_key = $::os_service_default,
+  $ovn_sb_certificate = $::os_service_default,
+  $ovn_sb_ca_cert     = $::os_service_default,
 ) {
 
   include tripleo::profile::base::octavia::api
@@ -78,23 +100,35 @@ class tripleo::profile::base::octavia::provider::ovn (
     if $::tripleo::profile::base::octavia::api::ovn_db_host and !is_service_default(::tripleo::profile::base::octavia::api::ovn_db_host) {
       $ovn_db_hosts_real = any2array($::tripleo::profile::base::octavia::api::ovn_db_host)
       $ovn_nb_port_real  = $::tripleo::profile::base::octavia::api::ovn_nb_port
+      # NOTE(beagles): there is no backwards compatible case for the sb_port but I'm
+      # adding this line for consistency.
+      $ovn_sb_port_real  = $ovn_sb_port
     } elsif $ovn_db_clustered {
       $ovn_db_hosts_real = any2array($ovn_db_node_ips)
       $ovn_nb_port_real  = $ovn_nb_port
+      $ovn_sb_port_real  = $ovn_sb_port
     } else {
       $ovn_db_hosts_real = any2array($ovn_db_host)
       $ovn_nb_port_real  = $ovn_nb_port
+      $ovn_sb_port_real  = $ovn_sb_port
     }
 
     if ! empty($ovn_db_hosts_real) {
       $nb_conn = $ovn_db_hosts_real.map |$h| {
         join([$protocol, normalize_ip_for_uri($h), "${ovn_nb_port_real}"].filter |$c| { !$c.empty() }, ':')
       }
+      $sb_conn = $ovn_db_hosts_real.map |$h| {
+        join([$protocol, normalize_ip_for_uri($h), "${ovn_sb_port_real}"].filter |$c| { !$c.empty() }, ':')
+      }
       class { 'octavia::provider::ovn':
         ovn_nb_connection  => join(any2array($nb_conn), ','),
+        ovn_sb_connection  => join(any2array($sb_conn), ','),
         ovn_nb_private_key => $ovn_nb_private_key,
         ovn_nb_certificate => $ovn_nb_certificate,
         ovn_nb_ca_cert     => $ovn_nb_ca_cert,
+        ovn_sb_private_key => $ovn_sb_private_key,
+        ovn_sb_certificate => $ovn_sb_certificate,
+        ovn_sb_ca_cert     => $ovn_sb_ca_cert,
       }
     }
   }
