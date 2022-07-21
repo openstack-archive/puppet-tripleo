@@ -55,14 +55,6 @@
 #  (Required) Redis ip address for the coordination url
 #  Defaults to hiera('redis_vip')
 #
-# [*gnocchi_rbd_client_name*]
-#   (Optional) RBD Client username.
-#   Defaults to hiera('gnocchi::storage::ceph::ceph_username')
-#
-# [*gnocchi_rbd_ceph_conf_path*]
-#   (Optional) The path where the Ceph Cluster config files are stored on the host
-#   Defaults to '/etc/ceph'
-#
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
@@ -80,8 +72,6 @@ class tripleo::profile::base::gnocchi::api (
   $gnocchi_network               = hiera('gnocchi_api_network', undef),
   $gnocchi_redis_password        = hiera('gnocchi_redis_password'),
   $redis_vip                     = hiera('redis_vip'),
-  $gnocchi_rbd_client_name       = hiera('gnocchi::storage::ceph::ceph_username','openstack'),
-  $gnocchi_rbd_ceph_conf_path    = '/etc/ceph',
   $step                          = Integer(hiera('step')),
   $incoming_storage_driver       = hiera('incoming_storage_driver', undef),
 ) {

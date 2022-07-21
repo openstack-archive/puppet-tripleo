@@ -121,7 +121,6 @@ eos
         :gnocchi_backend         => 'rbd',
         :gnocchi_redis_password  => 'gnocchi',
         :redis_vip               => '127.0.0.1',
-        :gnocchi_rbd_client_name => 'openstack',
         :incoming_storage_driver => 'redis',
       } }
 
