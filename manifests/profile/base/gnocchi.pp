@@ -20,31 +20,31 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('gnocchi_api_short_bootstrap_node_name')
+#   Defaults to lookup('gnocchi_api_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*gnocchi_redis_password*]
 #  (Required) Password for the gnocchi redis user for the coordination url
-#  Defaults to hiera('gnocchi_redis_password')
+#  Defaults to lookup('gnocchi_redis_password')
 #
 # [*redis_vip*]
 #  (Required) Redis ip address for the coordination url
-#  Defaults to hiera('redis_vip')
+#  Defaults to lookup('redis_vip')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::gnocchi (
-  $bootstrap_node         = hiera('gnocchi_api_short_bootstrap_node_name', undef),
-  $enable_internal_tls    = hiera('enable_internal_tls', false),
-  $gnocchi_redis_password = hiera('gnocchi_redis_password'),
-  $redis_vip              = hiera('redis_vip'),
-  $step                   = Integer(hiera('step')),
+  $bootstrap_node         = lookup('gnocchi_api_short_bootstrap_node_name', undef, undef, undef),
+  $enable_internal_tls    = lookup('enable_internal_tls', undef, undef, false),
+  $gnocchi_redis_password = lookup('gnocchi_redis_password'),
+  $redis_vip              = lookup('redis_vip'),
+  $step                   = Integer(lookup('step')),
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
