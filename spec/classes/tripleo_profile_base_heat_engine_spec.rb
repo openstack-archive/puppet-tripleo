@@ -41,6 +41,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::engine')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to_not contain_class('heat::engine')
+        is_expected.to_not contain_class('heat::policy')
       }
     end
 
@@ -54,6 +55,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::engine')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to contain_class('heat::engine')
+        is_expected.to contain_class('heat::policy')
       }
     end
 
@@ -67,6 +69,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::engine')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to_not contain_class('heat::engine')
+        is_expected.to_not contain_class('heat::policy')
       }
     end
 
@@ -80,6 +83,7 @@ eos
         is_expected.to contain_class('tripleo::profile::base::heat::engine')
         is_expected.to contain_class('tripleo::profile::base::heat')
         is_expected.to contain_class('heat::engine')
+        is_expected.to contain_class('heat::policy')
       }
     end
 
