@@ -1,14 +1,10 @@
 <%- | String  $image_name    = '',
-      String  $bind_socket   = '',
       Boolean $debug,
       String  $container_cli = ''
 | -%>
 #!/bin/bash
 <%- if $debug { -%>set -x<%- } -%>
 
-<%- if $bind_socket { -%>
-export DOCKER_HOST="<%=$bind_socket%>"
-<%- } -%>
 ARGS="$@"
 
 # Extract the network namespace UUID from the command line args provided by
@@ -20,11 +16,7 @@ ARGS="$@"
 NETNS=$(ip netns identify)
 NAME=neutron-haproxy-${NETNS}
 HAPROXY_CMD='$(if [ -f /usr/sbin/haproxy-systemd-wrapper ]; then echo "/usr/sbin/haproxy -Ds"; else echo "/usr/sbin/haproxy -Ws"; fi)'
-<%- if $container_cli == 'docker' { -%>
-CLI='docker'
-LOGGING=''
-CMD="ip netns exec ${NETNS} "'$HAPROXY'
-<%- } elsif $container_cli == 'podman' { -%>
+<%- if $container_cli == 'podman' { -%>
 CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman"
 LOGGING="--log-driver k8s-file --log-opt path=/var/log/containers/stdouts/${NAME}.log"
 CMD='$HAPROXY'

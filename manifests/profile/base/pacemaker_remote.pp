@@ -82,25 +82,7 @@ class tripleo::profile::base::pacemaker_remote (
     force_authkey  => $force_authkey,
     tls_priorities => $tls_priorities,
   }
-  if str2bool(lookup('docker_enabled', undef, undef, false)) {
-    include systemd::systemctl::daemon_reload
 
-    Package<| name == 'docker' |>
-    -> file { '/etc/systemd/system/resource-agents-deps.target.wants':
-      ensure => directory,
-    }
-    -> systemd::unit_file { 'docker.service':
-      path   => '/etc/systemd/system/resource-agents-deps.target.wants',
-      target => '/usr/lib/systemd/system/docker.service',
-      before => Class['pacemaker::remote'],
-    }
-    -> systemd::unit_file { 'rhel-push-plugin.service':
-      path   => '/etc/systemd/system/resource-agents-deps.target.wants',
-      target => '/usr/lib/systemd/system/rhel-push-plugin.service',
-      before => Class['pacemaker::remote'],
-    }
-    ~> Class['systemd::systemctl::daemon_reload']
-  }
   $enable_fencing_real = str2bool($enable_fencing) and $step >= 5
 
   if $enable_fencing_real {

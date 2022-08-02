@@ -1,13 +1,9 @@
-<%- | String  $bind_socket   = '',
-      Boolean $debug,
+<%- | Boolean $debug,
       String  $container_cli = ''
 | -%>
 #!/bin/bash
 <%- if $debug { -%>set -x<%- } -%>
 
-<%- if $bind_socket { -%>
-export DOCKER_HOST="<%=$bind_socket%>"
-<%- } -%>
 ARGS="$@"
 
 # Extract the network namespace UUID from the command line args provided by
@@ -18,10 +14,7 @@ ARGS="$@"
 #   --dhcp-hostsfile=/var/lib/neutron/dhcp/317716b8-919a-4a6f-8db1-78128ec3b100/host ...
 NETNS=$(ip netns identify)
 NAME=neutron-keepalived-${NETNS}
-<%- if $container_cli == 'docker' { -%>
-CLI='docker exec --detach'
-CMD="ip netns exec ${NETNS} /usr/bin/neutron-keepalived-state-change exec"
-<%- } elsif $container_cli == 'podman' { -%>
+<%- if $container_cli == 'podman' { -%>
 CLI="nsenter --net=/run/netns/${NETNS} --preserve-credentials -m -t 1 podman exec"
 CMD='/usr/bin/neutron-keepalived-state-change'
 <%- } else { -%>

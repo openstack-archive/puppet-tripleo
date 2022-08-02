@@ -22,10 +22,7 @@
 #   Filename for radvd wrapper script.
 #
 # [*radvd_image*]
-#   Docker image name for radvd.
-#
-# [*bind_socket*]
-#   Socket for accessing the docker daemon.
+#   Container image name for radvd.
 #
 # [*debug*]
 #   Enable debug messages for the wrapper script.
@@ -39,14 +36,12 @@ define tripleo::profile::base::neutron::wrappers::radvd (
   $radvd_image,
   Boolean $debug,
   $container_cli,
-  $bind_socket = undef,
 ) {
     file { $radvd_process_wrapper:
       ensure  => file,
       mode    => '0755',
       content => epp('tripleo/neutron/radvd.epp', {
           'image_name'    => $radvd_image,
-          'bind_socket'   => $bind_socket,
           'debug'         => $debug,
           'container_cli' => $container_cli,
         })

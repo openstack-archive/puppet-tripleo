@@ -24,32 +24,6 @@ describe 'tripleo::profile::base::neutron::wrappers::keepalived_state_change' do
 
   shared_examples_for 'tripleo::profile::base::neutron::wrappers::keepalived_state_change' do
 
-    context 'creates wrapper file for docker' do
-      let(:params) {
-        {
-          :keepalived_state_change_wrapper  => '/usr/local/bin/keepalived-state-change',
-          :bind_socket                      => 'unix:///run/another/docker.sock',
-          :container_cli                    => 'docker',
-          :debug                            => true,
-        }
-      }
-
-      it 'should generate a wrapper file' do
-        is_expected.to contain_file('/usr/local/bin/keepalived-state-change').with(
-          :mode   => '0755'
-        )
-        is_expected.to contain_file('/usr/local/bin/keepalived-state-change').with_content(
-          /export DOCKER_HOST="unix:...run.another.docker.sock/
-        )
-        is_expected.to contain_file('/usr/local/bin/keepalived-state-change').with_content(
-          /set -x/
-        )
-        is_expected.to contain_file('/usr/local/bin/keepalived-state-change').with_content(
-          /CMD="ip netns exec.*\/usr\/bin\/neutron-keepalived-state-change/
-        )
-      end
-    end
-
     context 'creates wrapper file for podman' do
       let(:params) {
         {

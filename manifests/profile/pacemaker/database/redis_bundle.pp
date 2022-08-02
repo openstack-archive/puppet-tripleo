@@ -93,12 +93,11 @@
 #
 # [*container_backend*]
 #   (optional) Container backend to use when creating the bundle
-#   Defaults to 'docker'
+#   Defaults to 'podman'
 #
 # [*log_driver*]
-#   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
-#   when container_cli is set to podman and 'journald' when it is set to docker.
-#   Defaults to undef
+#   (optional) Container log driver to use.
+#   Defaults to 'k8s-file'
 #
 # [*log_file*]
 #   (optional) Container log file to use. Only relevant when log_driver is
@@ -122,9 +121,9 @@ class tripleo::profile::pacemaker::database::redis_bundle (
   $bootstrap_node            = hiera('redis_short_bootstrap_node_name'),
   $redis_docker_image        = undef,
   $redis_docker_control_port = 3124,
-  $container_backend         = 'docker',
+  $container_backend         = 'podman',
   $pcs_tries                 = hiera('pcs_tries', 20),
-  $log_driver                = undef,
+  $log_driver                = 'k8s-file',
   $log_file                  = '/var/log/containers/stdouts/redis-bundle.log',
   $step                      = Integer(hiera('step')),
   $redis_network             = hiera('redis_network', undef),
@@ -144,16 +143,7 @@ class tripleo::profile::pacemaker::database::redis_bundle (
     $pacemaker_master = false
   }
 
-  if $log_driver == undef {
-    if hiera('container_cli', 'docker') == 'podman' {
-      $log_driver_real = 'k8s-file'
-    } else {
-      $log_driver_real = 'journald'
-    }
-  } else {
-    $log_driver_real = $log_driver
-  }
-  if $log_driver_real == 'k8s-file' {
+  if $log_driver == 'k8s-file' {
     $log_file_real = " --log-opt path=${log_file}"
   } else {
     $log_file_real = ''
@@ -369,7 +359,7 @@ slave-announce-port ${local_tuple[0][2]}
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => "--user=${bundle_user} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=${bundle_user} --log-driver=${log_driver}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${redis_docker_control_port}",

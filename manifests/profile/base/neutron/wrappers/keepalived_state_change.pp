@@ -21,9 +21,6 @@
 # [*keepalived_state_change_wrapper*]
 #   Filename for neutron-keepalived-state-change wrapper script.
 #
-# [*bind_socket*]
-#   Socket for accessing the docker daemon.
-#
 # [*debug*]
 #   Enable debug messages for the wrapper script.
 #
@@ -34,13 +31,11 @@ define tripleo::profile::base::neutron::wrappers::keepalived_state_change (
   $keepalived_state_change_wrapper,
   Boolean $debug,
   $container_cli,
-  $bind_socket = undef,
 ) {
     file { $keepalived_state_change_wrapper:
       ensure  => file,
       mode    => '0755',
       content => epp('tripleo/neutron/neutron-keepalived-state-change.epp', {
-        'bind_socket'   => $bind_socket,
         'debug'         => $debug,
         'container_cli' => $container_cli,
         })

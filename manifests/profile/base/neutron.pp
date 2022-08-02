@@ -85,8 +85,8 @@
 # [*container_cli*]
 #   (Optional) A container CLI to be used with the wrapper
 #   tooling to manage containers controled by Neutron/OVN
-#   l3/dhcp/metadata agents. Accepts either 'podman' or 'docker'.
-#   Defaults to hiera('container_cli') or 'docker'.
+#   l3/dhcp/metadata agents. Accepts only 'podman'
+#   Defaults to hiera('container_cli', 'podman').
 #
 
 class tripleo::profile::base::neutron (
@@ -105,15 +105,12 @@ class tripleo::profile::base::neutron (
   $oslomsg_notify_use_ssl  = hiera('oslo_messaging_notify_use_ssl', '0'),
   $dhcp_agents_per_network = undef,
   $dhcp_nodes              = hiera('neutron_dhcp_short_node_names', []),
-  $container_cli           = hiera('container_cli', 'docker'),
+  $container_cli           = hiera('container_cli', 'podman'),
 ) {
   if $step >= 3 {
     # NOTE(bogdando) validate_* is deprecated and we do not want to use it here
-    if !($container_cli in ['docker', 'podman']) {
+    if !($container_cli in ['podman']) {
       fail("container_cli (${container_cli}) is not supported!")
-    }
-    if $container_cli == 'docker' {
-      warning('Docker runtime is deprecated. Consider switching container_cli to podman')
     }
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))

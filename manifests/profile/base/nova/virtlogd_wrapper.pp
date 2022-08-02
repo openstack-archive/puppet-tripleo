@@ -19,8 +19,7 @@
 # === Parameters
 #
 # [*enable_wrapper*]
-#  (Optional) If true, generates a wrapper for running virtlogd in
-#  a docker container.
+#  (Optional) If true, generates a wrapper for running virtlogd in a container.
 #  Defaults to false
 #
 # [*virtlogd_process_wrapper*]
@@ -28,7 +27,7 @@
 #   Defaults to undef
 #
 # [*virtlogd_image*]
-#   (Optional) Docker image name for virtlogd. Required if
+#   (Optional) Container image name for virtlogd. Required if
 #   virtlogd_wrapper is set.
 #   Defaults to undef
 #
@@ -44,7 +43,7 @@ class tripleo::profile::base::nova::virtlogd_wrapper (
 ) {
   if $enable_wrapper {
     unless $virtlogd_image and $virtlogd_process_wrapper{
-      fail('The docker image for virtlogd and wrapper filename must be provided when generating virtlogd wrappers')
+      fail('The container image for virtlogd and wrapper filename must be provided when generating virtlogd wrappers')
     }
     tripleo::profile::base::nova::wrappers::virtlogd{'nova_virtlogd_wrapper':
       virtlogd_process_wrapper => $virtlogd_process_wrapper,

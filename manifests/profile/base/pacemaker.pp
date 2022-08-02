@@ -189,25 +189,6 @@ class tripleo::profile::base::pacemaker (
       pcsd_bind_addr       => $pcsd_bind_addr,
       tls_priorities       => $tls_priorities,
     }
-    if str2bool(lookup('docker_enabled', undef, undef, false)) {
-      include systemd::systemctl::daemon_reload
-
-      Package<| name == 'docker' |>
-      -> file { '/etc/systemd/system/resource-agents-deps.target.wants':
-        ensure => directory,
-      }
-      -> systemd::unit_file { 'docker.service':
-        path   => '/etc/systemd/system/resource-agents-deps.target.wants',
-        target => '/usr/lib/systemd/system/docker.service',
-        before => Class['pacemaker'],
-      }
-      -> systemd::unit_file { 'rhel-push-plugin.service':
-        path   => '/etc/systemd/system/resource-agents-deps.target.wants',
-        target => '/usr/lib/systemd/system/rhel-push-plugin.service',
-        before => Class['pacemaker'],
-      }
-      ~> Class['systemd::systemctl::daemon_reload']
-    }
 
     if $pacemaker_master {
       class { 'pacemaker::stonith':

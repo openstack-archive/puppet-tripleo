@@ -45,12 +45,11 @@
 #
 # [*container_backend*]
 #   (optional) Container backend to use when creating the bundle
-#   Defaults to 'docker'
+#   Defaults to 'podman'
 #
 # [*log_driver*]
-#   (optional) Container log driver to use. When set to undef it uses 'k8s-file'
-#   when container_cli is set to podman and 'journald' when it is set to docker.
-#   Defaults to undef
+#   (optional) Container log driver to use.
+#   Defaults to 'k8s-file'
 #
 # [*log_file*]
 #   (optional) Container log file to use. Only relevant when log_driver is
@@ -74,9 +73,9 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
   $cinder_backup_docker_image = undef,
   $docker_volumes             = [],
   $docker_environment         = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
-  $container_backend          = 'docker',
+  $container_backend          = 'podman',
   $ceph_conf_path             = '/etc/ceph',
-  $log_driver                 = undef,
+  $log_driver                 = 'k8s-file',
   $log_file                   = '/var/log/containers/stdouts/openstack-cinder-backup.log',
   $tls_priorities             = hiera('tripleo::pacemaker::tls_priorities', undef),
   $bundle_user                = 'root',
@@ -88,16 +87,8 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
   } else {
     $pacemaker_master = false
   }
-  if $log_driver == undef {
-    if hiera('container_cli', 'docker') == 'podman' {
-      $log_driver_real = 'k8s-file'
-    } else {
-      $log_driver_real = 'journald'
-    }
-  } else {
-    $log_driver_real = $log_driver
-  }
-  if $log_driver_real == 'k8s-file' {
+
+  if $log_driver == 'k8s-file' {
     $log_file_real = " --log-opt path=${log_file}"
   } else {
     $log_file_real = ''
@@ -241,7 +232,7 @@ class tripleo::profile::pacemaker::cinder::backup_bundle (
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => "--ipc=host --privileged=true --user=${bundle_user} --log-driver=${log_driver_real}${log_file_real} ${docker_env}${tls_priorities_real}",
+        options           => "--ipc=host --privileged=true --user=${bundle_user} --log-driver=${log_driver}${log_file_real} ${docker_env}${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         storage_maps      => $storage_maps,
