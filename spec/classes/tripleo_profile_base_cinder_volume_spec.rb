@@ -467,7 +467,7 @@ describe 'tripleo::profile::base::cinder::volume' do
             :cluster => 'tripleo-cluster',
           )
           is_expected.to contain_class('cinder::coordination').with(
-            :backend_url => 'etcd3+http://127.0.0.1:2379',
+            :backend_url => "etcd3+http://127.0.0.1:2379?api_version=#{platform_params[:api_version]}",
           )
         end
 
@@ -483,7 +483,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           end
           it 'should configure coordination backend_url with https' do
             is_expected.to contain_class('cinder::coordination').with(
-              :backend_url => 'etcd3+https://127.0.0.1:2379?cert_key=/path/to/etcd.key&cert_cert=/path/to/etcd.cert',
+              :backend_url => "etcd3+https://127.0.0.1:2379?api_version=#{platform_params[:api_version]}&cert_key=/path/to/etcd.key&cert_cert=/path/to/etcd.cert",
             )
           end
         end
@@ -496,7 +496,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           end
           it 'should normalize it in the URI' do
             is_expected.to contain_class('cinder::coordination').with(
-              :backend_url => 'etcd3+http://[fe80::1ff:fe23:4567:890a]:2379',
+              :backend_url => "etcd3+http://[fe80::1ff:fe23:4567:890a]:2379?api_version=#{platform_params[:api_version]}",
             )
           end
         end
@@ -509,7 +509,7 @@ describe 'tripleo::profile::base::cinder::volume' do
           end
           it 'should craft a correct URI' do
             is_expected.to contain_class('cinder::coordination').with(
-              :backend_url => 'etcd3+http://etcdhost.localdomain:2379',
+              :backend_url => "etcd3+http://etcdhost.localdomain:2379?api_version=#{platform_params[:api_version]}",
             )
           end
         end
@@ -536,7 +536,16 @@ describe 'tripleo::profile::base::cinder::volume' do
         facts.merge(OSDefaults.get_facts({ :hostname => 'node.example.com' }))
       end
 
+      let(:platform_params) do
+        if facts[:operatingsystemmajrelease] == '8'
+          { :api_version => 'v3alpha' }
+        else
+          { :api_version => 'v3' }
+        end
+      end
+
       it_behaves_like 'tripleo::profile::base::cinder::volume'
+
     end
   end
 end
