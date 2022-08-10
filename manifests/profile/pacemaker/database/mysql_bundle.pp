@@ -177,6 +177,10 @@
 #   (optional) Controls the gcache size.
 #   Defaults to undef
 #
+# [*gcache_recover*]
+#   (optional) Recover gcache on galera startup.
+#   Defaults to false
+#
 # [*provider_options*]
 #   (optional) Allows passing extra options to wsrep_provider_options.
 #   Defaults to undef
@@ -215,6 +219,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $promote_timeout                = 300,
   $force_ocf                      = false,
   $gcache_size                    = undef,
+  $gcache_recover                 = false,
   $provider_options               = undef,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -264,10 +269,12 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $cluster_host_map_string = join($host_map_array, ';')
 
   if $gcache_size {
-    $gcache_options = "gcache.size=${gcache_size};"
+    $gcache_size_opt = "gcache.size=${gcache_size};"
   } else {
-    $gcache_options = ''
+    $gcache_size_opt = ''
   }
+  $gcache_recover_opt = "gcache.recover=${$gcache_recover ? { false => 'no', default => 'yes' }};"
+  $gcache_options = "${gcache_size_opt}${gcache_recover_opt}"
 
   if $sst_method == 'mariabackup' {
     $wsrep_sst_method = 'mariabackup'
