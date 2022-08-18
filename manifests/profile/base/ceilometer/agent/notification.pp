@@ -21,7 +21,7 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*notifier_enabled*]
 #   (optional) Enable configuration of notifier as pipeline publisher.
@@ -54,8 +54,9 @@
 # [*pipeline_publishers*]
 #   (Optional) A list of pipeline publishers
 #   Defaults to undef
+#
 class tripleo::profile::base::ceilometer::agent::notification (
-  $step                      = Integer(hiera('step')),
+  $step                      = Integer(lookup('step')),
   $notifier_enabled          = false,
   $notifier_events_enabled   = false,
   $notifier_host_addr        = undef,

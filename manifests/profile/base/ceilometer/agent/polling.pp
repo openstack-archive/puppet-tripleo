@@ -20,39 +20,41 @@
 #
 # [*central_namespace*]
 #   (Optional) Use central namespace for polling agent.
-#   Defaults to false.
+#   Defaults to lookup('central_namespace', undef, undef, false)
 #
 # [*compute_namespace*]
 #   (Optional) Use compute namespace for polling agent.
-#   Defaults to false.
+#   Defaults to lookup('compute_namespace', undef, undef, false)
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*ipmi_namespace*]
 #   (Optional) Use ipmi namespace for polling agent.
-#   Defaults to false.
+#   Defaults to lookup('ipmi_namespace', undef, undef, false)
 #
 # [*ceilometer_redis_password*]
 #   (Optional) redis password to configure coordination url
+#   Defaults to lookup('ceilometer_redis_password', undef, undef, undef)
 #
 # [*redis_vip*]
 #   (Optional) redis vip to configure coordination url
+#   Defaults to lookup('redis_vip', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::ceilometer::agent::polling (
-  $central_namespace         = hiera('central_namespace', false),
-  $compute_namespace         = hiera('compute_namespace', false),
-  $enable_internal_tls       = hiera('enable_internal_tls', false),
-  $ipmi_namespace            = hiera('ipmi_namespace', false),
-  $ceilometer_redis_password = hiera('ceilometer_redis_password', undef),
-  $redis_vip                 = hiera('redis_vip', undef),
-  $step                      = Integer(hiera('step')),
+  $central_namespace         = lookup('central_namespace', undef, undef, false),
+  $compute_namespace         = lookup('compute_namespace', undef, undef, false),
+  $enable_internal_tls       = lookup('enable_internal_tls', undef, undef, false),
+  $ipmi_namespace            = lookup('ipmi_namespace', undef, undef, false),
+  $ceilometer_redis_password = lookup('ceilometer_redis_password', undef, undef, undef),
+  $redis_vip                 = lookup('redis_vip', undef, undef, undef),
+  $step                      = Integer(lookup('step')),
 ) {
   include tripleo::profile::base::ceilometer
 
