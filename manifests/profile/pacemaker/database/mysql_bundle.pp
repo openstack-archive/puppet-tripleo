@@ -196,6 +196,10 @@
 #   (optional) Controls the gcache size.
 #   Defaults to undef
 #
+# [*gcache_recover*]
+#   (optional) Recover gcache on galera startup.
+#   Defaults to false
+#
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = undef,
   $control_port                   = 3123,
@@ -234,6 +238,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $stop_timeout                   = undef,
   $force_ocf                      = false,
   $gcache_size                    = undef,
+  $gcache_recover                 = false,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -273,10 +278,12 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $cluster_host_map_string = join($host_map_array, ';')
 
   if $gcache_size {
-    $gcache_options = "gcache.size=${gcache_size};"
+    $gcache_size_opt = "gcache.size=${gcache_size};"
   } else {
-    $gcache_options = ''
+    $gcache_size_opt = ''
   }
+  $gcache_recover_opt = "gcache.recover=${$gcache_recover ? { false => 'no', default => 'yes' }};"
+  $gcache_options = "${gcache_size_opt}${gcache_recover_opt}"
 
   if $sst_method == 'mariabackup' {
     $wsrep_sst_method = 'mariabackup'
