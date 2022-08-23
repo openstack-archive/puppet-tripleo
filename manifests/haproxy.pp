@@ -985,6 +985,10 @@ class tripleo::haproxy (
       public_ssl_port   => $ports[neutron_api_ssl_port],
       service_network   => $neutron_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
+      listen_options    => merge($default_listen_options, {
+        'timeout client' => '10m',
+        'timeout server' => '10m',
+      }),
     }
   }
 
