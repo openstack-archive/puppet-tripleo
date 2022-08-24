@@ -216,15 +216,12 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
     match             => '^-session\s+optional\s+pam_systemd.so',
     match_for_absence => true,
   }
-  # Note that once we move to RHEL8 where pam_unix.so supports the quiet option
-  # we can just add quiet to the pam_unix option for the session module and remove this one
-  file_line { 'rabbitmq-pamd-succeed':
+  file_line { 'rabbitmq-pamd-quiet':
     ensure => present,
     path   => '/etc/pam.d/system-auth',
-    line   => 'session     sufficient    pam_succeed_if.so quiet_success user ingroup rabbitmq',
-    after  => '^session.*pam_limits.so'
+    line   => 'session     required      pam_unix.so quiet',
+    match  => '^session\s+required\s+pam_unix.so$'
   }
-
 
   if $step >= 2 {
     if $pacemaker_master {
