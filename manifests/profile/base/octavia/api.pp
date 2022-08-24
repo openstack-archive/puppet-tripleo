@@ -63,6 +63,10 @@
 #   Defaults to undef
 #   Not used any more.
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::octavia::api (
   $bootstrap_node      = lookup('octavia_api_short_bootstrap_node_name', undef, undef, undef),
   $certificates_specs  = lookup('apache_certificates_specs', undef, undef, {}),
@@ -72,6 +76,7 @@ class tripleo::profile::base::octavia::api (
   $ovn_db_host         = undef,
   $ovn_nb_port         = undef,
   $neutron_driver      = undef,
+  $configure_apache    = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -107,10 +112,12 @@ Use tripleo::profile::base::octavia::provider::ovn.')
       sync_db           => $sync_db,
     }
     include octavia::healthcheck
-    include tripleo::profile::base::apache
-    class { 'octavia::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'octavia::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile
+      }
     }
   }
 }

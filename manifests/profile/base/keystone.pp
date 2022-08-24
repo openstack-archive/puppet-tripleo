@@ -150,6 +150,10 @@
 #   (Optional) oslo.cache backend used for caching.
 #   Defaults to lookup('keystone::cache::backend', undef, undef, false)
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 # DEPRECATED PARAMETERS
 #
 # [*memcached_ips*]
@@ -187,6 +191,7 @@ class tripleo::profile::base::keystone (
   $memcached_port                 = lookup('memcached_port', undef, undef, 11211),
   $memcached_ipv6                 = lookup('memcached_ipv6', undef, undef, false),
   $cache_backend                  = lookup('keystone::cache::backend', undef, undef, false),
+  $configure_apache               = lookup('configure_apache', undef, undef, true),
   # DEPRECATED PARAMETERS
   $memcached_ips                  = undef
 ) {
@@ -266,10 +271,12 @@ class tripleo::profile::base::keystone (
     include keystone::config
     include keystone::db
     include keystone::logging
-    include tripleo::profile::base::apache
-    class { 'keystone::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'keystone::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
     include keystone::cors
     include keystone::security_compliance

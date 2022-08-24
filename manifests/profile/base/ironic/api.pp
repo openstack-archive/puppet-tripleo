@@ -47,12 +47,17 @@
 #   (Optional) The current step of the deployment
 #   Defaults to Integer(lookup('step'))
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::ironic::api (
   $bootstrap_node      = lookup('ironic_api_short_bootstrap_node_name', undef, undef, undef),
   $certificates_specs  = lookup('apache_certificates_specs', undef, undef, {}),
   $ironic_api_network  = lookup('ironic_api_network', undef, undef, undef),
   $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
   $step                = Integer(lookup('step')),
+  $configure_apache    = lookup('configure_apache', undef, undef, true),
 ) {
   include tripleo::profile::base::ironic
   include tripleo::profile::base::ironic::authtoken
@@ -78,10 +83,12 @@ class tripleo::profile::base::ironic::api (
     include ironic::api
     include ironic::cors
     include ironic::healthcheck
-    include tripleo::profile::base::apache
-    class { 'ironic::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'ironic::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 

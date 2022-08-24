@@ -48,12 +48,17 @@
 #   for more details.
 #   Defaults to Integer(lookup('step'))
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::cinder::api (
   $bootstrap_node      = lookup('cinder_api_short_bootstrap_node_name', undef, undef, undef),
   $certificates_specs  = lookup('apache_certificates_specs', undef, undef, {}),
   $cinder_api_network  = lookup('cinder_api_network', undef, undef, undef),
   $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
   $step                = Integer(lookup('step')),
+  $configure_apache    = lookup('configure_apache', undef, undef, true),
 ) {
 
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
@@ -81,10 +86,12 @@ class tripleo::profile::base::cinder::api (
       sync_db => $sync_db,
     }
     include cinder::healthcheck
-    include tripleo::profile::base::apache
-    class { 'cinder::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'cinder::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 }

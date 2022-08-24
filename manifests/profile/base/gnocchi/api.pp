@@ -64,6 +64,10 @@
 #   (Optional)  Storage driver to use for incoming metric data
 #   Defaults to lookup('incoming_storage_driver', undef, undef, undef)
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::gnocchi::api (
   $bootstrap_node                = lookup('gnocchi_api_short_bootstrap_node_name', undef, undef, undef),
   $certificates_specs            = lookup('apache_certificates_specs', undef, undef, {}),
@@ -74,6 +78,7 @@ class tripleo::profile::base::gnocchi::api (
   $redis_vip                     = lookup('redis_vip'),
   $step                          = Integer(lookup('step')),
   $incoming_storage_driver       = lookup('incoming_storage_driver', undef, undef, undef),
+  $configure_apache              = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -113,10 +118,12 @@ class tripleo::profile::base::gnocchi::api (
     }
 
     include gnocchi::api
-    include tripleo::profile::base::apache
-    class { 'gnocchi::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'gnocchi::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
 
     if $incoming_storage_driver == 'redis' {

@@ -56,13 +56,18 @@
 #   listen port gets default value from designate::wsgi::apache)
 #   Defaults to undef
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::designate::api (
   $step                = Integer(lookup('step')),
   $certificates_specs  = lookup('apache_certificates_specs', undef, undef, {}),
   $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
   $designate_network   = lookup('designate_api_network', undef, undef, undef),
   $listen_ip           = undef,
-  $listen_port         = undef
+  $listen_port         = undef,
+  $configure_apache    = lookup('configure_apache', undef, undef, true),
 ) {
   include tripleo::profile::base::designate
   include tripleo::profile::base::designate::authtoken
@@ -86,10 +91,12 @@ class tripleo::profile::base::designate::api (
         listen => "${listen_uri}:${listen_port}"
       }
     } else {
-      include tripleo::profile::base::apache
-      class { 'designate::wsgi::apache':
-        ssl_cert => $tls_certfile,
-        ssl_key  => $tls_keyfile
+      if $configure_apache {
+        include tripleo::profile::base::apache
+        class { 'designate::wsgi::apache':
+          ssl_cert => $tls_certfile,
+          ssl_key  => $tls_keyfile
+        }
       }
       include designate::api
     }

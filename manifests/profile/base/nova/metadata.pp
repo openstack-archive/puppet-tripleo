@@ -46,12 +46,17 @@
 #   for more details.
 #   Defaults to Integer(lookup('step'))
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+
 class tripleo::profile::base::nova::metadata (
   $bootstrap_node        = lookup('nova_metadata_short_bootstrap_node_name', undef, undef, undef),
   $certificates_specs    = lookup('apache_certificates_specs', undef, undef, {}),
   $enable_internal_tls   = lookup('enable_internal_tls', undef, undef, false),
   $nova_metadata_network = lookup('nova_metadata_network', undef, undef, undef),
   $step                  = Integer(lookup('step')),
+  $configure_apache      = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -78,10 +83,12 @@ class tripleo::profile::base::nova::metadata (
     include nova::network::neutron
     include nova::metadata
     include nova::vendordata
-    include tripleo::profile::base::apache
-    class { 'nova::wsgi::apache_metadata':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'nova::wsgi::apache_metadata':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 }

@@ -86,6 +86,10 @@
 #   (Optional) Indicate whether Designate is available in the deployment.
 #   Defaults to lookup('designate_api_enabled', undef, undef, false)
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::neutron::server (
   $bootstrap_node        = lookup('neutron_api_short_bootstrap_node_name', undef, undef, undef),
   $certificates_specs    = lookup('apache_certificates_specs', undef, undef, {}),
@@ -99,6 +103,7 @@ class tripleo::profile::base::neutron::server (
   $tls_proxy_fqdn        = undef,
   $tls_proxy_port        = 9696,
   $designate_api_enabled = lookup('designate_api_enabled', undef, undef, false),
+  $configure_apache      = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -131,20 +136,22 @@ class tripleo::profile::base::neutron::server (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include tripleo::profile::base::apache
-    if $enable_internal_tls {
-      ::tripleo::tls_proxy { 'neutron-api':
-        servername => $tls_proxy_fqdn,
-        ip         => $tls_proxy_bind_ip,
-        port       => $tls_proxy_port,
-        tls_cert   => $tls_certfile,
-        tls_key    => $tls_keyfile,
-      }
-      Tripleo::Tls_proxy['neutron-api'] ~> Anchor<| title == 'neutron::service::begin' |>
-    } else {
-      class { 'neutron::wsgi::apache':
-        ssl_cert => $tls_certfile,
-        ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      if $enable_internal_tls {
+        ::tripleo::tls_proxy { 'neutron-api':
+          servername => $tls_proxy_fqdn,
+          ip         => $tls_proxy_bind_ip,
+          port       => $tls_proxy_port,
+          tls_cert   => $tls_certfile,
+          tls_key    => $tls_keyfile,
+        }
+        Tripleo::Tls_proxy['neutron-api'] ~> Anchor<| title == 'neutron::service::begin' |>
+      } else {
+        class { 'neutron::wsgi::apache':
+          ssl_cert => $tls_certfile,
+          ssl_key  => $tls_keyfile,
+        }
       }
     }
     if $designate_api_enabled {

@@ -95,7 +95,11 @@
 # [*oslomsg_notify_use_ssl*]
 #   Enable ssl oslo messaging services
 #   Defaults to lookup('oslo_messaging_notify_use_ssl', undef, undef, '0')
-
+#
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::barbican::api (
   $barbican_network        = lookup('barbican_api_network', undef, undef, undef),
   $bootstrap_node          = lookup('barbican_api_bootstrap_node_name', undef, undef, undef),
@@ -114,6 +118,7 @@ class tripleo::profile::base::barbican::api (
   $oslomsg_notify_port     = lookup('oslo_messaging_notify_port', undef, undef, '5672'),
   $oslomsg_notify_username = lookup('oslo_messaging_notify_user_name', undef, undef, 'guest'),
   $oslomsg_notify_use_ssl  = lookup('oslo_messaging_notify_use_ssl', undef, undef, '0'),
+  $configure_apache        = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -165,10 +170,12 @@ class tripleo::profile::base::barbican::api (
     include barbican::healthcheck
     include barbican::keystone::notification
     include barbican::quota
-    include tripleo::profile::base::apache
-    class { 'barbican::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'barbican::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 }

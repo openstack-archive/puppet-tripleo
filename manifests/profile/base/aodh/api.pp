@@ -52,6 +52,10 @@
 #   (Optional) Whether aodh expirer should be configured
 #   Defaults to lookup('enable_aodh_expirer', undef, undef, true)
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::aodh::api (
   $aodh_network                  = lookup('aodh_api_network', undef, undef, undef),
   $bootstrap_node                = lookup('aodh_api_bootstrap_node_name', undef, undef, undef),
@@ -59,6 +63,7 @@ class tripleo::profile::base::aodh::api (
   $enable_internal_tls           = lookup('enable_internal_tls', undef, undef, false),
   $step                          = Integer(lookup('step')),
   $enable_aodh_expirer           = true,
+  $configure_apache              = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -83,10 +88,12 @@ class tripleo::profile::base::aodh::api (
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include aodh::api
     include aodh::healthcheck
-    include tripleo::profile::base::apache
-    class { 'aodh::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'aodh::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 

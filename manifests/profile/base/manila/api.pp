@@ -92,6 +92,10 @@
 #   (Optional) Whether to enable db purging
 #   Defaults to true
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::manila::api (
   $enabled_share_protocols    = lookup('manila_enabled_share_protocols', undef, undef, undef),
   $backend_generic_enabled    = lookup('manila_backend_generic_enabled', undef, undef, false),
@@ -109,6 +113,7 @@ class tripleo::profile::base::manila::api (
   $enable_internal_tls        = lookup('enable_internal_tls', undef, undef, false),
   $step                       = Integer(lookup('step')),
   $manila_enable_db_purge     = true,
+  $configure_apache           = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $sync_db = true
@@ -131,7 +136,9 @@ class tripleo::profile::base::manila::api (
   }
 
   if $step >= 4 or ($step >= 3 and $sync_db) {
-    include tripleo::profile::base::apache
+    if $configure_apache {
+      include tripleo::profile::base::apache
+    }
 
     unless empty($enabled_share_protocols) {
       $enabled_share_protocols_real = join(any2array($enabled_share_protocols), ',')
@@ -160,9 +167,11 @@ class tripleo::profile::base::manila::api (
       enabled_share_protocols => $enabled_share_protocols_real
     }
     include manila::healthcheck
-    class { 'manila::wsgi::apache':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      class { 'manila::wsgi::apache':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 

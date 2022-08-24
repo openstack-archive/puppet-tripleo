@@ -103,6 +103,10 @@
 #   Whether the pycadf audit middleware is is enabled.
 #   Defaults to false
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::swift::proxy (
   $bootstrap_node       = lookup('swift_proxy_short_bootstrap_node_name', undef, undef, undef),
   $ceilometer_enabled   = true,
@@ -122,6 +126,7 @@ class tripleo::profile::base::swift::proxy (
   $tls_proxy_fqdn       = undef,
   $tls_proxy_port       = 8080,
   $audit_enabled        = false,
+  $configure_apache     = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -136,15 +141,17 @@ class tripleo::profile::base::swift::proxy (
       $tls_certfile = $certificates_specs["httpd-${swift_proxy_network}"]['service_certificate']
       $tls_keyfile = $certificates_specs["httpd-${swift_proxy_network}"]['service_key']
 
-      ::tripleo::tls_proxy { 'swift-proxy-api':
-        servername => $tls_proxy_fqdn,
-        ip         => $tls_proxy_bind_ip,
-        port       => $tls_proxy_port,
-        tls_cert   => $tls_certfile,
-        tls_key    => $tls_keyfile,
+      if $configure_apache {
+        ::tripleo::tls_proxy { 'swift-proxy-api':
+          servername => $tls_proxy_fqdn,
+          ip         => $tls_proxy_bind_ip,
+          port       => $tls_proxy_port,
+          tls_cert   => $tls_certfile,
+          tls_key    => $tls_keyfile,
+        }
+        Tripleo::Tls_proxy['swift-proxy-api'] ~> Anchor<| title == 'swift::service::begin' |>
+        include tripleo::profile::base::apache
       }
-      Tripleo::Tls_proxy['swift-proxy-api'] ~> Anchor<| title == 'swift::service::begin' |>
-      include tripleo::profile::base::apache
     }
   }
   include tripleo::profile::base::swift

@@ -131,6 +131,10 @@
 #   (optional) Whether to enable caching
 #   defaults to false
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 # DEPRECATED PARAMETERS
 #
 # [*glance_rbd_client_name*]
@@ -163,6 +167,7 @@ class tripleo::profile::base::glance::api (
   $tls_proxy_port          = 9292,
   $glance_enable_db_purge  = true,
   $glance_enable_cache     = false,
+  $configure_apache        = lookup('configure_apache', undef, undef, true),
   # DEPRECATED PARAMETERS
   $glance_rbd_client_name  = undef,
 ) {
@@ -188,15 +193,17 @@ class tripleo::profile::base::glance::api (
       $tls_certfile = $certificates_specs["httpd-${glance_network}"]['service_certificate']
       $tls_keyfile = $certificates_specs["httpd-${glance_network}"]['service_key']
 
-      tripleo::tls_proxy { 'glance-api':
-        servername => $tls_proxy_fqdn,
-        ip         => $tls_proxy_bind_ip,
-        port       => $tls_proxy_port,
-        tls_cert   => $tls_certfile,
-        tls_key    => $tls_keyfile,
-        notify     => Class['glance::api'],
+      if $configure_apache {
+        tripleo::tls_proxy { 'glance-api':
+          servername => $tls_proxy_fqdn,
+          ip         => $tls_proxy_bind_ip,
+          port       => $tls_proxy_port,
+          tls_cert   => $tls_certfile,
+          tls_key    => $tls_keyfile,
+          notify     => Class['glance::api'],
+        }
+        include tripleo::profile::base::apache
       }
-      include tripleo::profile::base::apache
     }
 
     $multistore_backends = $multistore_config.map |$backend_config| {

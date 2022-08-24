@@ -48,12 +48,17 @@
 #   for more details.
 #   Defaults to Integer(lookup('step'))
 #
+# [*configure_apache*]
+#   (Optional) Whether apache is configured via puppet or not.
+#   Defaults to lookup('configure_apache', undef, undef, true)
+#
 class tripleo::profile::base::heat::api (
   $bootstrap_node                = lookup('heat_api_short_bootstrap_node_name', undef, undef, undef),
   $certificates_specs            = lookup('apache_certificates_specs', undef, undef, {}),
   $enable_internal_tls           = lookup('enable_internal_tls', undef, undef, false),
   $heat_api_network              = lookup('heat_api_network', undef, undef, undef),
   $step                          = Integer(lookup('step')),
+  $configure_apache              = lookup('configure_apache', undef, undef, true),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $is_bootstrap = true
@@ -77,10 +82,12 @@ class tripleo::profile::base::heat::api (
   if $step >= 4 or ( $step >= 3 and $is_bootstrap ) {
     include heat::api
     include heat::healthcheck
-    include tripleo::profile::base::apache
-    class { 'heat::wsgi::apache_api':
-      ssl_cert => $tls_certfile,
-      ssl_key  => $tls_keyfile,
+    if $configure_apache {
+      include tripleo::profile::base::apache
+      class { 'heat::wsgi::apache_api':
+        ssl_cert => $tls_certfile,
+        ssl_key  => $tls_keyfile,
+      }
     }
   }
 }
