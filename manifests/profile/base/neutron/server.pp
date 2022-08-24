@@ -109,6 +109,17 @@ class tripleo::profile::base::neutron::server (
   include tripleo::profile::base::neutron
   include tripleo::profile::base::neutron::authtoken
 
+  if $enable_internal_tls {
+    if !$neutron_network {
+      fail('neutron_api_network is not set in the hieradata.')
+    }
+    $tls_certfile = $certificates_specs["httpd-${neutron_network}"]['service_certificate']
+    $tls_keyfile = $certificates_specs["httpd-${neutron_network}"]['service_key']
+  } else {
+    $tls_certfile = undef
+    $tls_keyfile = undef
+  }
+
   # Calculate neutron::server::l3_ha based on the number of API nodes
   # combined with if DVR is enabled.
   if $l3_ha_override != '' {
@@ -122,12 +133,6 @@ class tripleo::profile::base::neutron::server (
   if $step >= 4 or ($step >= 3 and $sync_db) {
     include tripleo::profile::base::apache
     if $enable_internal_tls {
-      if !$neutron_network {
-        fail('neutron_api_network is not set in the hieradata.')
-      }
-      $tls_certfile = $certificates_specs["httpd-${neutron_network}"]['service_certificate']
-      $tls_keyfile = $certificates_specs["httpd-${neutron_network}"]['service_key']
-
       ::tripleo::tls_proxy { 'neutron-api':
         servername => $tls_proxy_fqdn,
         ip         => $tls_proxy_bind_ip,
@@ -136,8 +141,7 @@ class tripleo::profile::base::neutron::server (
         tls_key    => $tls_keyfile,
       }
       Tripleo::Tls_proxy['neutron-api'] ~> Anchor<| title == 'neutron::service::begin' |>
-    }
-    else {
+    } else {
       class { 'neutron::wsgi::apache':
         ssl_cert => $tls_certfile,
         ssl_key  => $tls_keyfile,
