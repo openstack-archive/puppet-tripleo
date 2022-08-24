@@ -64,7 +64,6 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
-        is_expected.to contain_class('nova::cell_v2::simple_setup')
         is_expected.to contain_class('nova::api').with(
           :nova_metadata_wsgi_enabled => true
         )
@@ -90,7 +89,6 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
-        is_expected.to_not contain_class('nova::cell_v2::simple_setup')
         is_expected.to_not contain_class('nova::api')
         is_expected.to_not contain_class('nova::cors')
         is_expected.to_not contain_class('nova::quota')
@@ -114,7 +112,6 @@ eos
         is_expected.to contain_class('tripleo::profile::base::nova::api')
         is_expected.to contain_class('tripleo::profile::base::nova')
         is_expected.to contain_class('tripleo::profile::base::nova::authtoken')
-        is_expected.to_not contain_class('nova::cell_v2::simple_setup')
         is_expected.to contain_class('nova::api').with(
           :nova_metadata_wsgi_enabled => true
         )
