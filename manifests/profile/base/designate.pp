@@ -134,5 +134,6 @@ class tripleo::profile::base::designate (
     }
     include designate::config
     include designate::logging
+    include designate::network_api::neutron
   }
 }
