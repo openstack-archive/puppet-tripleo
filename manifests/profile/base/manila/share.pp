@@ -26,10 +26,6 @@
 #   (Optional) Whether or not the netapp backend is enabled
 #   Defaults to lookup('manila_backend_netapp_enabled', undef, undef, false)
 #
-# [*backend_vmax_enabled*]
-#   (Optional) Whether or not the vmax backend is enabled
-#   Defaults to lookup('manila_backend_vmax_enabled', undef, undef, false)
-#
 # [*backend_powermax_enabled*]
 #   (Optional) Whether or not the powermax backend is enabled
 #   Defaults to lookup('manila_backend_powermax_enabled', undef, undef, false)
@@ -66,7 +62,6 @@
 class tripleo::profile::base::manila::share (
   $backend_generic_enabled      = lookup('manila_backend_generic_enabled', undef, undef, false),
   $backend_netapp_enabled       = lookup('manila_backend_netapp_enabled', undef, undef, false),
-  $backend_vmax_enabled         = lookup('manila_backend_vmax_enabled', undef, undef, false),
   $backend_powermax_enabled     = lookup('manila_backend_powermax_enabled', undef, undef, false),
   $backend_isilon_enabled       = lookup('manila_backend_isilon_enabled', undef, undef, false),
   $backend_unity_enabled        = lookup('manila_backend_unity_enabled', undef, undef, false),
@@ -176,21 +171,6 @@ class tripleo::profile::base::manila::share (
       })})
     }
 
-    # manila vmax:
-    if $backend_vmax_enabled {
-      $manila_vmax_backend = lookup('manila::backend::dellemc_vmax::title')
-      create_resources('manila::backend::dellemc_vmax', { $manila_vmax_backend => delete_undef_values({
-        'backend_availability_zone'    => lookup('manila::backend::dellemc_vmax::backend_availability_zone', undef, undef, undef),
-        'emc_nas_login'                => lookup('manila::backend::dellemc_vmax::emc_nas_login', undef, undef, undef),
-        'emc_nas_password'             => lookup('manila::backend::dellemc_vmax::emc_nas_password', undef, undef, undef),
-        'emc_nas_server'               => lookup('manila::backend::dellemc_vmax::emc_nas_server', undef, undef, undef),
-        'emc_share_backend'            => lookup('manila::backend::dellemc_vmax::emc_share_backend', undef, undef, 'vmax'),
-        'vmax_server_container'        => lookup('manila::backend::dellemc_vmax::vmax_server_container', undef, undef, undef),
-        'vmax_share_data_pools'        => lookup('manila::backend::dellemc_vmax::vmax_share_data_pools', undef, undef, undef),
-        'vmax_ethernet_ports'          => lookup('manila::backend::dellemc_vmax::vmax_ethernet_ports', undef, undef, undef),
-      })})
-    }
-
     # manila powermax:
     if $backend_powermax_enabled {
       $manila_powermax_backend = lookup('manila::backend::dellemc_powermax::title')
@@ -276,7 +256,6 @@ class tripleo::profile::base::manila::share (
     $backends = delete_undef_values(concat([], $manila_generic_backend,
                                       $manila_cephfs_backend,
                                       $manila_netapp_backend,
-                                      $manila_vmax_backend,
                                       $manila_powermax_backend,
                                       $manila_isilon_backend,
                                       $manila_unity_backend,
