@@ -71,6 +71,22 @@
 #   Enable ssl oslo messaging services
 #   Defaults to lookup('oslo_messaging_notify_use_ssl', undef, undef, '0')
 #
+# [*memcached_hosts*]
+#   (Optional) Array of hostnames, ipv4 or ipv6 addresses for memcache.
+#   Defaults to lookup('memcached_node_names', undef, undef, [])
+#
+# [*memcached_port*]
+#   (Optional) Memcached port to use.
+#   Defaults to lookup('memcached_port', undef, undef, 11211)
+#
+# [*memcached_ipv6*]
+#   (Optional) Whether Memcached uses IPv6 network instead of IPv4 network.
+#   Defauls to lookup('memcached_ipv6', undef, undef, false)
+#
+# [*cache_backend*]
+#   (Optional) oslo.cache backend used for caching.
+#   Defaults to lookup('ceilometer::cache::backend', undef, undef, false)
+#
 class tripleo::profile::base::ceilometer (
   $step                      = Integer(lookup('step')),
   $oslomsg_rpc_proto         = lookup('oslo_messaging_rpc_scheme', undef, undef, 'rabbit'),
@@ -85,11 +101,35 @@ class tripleo::profile::base::ceilometer (
   $oslomsg_notify_port       = lookup('oslo_messaging_notify_port', undef, undef, '5672'),
   $oslomsg_notify_username   = lookup('oslo_messaging_notify_user_name', undef, undef, 'guest'),
   $oslomsg_notify_use_ssl    = lookup('oslo_messaging_notify_use_ssl', undef, undef, '0'),
+  $memcached_hosts           = lookup('memcached_node_names', undef, undef, []),
+  $memcached_port            = lookup('memcached_port', undef, undef, 11211),
+  $memcached_ipv6            = lookup('memcached_ipv6', undef, undef, false),
+  $cache_backend             = lookup('ceilometer::cache::backend', undef, undef, false),
 ) {
+
+  $memcached_hosts_real = any2array($memcached_hosts)
 
   if $step >= 3 {
     $oslomsg_rpc_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_rpc_use_ssl)))
     $oslomsg_notify_use_ssl_real = sprintf('%s', bool2num(str2bool($oslomsg_notify_use_ssl)))
+
+    if $memcached_ipv6 or $memcached_hosts_real[0] =~ Stdlib::Compat::Ipv6 {
+      if $cache_backend in ['oslo_cache.memcache_pool', 'dogpile.cache.memcached'] {
+        # NOTE(tkajinm): The inet6 prefix is required for backends using
+        #                python-memcached
+        $cache_memcache_servers = $memcached_hosts_real.map |$server| { "inet6:[${server}]:${memcached_port}" }
+      } else {
+        # NOTE(tkajinam): The other backends like pymemcache don't require
+        #                 the inet6 prefix
+        $cache_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+      }
+    } else {
+      $cache_memcache_servers = suffix(any2array(normalize_ip_for_uri($memcached_hosts_real)), ":${memcached_port}")
+    }
+    class { 'ceilometer::cache':
+      memcache_servers => $cache_memcache_servers
+    }
+
     class { 'ceilometer' :
       default_transport_url      => os_transport_url({
         'transport' => $oslomsg_rpc_proto,
