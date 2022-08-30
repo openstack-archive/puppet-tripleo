@@ -23,14 +23,15 @@ describe 'tripleo::profile::base::ceilometer' do
       it 'should do nothing' do
         is_expected.to contain_class('tripleo::profile::base::ceilometer')
         is_expected.to_not contain_class('ceilometer')
+        is_expected.to_not contain_class('ceilometer::cache')
         is_expected.to_not contain_class('ceilometer::config')
       end
     end
 
     context 'with step 3' do
       let(:params) { {
-        :step           => 3,
-        :oslomsg_rpc_hosts => [ '127.0.0.1' ],
+        :step                 => 3,
+        :oslomsg_rpc_hosts    => [ '127.0.0.1' ],
         :oslomsg_rpc_username => 'ceilometer',
         :oslomsg_rpc_password => 'foo',
       } }
@@ -39,10 +40,68 @@ describe 'tripleo::profile::base::ceilometer' do
         is_expected.to contain_class('ceilometer').with(
           :default_transport_url => 'rabbit://ceilometer:foo@127.0.0.1:5672/?ssl=0'
         )
+        is_expected.to contain_class('ceilometer::cache').with(
+          :memcache_servers => ['controller-1:11211']
+        )
         is_expected.to contain_class('ceilometer::config')
       end
     end
 
+    context 'with step 3 and memcache ipv6' do
+      let(:params) { {
+        :step            => 3,
+        :memcached_hosts => '::1',
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('ceilometer::cache').with(
+          :memcache_servers => ['[::1]:11211']
+        )
+      end
+    end
+
+    context 'with step 3 and memcache ipv6 and memcached backend' do
+      let(:params) { {
+        :step            => 3,
+        :memcached_hosts => '::1',
+        :cache_backend   => 'dogpile.cache.memcached',
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('ceilometer::cache').with(
+          :memcache_servers => ['inet6:[::1]:11211']
+        )
+      end
+    end
+
+    context 'with step 3 and the ipv6 parameter' do
+      let(:params) { {
+        :step            => 3,
+        :memcached_hosts => 'node.example.com',
+        :memcached_ipv6  => true,
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('ceilometer::cache').with(
+          :memcache_servers => ['node.example.com:11211']
+        )
+      end
+    end
+
+    context 'with step 3 and the ipv6 parameter and memcached backend' do
+      let(:params) { {
+        :step            => 3,
+        :memcached_hosts => 'node.example.com',
+        :memcached_ipv6  => true,
+        :cache_backend   => 'dogpile.cache.memcached',
+      } }
+
+      it 'should format the memcache_server parameter' do
+        is_expected.to contain_class('ceilometer::cache').with(
+          :memcache_servers => ['inet6:[node.example.com]:11211']
+        )
+      end
+    end
   end
 
 
