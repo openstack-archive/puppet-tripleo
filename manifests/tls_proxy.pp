@@ -59,7 +59,9 @@ define tripleo::tls_proxy(
     manage_docroot      => false,
     servername          => $servername,
     ip                  => $ip,
-    port                => $port,
+    # NOTE(tkajinam): apache::vhost::port no longer accepts a string value
+    #                 since v8.0.0.
+    port                => Integer($port),
     ssl                 => true,
     ssl_cert            => $tls_cert,
     ssl_key             => $tls_key,
