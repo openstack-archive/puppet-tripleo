@@ -21,21 +21,21 @@
 #
 # [*vts_url_ip*]
 #   (Optional) IP address of the VTS Server
-#   Defaults to undefined
+#   Defaults to lookup('vts::vts_ip', undef, undef, undef)
 #
 # [*vts_port*]
 #   (Optional) VTS Server Neutron service port
-#   Defaults to '8888'
+#   Defaults to lookup('vts::vts_port', undef, undef, 8888)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 class tripleo::profile::base::neutron::plugins::ml2::vts (
-  $vts_url_ip   = hiera('vts::vts_ip', undef),
-  $vts_port     = hiera('vts::vts_port', 8888),
-  $step         = hiera('step'),
+  $vts_url_ip = lookup('vts::vts_ip', undef, undef, undef),
+  $vts_port   = lookup('vts::vts_port', undef, undef, 8888),
+  $step       = Integer(lookup('step')),
 ) {
 
   if $step >= 4 {

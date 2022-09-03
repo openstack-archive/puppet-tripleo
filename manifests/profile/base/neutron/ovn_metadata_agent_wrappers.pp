@@ -41,7 +41,7 @@ class tripleo::profile::base::neutron::ovn_metadata_agent_wrappers (
   $haproxy_image           = undef,
   Boolean $debug           = false,
 ) {
-  $container_cli = hiera('tripleo::profile::base::neutron::container_cli', 'podman')
+  $container_cli = lookup('tripleo::profile::base::neutron::container_cli', undef, undef, 'podman')
   if $enable_haproxy_wrapper {
     unless $haproxy_image and $haproxy_process_wrapper{
       fail('The container image for haproxy and wrapper filename must be provided when generating haproxy wrappers')

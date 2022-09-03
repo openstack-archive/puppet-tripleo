@@ -21,26 +21,27 @@
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*vhostuser_socket_dir*]
 #   (Optional) vhostuser socket dir, The directory where $vhostuser_socket_dir
 #   will be created with correct permissions, inorder to support vhostuser
 #   client mode.
+#   Defaults to lookup('neutron::agents::ml2::ovs::vhostuser_socket_dir', undef, undef, undef)
 #
 # [*vhostuser_socket_group*]
 #   (Optional) Group name for vhostuser socket dir.
-#   Defaults to qemu
+#   Defaults to lookup('vhostuser_socket_group', undef, undef, 'qemu')
 #
 # [*vhostuser_socket_user*]
 #   (Optional) User name for vhostuser socket dir.
-#   Defaults to qemu
-
+#   Defaults to lookup('vhostuser_socket_user', undef, undef, 'qemu')
+#
 class tripleo::profile::base::neutron::ovs(
-  $step                   = Integer(hiera('step')),
-  $vhostuser_socket_dir   = hiera('neutron::agents::ml2::ovs::vhostuser_socket_dir', undef),
-  $vhostuser_socket_group = hiera('vhostuser_socket_group', 'qemu'),
-  $vhostuser_socket_user  = hiera('vhostuser_socket_user', 'qemu'),
+  $step                   = Integer(lookup('step')),
+  $vhostuser_socket_dir   = lookup('neutron::agents::ml2::ovs::vhostuser_socket_dir', undef, undef, undef),
+  $vhostuser_socket_group = lookup('vhostuser_socket_group', undef, undef, 'qemu'),
+  $vhostuser_socket_user  = lookup('vhostuser_socket_user', undef, undef, 'qemu'),
 ) {
   include tripleo::profile::base::neutron
 
