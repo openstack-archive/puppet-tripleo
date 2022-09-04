@@ -81,12 +81,12 @@
 # [*controller_hosts*]
 #  IPs of host or group of hosts to load-balance the services
 #  Can be a string or an array.
-#  Defaults tohiera('controller_node_ips')
+#  Defaults to lookup('controller_node_ips')
 #
 # [*controller_hosts_names*]
 #  Names of host or group of hosts to load-balance the services
 #  Can be a string or an array.
-#  Defaults to hiera('controller_node_names', undef)
+#  Defaults to lookup('controller_node_names', undef, undef, undef)
 #
 # [*controller_virtual_ip*]
 #  Control IP or group of IPs to bind the pools
@@ -101,7 +101,7 @@
 # [*use_backend_syntax*]
 #  (optional) When set to true, generate a config with frontend and
 #  backend sections, otherwise use listen sections.
-#  Defaults to hiera('haproxy_backend_syntax', false)
+#  Defaults to lookup('haproxy_backend_syntax', undef, undef, false)
 #
 # [*haproxy_stats_user*]
 #  Username for haproxy stats authentication.
@@ -145,7 +145,7 @@
 # [*enable_internal_tls*]
 #  A flag that indicates if the servers in the internal network are using TLS.
 #  This enables the 'ssl' option for the server members that are proxied.
-#  Defaults to hiera('enable_internal_tls', false)
+#  Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*ssl_cipher_suite*]
 #  The default string describing the list of cipher algorithms ("cipher suite")
@@ -177,95 +177,95 @@
 #
 # [*keystone_admin*]
 #  (optional) Enable or not Keystone Admin API binding
-#  Defaults to hiera('keystone_enabled', false)
+#  Defaults to lookup('keystone_enabled', undef, undef, false)
 #
 # [*keystone_public*]
 #  (optional) Enable or not Keystone Public API binding
-#  Defaults to hiera('keystone_enabled', false)
+#  Defaults to lookup('keystone_enabled', undef, undef, false)
 #
 # [*neutron*]
 #  (optional) Enable or not Neutron API binding
-#  Defaults to hiera('neutron_api_enabled', false)
+#  Defaults to lookup('neutron_api_enabled', undef, undef, false)
 #
 # [*cinder*]
 #  (optional) Enable or not Cinder API binding
-#  Defaults to hiera('cinder_api_enabled', false)
+#  Defaults to lookup('cinder_api_enabled', undef, undef, false)
 #
 # [*manila*]
 #  (optional) Enable or not Manila API binding
-#  Defaults to hiera('manila_api_enabled', false)
+#  Defaults to lookup('manila_api_enabled', undef, undef, false)
 #
 # [*glance_api*]
 #  (optional) Enable or not Glance API binding
-#  Defaults to hiera('glance_api_enabled', false)
+#  Defaults to lookup('glance_api_enabled', undef, undef, false)
 #
 # [*nova_osapi*]
 #  (optional) Enable or not Nova API binding
-#  Defaults to hiera('nova_api_enabled', false)
+#  Defaults to lookup('nova_api_enabled', undef, undef, false)
 #
 # [*placement*]
 #  (optional) Enable or not Placement API binding
-#  Defaults to hiera('placement_enabled', false)
+#  Defaults to lookup('placement_enabled', undef, undef, false)
 #
 # [*nova_metadata*]
 #  (optional) Enable or not Nova metadata binding
-#  Defaults to hiera('nova_metadata_enabled', false)
+#  Defaults to lookup('nova_metadata_enabled', undef, undef, false)
 #
 # [*nova_novncproxy*]
 #  (optional) Enable or not Nova novncproxy binding
-#  Defaults to hiera('nova_vnc_proxy_enabled', false)
+#  Defaults to lookup('nova_vnc_proxy_enabled', undef, undef, false)
 #
 # [*aodh*]
 #  (optional) Enable or not Aodh API binding
-#  Defaults to hiera('aodh_api_enabled', false)
+#  Defaults to lookup('aodh_api_enabled', undef, undef, false)
 #
 # [*barbican*]
 #  (optional) Enable or not Barbican API binding
-#  Defaults to hiera('barbican_api_enabled', false)
+#  Defaults to lookup('barbican_api_enabled', undef, undef, false)
 #
 # [*designate*]
 #  (optional) Enable or not Designate API binding
-#  Defaults to hiera('designate_api_enabled', false)
+#  Defaults to lookup('designate_api_enabled', undef, undef, false)
 #
 # [*metrics_qdr*]
 #  (optional) Enable or not Metrics QDR binding
-#  Defaults to hiera('metrics_qdr_enabled', false)
+#  Defaults to lookup('metrics_qdr_enabled', undef, undef, false)
 #
 # [*gnocchi*]
 #  (optional) Enable or not Gnocchi API binding
-#  Defaults to hiera('gnocchi_api_enabled', false)
+#  Defaults to lookup('gnocchi_api_enabled', undef, undef, false)
 #
 # [*swift_proxy_server*]
 #  (optional) Enable or not Swift API binding
-#  Defaults to hiera('swift_proxy_enabled', false)
+#  Defaults to lookup('swift_proxy_enabled', undef, undef, false)
 #
 # [*heat_api*]
 #  (optional) Enable or not Heat API binding
-#  Defaults to hiera('heat_api_enabled', false)
+#  Defaults to lookup('heat_api_enabled', undef, undef, false)
 #
 # [*heat_cfn*]
 #  (optional) Enable or not Heat CFN API binding
-#  Defaults to hiera('heat_api_cfn_enabled', false)
+#  Defaults to lookup('heat_api_cfn_enabled', undef, undef, false)
 #
 # [*horizon*]
 #  (optional) Enable or not Horizon dashboard binding
-#  Defaults to hiera('horizon_enabled', false)
+#  Defaults to lookup('horizon_enabled', undef, undef, false)
 #
 # [*ironic*]
 #  (optional) Enable or not Ironic API binding
-#  Defaults to hiera('ironic_enabled', false)
+#  Defaults to lookup('ironic_enabled', undef, undef, false)
 #
 # [*ironic_inspector*]
 #  (optional) Enable or not Ironic Inspector API binding
-#  Defaults to hiera('ironic_inspector_enabled', false)
+#  Defaults to lookup('ironic_inspector_enabled', undef, undef, false)
 #
 # [*octavia*]
 #  (optional) Enable or not Octavia APII binding
-#  Defaults to hiera('octavia_api_enabled', false)
+#  Defaults to lookup('octavia_api_enabled', undef, undef, false)
 #
 # [*mysql*]
 #  (optional) Enable or not MySQL Galera binding
-#  Defaults to hiera('mysql_enabled', false)
+#  Defaults to lookup('mysql_enabled', undef, undef, false)
 #
 # [*mysql_clustercheck*]
 #  (optional) Enable check via clustercheck for mysql
@@ -301,15 +301,15 @@
 #
 # [*etcd*]
 #  (optional) Enable or not Etcd binding
-#  Defaults to hiera('etcd_enabled', false)
+#  Defaults to lookup('etcd_enabled', undef, undef, false)
 #
 # [*docker_registry*]
 #  (optional) Enable or not the Docker Registry API binding
-#  Defaults to hiera('enable_docker_registry', false)
+#  Defaults to lookup('enable_docker_registry', undef, undef, false)
 #
 # [*redis*]
 #  (optional) Enable or not Redis binding
-#  Defaults to hiera('redis_enabled', false)
+#  Defaults to lookup('redis_enabled', undef, undef, false)
 #
 # [*redis_password*]
 #  (optional) Password for Redis authentication, eventually needed by the
@@ -318,19 +318,19 @@
 #
 # [*ceph_rgw*]
 #  (optional) Enable or not Ceph RadosGW binding
-#  Defaults to hiera('ceph_rgw_enabled', false)
+#  Defaults to lookup('ceph_rgw_enabled', undef, undef, false)
 #
 # [*ceph_grafana*]
 #  (optional) Enable or not Ceph Grafana dashboard binding
-#  Defaults to hiera('ceph_grafana_enabled', false)
+#  Defaults to lookup('ceph_grafana_enabled', undef, undef, false)
 #
 # [*ceph_dashboard*]
 #  (optional) Enable or not Ceph Dashboard binding
-#  Defaults to hiera('ceph_grafana_enabled', false)
+#  Defaults to lookup('ceph_grafana_enabled', undef, undef, false)
 #
 # [*ovn_dbs*]
 #  (optional) Enable or not OVN northd binding
-#  Defaults to hiera('ovn_dbs_enabled', false)
+#  Defaults to lookup('ovn_dbs_enabled', undef, undef, false)
 #
 # [*ovn_dbs_manage_lb*]
 #  (optional) Whether or not haproxy should configure OVN dbs for load balancing
@@ -339,129 +339,129 @@
 #
 # [*aodh_network*]
 #  (optional) Specify the network aodh is running on.
-#  Defaults to hiera('aodh_api_network', undef)
+#  Defaults to lookup('aodh_api_network', undef, undef, undef)
 #
 # [*barbican_network*]
 #  (optional) Specify the network barbican is running on.
-#  Defaults to hiera('barbican_api_network', undef)
+#  Defaults to lookup('barbican_api_network', undef, undef, undef)
 #
 # [*ceph_rgw_network*]
 #  (optional) Specify the network ceph_rgw is running on.
-#  Defaults to hiera('ceph_rgw_network', undef)
+#  Defaults to lookup('ceph_rgw_network', undef, undef, undef)
 #
 # [*ceph_grafana_network*]
 #  (optional) Specify the network ceph_grafana is running on.
-#  Defaults to hiera('ceph_grafana_network', undef)
+#  Defaults to lookup('ceph_grafana_network', undef, undef, undef)
 #
 # [*ceph_dashboard_network*]
 #  (optional) Specify the network ceph_dashboard is running on.
-#  Defaults to hiera('ceph_dashboard_network', undef)
+#  Defaults to lookup('ceph_dashboard_network', undef, undef, undef)
 #
 # [*cinder_network*]
 #  (optional) Specify the network cinder is running on.
-#  Defaults to hiera('cinder_api_network', undef)
+#  Defaults to lookup('cinder_api_network', undef, undef, undef)
 #
 # [*designate_network*]
 #  (optional) Specify the network designate is running on.
-#  Defaults to hiera('designate_api_network', undef)
+#  Defaults to lookup('designate_api_network', undef, undef, undef)
 #
 # [*metrics_qdr_network*]
 #  (optional) Specify the network metrics_qdr is running on.
-#  Defaults to hiera('metrics_qdr_network', undef)
+#  Defaults to lookup('metrics_qdr_network', undef, undef, undef)
 #
 # [*docker_registry_network*]
 #  (optional) Specify the network docker-registry is running on.
-#  Defaults to hiera('docker_registry_network', undef)
+#  Defaults to lookup('docker_registry_network', undef, undef, undef)
 #
 # [*glance_api_network*]
 #  (optional) Specify the network glance_api is running on.
-#  Defaults to hiera('glance_api_network', undef)
+#  Defaults to lookup('glance_api_network', undef, undef, undef)
 #
 # [*gnocchi_network*]
 #  (optional) Specify the network gnocchi is running on.
-#  Defaults to hiera('gnocchi_api_network', undef)
+#  Defaults to lookup('gnocchi_api_network', undef, undef, undef)
 #
 # [*heat_api_network*]
 #  (optional) Specify the network heat_api is running on.
-#  Defaults to hiera('heat_api_network', undef)
+#  Defaults to lookup('heat_api_network', undef, undef, undef)
 #
 # [*heat_cfn_network*]
 #  (optional) Specify the network heat_cfn is running on.
-#  Defaults to hiera('heat_api_cfn_network', undef)
+#  Defaults to lookup('heat_api_cfn_network', undef, undef, undef)
 #
 # [*horizon_network*]
 #  (optional) Specify the network horizon is running on.
-#  Defaults to hiera('horizon_network', undef)
+#  Defaults to lookup('horizon_network', undef, undef, undef)
 #
 # [*ironic_inspector_network*]
 #  (optional) Specify the network ironic_inspector is running on.
-#  Defaults to hiera('ironic_inspector_network', undef)
+#  Defaults to lookup('ironic_inspector_network', undef, undef, undef)
 #
 # [*ironic_network*]
 #  (optional) Specify the network ironic is running on.
-#  Defaults to hiera('ironic_api_network', undef)
+#  Defaults to lookup('ironic_api_network', undef, undef, undef)
 #
 # [*keystone_admin_network*]
 #  (optional) Specify the network keystone_admin is running on.
-#  Defaults to hiera('keystone_network', undef)
+#  Defaults to lookup('keystone_network', undef, undef, undef)
 #
 # [*keystone_public_network*]
 #  (optional) Specify the network keystone_public is running on.
-#  Defaults to hiera('keystone_network', undef)
+#  Defaults to lookup('keystone_network', undef, undef, undef)
 #
 # [*keystone_sticky_sessions*]
 #  (optional) Use cookie-based session persistence for the Keystone
 #  public API.
-#  Defaults to hiera('keystone_sticky_sessions', false)
+#  Defaults to lookup('keystone_sticky_sessions', undef, undef, false)
 #
 # [*keystone_session_cookie*]
 #  (optional) Use a specified name for the Keystone sticky session cookie.
-#  Defaults to hiera('keystone_session_cookie', 'KEYSTONESESSION')
+#  Defaults to lookup('keystone_session_cookie', undef, undef, 'KEYSTONESESSION')
 #
 # [*manila_network*]
 #  (optional) Specify the network manila is running on.
-#  Defaults to hiera('manila_api_network', undef)
+#  Defaults to lookup('manila_api_network', undef, undef, undef)
 #
 # [*neutron_network*]
 #  (optional) Specify the network neutron is running on.
-#  Defaults to hiera('neutron_api_network', undef)
+#  Defaults to lookup('neutron_api_network', undef, undef, undef)
 #
 # [*nova_metadata_network*]
 #  (optional) Specify the network nova_metadata is running on.
-#  Defaults to hiera('nova_metadata_network', undef)
+#  Defaults to lookup('nova_metadata_network', undef, undef, undef)
 #
 # [*nova_novncproxy_network*]
 #  (optional) Specify the network nova_novncproxy is running on.
-#  Defaults to hiera('nova_vnc_proxy_network', hiera('nova_libvirt_network', undef))
+#  Defaults to lookup('nova_vnc_proxy_network', undef, undef, lookup('nova_libvirt_network', undef, undef, undef))
 #
 # [*nova_osapi_network*]
 #  (optional) Specify the network nova_osapi is running on.
-#  Defaults to hiera('nova_api_network', undef)
+#  Defaults to lookup('nova_api_network', undef, undef, undef)
 #
 # [*placement_network*]
 #  (optional) Specify the network placement is running on.
-#  Defaults to hiera('placement_network', undef)
+#  Defaults to lookup('placement_network', undef, undef, undef)
 #
 # [*etcd_network*]
 #  (optional) Specify the network etcd is running on.
-#  Defaults to hiera('etcd_network', undef)
+#  Defaults to lookup('etcd_network', undef, undef, undef)
 #
 # [*octavia_network*]
 #  (optional) Specify the network octavia is running on.
-#  Defaults to hiera('octavia_api_network', undef)
+#  Defaults to lookup('octavia_api_network', undef, undef, undef)
 #
 # [*ovn_dbs_network*]
 #  (optional) Specify the network ovn_dbs is running on.
-#  Defaults to hiera('ovn_dbs_network', undef)
+#  Defaults to lookup('ovn_dbs_network', undef, undef, undef)
 #
 # [*swift_proxy_server_network*]
 #  (optional) Specify the network swift_proxy_server is running on.
-#  Defaults to hiera('swift_proxy_network', undef)
+#  Defaults to lookup('swift_proxy_network', undef, undef, undef)
 #
 # [*designate_mdns_proxy_baseport*]
 #  (optional) Specify the base port value for the external->internal
 #  proxies used for external DNS integration with designate workers.
-#  Defaults to hiera('designate_mdns_public_port_start', undef)
+#  Defaults to lookup('designate_mdns_public_port_start', undef, undef, 16000)
 #
 # [*service_ports*]
 #  (optional) Hash that contains the values to override from the service ports
@@ -526,7 +526,7 @@
 class tripleo::haproxy (
   $controller_virtual_ip,
   $public_virtual_ip,
-  $use_backend_syntax            = hiera('haproxy_backend_syntax', false),
+  $use_backend_syntax            = lookup('haproxy_backend_syntax', undef, undef, false),
   $haproxy_service_manage        = true,
   $haproxy_global_maxconn        = 20480,
   $haproxy_default_maxconn       = 4096,
@@ -543,43 +543,43 @@ class tripleo::haproxy (
   $haproxy_stats_user            = 'admin',
   $haproxy_stats_password        = undef,
   $haproxy_stats_bind_address    = undef,
-  $controller_hosts              = hiera('controller_node_ips'),
-  $controller_hosts_names        = hiera('controller_node_names', undef),
+  $controller_hosts              = lookup('controller_node_ips'),
+  $controller_hosts_names        = lookup('controller_node_names', undef, undef, undef),
   $service_certificate           = undef,
   $use_internal_certificates     = false,
   $internal_certificates_specs   = {},
-  $enable_internal_tls           = hiera('enable_internal_tls', false),
+  $enable_internal_tls           = lookup('enable_internal_tls', undef, undef, false),
   $ssl_cipher_suite              = '!SSLv2:kEECDH:kRSA:kEDH:kPSK:+3DES:!aNULL:!eNULL:!MD5:!EXP:!RC4:!SEED:!IDEA:!DES',
   $ssl_options                   = 'no-sslv3 no-tlsv10',
   $ca_bundle                     = '/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt',
   $crl_file                      = undef,
   $haproxy_stats_certificate     = undef,
   $haproxy_stats                 = true,
-  $keystone_admin                = hiera('keystone_enabled', false),
-  $keystone_public               = hiera('keystone_enabled', false),
-  $neutron                       = hiera('neutron_api_enabled', false),
-  $cinder                        = hiera('cinder_api_enabled', false),
-  $manila                        = hiera('manila_api_enabled', false),
-  $glance_api                    = hiera('glance_api_enabled', false),
-  $nova_osapi                    = hiera('nova_api_enabled', false),
-  $placement                     = hiera('placement_enabled', false),
-  $nova_metadata                 = hiera('nova_metadata_enabled', false),
-  $nova_novncproxy               = hiera('nova_vnc_proxy_enabled', false),
-  $aodh                          = hiera('aodh_api_enabled', false),
-  $barbican                      = hiera('barbican_api_enabled', false),
-  $ceph_grafana                  = hiera('ceph_grafana_enabled', false),
-  $ceph_dashboard                = hiera('ceph_grafana_enabled', false),
-  $gnocchi                       = hiera('gnocchi_api_enabled', false),
-  $swift_proxy_server            = hiera('swift_proxy_enabled', false),
-  $heat_api                      = hiera('heat_api_enabled', false),
-  $heat_cfn                      = hiera('heat_api_cfn_enabled', false),
-  $horizon                       = hiera('horizon_enabled', false),
-  $ironic                        = hiera('ironic_api_enabled', false),
-  $ironic_inspector              = hiera('ironic_inspector_enabled', false),
-  $octavia                       = hiera('octavia_api_enabled', false),
-  $designate                     = hiera('designate_api_enabled', false),
-  $metrics_qdr                   = hiera('metrics_qdr_enabled', false),
-  $mysql                         = hiera('mysql_enabled', false),
+  $keystone_admin                = lookup('keystone_enabled', undef, undef, false),
+  $keystone_public               = lookup('keystone_enabled', undef, undef, false),
+  $neutron                       = lookup('neutron_api_enabled', undef, undef, false),
+  $cinder                        = lookup('cinder_api_enabled', undef, undef, false),
+  $manila                        = lookup('manila_api_enabled', undef, undef, false),
+  $glance_api                    = lookup('glance_api_enabled', undef, undef, false),
+  $nova_osapi                    = lookup('nova_api_enabled', undef, undef, false),
+  $placement                     = lookup('placement_enabled', undef, undef, false),
+  $nova_metadata                 = lookup('nova_metadata_enabled', undef, undef, false),
+  $nova_novncproxy               = lookup('nova_vnc_proxy_enabled', undef, undef, false),
+  $aodh                          = lookup('aodh_api_enabled', undef, undef, false),
+  $barbican                      = lookup('barbican_api_enabled', undef, undef, false),
+  $ceph_grafana                  = lookup('ceph_grafana_enabled', undef, undef, false),
+  $ceph_dashboard                = lookup('ceph_grafana_enabled', undef, undef, false),
+  $gnocchi                       = lookup('gnocchi_api_enabled', undef, undef, false),
+  $swift_proxy_server            = lookup('swift_proxy_enabled', undef, undef, false),
+  $heat_api                      = lookup('heat_api_enabled', undef, undef, false),
+  $heat_cfn                      = lookup('heat_api_cfn_enabled', undef, undef, false),
+  $horizon                       = lookup('horizon_enabled', undef, undef, false),
+  $ironic                        = lookup('ironic_api_enabled', undef, undef, false),
+  $ironic_inspector              = lookup('ironic_inspector_enabled', undef, undef, false),
+  $octavia                       = lookup('octavia_api_enabled', undef, undef, false),
+  $designate                     = lookup('designate_api_enabled', undef, undef, false),
+  $metrics_qdr                   = lookup('metrics_qdr_enabled', undef, undef, false),
+  $mysql                         = lookup('mysql_enabled', undef, undef, false),
   $mysql_clustercheck            = false,
   $mysql_max_conn                = undef,
   $mysql_member_options          = undef,
@@ -587,44 +587,44 @@ class tripleo::haproxy (
   $mysql_custom_frontend_options = {},
   $mysql_custom_backend_options  = {},
   $rabbitmq                      = false,
-  $etcd                          = hiera('etcd_enabled', false),
-  $docker_registry               = hiera('enable_docker_registry', false),
-  $redis                         = hiera('redis_enabled', false),
+  $etcd                          = lookup('etcd_enabled', undef, undef, false),
+  $docker_registry               = lookup('enable_docker_registry', undef, undef, false),
+  $redis                         = lookup('redis_enabled', undef, undef, false),
   $redis_password                = undef,
-  $ceph_rgw                      = hiera('ceph_rgw_enabled', false),
-  $ovn_dbs                       = hiera('ovn_dbs_enabled', false),
+  $ceph_rgw                      = lookup('ceph_rgw_enabled', undef, undef, false),
+  $ovn_dbs                       = lookup('ovn_dbs_enabled', undef, undef, false),
   $ovn_dbs_manage_lb             = false,
-  $aodh_network                  = hiera('aodh_api_network', undef),
-  $barbican_network              = hiera('barbican_api_network', false),
-  $ceph_rgw_network              = hiera('ceph_rgw_network', undef),
-  $cinder_network                = hiera('cinder_api_network', undef),
-  $designate_network             = hiera('designate_api_network', undef),
-  $metrics_qdr_network           = hiera('metrics_qdr_network', undef),
-  $docker_registry_network       = hiera('docker_registry_network', undef),
-  $glance_api_network            = hiera('glance_api_network', undef),
-  $gnocchi_network               = hiera('gnocchi_api_network', undef),
-  $heat_api_network              = hiera('heat_api_network', undef),
-  $ceph_grafana_network          = hiera('ceph_grafana_network', undef),
-  $ceph_dashboard_network        = hiera('ceph_dashboard_network', undef),
-  $heat_cfn_network              = hiera('heat_api_cfn_network', undef),
-  $horizon_network               = hiera('horizon_network', undef),
-  $ironic_inspector_network      = hiera('ironic_inspector_network', undef),
-  $ironic_network                = hiera('ironic_api_network', undef),
-  $keystone_admin_network        = hiera('keystone_admin_api_network', undef),
-  $keystone_public_network       = hiera('keystone_public_api_network', undef),
-  $keystone_sticky_sessions      = hiera('keystone_sticky_sessions', false),
-  $keystone_session_cookie       = hiera('keystone_session_cookie,', 'KEYSTONESESSION'),
-  $manila_network                = hiera('manila_api_network', undef),
-  $neutron_network               = hiera('neutron_api_network', undef),
-  $nova_metadata_network         = hiera('nova_metadata_network', undef),
-  $nova_novncproxy_network       = hiera('nova_vnc_proxy_network', hiera('nova_libvirt_network', undef)),
-  $nova_osapi_network            = hiera('nova_api_network', undef),
-  $placement_network             = hiera('placement_network', undef),
-  $octavia_network               = hiera('octavia_api_network', undef),
-  $ovn_dbs_network               = hiera('ovn_dbs_network', undef),
-  $etcd_network                  = hiera('etcd_network', undef),
-  $swift_proxy_server_network    = hiera('swift_proxy_network', undef),
-  $designate_mdns_proxy_baseport = hiera('designate_mdns_public_port_start', 16000),
+  $aodh_network                  = lookup('aodh_api_network', undef, undef, undef),
+  $barbican_network              = lookup('barbican_api_network', undef, undef, false),
+  $ceph_rgw_network              = lookup('ceph_rgw_network', undef, undef, undef),
+  $cinder_network                = lookup('cinder_api_network', undef, undef, undef),
+  $designate_network             = lookup('designate_api_network', undef, undef, undef),
+  $metrics_qdr_network           = lookup('metrics_qdr_network', undef, undef, undef),
+  $docker_registry_network       = lookup('docker_registry_network', undef, undef, undef),
+  $glance_api_network            = lookup('glance_api_network', undef, undef, undef),
+  $gnocchi_network               = lookup('gnocchi_api_network', undef, undef, undef),
+  $heat_api_network              = lookup('heat_api_network', undef, undef, undef),
+  $ceph_grafana_network          = lookup('ceph_grafana_network', undef, undef, undef),
+  $ceph_dashboard_network        = lookup('ceph_dashboard_network', undef, undef, undef),
+  $heat_cfn_network              = lookup('heat_api_cfn_network', undef, undef, undef),
+  $horizon_network               = lookup('horizon_network', undef, undef, undef),
+  $ironic_inspector_network      = lookup('ironic_inspector_network', undef, undef, undef),
+  $ironic_network                = lookup('ironic_api_network', undef, undef, undef),
+  $keystone_admin_network        = lookup('keystone_admin_api_network', undef, undef, undef),
+  $keystone_public_network       = lookup('keystone_public_api_network', undef, undef, undef),
+  $keystone_sticky_sessions      = lookup('keystone_sticky_sessions', undef, undef, false),
+  $keystone_session_cookie       = lookup('keystone_session_cookie,', undef, undef, 'KEYSTONESESSION'),
+  $manila_network                = lookup('manila_api_network', undef, undef, undef),
+  $neutron_network               = lookup('neutron_api_network', undef, undef, undef),
+  $nova_metadata_network         = lookup('nova_metadata_network', undef, undef, undef),
+  $nova_novncproxy_network       = lookup('nova_vnc_proxy_network', undef, undef, lookup('nova_libvirt_network', undef, undef, undef)),
+  $nova_osapi_network            = lookup('nova_api_network', undef, undef, undef),
+  $placement_network             = lookup('placement_network', undef, undef, undef),
+  $octavia_network               = lookup('octavia_api_network', undef, undef, undef),
+  $ovn_dbs_network               = lookup('ovn_dbs_network', undef, undef, undef),
+  $etcd_network                  = lookup('etcd_network', undef, undef, undef),
+  $swift_proxy_server_network    = lookup('swift_proxy_network', undef, undef, undef),
+  $designate_mdns_proxy_baseport = lookup('designate_mdns_public_port_start', undef, undef, 16000),
   $service_ports                 = {},
   # DEPRECATED PARAMETERS
   $activate_httplog              = undef
@@ -716,12 +716,12 @@ class tripleo::haproxy (
     $controller_hosts_names_real = downcase(any2array(split($controller_hosts_names, ',')))
   }
 
-  $mysql_vip = hiera('mysql_vip', $controller_virtual_ip)
+  $mysql_vip = lookup('mysql_vip', undef, undef, $controller_virtual_ip)
   $mysql_bind_opts = {
     "${mysql_vip}:3306" => $haproxy_listen_bind_param,
   }
 
-  $rabbitmq_vip = hiera('rabbitmq_vip', $controller_virtual_ip)
+  $rabbitmq_vip = lookup('rabbitmq_vip', undef, undef, $controller_virtual_ip)
   $rabbitmq_bind_opts = {
     "${rabbitmq_vip}:5672" => $haproxy_listen_bind_param,
   }
@@ -789,7 +789,7 @@ class tripleo::haproxy (
     backend_options             => $default_backend_options,
   }
 
-  $service_names = hiera('enabled_services', [])
+  $service_names = lookup('enabled_services', undef, undef, [])
   tripleo::haproxy::service_endpoints { $service_names: }
 
   if $haproxy_stats {
@@ -826,11 +826,11 @@ class tripleo::haproxy (
     # nowadays as the public/internal one. We can just loadbalance towards the
     # same IP.
     ::tripleo::haproxy::endpoint { 'keystone_admin':
-      internal_ip      => hiera('keystone_admin_api_vip', $controller_virtual_ip),
+      internal_ip      => lookup('keystone_admin_api_vip', undef, undef, $controller_virtual_ip),
       service_port     => $ports[keystone_public_api_port],
       haproxy_port     => $ports[keystone_admin_api_port],
-      ip_addresses     => hiera('keystone_public_api_node_ips', $controller_hosts_real),
-      server_names     => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
+      ip_addresses     => lookup('keystone_public_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names     => lookup('keystone_public_api_node_names', undef, undef, $controller_hosts_names_real),
       mode             => 'http',
       listen_options   => merge($default_listen_options, $keystone_listen_opts),
       frontend_options => merge($default_frontend_options, $keystone_frontend_opts),
@@ -843,10 +843,10 @@ class tripleo::haproxy (
   if $keystone_public {
     ::tripleo::haproxy::endpoint { 'keystone_public':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('keystone_public_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('keystone_public_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[keystone_public_api_port],
-      ip_addresses      => hiera('keystone_public_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('keystone_public_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('keystone_public_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('keystone_public_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $keystone_listen_opts),
       frontend_options  => merge($default_frontend_options, $keystone_frontend_opts),
@@ -873,10 +873,10 @@ class tripleo::haproxy (
                                                 $neutron_backend_opts)
     ::tripleo::haproxy::endpoint { 'neutron':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('neutron_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('neutron_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[neutron_api_port],
-      ip_addresses      => hiera('neutron_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('neutron_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('neutron_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('neutron_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $neutron_listen_opts),
       frontend_options  => merge($default_frontend_options, $neutron_frontend_opts),
@@ -899,10 +899,10 @@ class tripleo::haproxy (
                                               $cinder_backend_opts)
     ::tripleo::haproxy::endpoint { 'cinder':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('cinder_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('cinder_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[cinder_api_port],
-      ip_addresses      => hiera('cinder_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('cinder_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('cinder_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('cinder_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $cinder_listen_opts),
       frontend_options  => merge($default_frontend_options, $cinder_frontend_opts),
@@ -924,10 +924,10 @@ class tripleo::haproxy (
                                               $manila_backend_opts)
     ::tripleo::haproxy::endpoint { 'manila':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('manila_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('manila_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[manila_api_port],
-      ip_addresses      => hiera('manila_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('manila_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('manila_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('manila_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $manila_listen_opts),
       frontend_options  => merge($default_frontend_options, $manila_frontend_opts),
@@ -949,10 +949,10 @@ class tripleo::haproxy (
                                               $glance_backend_opts)
     ::tripleo::haproxy::endpoint { 'glance_api':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('glance_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('glance_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[glance_api_port],
-      ip_addresses      => hiera('glance_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('glance_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('glance_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('glance_api_node_names', undef, undef, $controller_hosts_names_real),
       public_ssl_port   => $ports[glance_api_ssl_port],
       mode              => 'http',
       listen_options    => merge($default_listen_options, $glance_listen_opts),
@@ -970,10 +970,10 @@ class tripleo::haproxy (
       $ceph_grafana_tls_member_options = []
     }
     ::tripleo::haproxy::endpoint { 'ceph_grafana':
-      internal_ip      => hiera('ceph_dashboard_vip', $controller_virtual_ip),
+      internal_ip      => lookup('ceph_dashboard_vip', undef, undef, $controller_virtual_ip),
       service_port     => $ports[ceph_grafana_port],
-      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      ip_addresses     => lookup('ceph_grafana_node_ips', undef, undef, $controller_hosts_real),
+      server_names     => lookup('ceph_grafana_node_names', undef, undef, $controller_hosts_names_real),
       mode             => 'http',
       public_ssl_port  => $ports[ceph_grafana_ssl_port],
       listen_options   => merge($default_listen_options, {
@@ -989,10 +989,10 @@ class tripleo::haproxy (
       member_options   => union($haproxy_member_options, $ceph_grafana_tls_member_options),
     }
     ::tripleo::haproxy::endpoint { 'ceph_prometheus':
-      internal_ip      => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      internal_ip      => lookup('ceph_grafana_vip', undef, undef, $controller_virtual_ip),
       service_port     => $ports[ceph_prometheus_port],
-      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      ip_addresses     => lookup('ceph_grafana_node_ips', undef, undef, $controller_hosts_real),
+      server_names     => lookup('ceph_grafana_node_names', undef, undef, $controller_hosts_names_real),
       mode             => 'http',
       public_ssl_port  => $ports[ceph_prometheus_ssl_port],
       listen_options   => merge($default_listen_options, {
@@ -1008,10 +1008,10 @@ class tripleo::haproxy (
       member_options   => $haproxy_member_options,
     }
     ::tripleo::haproxy::endpoint { 'ceph_alertmanager':
-      internal_ip      => hiera('ceph_grafana_vip', $controller_virtual_ip),
+      internal_ip      => lookup('ceph_grafana_vip', undef, undef, $controller_virtual_ip),
       service_port     => $ports[ceph_alertmanager_port],
-      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      ip_addresses     => lookup('ceph_grafana_node_ips', undef, undef, $controller_hosts_real),
+      server_names     => lookup('ceph_grafana_node_names', undef, undef, $controller_hosts_names_real),
       mode             => 'http',
       public_ssl_port  => $ports[ceph_alertmanager_ssl_port],
       listen_options   => merge($default_listen_options, {
@@ -1042,10 +1042,10 @@ class tripleo::haproxy (
     $ceph_dashboard_listen_opts = merge_hash_values($default_frontend_options,
                                                       $ceph_dashboard_backend_opts)
     ::tripleo::haproxy::endpoint { 'ceph_dashboard':
-      internal_ip      => hiera('ceph_dashboard_vip', $controller_virtual_ip),
+      internal_ip      => lookup('ceph_dashboard_vip', undef, undef, $controller_virtual_ip),
       service_port     => $ports[ceph_dashboard_port],
-      ip_addresses     => hiera('ceph_grafana_node_ips', $controller_hosts_real),
-      server_names     => hiera('ceph_grafana_node_names', $controller_hosts_names_real),
+      ip_addresses     => lookup('ceph_grafana_node_ips', undef, undef, $controller_hosts_real),
+      server_names     => lookup('ceph_grafana_node_names', undef, undef, $controller_hosts_names_real),
       mode             => 'http',
       public_ssl_port  => $ports[ceph_dashboard_ssl_port],
       listen_options   => merge($default_listen_options, $ceph_dashboard_listen_opts),
@@ -1056,15 +1056,15 @@ class tripleo::haproxy (
     }
   }
 
-  $nova_api_vip = hiera('nova_api_vip', $controller_virtual_ip)
+  $nova_api_vip = lookup('nova_api_vip', undef, undef, $controller_virtual_ip)
   if $nova_osapi {
     # NOTE(tkajinam): Nova doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'nova_osapi':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $nova_api_vip,
       service_port      => $ports[nova_api_port],
-      ip_addresses      => hiera('nova_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('nova_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('nova_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('nova_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[nova_api_ssl_port],
       service_network   => $nova_osapi_network,
@@ -1072,15 +1072,15 @@ class tripleo::haproxy (
     }
   }
 
-  $placement_vip = hiera('placement_vip', $controller_virtual_ip)
+  $placement_vip = lookup('placement_vip', undef, undef, $controller_virtual_ip)
   if $placement {
     # NOTE(tkajinam): Placement doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'placement':
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $placement_vip,
       service_port      => $ports[placement_port],
-      ip_addresses      => hiera('placement_node_ips', $controller_hosts_real),
-      server_names      => hiera('placement_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('placement_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('placement_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[placement_ssl_port],
       service_network   => $placement_network,
@@ -1090,10 +1090,10 @@ class tripleo::haproxy (
 
   if $nova_metadata {
     # NOTE(tkajinam): Nova doesn't provide healthcheck API
-    if hiera('nova_is_additional_cell', undef) {
-      $nova_metadata_server_names_real = hiera('nova_metadata_cell_node_names', $controller_hosts_names_real)
+    if lookup('nova_is_additional_cell', undef, undef, undef) {
+      $nova_metadata_server_names_real = lookup('nova_metadata_cell_node_names', undef, undef, $controller_hosts_names_real)
     } else {
-      $nova_metadata_server_names_real = hiera('nova_metadata_node_names', $controller_hosts_names_real)
+      $nova_metadata_server_names_real = lookup('nova_metadata_node_names', undef, undef, $controller_hosts_names_real)
     }
     $nova_metadata_backend_opts = {
       'balance'   => 'source',
@@ -1102,9 +1102,9 @@ class tripleo::haproxy (
     $nova_metadata_listen_opts = merge_hash_values($default_listen_options,
                                                       $nova_metadata_backend_opts)
     ::tripleo::haproxy::endpoint { 'nova_metadata':
-      internal_ip      => hiera('nova_metadata_vip', $controller_virtual_ip),
+      internal_ip      => lookup('nova_metadata_vip', undef, undef, $controller_virtual_ip),
       service_port     => $ports[nova_metadata_port],
-      ip_addresses     => hiera('nova_metadata_node_ips', $controller_hosts_real),
+      ip_addresses     => lookup('nova_metadata_node_ips', undef, undef, $controller_hosts_real),
       server_names     => $nova_metadata_server_names_real,
       mode             => 'http',
       service_network  => $nova_metadata_network,
@@ -1115,7 +1115,7 @@ class tripleo::haproxy (
     }
   }
 
-  $nova_vnc_proxy_vip = hiera('nova_vnc_proxy_vip', $controller_virtual_ip)
+  $nova_vnc_proxy_vip = lookup('nova_vnc_proxy_vip', undef, undef, $controller_virtual_ip)
   if $nova_novncproxy {
     # NOTE(tkajinam): Nova-VNCProxy doesn't provide healthcheck API
     if $enable_internal_tls {
@@ -1126,10 +1126,10 @@ class tripleo::haproxy (
       $haproxy_member_options_real   = $haproxy_member_options
       $novncproxy_ssl_member_options = []
     }
-    if hiera('nova_is_additional_cell', undef) {
-      $novncproxy_server_names_real = hiera('nova_vnc_proxy_cell_node_names', $controller_hosts_names_real)
+    if lookup('nova_is_additional_cell', undef, undef, undef) {
+      $novncproxy_server_names_real = lookup('nova_vnc_proxy_cell_node_names', undef, undef, $controller_hosts_names_real)
     } else {
-      $novncproxy_server_names_real = hiera('nova_vnc_proxy_node_names', $controller_hosts_names_real)
+      $novncproxy_server_names_real = lookup('nova_vnc_proxy_node_names', undef, undef, $controller_hosts_names_real)
     }
     $nova_vncproxy_frontend_opts = {
       'option'  => [ 'tcpka', 'tcplog' ],
@@ -1145,7 +1145,7 @@ class tripleo::haproxy (
       public_virtual_ip => $public_virtual_ip,
       internal_ip       => $nova_vnc_proxy_vip,
       service_port      => $ports[nova_novnc_port],
-      ip_addresses      => hiera('nova_vnc_proxy_node_ips', $controller_hosts_real),
+      ip_addresses      => lookup('nova_vnc_proxy_node_ips', undef, undef, $controller_hosts_real),
       server_names      => $novncproxy_server_names_real,
       mode              => 'http',
       listen_options    => merge($default_listen_options, $nova_vncproxy_listen_opts),
@@ -1168,10 +1168,10 @@ class tripleo::haproxy (
                                             $aodh_backend_opts)
     ::tripleo::haproxy::endpoint { 'aodh':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('aodh_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('aodh_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[aodh_api_port],
-      ip_addresses      => hiera('aodh_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('aodh_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('aodh_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('aodh_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $aodh_listen_opts),
       frontend_options  => merge($default_frontend_options, $aodh_frontend_opts),
@@ -1193,10 +1193,10 @@ class tripleo::haproxy (
                                                 $barbican_backend_opts)
     ::tripleo::haproxy::endpoint { 'barbican':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('barbican_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('barbican_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[barbican_api_port],
-      ip_addresses      => hiera('barbican_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('barbican_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('barbican_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('barbican_api_node_names', undef, undef, $controller_hosts_names_real),
       public_ssl_port   => $ports[barbican_api_ssl_port],
       service_network   => $barbican_network,
       mode              => 'http',
@@ -1211,10 +1211,10 @@ class tripleo::haproxy (
     # NOTE(tkajinam): Gnocchi doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'gnocchi':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('gnocchi_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('gnocchi_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[gnocchi_api_port],
-      ip_addresses      => hiera('gnocchi_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('gnocchi_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('gnocchi_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('gnocchi_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[gnocchi_api_ssl_port],
       service_network   => $gnocchi_network,
@@ -1236,10 +1236,10 @@ class tripleo::haproxy (
                                                               $swift_proxy_server_backend_options)
     ::tripleo::haproxy::endpoint { 'swift_proxy_server':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('swift_proxy_vip', $controller_virtual_ip),
+      internal_ip       => lookup('swift_proxy_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[swift_proxy_port],
-      ip_addresses      => hiera('swift_proxy_node_ips', $controller_hosts_real),
-      server_names      => hiera('swift_proxy_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('swift_proxy_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('swift_proxy_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $swift_proxy_server_listen_options),
       frontend_options  => merge($default_frontend_options, $swift_proxy_server_frontend_options),
@@ -1250,8 +1250,8 @@ class tripleo::haproxy (
     }
   }
 
-  $heat_api_vip = hiera('heat_api_vip', $controller_virtual_ip)
-  $heat_ip_addresses = hiera('heat_api_node_ips', $controller_hosts_real)
+  $heat_api_vip = lookup('heat_api_vip', undef, undef, $controller_virtual_ip)
+  $heat_ip_addresses = lookup('heat_api_node_ips', undef, undef, $controller_hosts_real)
   $heat_frontend_options = {
     'option'         => [ 'httplog', 'forwardfor' ],
     'timeout client' => '10m',
@@ -1280,7 +1280,7 @@ class tripleo::haproxy (
       internal_ip       => $heat_api_vip,
       service_port      => $ports[heat_api_port],
       ip_addresses      => $heat_ip_addresses,
-      server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
+      server_names      => lookup('heat_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => $heat_listen_options_real,
       frontend_options  => $heat_frontend_options_real,
@@ -1297,7 +1297,7 @@ class tripleo::haproxy (
       internal_ip       => $heat_api_vip,
       service_port      => $ports[heat_cfn_port],
       ip_addresses      => $heat_ip_addresses,
-      server_names      => hiera('heat_api_node_names', $controller_hosts_names_real),
+      server_names      => lookup('heat_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => $heat_listen_options_real,
       frontend_options  => $heat_frontend_options_real,
@@ -1311,10 +1311,10 @@ class tripleo::haproxy (
   if $horizon {
     class { 'tripleo::haproxy::horizon_endpoint':
       public_virtual_ip           => $public_virtual_ip,
-      internal_ip                 => hiera('horizon_vip', $controller_virtual_ip),
+      internal_ip                 => lookup('horizon_vip', undef, undef, $controller_virtual_ip),
       haproxy_listen_bind_param   => $haproxy_listen_bind_param,
-      ip_addresses                => hiera('horizon_node_ips', $controller_hosts_real),
-      server_names                => hiera('horizon_node_names', $controller_hosts_names_real),
+      ip_addresses                => lookup('horizon_node_ips', undef, undef, $controller_hosts_real),
+      server_names                => lookup('horizon_node_names', undef, undef, $controller_hosts_names_real),
       member_options              => union($haproxy_member_options, $internal_tls_member_options),
       public_certificate          => $service_certificate,
       use_internal_certificates   => $use_internal_certificates,
@@ -1334,10 +1334,10 @@ class tripleo::haproxy (
                                             $ironic_backend_opts)
     ::tripleo::haproxy::endpoint { 'ironic':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ironic_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('ironic_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[ironic_api_port],
-      ip_addresses      => hiera('ironic_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('ironic_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('ironic_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('ironic_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       frontend_options  => merge($default_frontend_options, $ironic_frontend_opts),
       backend_options   => merge($default_backend_options, $ironic_backend_opts),
@@ -1361,10 +1361,10 @@ class tripleo::haproxy (
     # NOTE(tkajinam): Ironic-inspector doesn't provide healthcheck API
     ::tripleo::haproxy::endpoint { 'ironic-inspector':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ironic_inspector_vip', $controller_virtual_ip),
+      internal_ip       => lookup('ironic_inspector_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[ironic_inspector_port],
-      ip_addresses      => hiera('ironic_inspector_node_ips', $controller_hosts_real),
-      server_names      => hiera('ironic_inspector_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('ironic_inspector_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('ironic_inspector_node_names', undef, undef, $controller_hosts_names_real),
       public_ssl_port   => $ports[ironic_inspector_ssl_port],
       service_network   => $ironic_inspector_network,
       mode              => 'http',
@@ -1385,10 +1385,10 @@ class tripleo::haproxy (
                                                   $designate_backend_opts)
     ::tripleo::haproxy::endpoint { 'designate':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('designate_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('designate_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[designate_api_port],
-      ip_addresses      => hiera('designate_api_node_ips', $controller_hosts_real),
-      server_names      => hiera('designate_api_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('designate_api_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('designate_api_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       listen_options    => merge($default_listen_options, $designate_listen_opts),
       frontend_options  => merge($default_frontend_options, $designate_frontend_opts),
@@ -1402,8 +1402,9 @@ class tripleo::haproxy (
     # network.
     #
     if $designate_mdns_proxy_baseport {
-      $mdns_nodes = zip(hiera('designate_mdns_node_ips', $controller_hosts_real),
-                        hiera('designate_mdns_node_names', $controller_hosts_names_real))
+      $mdns_nodes = zip(
+        lookup('designate_mdns_node_ips', undef, undef, $controller_hosts_real),
+        lookup('designate_mdns_node_names', undef, undef, $controller_hosts_names_real))
 
       # TODO(beagles): it would preferable to implement in terms of
       # tripleo::haproxy::endpoint. I'm leaving as a follow up as
@@ -1492,8 +1493,8 @@ class tripleo::haproxy (
     haproxy::balancermember { 'metrics_qdr':
       listening_service => $metrics_qdr_service,
       ports             => $ports[metrics_qdr_port],
-      ipaddresses       => hiera('pacemaker_node_ips', $controller_hosts_real),
-      server_names      => hiera('pacemaker_node_names', $controller_hosts_names_real),
+      ipaddresses       => lookup('pacemaker_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('pacemaker_node_names', undef, undef, $controller_hosts_names_real),
       options           => union($haproxy_member_options, ['on-marked-down shutdown-sessions']),
       verifyhost        => false,
     }
@@ -1536,10 +1537,10 @@ class tripleo::haproxy (
   }
 
   if $mysql {
-    if hiera('nova_is_additional_cell', undef) {
-      $mysql_server_names_real = hiera('mysql_cell_node_names', $controller_hosts_names_real)
+    if lookup('nova_is_additional_cell', undef, undef, undef) {
+      $mysql_server_names_real = lookup('mysql_cell_node_names', undef, undef, $controller_hosts_names_real)
     } else {
-      $mysql_server_names_real = hiera('mysql_node_names', $controller_hosts_names_real)
+      $mysql_server_names_real = lookup('mysql_node_names', undef, undef, $controller_hosts_names_real)
     }
     if $use_backend_syntax {
       haproxy::frontend { 'mysql':
@@ -1564,7 +1565,7 @@ class tripleo::haproxy (
     haproxy::balancermember { 'mysql-backup':
       listening_service => $mysql_service,
       ports             => '3306',
-      ipaddresses       => hiera('mysql_node_ips', $controller_hosts_real),
+      ipaddresses       => lookup('mysql_node_ips', undef, undef, $controller_hosts_real),
       server_names      => $mysql_server_names_real,
       options           => $mysql_member_options_real,
     }
@@ -1602,18 +1603,18 @@ class tripleo::haproxy (
     haproxy::balancermember { 'rabbitmq':
       listening_service => $rabbitmq_service,
       ports             => '5672',
-      ipaddresses       => hiera('rabbitmq_node_ips', $controller_hosts_real),
-      server_names      => hiera('rabbitmq_node_names', $controller_hosts_names_real),
+      ipaddresses       => lookup('rabbitmq_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('rabbitmq_node_names', undef, undef, $controller_hosts_names_real),
       options           => $haproxy_member_options,
     }
   }
 
   if $etcd {
     ::tripleo::haproxy::endpoint { 'etcd':
-      internal_ip     => hiera('etcd_vip', $controller_virtual_ip),
+      internal_ip     => lookup('etcd_vip', undef, undef, $controller_virtual_ip),
       service_port    => $ports[etcd_port],
-      ip_addresses    => hiera('etcd_node_ips', $controller_hosts_real),
-      server_names    => hiera('etcd_node_names', $controller_hosts_names_real),
+      ip_addresses    => lookup('etcd_node_ips', undef, undef, $controller_hosts_real),
+      server_names    => lookup('etcd_node_names', undef, undef, $controller_hosts_names_real),
       service_network => $etcd_network,
       member_options  => union($haproxy_member_options, $internal_tls_member_options),
       listen_options  => {
@@ -1628,17 +1629,17 @@ class tripleo::haproxy (
   if $docker_registry {
     ::tripleo::haproxy::endpoint { 'docker-registry':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('docker_registry_vip', $controller_virtual_ip),
+      internal_ip       => lookup('docker_registry_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[docker_registry_port],
-      ip_addresses      => hiera('docker_registry_node_ips', $controller_hosts_real),
-      server_names      => hiera('docker_registry_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('docker_registry_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('docker_registry_node_names', undef, undef, $controller_hosts_names_real),
       public_ssl_port   => $ports[docker_registry_ssl_port],
       service_network   => $docker_registry_network,
     }
   }
 
   if $redis {
-    $redis_vip = hiera('redis_vip', $controller_virtual_ip)
+    $redis_vip = lookup('redis_vip', undef, undef, $controller_virtual_ip)
     $redis_bind_opts = {
       "${redis_vip}:6379" => $haproxy_listen_bind_param,
     }
@@ -1700,8 +1701,8 @@ class tripleo::haproxy (
     haproxy::balancermember { 'redis':
       listening_service => $redis_service,
       ports             => '6379',
-      ipaddresses       => hiera('redis_node_ips', $controller_hosts_real),
-      server_names      => hiera('redis_node_names', $controller_hosts_names_real),
+      ipaddresses       => lookup('redis_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('redis_node_names', undef, undef, $controller_hosts_names_real),
       options           => union($haproxy_member_options, ['on-marked-down shutdown-sessions'], $redis_ssl_member_options),
       verifyhost        => false,
     }
@@ -1716,10 +1717,10 @@ class tripleo::haproxy (
                                                 $ceph_rgw_backend_opts)
     ::tripleo::haproxy::endpoint { 'ceph_rgw':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ceph_rgw_vip', $controller_virtual_ip),
+      internal_ip       => lookup('ceph_rgw_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[ceph_rgw_port],
-      ip_addresses      => hiera('ceph_rgw_node_ips', $controller_hosts_real),
-      server_names      => hiera('ceph_rgw_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('ceph_rgw_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('ceph_rgw_node_names', undef, undef, $controller_hosts_names_real),
       mode              => 'http',
       public_ssl_port   => $ports[ceph_rgw_ssl_port],
       service_network   => $ceph_rgw_network,
@@ -1743,10 +1744,10 @@ class tripleo::haproxy (
                                                 $octavia_backend_opts)
     ::tripleo::haproxy::endpoint { 'octavia':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('octavia_api_vip', $controller_virtual_ip),
+      internal_ip       => lookup('octavia_api_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[octavia_api_port],
-      ip_addresses      => hiera('octavia_api_node_ips'),
-      server_names      => hiera('octavia_api_node_names'),
+      ip_addresses      => lookup('octavia_api_node_ips'),
+      server_names      => lookup('octavia_api_node_names'),
       public_ssl_port   => $ports[octavia_api_ssl_port],
       service_network   => $octavia_network,
       mode              => 'http',
@@ -1777,10 +1778,10 @@ class tripleo::haproxy (
                                               $ovn_db_backend_opts)
     ::tripleo::haproxy::endpoint { 'ovn_nbdb':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ovn_dbs_vip', $controller_virtual_ip),
+      internal_ip       => lookup('ovn_dbs_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[ovn_nbdb_port],
-      ip_addresses      => hiera('ovn_dbs_node_ips', $controller_hosts_real),
-      server_names      => hiera('ovn_dbs_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('ovn_dbs_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('ovn_dbs_node_names', undef, undef, $controller_hosts_names_real),
       service_network   => $ovn_dbs_network,
       public_ssl_port   => $ports[ovn_nbdb_ssl_port],
       listen_options    => $ovn_db_listen_opts,
@@ -1790,10 +1791,10 @@ class tripleo::haproxy (
     }
     ::tripleo::haproxy::endpoint { 'ovn_sbdb':
       public_virtual_ip => $public_virtual_ip,
-      internal_ip       => hiera('ovn_dbs_vip', $controller_virtual_ip),
+      internal_ip       => lookup('ovn_dbs_vip', undef, undef, $controller_virtual_ip),
       service_port      => $ports[ovn_sbdb_port],
-      ip_addresses      => hiera('ovn_dbs_node_ips', $controller_hosts_real),
-      server_names      => hiera('ovn_dbs_node_names', $controller_hosts_names_real),
+      ip_addresses      => lookup('ovn_dbs_node_ips', undef, undef, $controller_hosts_real),
+      server_names      => lookup('ovn_dbs_node_names', undef, undef, $controller_hosts_names_real),
       service_network   => $ovn_dbs_network,
       public_ssl_port   => $ports[ovn_sbdb_ssl_port],
       listen_options    => $ovn_db_listen_opts,

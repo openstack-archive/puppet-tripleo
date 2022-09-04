@@ -27,7 +27,7 @@
 # [*use_backend_syntax*]
 #  (optional) When set to true, generate a config with frontend and
 #  backend sections, otherwise use listen sections.
-#  Defaults to hiera('haproxy_backend_syntax', false)
+#  Defaults to lookup('haproxy_backend_syntax', undef, undef, false)
 #
 # [*port*]
 #  Port on which to listen to for haproxy stats web interface
@@ -52,7 +52,7 @@
 class tripleo::haproxy::stats (
   $haproxy_listen_bind_param,
   $ip,
-  $use_backend_syntax = hiera('haproxy_backend_syntax', false),
+  $use_backend_syntax = lookup('haproxy_backend_syntax', undef, undef, false),
   $port        = '1993',
   $password    = undef,
   $certificate = undef,

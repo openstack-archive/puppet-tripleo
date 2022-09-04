@@ -39,7 +39,7 @@
 # [*use_backend_syntax*]
 #  (optional) When set to true, generate a config with frontend and
 #  backend sections, otherwise use listen sections.
-#  Defaults to hiera('haproxy_backend_syntax', false)
+#  Defaults to lookup('haproxy_backend_syntax', undef, undef, false)
 #
 # [*haproxy_listen_bind_param*]
 #  A list of params to be added to the HAProxy listener bind directive.
@@ -82,7 +82,7 @@ class tripleo::haproxy::horizon_endpoint (
   $server_names,
   $member_options,
   $public_virtual_ip,
-  $use_backend_syntax          = hiera('haproxy_backend_syntax', false),
+  $use_backend_syntax          = lookup('haproxy_backend_syntax', undef, undef, false),
   $haproxy_listen_bind_param   = undef,
   $public_certificate          = undef,
   $use_internal_certificates   = false,
@@ -91,11 +91,16 @@ class tripleo::haproxy::horizon_endpoint (
   $hsts_header_value           = undef,
 ) {
   # Let users override the options on a per-service basis
-  $custom_options = hiera('tripleo::haproxy::horizon::options', undef)
-  $custom_frontend_options = hiera('tripleo::haproxy::horizon::frontend_options', undef)
-  $custom_backend_options = hiera('tripleo::haproxy::horizon::backend_options', undef)
-  $custom_bind_options_public = delete(any2array(hiera('tripleo::haproxy::horizon::public_bind_options', undef)), undef).flatten()
-  $custom_bind_options_internal = delete(any2array(hiera('tripleo::haproxy::horizon::internal_bind_options', undef)), undef).flatten()
+  $custom_options = lookup('tripleo::haproxy::horizon::options', undef, undef, undef)
+  $custom_frontend_options = lookup('tripleo::haproxy::horizon::frontend_options', undef, undef, undef)
+  $custom_backend_options = lookup('tripleo::haproxy::horizon::backend_options', undef, undef, undef)
+  $custom_bind_options_public = delete(
+    any2array(lookup('tripleo::haproxy::horizon::public_bind_options', undef, undef, undef)),
+    undef).flatten()
+  $custom_bind_options_internal = delete(
+    any2array(lookup('tripleo::haproxy::horizon::internal_bind_options', undef, undef, undef)),
+    undef).flatten()
+
   # service exposed to the public network
   if $public_certificate {
     if $use_internal_certificates {
