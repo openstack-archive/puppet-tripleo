@@ -26,6 +26,14 @@
 #   (Optional) The bundle's pacemaker_remote control port on the host
 #   Defaults to 3122
 #
+# [*docker_volumes*]
+#   (Optional) The list of volumes to be mounted in the docker container
+#   Defaults to []
+#
+# [*docker_environment*]
+#   (Optional) List or Hash of environment variables set in the docker container
+#   Defaults to {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'}
+#
 # [*erlang_cookie*]
 #   (Optional) Content of erlang cookie.
 #   Defaults to hiera('rabbitmq::erlang_cookie').
@@ -138,6 +146,8 @@
 class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_image        = undef,
   $rabbitmq_docker_control_port = 3122,
+  $docker_volumes               = [],
+  $docker_environment           = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
   $erlang_cookie                = hiera('rabbitmq::erlang_cookie'),
   $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
   $rpc_scheme                   = hiera('oslo_messaging_rpc_scheme'),
@@ -243,85 +253,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
         }
       }
 
-      $storage_maps = {
-        'rabbitmq-cfg-files'               => {
-          'source-dir' => '/var/lib/kolla/config_files/rabbitmq.json',
-          'target-dir' => '/var/lib/kolla/config_files/config.json',
-          'options'    => 'ro',
-        },
-        'rabbitmq-cfg-data'                => {
-          'source-dir' => '/var/lib/config-data/puppet-generated/rabbitmq/',
-          'target-dir' => '/var/lib/kolla/config_files/src',
-          'options'    => 'ro',
-        },
-        'rabbitmq-hosts'                   => {
-          'source-dir' => '/etc/hosts',
-          'target-dir' => '/etc/hosts',
-          'options'    => 'ro',
-        },
-        'rabbitmq-localtime'               => {
-          'source-dir' => '/etc/localtime',
-          'target-dir' => '/etc/localtime',
-          'options'    => 'ro',
-        },
-        'rabbitmq-lib'                     => {
-          'source-dir' => '/var/lib/rabbitmq',
-          'target-dir' => '/var/lib/rabbitmq',
-          'options'    => 'rw,z',
-        },
-        'rabbitmq-pki-extracted'           => {
-          'source-dir' => '/etc/pki/ca-trust/extracted',
-          'target-dir' => '/etc/pki/ca-trust/extracted',
-          'options'    => 'ro',
-        },
-        'rabbitmq-pki-ca-bundle-crt'       => {
-          'source-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
-          'target-dir' => '/etc/pki/tls/certs/ca-bundle.crt',
-          'options'    => 'ro',
-        },
-        'rabbitmq-pki-ca-bundle-trust-crt' => {
-          'source-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
-          'target-dir' => '/etc/pki/tls/certs/ca-bundle.trust.crt',
-          'options'    => 'ro',
-        },
-        'rabbitmq-pki-cert'                => {
-          'source-dir' => '/etc/pki/tls/cert.pem',
-          'target-dir' => '/etc/pki/tls/cert.pem',
-          'options'    => 'ro',
-        },
-        'rabbitmq-log'                     => {
-          'source-dir' => '/var/log/containers/rabbitmq',
-          'target-dir' => '/var/log/rabbitmq',
-          'options'    => 'rw,z',
-        },
-        'rabbitmq-dev-log'                 => {
-          'source-dir' => '/dev/log',
-          'target-dir' => '/dev/log',
-          'options'    => 'rw',
-        },
-      }
+      $docker_vol_arr = delete(any2array($docker_volumes), '').flatten()
+      $storage_maps = docker_volumes_to_storage_maps($docker_vol_arr, 'rabbitmq')
 
-      if $enable_internal_tls {
-        $storage_maps_tls = {
-          'rabbitmq-pki-cert' => {
-            'source-dir' => '/etc/pki/tls/certs/rabbitmq.crt',
-            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/certs/rabbitmq.crt',
-            'options'    => 'ro',
-          },
-          'rabbitmq-pki-key'  => {
-            'source-dir' => '/etc/pki/tls/private/rabbitmq.key',
-            'target-dir' => '/var/lib/kolla/config_files/src-tls/etc/pki/tls/private/rabbitmq.key',
-            'options'    => 'ro',
-          },
-          'rabbitmq-pki-cafile' => {
-            'source-dir' => $rabbitmq_cacert,
-            'target-dir' => "/var/lib/kolla/config_files/src-tls${rabbitmq_cacert}",
-            'options'    => 'ro',
-          },
-        }
-      } else {
-        $storage_maps_tls = {}
-      }
+      $docker_env = join($docker_environment.map |$index, $value| { "-e ${index}=${value}" }, ' ')
+
       if $tls_priorities != undef {
         $tls_priorities_real = " -e PCMK_tls_priorities=${tls_priorities}"
       } else {
@@ -360,11 +296,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           },
           container_options => 'network=host',
           # lint:ignore:140chars
-          options           => "--user=${bundle_user} --log-driver=${log_driver}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
+          options           => "--user=${bundle_user} --log-driver=${log_driver}${log_file_real} ${docker_env}${tls_priorities_real}",
           # lint:endignore
           run_command       => '/bin/bash /usr/local/bin/kolla_start',
           network           => "control-port=${rabbitmq_docker_control_port}",
-          storage_maps      => merge($storage_maps, $storage_maps_tls),
+          storage_maps      => $storage_maps,
           container_backend => $container_backend,
           tries             => $pcs_tries,
         }
@@ -418,11 +354,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
           },
           container_options => 'network=host',
           # lint:ignore:140chars
-          options           => "--user=${bundle_user} --log-driver=${log_driver}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8${tls_priorities_real}",
+          options           => "--user=${bundle_user} --log-driver=${log_driver}${log_file_real} ${docker_env}${tls_priorities_real}",
           # lint:endignore
           run_command       => '/bin/bash /usr/local/bin/kolla_start',
           network           => "control-port=${rabbitmq_docker_control_port}",
-          storage_maps      => merge($storage_maps, $storage_maps_tls),
+          storage_maps      => $storage_maps,
           container_backend => $container_backend,
           tries             => $pcs_tries,
         }
