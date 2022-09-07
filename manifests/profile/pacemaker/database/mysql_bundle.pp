@@ -369,14 +369,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
       'default-storage-engine'         => 'innodb',
       'innodb_autoinc_lock_mode'       => '2',
       'innodb_locks_unsafe_for_binlog' => '1',
-      'innodb_file_per_table'          => 'ON',
       'innodb_flush_log_at_trx_commit' => $innodb_flush_log_at_trx_commit,
-      'query_cache_size'               => '0',
-      'query_cache_type'               => '0',
-      'bind-address'                   => $bind_address,
-      'log_warnings'                   => '1',
-      'max_connections'                => hiera('mysql_max_connections'),
-      'open_files_limit'               => '65536',
       'wsrep_on'                       => 'ON',
       'wsrep_provider'                 => '/usr/lib64/galera/libgalera_smm.so',
       'wsrep_cluster_name'             => 'galera_cluster',
@@ -446,6 +439,7 @@ MYSQL_HOST=localhost\n",
     # we don't include it in step 1 because the kolla bootstrap
     # happens after step 1 baremetal
     class { 'tripleo::profile::base::database::mysql':
+      bind_address            => $bind_address,
       bootstrap_node          => $bootstrap_node,
       manage_resources        => false,
       remove_default_accounts => $remove_default_accounts,
