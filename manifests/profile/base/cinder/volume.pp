@@ -160,14 +160,22 @@ class tripleo::profile::base::cinder::volume (
       if empty($etcd_host) {
         fail('etcd_vip not set in hieradata')
       }
+      case $::operatingsystemmajrelease {
+        # el8 uses etcd version 3.2, which supports v3alpha path
+        '8'     : { $api_version = 'v3alpha' }
+        # el9 uses etcd version 3.4, which supports v3 path
+        default : { $api_version = 'v3' }
+      }
+      $options_init = "?api_version=${api_version}"
       if $enable_internal_tls {
         $protocol = 'https'
         $tls_keyfile = $etcd_certificate_specs['service_key']
         $tls_certfile = $etcd_certificate_specs['service_certificate']
-        $options = sprintf('?cert_key=%s&cert_cert=%s', $tls_keyfile, $tls_certfile)
+        $options_tls = sprintf('&cert_key=%s&cert_cert=%s', $tls_keyfile, $tls_certfile)
+        $options = "${options_init}${options_tls}"
       } else {
         $protocol = 'http'
-        $options = ''
+        $options = "${options_init}"
       }
       $backend_url = sprintf('etcd3+%s://%s:%s%s', $protocol, normalize_ip_for_uri($etcd_host), $etcd_port, $options)
       class { 'cinder::coordination' :
