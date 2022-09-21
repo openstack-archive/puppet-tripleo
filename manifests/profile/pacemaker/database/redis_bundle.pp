@@ -28,16 +28,16 @@
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('redis_short_bootstrap_node_name')
+#   Defaults to lookup('redis_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*certificate_specs*]
 #   (Optional) The specifications to give to certmonger for the certificate(s)
@@ -48,16 +48,16 @@
 #       service_certificate: <service certificate path>
 #       service_key: <service key path>
 #       principal: "haproxy/<overcloud controller fqdn>"
-#   Defaults to hiera('redis_certificate_specs', {}).
+#   Defaults to lookup('redis_certificate_specs', undef, undef, {}).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*redis_network*]
 #   (Optional) The network name where the redis endpoint is listening on.
 #   This is set by t-h-t.
-#   Defaults to hiera('redis_network', undef)
+#   Defaults to lookup('redis_network', undef, undef, undef)
 #
 # [*extra_config_file*]
 #   (Optional) When TLS proxy is in use, name of a host-specific Redis
@@ -106,7 +106,7 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*bundle_user*]
 #   (optional) Set the --user= switch to be passed to pcmk
@@ -116,24 +116,24 @@
 #   (optional) Use --force when creating the ocf resource via pcs
 #   Defaults to false
 class tripleo::profile::pacemaker::database::redis_bundle (
-  $certificate_specs         = hiera('redis_certificate_specs', {}),
-  $enable_internal_tls       = hiera('enable_internal_tls', false),
-  $bootstrap_node            = hiera('redis_short_bootstrap_node_name'),
+  $certificate_specs         = lookup('redis_certificate_specs', undef, undef, {}),
+  $enable_internal_tls       = lookup('enable_internal_tls', undef, undef, false),
+  $bootstrap_node            = lookup('redis_short_bootstrap_node_name'),
   $redis_docker_image        = undef,
   $redis_docker_control_port = 3124,
   $container_backend         = 'podman',
-  $pcs_tries                 = hiera('pcs_tries', 20),
+  $pcs_tries                 = lookup('pcs_tries', undef, undef, 20),
   $log_driver                = 'k8s-file',
   $log_file                  = '/var/log/containers/stdouts/redis-bundle.log',
-  $step                      = Integer(hiera('step')),
-  $redis_network             = hiera('redis_network', undef),
+  $step                      = Integer(lookup('step')),
+  $redis_network             = lookup('redis_network', undef, undef, undef),
   $extra_config_file         = '/etc/redis-tls.conf',
   $tls_tunnel_local_name     = 'localhost',
   $tls_tunnel_base_port      = 6660,
   $tls_proxy_bind_ip         = undef,
   $tls_proxy_fqdn            = undef,
   $tls_proxy_port            = 6379,
-  $tls_priorities            = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities            = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $bundle_user               = 'root',
   $force_ocf                 = false,
 ) {
@@ -163,8 +163,8 @@ class tripleo::profile::pacemaker::database::redis_bundle (
       $tls_certfile = $certificate_specs['service_certificate']
       $tls_keyfile = $certificate_specs['service_key']
 
-      $redis_node_names = hiera('redis_short_node_names', [$::hostname])
-      $redis_node_ips   = hiera('redis_node_ips', [$tls_proxy_bind_ip])
+      $redis_node_names = lookup('redis_short_node_names', undef, undef, [$::hostname])
+      $redis_node_ips   = lookup('redis_node_ips', undef, undef, [$tls_proxy_bind_ip])
 
       # keep a mapping of [node name, node ip, replication port]
       $replication_tuples = zip($redis_node_names, $redis_node_ips).map |$index, $pair| {
@@ -218,10 +218,10 @@ slave-announce-port ${local_tuple[0][2]}
 
   if $step >= 2 {
     if $pacemaker_master {
-      if (hiera('redis_short_node_names_override', undef)) {
-        $redis_short_node_names = hiera('redis_short_node_names_override')
+      if (lookup('redis_short_node_names_override', undef, undef, undef)) {
+        $redis_short_node_names = lookup('redis_short_node_names_override')
       } else {
-        $redis_short_node_names = hiera('redis_short_node_names')
+        $redis_short_node_names = lookup('redis_short_node_names')
       }
 
       $redis_nodes_count = count($redis_short_node_names)

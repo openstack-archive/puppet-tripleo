@@ -20,21 +20,21 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('ceph_nfs_short_bootstrap_node_name')
+#   Defaults to lookup('ceph_nfs_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 class tripleo::profile::pacemaker::ceph_nfs (
-  $bootstrap_node          = hiera('ceph_nfs_short_bootstrap_node_name'),
-  $step                    = hiera('step'),
-  $pcs_tries               = hiera('pcs_tries', 20),
+  $bootstrap_node = lookup('ceph_nfs_short_bootstrap_node_name'),
+  $step           = Integer(lookup('step')),
+  $pcs_tries      = lookup('pcs_tries', undef, undef, 20),
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -42,7 +42,7 @@ class tripleo::profile::pacemaker::ceph_nfs (
     $pacemaker_master = false
   }
 
-  $ganesha_vip = hiera('ganesha_vip')
+  $ganesha_vip = lookup('ganesha_vip')
   # NB: Until the IPaddr2 RA has a fix for https://bugzilla.redhat.com/show_bug.cgi?id=1445628
   # we need to specify the nic when creating the ipv6 vip.
   if $ganesha_vip =~ Stdlib::Compat::Ipv6 {
@@ -124,10 +124,10 @@ class tripleo::profile::pacemaker::ceph_nfs (
     }
 
     # See comment on pacemaker::property at step2
-    if (hiera('ceph_nfs_short_node_names_override', undef)) {
-      $ceph_nfs_short_node_names = hiera('ceph_nfs_short_node_names_override')
+    if (lookup('ceph_nfs_short_node_names_override', undef, undef, undef)) {
+      $ceph_nfs_short_node_names = lookup('ceph_nfs_short_node_names_override')
     } else {
-      $ceph_nfs_short_node_names = hiera('ceph_nfs_short_node_names')
+      $ceph_nfs_short_node_names = lookup('ceph_nfs_short_node_names')
     }
 
     $ceph_nfs_short_node_names.each |String $node_name| {

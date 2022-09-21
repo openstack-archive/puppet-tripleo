@@ -69,8 +69,8 @@ define tripleo::pacemaker::haproxy_with_vip(
   $op_params     = '',
   $pcs_tries     = 1,
   $nic           = undef,
-  $ensure        = true)
-{
+  $ensure        = true
+){
   if($ensure) {
     if $ip_address =~ Stdlib::Compat::Ipv6 {
       $netmask        = '128'
@@ -90,7 +90,7 @@ define tripleo::pacemaker::haproxy_with_vip(
       $nic_real = $vip_nic
     }
 
-    $haproxy_in_container = hiera('haproxy_docker', false)
+    $haproxy_in_container = lookup('haproxy_docker', undef, undef, false)
     $constraint_target_name = $haproxy_in_container ? {
       true => 'haproxy-bundle',
       default => 'haproxy-clone'

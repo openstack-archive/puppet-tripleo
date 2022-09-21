@@ -20,34 +20,34 @@
 #
 # [*haproxy_docker_image*]
 #   (Optional) The docker image to use for creating the pacemaker bundle
-#   Defaults to hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef)
+#   Defaults to lookup('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef, undef, undef)
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('haproxy_short_bootstrap_node_name')
+#   Defaults to lookup('haproxy_short_bootstrap_node_name')
 #
 # [*enable_load_balancer*]
 #   (Optional) Whether load balancing is enabled for this cluster
-#   Defaults to hiera('enable_load_balancer', true)
+#   Defaults to lookup('enable_load_balancer', undef, undef, true)
 #
 # [*ca_bundle*]
 #   (Optional) The path to the CA file that will be used for the TLS
 #   configuration. It's only used if internal TLS is enabled.
-#   Defaults to hiera('tripleo::haproxy::ca_bundle', undef)
+#   Defaults to lookup('tripleo::haproxy::ca_bundle', undef, undef, undef)
 #
 # [*crl_file*]
 #   (Optional) The path to the file that contains the certificate
 #   revocation list. It's only used if internal TLS is enabled.
-#   Defaults to hiera('tripleo::haproxy::crl_file', undef)
+#   Defaults to lookup('tripleo::haproxy::crl_file', undef, undef, undef)
 #
 # [*deployed_ssl_cert_path*]
 #   (Optional) The filepath of the certificate as it will be stored in
 #   the controller.
-#   Defaults to hiera('tripleo::haproxy::service_certificate', undef)
+#   Defaults to lookup('tripleo::haproxy::service_certificate', undef, undef, undef)
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*internal_certs_directory*]
 #   (Optional) Directory the holds the certificates to be used when
@@ -82,16 +82,16 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*bundle_user*]
 #   (optional) Set the --user= switch to be passed to pcmk
@@ -101,28 +101,28 @@
 #   (optional) Force a specific nic interface name when creating all the VIPs
 #   The listening nic can be customized on a per-VIP basis by creating a hiera
 #   dict called: force_vip_nic_overrides[<vip/network name>] = 'dummy'
-#   Defaults to hiera('tripleo::pacemaker::force_nic', undef)
+#   Defaults to lookup('tripleo::pacemaker::force_nic', undef, undef, undef)
 #
 class tripleo::profile::pacemaker::haproxy_bundle (
-  $haproxy_docker_image     = hiera('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef),
-  $bootstrap_node           = hiera('haproxy_short_bootstrap_node_name'),
-  $enable_load_balancer     = hiera('enable_load_balancer', true),
-  $ca_bundle                = hiera('tripleo::haproxy::ca_bundle', undef),
-  $crl_file                 = hiera('tripleo::haproxy::crl_file', undef),
-  $enable_internal_tls      = hiera('enable_internal_tls', false),
+  $haproxy_docker_image     = lookup('tripleo::profile::pacemaker::haproxy::haproxy_docker_image', undef, undef, undef),
+  $bootstrap_node           = lookup('haproxy_short_bootstrap_node_name'),
+  $enable_load_balancer     = lookup('enable_load_balancer', undef, undef, true),
+  $ca_bundle                = lookup('tripleo::haproxy::ca_bundle', undef, undef, undef),
+  $crl_file                 = lookup('tripleo::haproxy::crl_file', undef, undef, undef),
+  $enable_internal_tls      = lookup('enable_internal_tls', undef, undef, false),
   $internal_certs_directory = undef,
   $internal_keys_directory  = undef,
-  $deployed_ssl_cert_path   = hiera('tripleo::haproxy::service_certificate', undef),
+  $deployed_ssl_cert_path   = lookup('tripleo::haproxy::service_certificate', undef, undef, undef),
   $meta_params              = '',
   $op_params                = '',
   $container_backend        = 'podman',
-  $tls_priorities           = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities           = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $bundle_user              = 'root',
-  $force_nic                = hiera('tripleo::pacemaker::force_nic', undef),
+  $force_nic                = lookup('tripleo::pacemaker::force_nic', undef, undef, undef),
   $log_driver               = 'k8s-file',
   $log_file                 = '/var/log/containers/stdouts/haproxy-bundle.log',
-  $step                     = Integer(hiera('step')),
-  $pcs_tries                = hiera('pcs_tries', 20),
+  $step                     = Integer(lookup('step')),
+  $pcs_tries                = lookup('pcs_tries', undef, undef, 20),
 ) {
   include tripleo::profile::base::haproxy
 
@@ -137,15 +137,15 @@ class tripleo::profile::pacemaker::haproxy_bundle (
   } else {
     $log_file_real = ''
   }
-  $force_vip_nic_overrides = hiera('force_vip_nic_overrides', {})
+  $force_vip_nic_overrides = lookup('force_vip_nic_overrides', undef, undef, {})
   validate_legacy(Hash, 'validate_hash',  $force_vip_nic_overrides)
 
   if $step >= 2 and $enable_load_balancer {
     if $pacemaker_master {
-      if (hiera('haproxy_short_node_names_override', undef)) {
-        $haproxy_short_node_names = hiera('haproxy_short_node_names_override')
+      if (lookup('haproxy_short_node_names_override', undef, undef, undef)) {
+        $haproxy_short_node_names = lookup('haproxy_short_node_names_override')
       } else {
-        $haproxy_short_node_names = hiera('haproxy_short_node_names')
+        $haproxy_short_node_names = lookup('haproxy_short_node_names')
       }
 
       $haproxy_short_node_names.each |String $node_name| {
@@ -166,7 +166,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
       # parameters here to configure pacemaker VIPs. The configuration
       # of pacemaker VIPs could move into puppet-tripleo or we should
       # make use of less specific hiera parameters here for the settings.
-      $haproxy_nodes = hiera('haproxy_short_node_names')
+      $haproxy_nodes = lookup('haproxy_short_node_names')
       $haproxy_nodes_count = count($haproxy_nodes)
 
 
@@ -294,7 +294,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         container_backend => $container_backend,
         tries             => $pcs_tries,
       }
-      $control_vip = hiera('controller_virtual_ip')
+      $control_vip = lookup('controller_virtual_ip')
       if has_key($force_vip_nic_overrides, 'controller_virtual_ip') {
         $control_vip_nic = $force_vip_nic_overrides['controller_virtual_ip']
       } else {
@@ -310,7 +310,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         pcs_tries     => $pcs_tries,
       }
 
-      $public_vip = hiera('public_virtual_ip')
+      $public_vip = lookup('public_virtual_ip')
       if has_key($force_vip_nic_overrides, 'public_virtual_ip') {
         $public_vip_nic = $force_vip_nic_overrides['public_virtual_ip']
       } else {
@@ -327,9 +327,9 @@ class tripleo::profile::pacemaker::haproxy_bundle (
         pcs_tries     => $pcs_tries,
       }
 
-      $redis = hiera('redis_enabled', false)
+      $redis = lookup('redis_enabled', undef, undef, false)
       if $redis {
-        $redis_vip = hiera('redis_vip')
+        $redis_vip = lookup('redis_vip')
         if has_key($force_vip_nic_overrides, 'redis_vip') {
           $redis_vip_nic = $force_vip_nic_overrides['redis_vip']
         } else {
@@ -348,7 +348,7 @@ class tripleo::profile::pacemaker::haproxy_bundle (
       }
 
       # Set up all vips for isolated networks
-      $network_vips = hiera('network_virtual_ips', {})
+      $network_vips = lookup('network_virtual_ips', undef, undef, {})
       $network_vips.each |String $net_name, $vip_info| {
         $virtual_ip = $vip_info[ip_address]
         if has_key($force_vip_nic_overrides, $net_name) {

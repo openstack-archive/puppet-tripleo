@@ -36,60 +36,60 @@
 #
 # [*erlang_cookie*]
 #   (Optional) Content of erlang cookie.
-#   Defaults to hiera('rabbitmq::erlang_cookie').
+#   Defaults to lookup('rabbitmq::erlang_cookie').
 #
 # [*user_ha_queues*]
 #   (Optional) The number of HA queues in to be configured in rabbitmq
-#   Defaults to hiera('rabbitmq::nr_ha_queues'), which is usually 0 meaning
+#   Defaults to lookup('rabbitmq::nr_ha_queues'), which is usually 0 meaning
 #   that the queues number will be CEIL(N/2) where N is the number of rabbitmq
 #   nodes.
 #
 # [*rpc_scheme*]
 #   (Optional) Protocol for oslo messaging rpc backend.
-#   Defaults to hiera('oslo_messaging_rpc_scheme').
+#   Defaults to lookup('oslo_messaging_rpc_scheme').
 #
 # [*rpc_bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   when rabbit is configured for rpc messaging backend
-#   Defaults to hiera('oslo_messaging_rpc_bootstrap_node_name')
+#   Defaults to lookup('oslo_messaging_rpc_bootstrap_node_name')
 #
 # [*rpc_nodes*]
 #   (Optional) Array of host(s) for oslo messaging rpc nodes.
-#   Defaults to hiera('oslo_messaging_rpc_node_names', []).
+#   Defaults to lookup('oslo_messaging_rpc_node_names', undef, undef, []).
 #
 # [*notify_scheme*]
 #   (Optional) oslo messaging notify backend indicator.
-#   Defaults to hiera('oslo_messaging_notify_scheme').
+#   Defaults to lookup('oslo_messaging_notify_scheme').
 #
 # [*notify_bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
 #   when rabbit is configured for rpc messaging backend
-#   Defaults to hiera('oslo_messaging_notify_bootstrap_node_name')
+#   Defaults to lookup('oslo_messaging_notify_bootstrap_node_name')
 #
 # [*notify_nodes*]
 #   (Optional) Array of host(s) for oslo messaging notify nodes.
-#   Defaults to hiera('oslo_messaging_notify_node_names', []).
+#   Defaults to lookup('oslo_messaging_notify_node_names', undef, undef, []).
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*rabbitmq_cacert*]
 #   (Optional) When internal tls is enabled this should point to the CA file
-#   Defaults to hiera('rabbitmq::ssl_cacert', '/etc/ipa/ca.crt')
+#   Defaults to lookup('rabbitmq::ssl_cacert', undef, undef, '/etc/ipa/ca.crt')
 #
 # [*rabbitmq_extra_policies*]
 #   (Optional) Hash of extra policies for the HA queues
-#   Defaults to hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'})
+#   Defaults to lookup('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'})
 #
 # [*pcs_tries*]
 #   (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*container_backend*]
 #   (optional) Container backend to use when creating the bundle
@@ -106,7 +106,7 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*bundle_user*]
 #   (optional) Set the --user= switch to be passed to pcmk
@@ -148,25 +148,26 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $rabbitmq_docker_control_port = 3122,
   $docker_volumes               = [],
   $docker_environment           = {'KOLLA_CONFIG_STRATEGY' => 'COPY_ALWAYS'},
-  $erlang_cookie                = hiera('rabbitmq::erlang_cookie'),
-  $user_ha_queues               = hiera('rabbitmq::nr_ha_queues', 0),
-  $rpc_scheme                   = hiera('oslo_messaging_rpc_scheme'),
-  $rpc_bootstrap_node           = hiera('oslo_messaging_rpc_short_bootstrap_node_name'),
-  $rpc_nodes                    = hiera('oslo_messaging_rpc_node_names_override',
-                                        hiera('oslo_messaging_rpc_node_names', [])),
-  $notify_scheme                = hiera('oslo_messaging_notify_scheme'),
-  $notify_bootstrap_node        = hiera('oslo_messaging_notify_short_bootstrap_node_name'),
-  $notify_nodes                 = hiera('oslo_messaging_notify_node_names_override',
-                                        hiera('oslo_messaging_notify_node_names', [])),
-  $enable_internal_tls          = hiera('enable_internal_tls', false),
-  $rabbitmq_cacert              = hiera('rabbitmq::ssl_cacert', '/etc/ipa/ca.crt'),
-  $rabbitmq_extra_policies      = hiera('rabbitmq_extra_policies', {'ha-promote-on-shutdown' => 'always'}),
-  $pcs_tries                    = hiera('pcs_tries', 20),
-  $step                         = Integer(hiera('step')),
+  $erlang_cookie                = lookup('rabbitmq::erlang_cookie'),
+  $user_ha_queues               = lookup('rabbitmq::nr_ha_queues', undef, undef, 0),
+  $rpc_scheme                   = lookup('oslo_messaging_rpc_scheme'),
+  $rpc_bootstrap_node           = lookup('oslo_messaging_rpc_short_bootstrap_node_name'),
+  $rpc_nodes                    = lookup('oslo_messaging_rpc_node_names_override', undef, undef,
+                                        lookup('oslo_messaging_rpc_node_names', undef, undef, [])),
+  $notify_scheme                = lookup('oslo_messaging_notify_scheme'),
+  $notify_bootstrap_node        = lookup('oslo_messaging_notify_short_bootstrap_node_name'),
+  $notify_nodes                 = lookup('oslo_messaging_notify_node_names_override', undef, undef,
+                                        lookup('oslo_messaging_notify_node_names', undef, undef, [])),
+  $enable_internal_tls          = lookup('enable_internal_tls', undef, undef, false),
+  $rabbitmq_cacert              = lookup('rabbitmq::ssl_cacert', undef, undef, '/etc/ipa/ca.crt'),
+  $rabbitmq_extra_policies      = lookup('rabbitmq_extra_policies', undef, undef,
+                                        {'ha-promote-on-shutdown' => 'always'}),
+  $pcs_tries                    = lookup('pcs_tries', undef, undef, 20),
+  $step                         = Integer(lookup('step')),
   $container_backend            = 'podman',
   $log_driver                   = 'k8s-file',
   $log_file                     = '/var/log/containers/stdouts/rabbitmq-bundle.log',
-  $tls_priorities               = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities               = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $bundle_user                  = 'root',
   $force_ocf                    = false,
   $debug                        = false,
@@ -177,8 +178,8 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   $stop_timeout                 = 200,
 ) {
   # is this an additional nova cell?
-  if hiera('nova_is_additional_cell', undef) {
-    $rpc_nodes_real = hiera('oslo_messaging_rpc_cell_node_names', [])
+  if lookup('nova_is_additional_cell', undef, undef, undef) {
+    $rpc_nodes_real = lookup('oslo_messaging_rpc_cell_node_names', undef, undef, [])
   } else {
     $rpc_nodes_real = $rpc_nodes
   }
@@ -186,11 +187,11 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   if $rpc_scheme == 'rabbit' {
     $bootstrap_node = $rpc_bootstrap_node
     $rabbit_nodes = $rpc_nodes_real
-    $rabbit_short_nodes = hiera('oslo_messaging_rpc_short_node_names', [])
+    $rabbit_short_nodes = lookup('oslo_messaging_rpc_short_node_names', undef, undef, [])
   } elsif $notify_scheme == 'rabbit' {
     $bootstrap_node = $notify_bootstrap_node
     $rabbit_nodes = $notify_nodes
-    $rabbit_short_nodes = hiera('oslo_messaging_notify_short_node_names', [])
+    $rabbit_short_nodes = lookup('oslo_messaging_notify_short_node_names', undef, undef, [])
   } else {
     $bootstrap_node = undef
     $rabbit_nodes = []
@@ -236,11 +237,15 @@ class tripleo::profile::pacemaker::rabbitmq_bundle (
   if $step >= 2 {
     if $pacemaker_master {
       if $rpc_scheme == 'rabbit' {
-        $rabbitmq_short_node_names = hiera('oslo_messaging_rpc_short_node_names_override',
-          hiera('oslo_messaging_rpc_short_node_names'))
+        $rabbitmq_short_node_names = lookup(
+          'oslo_messaging_rpc_short_node_names_override',
+          undef, undef,
+          lookup('oslo_messaging_rpc_short_node_names'))
       } elsif $notify_scheme == 'rabbit' {
-        $rabbitmq_short_node_names = hiera('oslo_messaging_notify_short_node_names_override',
-          hiera('oslo_messaging_notify_short_node_names'))
+        $rabbitmq_short_node_names = lookup(
+          'oslo_messaging_notify_short_node_names_override',
+          undef, undef,
+          lookup('oslo_messaging_notify_short_node_names'))
       }
       $rabbitmq_nodes_count = count($rabbitmq_short_node_names)
       $rabbitmq_short_node_names.each |String $node_name| {

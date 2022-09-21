@@ -28,21 +28,21 @@
 #
 # [*bootstrap_node*]
 #   (Optional) The hostname of the node responsible for bootstrapping tasks
-#   Defaults to hiera('ovn_dbs_short_bootstrap_node_name')
+#   Defaults to lookup('ovn_dbs_short_bootstrap_node_name')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
 #   for more details.
-#   Defaults to hiera('step')
+#   Defaults to Integer(lookup('step'))
 #
 # [*pcs_tries*]
 #  (Optional) The number of times pcs commands should be retried.
-#   Defaults to hiera('pcs_tries', 20)
+#   Defaults to lookup('pcs_tries', undef, undef, 20)
 #
 # [*ovn_dbs_vip*]
 #   (Optional) The vip to be used for OVN DB servers. It is expected that
 #   the vip resource to be created before calling this class.
-#   Defaults to hiera('ovn_dbs_vip')
+#   Defaults to lookup('ovn_dbs_vip')
 #
 # [*nb_db_port*]
 #   The TCP port in which the OVN Northbound DB listens to.
@@ -75,7 +75,7 @@
 #
 # [*tls_priorities*]
 #   (optional) Sets PCMK_tls_priorities in /etc/sysconfig/pacemaker when set
-#   Defaults to hiera('tripleo::pacemaker::tls_priorities', undef)
+#   Defaults to lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef)
 #
 # [*bundle_user*]
 #   (optional) Set the --user= switch to be passed to pcmk
@@ -83,7 +83,7 @@
 #
 # [*enable_internal_tls*]
 #   (Optional) Whether TLS in the internal network is enabled or not.
-#   Defaults to hiera('enable_internal_tls', false)
+#   Defaults to lookup('enable_internal_tls', undef, undef, false)
 #
 # [*ca_file*]
 #   (Optional) The path to the CA file that will be used for the TLS
@@ -108,7 +108,7 @@
 #   (optional) Force a specific nic interface name when creating all the VIPs
 #   The listening nic can be customized on a per-VIP basis by creating a hiera
 #   dict called: force_vip_nic_overrides[<vip/network name>] = 'dummy'
-#   Defaults to hiera('tripleo::pacemaker::force_nic', undef)
+#   Defaults to lookup('tripleo::pacemaker::force_nic', undef, undef, undef)
 #
 # [*monitor_interval_master*]
 #   (Optional) monitor interval for ovn dbs resource
@@ -127,25 +127,25 @@
 class tripleo::profile::pacemaker::ovn_dbs_bundle (
   $ovn_dbs_docker_image        = undef,
   $ovn_dbs_control_port        = 3125,
-  $bootstrap_node              = hiera('ovn_dbs_short_bootstrap_node_name'),
-  $step                        = Integer(hiera('step')),
-  $pcs_tries                   = hiera('pcs_tries', 20),
-  $ovn_dbs_vip                 = hiera('ovn_dbs_vip'),
+  $bootstrap_node              = lookup('ovn_dbs_short_bootstrap_node_name'),
+  $step                        = Integer(lookup('step')),
+  $pcs_tries                   = lookup('pcs_tries', undef, undef, 20),
+  $ovn_dbs_vip                 = lookup('ovn_dbs_vip'),
   $nb_db_port                  = 6641,
   $sb_db_port                  = 6642,
   $meta_params                 = '',
   $op_params                   = '',
   $container_backend           = 'podman',
-  $tls_priorities              = hiera('tripleo::pacemaker::tls_priorities', undef),
+  $tls_priorities              = lookup('tripleo::pacemaker::tls_priorities', undef, undef, undef),
   $bundle_user                 = undef,
   $log_driver                  = 'k8s-file',
   $log_file                    = '/var/log/containers/stdouts/ovn-dbs-bundle.log',
-  $enable_internal_tls         = hiera('enable_internal_tls', false),
+  $enable_internal_tls         = lookup('enable_internal_tls', undef, undef, false),
   $ca_file                     = undef,
   $dbs_timeout                 = 60,
   $listen_on_master_ip_only    = 'yes',
   $force_ocf                   = false,
-  $force_nic                   = hiera('tripleo::pacemaker::force_nic', undef),
+  $force_nic                   = lookup('tripleo::pacemaker::force_nic', undef, undef, undef),
   $monitor_interval_master     = 10,
   $monitor_interval_slave      = 30,
   $replication_probe_interval  =  60000,
@@ -162,7 +162,7 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
   } else {
     $log_file_real = ''
   }
-  $force_vip_nic_overrides = hiera('force_vip_nic_overrides', {})
+  $force_vip_nic_overrides = lookup('force_vip_nic_overrides', undef, undef, {})
   validate_legacy(Hash, 'validate_hash',  $force_vip_nic_overrides)
   if $step >= 3 {
 
@@ -217,10 +217,10 @@ class tripleo::profile::pacemaker::ovn_dbs_bundle (
           'options'    => 'rw',
         },
       }
-      if (hiera('ovn_dbs_short_node_names_override', undef)) {
-        $ovn_dbs_short_node_names = hiera('ovn_dbs_short_node_names_override')
+      if (lookup('ovn_dbs_short_node_names_override', undef, undef, undef)) {
+        $ovn_dbs_short_node_names = lookup('ovn_dbs_short_node_names_override')
       } else {
-        $ovn_dbs_short_node_names = hiera('ovn_dbs_short_node_names')
+        $ovn_dbs_short_node_names = lookup('ovn_dbs_short_node_names')
       }
       $ovn_dbs_nodes_count = count($ovn_dbs_short_node_names)
       $ovn_dbs_short_node_names.each |String $node_name| {
