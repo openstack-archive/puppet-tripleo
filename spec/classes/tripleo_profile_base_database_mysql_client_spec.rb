@@ -24,61 +24,6 @@ describe 'tripleo::profile::base::database::mysql::client' do
         { :step => 1 }
       end
 
-      before (:each) do
-        facts.merge!({ :deployment_type => 'notcontainers' })
-      end
-
-      it {
-        is_expected.to contain_exec('directory-create-etc-my.cnf.d')
-        is_expected.to contain_file('/etc/my.cnf.d/tripleo.cnf').with(
-          :ensure => 'file',
-        )
-        is_expected.to contain_augeas('tripleo-mysql-client-conf').with(
-          :incl    => '/etc/my.cnf.d/tripleo.cnf',
-          :changes => [
-            'rm tripleo/bind-address',
-            'rm tripleo/ssl',
-            'rm tripleo/ssl-ca',
-            'rm client/ssl',
-            'rm client/ssl-ca'
-          ]
-        )
-      }
-    end
-
-    context 'with defaults in containers' do
-      let (:params) do
-        { :step => 1 }
-      end
-
-      before (:each) do
-        facts.merge!({ :deployment_type => 'containers' })
-      end
-
-      it {
-        is_expected.to contain_file('/etc/my.cnf.d').with(:ensure => 'directory')
-        is_expected.to contain_augeas('tripleo-mysql-client-conf').with(
-          :incl    => '/etc/my.cnf.d/tripleo.cnf',
-          :changes => [
-            'rm tripleo/bind-address',
-            'rm tripleo/ssl',
-            'rm tripleo/ssl-ca',
-            'rm client/ssl',
-            'rm client/ssl-ca'
-          ]
-        )
-      }
-    end
-
-    context 'with defaults with deployment_type' do
-      let (:params) do
-        { :step => 1 }
-      end
-
-      before (:each) do
-        facts.merge!({ :deployment_type => 'notcontainers', :deployment_type => 'containers' })
-      end
-
       it {
         is_expected.to contain_file('/etc/my.cnf.d').with(:ensure => 'directory')
         is_expected.to contain_augeas('tripleo-mysql-client-conf').with(
@@ -101,12 +46,8 @@ describe 'tripleo::profile::base::database::mysql::client' do
         }
       end
 
-      before (:each) do
-        facts.merge!({ :deployment_type => 'notcontainers' })
-      end
-
       it {
-        is_expected.to contain_exec('directory-create-etc-my.cnf.d')
+        is_expected.to contain_file('/etc/my.cnf.d').with(:ensure => 'directory')
         is_expected.to contain_augeas('tripleo-mysql-client-conf').with(
           :incl    => '/etc/my.cnf.d/tripleo.cnf',
           :changes => [
@@ -128,12 +69,8 @@ describe 'tripleo::profile::base::database::mysql::client' do
         }
       end
 
-      before (:each) do
-        facts.merge!({ :deployment_type => 'notcontainers' })
-      end
-
       it {
-        is_expected.to contain_exec('directory-create-etc-my.cnf.d')
+        is_expected.to contain_file('/etc/my.cnf.d').with(:ensure => 'directory')
         is_expected.to contain_augeas('tripleo-mysql-client-conf').with(
           :incl    => '/etc/my.cnf.d/tripleo.cnf',
           :changes => [
