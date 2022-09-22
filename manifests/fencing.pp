@@ -115,10 +115,8 @@ class tripleo::fencing(
     $level = regsubst($index, 'level', '', 'G')
     $all_devices = $levelx_devices
 
-    if $::deployment_type != 'containers' {
-      $xvm_devices = local_fence_devices('fence_xvm', $all_devices)
-      create_resources('pacemaker::stonith::fence_xvm', $xvm_devices, $common_params)
-    }
+    $xvm_devices = local_fence_devices('fence_xvm', $all_devices)
+    create_resources('pacemaker::stonith::fence_xvm', $xvm_devices, $common_params)
 
     $ironic_devices = local_fence_devices('fence_ironic', $all_devices)
     create_resources('pacemaker::stonith::fence_ironic', $ironic_devices, $common_params)
