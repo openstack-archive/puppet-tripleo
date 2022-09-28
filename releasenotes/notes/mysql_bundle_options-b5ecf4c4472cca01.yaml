@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Add support for injecting arbitrary arguments into the wsrep_provider_options
+    string.
+    Operators should be extremely careful in doing so as there is no validation
+    or syntax checking whatsoever.
+
