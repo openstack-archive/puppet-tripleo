@@ -100,7 +100,7 @@ describe 'tripleo::profile::base::swift::proxy' do
       end
     end
 
-    context 'with ceilometer middleare disabled' do
+    context 'with ceilometer middleware disabled' do
       let(:params) { {
         :step               => 4,
         :memcache_servers   => ['192.168.0.1', '192.168.0.2'],
@@ -112,7 +112,7 @@ describe 'tripleo::profile::base::swift::proxy' do
       end
     end
 
-    context 'with audit middleare enabled' do
+    context 'with audit middleware enabled' do
       let(:params) { {
         :step             => 4,
         :memcache_servers => ['192.168.0.1', '192.168.0.2'],

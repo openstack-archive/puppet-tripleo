@@ -26,7 +26,7 @@
 #   Defaults to {}
 #
 # [*cinder_ca_certificates_file*]
-#   (Optional) Location of ca certicate file to use for cinder client requests.
+#   (Optional) Location of ca certificate file to use for cinder client requests.
 #   Defaults to lookup('glance::backend::cinder::cinder_ca_certificates_file', undef, undef, undef).
 #
 # [*cinder_api_insecure*]

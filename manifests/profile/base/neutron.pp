@@ -84,7 +84,7 @@
 #
 # [*container_cli*]
 #   (Optional) A container CLI to be used with the wrapper
-#   tooling to manage containers controled by Neutron/OVN
+#   tooling to manage containers controlled by Neutron/OVN
 #   l3/dhcp/metadata agents. Accepts only 'podman'
 #   Defaults to lookup('container_cli', undef, undef, 'podman').
 #

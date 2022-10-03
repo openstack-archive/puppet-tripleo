@@ -39,7 +39,7 @@ eos
       }
     end
 
-    context 'with step 3 on bootstap node' do
+    context 'with step 3 on bootstrap node' do
       let(:params) { {
         :step           => 3,
         :bootstrap_node => 'node.example.com',
@@ -54,7 +54,7 @@ eos
       }
     end
 
-    context 'with step 3 not on bootstap node' do
+    context 'with step 3 not on bootstrap node' do
       let(:params) { {
         :step           => 3,
         :bootstrap_node => 'other.example.com',

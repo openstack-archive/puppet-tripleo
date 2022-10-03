@@ -262,7 +262,7 @@ class tripleo::profile::base::pacemaker (
     }
     # When we have a non-zero number of pacemaker remote nodes we
     # want to set the cluster-recheck-interval property to something
-    # lower (unless the operator has explicitely set a value)
+    # lower (unless the operator has explicitly set a value)
     if count($remote_short_node_names) > 0 and $cluster_recheck_interval == undef {
       pacemaker::property{ 'cluster-recheck-interval-property':
         property => 'cluster-recheck-interval',

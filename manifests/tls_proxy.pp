@@ -35,7 +35,7 @@
 #   (Required) The path to the key used for the specified certificate.
 #
 # [*preserve_host*]
-#   (Optional) Whether the Host header is perserved in proxied requests.
+#   (Optional) Whether the Host header is preserved in proxied requests.
 #   See the Apache ProxyPreserveHost directive docs.
 #   Defaults to false
 #

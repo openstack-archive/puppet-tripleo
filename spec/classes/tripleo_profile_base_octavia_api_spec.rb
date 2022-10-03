@@ -73,7 +73,7 @@ eos
         :bootstrap_node => 'node.example.com'
       } }
 
-      it 'should should start configurating database' do
+      it 'should start configuring database' do
         is_expected.to_not contain_class('octavia::api')
         is_expected.to_not contain_class('octavia::controller')
         is_expected.to_not contain_class('octavia::healthcheck')

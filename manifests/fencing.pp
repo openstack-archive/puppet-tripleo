@@ -94,7 +94,7 @@ class tripleo::fencing(
   # and convert it to integer.
   $local_levels = 0 + $facts['stonith_levels']
 
-  # if the number of levels defined on this system is greather than the number in hiera
+  # if the number of levels defined on this system is greater than the number in hiera
   # we need to delete the delta.
   if $local_levels > $all_levels.length {
     $begin = $all_levels.length + 1

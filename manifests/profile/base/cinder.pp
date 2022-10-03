@@ -23,7 +23,7 @@
 #   Defaults to lookup('cinder_api_short_bootstrap_node_name', undef, undef, undef)
 #
 # [*cinder_enable_db_purge*]
-#   (Optional) Wheter to enable db purging
+#   (Optional) Whether to enable db purging
 #   Defaults to true
 #
 # [*step*]

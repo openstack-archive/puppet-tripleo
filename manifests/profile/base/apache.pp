@@ -14,7 +14,7 @@
 #
 # == Class tripleo::profile::base::apache
 #
-# Common apache modules and configurationfor API listeners
+# Common apache modules and configuration for API listeners
 #
 # === Parameters
 #

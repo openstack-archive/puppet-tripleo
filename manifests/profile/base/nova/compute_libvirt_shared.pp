@@ -24,7 +24,7 @@
 #   Defaults to Integer(lookup('step'))
 #
 # [*rbd_ephemeral_storage*]
-#   (Optional) Use Ceph as ephmeral disk backend.
+#   (Optional) Use Ceph as ephemeral disk backend.
 #   Defaults to lookup('nova::compute::rbd::ephemeral_storage', undef, undef, false)
 #
 # [*rbd_persistent_storage*]

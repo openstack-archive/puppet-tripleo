@@ -40,7 +40,7 @@
 #   Defaults to undef
 #
 # [*listener_ssl_cert_file*]
-#   (optional) Path to certificat file
+#   (optional) Path to certificate file
 #   Defaults to undef
 #
 # [*listener_ssl_key_file*]
@@ -91,7 +91,7 @@ class tripleo::profile::base::qdr (
     #     B:             [A]
     #     C:             [A,B]
     #
-    # NB: puppet 4.8 introduces break(), which would be favord to
+    # NB: puppet 4.8 introduces break(), which would be favored to
     # the following
     $connectors = $qdr_node_names.reduce([]) |$memo, $node| {
       if $::hostname in $node {

@@ -39,7 +39,7 @@
 #   Defaults to 22
 #
 # [*libvirt_tls*]
-#   (Optional) Whether or not libvird TLS service is enabled.
+#   (Optional) Whether or not libvirt TLS service is enabled.
 #   Defaults to false
 
 class tripleo::profile::base::nova::migration::client (

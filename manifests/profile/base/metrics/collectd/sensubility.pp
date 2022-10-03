@@ -101,7 +101,7 @@
 #  Defaults to undef
 #
 # [*results_format*]
-#  (Optional) String. Set message format compatability. Options are
+#  (Optional) String. Set message format compatibility. Options are
 #  [smartgateway,sensu]
 #  Defaults to smartgateway
 #

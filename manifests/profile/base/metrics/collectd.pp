@@ -111,7 +111,7 @@
 #
 # [*amqp_instances*]
 #  (Optional) Hash of hashes. Each inner hash represent Instance block in plugin
-#  configuration file. Key of outter hash represents instance name.
+#  configuration file. Key of outer hash represents instance name.
 #  The 'address' value concatenated with the 'name' given will be used
 #  as the send-to address for communications over the messaging link.
 #  Defaults to {}.

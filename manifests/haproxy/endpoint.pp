@@ -40,7 +40,7 @@
 # [*base_service_name*]
 #  In cases where the service name doesn't match the endpoint name, you can
 #  specify this option in order to get an appropriate value for $ip_addresses
-#  and $server_names. So, this will be used in hiera to dervice these, if set.
+#  and $server_names. So, this will be used in hiera to derive these, if set.
 #  Defaults to undef
 #
 # [*ip_addresses*]
@@ -53,7 +53,7 @@
 #
 # [*public_virtual_ip*]
 #  Address in which the proxy endpoint will be listening in the public network.
-#  If this service is internal only this should be ommitted.
+#  If this service is internal only this should be omitted.
 #  Defaults to undef.
 #
 # [*mode*]
@@ -234,7 +234,7 @@ define tripleo::haproxy::endpoint (
       # NOTE(jaosorior): This service is configured for the internal network.
       # We use the certificate spec hash. The key of the
       # internal_certificates_specs hash must must match the convention
-      # haproxy-<network name> or else this will fail. Futherly, it must
+      # haproxy-<network name> or else this will fail. Further, it must
       # contain the path that we'll use under 'service_pem'.
       $internal_cert_path = $internal_certificates_specs["haproxy-${service_network}"]['service_pem']
     }

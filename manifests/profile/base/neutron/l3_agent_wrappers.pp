@@ -14,7 +14,7 @@
 #
 # == Class: tripleo::profile::base::neutron::l3_agent_wrappers
 #
-# Generates wrapper scripts for running l3 agent subprocesess in containers.
+# Generates wrapper scripts for running l3 agent subprocesses in containers.
 #
 # === Parameters
 #
