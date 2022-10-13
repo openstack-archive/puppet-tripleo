@@ -200,6 +200,10 @@
 #   (optional) Recover gcache on galera startup.
 #   Defaults to false
 #
+# [*provider_options*]
+#   (optional) Allows passing extra options to wsrep_provider_options.
+#   Defaults to undef
+#
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = undef,
   $control_port                   = 3123,
@@ -239,6 +243,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $force_ocf                      = false,
   $gcache_size                    = undef,
   $gcache_recover                 = false,
+  $provider_options               = undef,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -356,10 +361,15 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
       $mysqld_options_sst = {}
     }
   }
-  if $ipv6 {
-    $wsrep_provider_options = "${gcache_options}gmcast.listen_addr=tcp://[::]:4567;${tls_options}"
+  if $provider_options {
+    $extra_options = "${provider_options};"
   } else {
-    $wsrep_provider_options = "${gcache_options}gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}"
+    $extra_options = ''
+  }
+  if $ipv6 {
+    $wsrep_provider_options = "${extra_options}${gcache_options}gmcast.listen_addr=tcp://[::]:4567;${tls_options}"
+  } else {
+    $wsrep_provider_options = "${extra_options}${gcache_options}gmcast.listen_addr=tcp://${gmcast_listen_addr}:4567;${tls_options}"
   }
 
   $mysqld_options_mysqld = {
