@@ -229,9 +229,6 @@ class tripleo::profile::base::database::mysql (
     if lookup('aodh_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'aodh::db::mysql':}
     }
-    if lookup('ceilometer_collector_enabled', undef, undef, false) {
-      tripleo::profile::base::database::mysql::include_and_check_auth{'ceilometer::db::mysql':}
-    }
     if lookup('cinder_api_enabled', undef, undef, false) {
       tripleo::profile::base::database::mysql::include_and_check_auth{'cinder::db::mysql':}
     }
