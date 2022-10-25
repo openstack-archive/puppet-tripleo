@@ -81,30 +81,12 @@ class tripleo::profile::base::database::mysql::client (
 
     $conf_changes = union($client_bind_changes, $changes_ssl)
 
-    # Create /etc/my.cnf.d/tripleo.cnf
-    # If the folder /etc/my.cnf.d does not exist (e.g. if mariadb is not
-    # present in the base image but installed as a package afterwards),
-    # create it. We do not want to touch the permissions in case it already
-    # exists due to the mariadb server package being pre-installed
-    if $::deployment_type == 'containers' {
-      # When generating configuration with docker-puppet, services do
-      # not include any profile that would ensure creation of /etc/my.cnf.d,
-      # so we enforce the check here.
-      file {'/etc/my.cnf.d':
-        ensure => 'directory'
-      }
-    } else {
-      # Otherwise, depending on the role, puppet may run this profile
-      # concurrently with the mysql profile, so we use an exec resource
-      # in order to avoid getting duplicate declaration errors
-      exec { 'directory-create-etc-my.cnf.d':
-        command => 'mkdir -p /etc/my.cnf.d',
-        unless  => 'test -d /etc/my.cnf.d',
-        path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
-        before  => Augeas['tripleo-mysql-client-conf']
-      }
+    # When generating configuration with docker-puppet, services do
+    # not include any profile that would ensure creation of /etc/my.cnf.d,
+    # so we enforce the check here.
+    file {'/etc/my.cnf.d':
+      ensure => 'directory'
     }
-
     file { $mysql_read_default_file:
       ensure => file,
     }
