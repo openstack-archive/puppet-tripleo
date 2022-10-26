@@ -289,7 +289,7 @@ class tripleo::profile::base::keystone (
             persistent => true,
         }
       }
-      create_resources('::keystone::ldap_backend', $ldap_backends_config, {})
+      create_resources('keystone::ldap_backend', $ldap_backends_config, { 'create_domain_entry' => false })
     }
 
     if $keystone_federation_enabled {
