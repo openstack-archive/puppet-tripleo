@@ -199,6 +199,10 @@
 #  (optional) Enable or not Glance API binding
 #  Defaults to lookup('glance_api_enabled', undef, undef, false)
 #
+# [*glance_api_internal*]
+#  (optional) Enable or not Glance API (internal) binding
+#  Defaults to lookup('glance_api_internal_enabled', undef, undef, false)
+#
 # [*nova_osapi*]
 #  (optional) Enable or not Nova API binding
 #  Defaults to lookup('nova_api_enabled', undef, undef, false)
@@ -475,6 +479,7 @@
 #    'docker_registry_port' (Defaults to 8787)
 #    'docker_registry_ssl_port' (Defaults to 13787)
 #    'glance_api_port' (Defaults to 9292)
+#    'glance_api_internal_port' (Defaults to 9293)
 #    'glance_api_ssl_port' (Defaults to 13292)
 #    'gnocchi_api_port' (Defaults to 8041)
 #    'gnocchi_api_ssl_port' (Defaults to 13041)
@@ -561,6 +566,7 @@ class tripleo::haproxy (
   $cinder                        = lookup('cinder_api_enabled', undef, undef, false),
   $manila                        = lookup('manila_api_enabled', undef, undef, false),
   $glance_api                    = lookup('glance_api_enabled', undef, undef, false),
+  $glance_api_internal           = lookup('glance_api_internal_enabled', undef, undef, false),
   $nova_osapi                    = lookup('nova_api_enabled', undef, undef, false),
   $placement                     = lookup('placement_enabled', undef, undef, false),
   $nova_metadata                 = lookup('nova_metadata_enabled', undef, undef, false),
@@ -647,6 +653,7 @@ class tripleo::haproxy (
     docker_registry_ssl_port => 13787,
     etcd_port => 2379,
     glance_api_port => 9292,
+    glance_api_internal_port => 9293,
     glance_api_ssl_port => 13292,
     gnocchi_api_port => 8041,
     gnocchi_api_ssl_port => 13041,
@@ -960,6 +967,32 @@ class tripleo::haproxy (
       backend_options   => merge($default_backend_options, $glance_backend_opts),
       service_network   => $glance_api_network,
       member_options    => union($haproxy_member_options, $internal_tls_member_options),
+    }
+  }
+
+  if $glance_api_internal {
+    $glance_internal_frontend_opts = {
+      'option' => [ 'httplog', 'forwardfor' ],
+    }
+    $glance_internal_backend_opts = {
+      'option' => [ 'httpchk GET /healthcheck' ],
+    }
+    $glance_internal_listen_opts = merge_hash_values($glance_internal_frontend_opts,
+                                                      $glance_internal_backend_opts)
+
+    # The glance_api_internal service uses the same network and internal VIP as the
+    # glance_api service. There is no public VIP (that's handled by the glance_api service).
+    ::tripleo::haproxy::endpoint { 'glance_api_internal':
+      internal_ip      => lookup('glance_api_vip', undef, undef, $controller_virtual_ip),
+      service_port     => $ports[glance_api_internal_port],
+      ip_addresses     => lookup('glance_api_internal_node_ips', undef, undef, $controller_hosts_real),
+      server_names     => lookup('glance_api_internal_node_names', undef, undef, $controller_hosts_names_real),
+      mode             => 'http',
+      listen_options   => merge($default_listen_options, $glance_internal_listen_opts),
+      frontend_options => merge($default_frontend_options, $glance_internal_frontend_opts),
+      backend_options  => merge($default_backend_options, $glance_internal_backend_opts),
+      service_network  => $glance_api_network,
+      member_options   => union($haproxy_member_options, $internal_tls_member_options),
     }
   }
 
