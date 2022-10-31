@@ -51,6 +51,29 @@
 #   This is set by t-h-t.
 #   Defaults to hiera('glance_api_network', undef)
 #
+# [*bind_port*]
+#   (optional) The port the server should bind to.
+#   Default: 9292
+#
+# [*log_dir*]
+#   (Optional) Directory where logs should be stored.
+#   If set to $::os_service_default, it will not log to any directory.
+#   Defaults to '/var/log/glance'.
+#
+# [*log_file*]
+#   (Optional) File where logs should be stored.
+#   If set to $::os_service_default, it will not log to any file.
+#   Defaults to '/var/log/glance/api.log'.
+#
+# [*show_image_direct_url*]
+#   (optional) Expose image location to trusted clients.
+#   Defaults to false
+#
+# [*show_multiple_locations*]
+#   (optional) Whether to include the backend image locations in image
+#    properties.
+#   Defaults to false
+#
 # [*multistore_config*]
 #   (Optional) Hash of settings for configuring additional glance-api backends.
 #   Defaults to {}
@@ -144,6 +167,11 @@ class tripleo::profile::base::glance::api (
   $glance_backend          = downcase(hiera('glance_backend', 'swift')),
   $glance_backend_id       = 'default_backend',
   $glance_network          = hiera('glance_api_network', undef),
+  $bind_port               = 9292,
+  $log_dir                 = '/var/log/glance',
+  $log_file                = '/var/log/glance/api.log',
+  $show_image_direct_url   = false,
+  $show_multiple_locations = false,
   $multistore_config       = {},
   $step                    = Integer(hiera('step')),
   $oslomsg_rpc_proto       = hiera('oslo_messaging_rpc_scheme', 'rabbit'),
@@ -211,11 +239,17 @@ class tripleo::profile::base::glance::api (
     include glance
     include glance::config
     include glance::healthcheck
-    include glance::api::logging
+    class { 'glance::api::logging':
+      log_dir  => $log_dir,
+      log_file => $log_file,
+    }
     class { 'glance::api':
-      enabled_backends => $enabled_backends,
-      default_backend  => $glance_backend_id,
-      sync_db          => $sync_db,
+      bind_port               => $bind_port,
+      enabled_backends        => $enabled_backends,
+      default_backend         => $glance_backend_id,
+      show_image_direct_url   => $show_image_direct_url,
+      show_multiple_locations => $show_multiple_locations,
+      sync_db                 => $sync_db,
     }
 
     ['cinder', 'file', 'rbd', 'swift'].each |String $backend_type| {
