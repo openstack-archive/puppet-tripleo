@@ -21,12 +21,9 @@ ca_path=""
 
 if [ "$certmonger_ca" == "local" ]; then
     ca_path="/etc/pki/ca-trust/source/anchors/cm-local-ca.pem"
-    #check if CA is still valid and update if not
-    if ! openssl verify ${ca_path}; then
     openssl pkcs12 -in /var/lib/certmonger/local/creds -out ${ca_path} -nokeys -nodes -passin pass:''
     chmod 0644 ${ca_path}
     update-ca-trust extract
-    fi
 elif [ "$certmonger_ca" == "IPA" ]; then
     ca_path="/etc/ipa/ca.crt"
 fi
