@@ -9,10 +9,6 @@ mod 'etcd',
   :git => 'https://github.com/puppet-etcd/puppet-etcd',
   :ref => 'master'
 
-mod 'fdio',
-  :git => 'https://git.fd.io/puppet-fdio',
-  :ref => 'master'
-
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
   :ref => 'master'

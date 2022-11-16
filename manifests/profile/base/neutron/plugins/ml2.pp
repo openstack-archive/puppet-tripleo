@@ -67,10 +67,6 @@ class tripleo::profile::base::neutron::plugins::ml2 (
       include tripleo::profile::base::neutron::plugins::ml2::ovn
     }
 
-    if 'vpp' in $mechanism_drivers {
-      include tripleo::profile::base::neutron::plugins::ml2::vpp
-    }
-
     if 'nuage' in $mechanism_drivers {
       include tripleo::profile::base::neutron::plugins::ml2::nuage
     }
