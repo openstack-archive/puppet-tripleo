@@ -87,9 +87,5 @@ class tripleo::profile::base::neutron::plugins::ml2 (
     if 'baremetal' in $mechanism_drivers {
       include tripleo::profile::base::neutron::plugins::ml2::networking_baremetal
     }
-
-    if ('ansible' in $mechanism_drivers) and ('neutron_plugin_ml2_ansible' in $service_names) {
-      include tripleo::profile::base::neutron::plugins::ml2::networking_ansible
-    }
   }
 }
