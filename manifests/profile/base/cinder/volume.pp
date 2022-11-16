@@ -1,4 +1,4 @@
-# Copyright 2016 Red Hat, Inc.
+# Copyright 2022 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -52,6 +52,10 @@
 #
 # [*cinder_enable_dellemc_xtremio_backend*]
 #   (Optional) Whether to enable the xtremio backend
+#   Defaults to false
+#
+# [*cinder_enable_ibm_svf_backend*]
+#   (Optional) Whether to enable the ibm_svf backend
 #   Defaults to false
 #
 # [*cinder_enable_iscsi_backend*]
@@ -127,6 +131,7 @@ class tripleo::profile::base::cinder::volume (
   $cinder_enable_dellemc_powerstore_backend    = false,
   $cinder_enable_dellemc_vnx_backend           = false,
   $cinder_enable_dellemc_xtremio_backend       = false,
+  $cinder_enable_ibm_svf_backend               = false,
   $cinder_enable_iscsi_backend                 = true,
   $cinder_enable_netapp_backend                = false,
   $cinder_enable_nfs_backend                   = false,
@@ -256,6 +261,14 @@ class tripleo::profile::base::cinder::volume (
       $cinder_dellemc_xtremio_backend_name = undef
     }
 
+    if $cinder_enable_ibm_svf_backend {
+      include tripleo::profile::base::cinder::volume::ibm_svf
+      $cinder_ibm_svf_backend_name = lookup('cinder::backend::ibm_svf::volume_backend_name',
+                                                    undef, undef, 'tripleo_ibm_svf')
+    } else {
+      $cinder_ibm_svf_backend_name = undef
+    }
+
     if $cinder_enable_iscsi_backend {
       include tripleo::profile::base::cinder::volume::iscsi
       $cinder_iscsi_backend_name = lookup('cinder::backend::iscsi::volume_backend_name', undef, undef, 'tripleo_iscsi')
@@ -326,6 +339,7 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_dellemc_powerstore_backend_name,
                                       $cinder_dellemc_vnx_backend_name,
                                       $cinder_dellemc_xtremio_backend_name,
+                                      $cinder_ibm_svf_backend_name,
                                       $cinder_netapp_backend_name,
                                       $cinder_nfs_backend_name,
                                       $cinder_user_enabled_backends,
