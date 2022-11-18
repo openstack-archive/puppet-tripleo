@@ -8,7 +8,7 @@
       - release-notes-jobs-python3
       - tripleo-standalone-scenarios-pipeline
       - tripleo-standalone-multinode-ipa-pipeline
-      - tripleo-upgrades-master-pipeline
+      - tripleo-upgrades-zed-pipeline
     check:
       jobs:
         - tripleo-ci-centos-9-content-provider
