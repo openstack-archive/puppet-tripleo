@@ -204,6 +204,12 @@
 #   (optional) Allows passing extra options to wsrep_provider_options.
 #   Defaults to undef
 #
+# [*pids_limit*]
+#   (optional) Tune the container's pids limit. Set to 0 to have unlimited
+#   pids for the container. The default is 4096 on systems that support
+#   "pids" cgroup controller.
+#   Defaults to undef
+#
 class tripleo::profile::pacemaker::database::mysql_bundle (
   $mysql_docker_image             = undef,
   $control_port                   = 3123,
@@ -244,6 +250,7 @@ class tripleo::profile::pacemaker::database::mysql_bundle (
   $gcache_size                    = undef,
   $gcache_recover                 = false,
   $provider_options               = undef,
+  $pids_limit                     = undef,
 ) {
   if $bootstrap_node and $::hostname == downcase($bootstrap_node) {
     $pacemaker_master = true
@@ -523,6 +530,11 @@ MYSQL_HOST=localhost\n",
         },
       }
 
+      if $pids_limit != undef {
+        $pids_limit_real = " --pids-limit ${pids_limit}"
+      } else {
+        $pids_limit_real = ''
+      }
       if $enable_internal_tls {
         $mysql_storage_maps_tls = {
           'mysql-pki-gcomm-key'  => {
@@ -573,7 +585,7 @@ MYSQL_HOST=localhost\n",
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => "--user=${bundle_user} --log-driver=${log_driver}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=${bundle_user}${pids_limit_real} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${control_port}",
