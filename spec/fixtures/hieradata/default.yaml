@@ -141,7 +141,7 @@ memcached::max_memory: 4096
 # octavia related items
 octavia_api_short_bootstrap_node_name: node
 octavia::keystone::authtoken::password: 'password'
-octavia::health_manager::heartbeat_key: 'key'
+octavia::controller::heartbeat_key: 'key'
 octavia::service_auth::password: 'password'
 # horizon related
 horizon_short_bootstrap_node_name: node
