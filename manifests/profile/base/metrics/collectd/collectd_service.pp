@@ -4,8 +4,11 @@ define tripleo::profile::base::metrics::collectd::collectd_service (
 ) {
   $plugins = lookup("'tripleo.collectd.plugins.${title}'", undef, undef, [])
 
-  if $plugins {
-    ::tripleo::profile::base::metrics::collectd::collectd_plugin {
-      $plugins: }
+  $plugins.each |$plugin| {
+    ensure_resource(
+      'tripleo::profile::base::metrics::collectd::collectd_plugin',
+      $plugin,
+      {}
+    )
   }
 }
