@@ -22,10 +22,6 @@
 #   (Optional) Whether to enable the pure backend
 #   Defaults to false
 #
-# [*cinder_enable_dellsc_backend*]
-#   (Optional) Whether to enable the delsc backend
-#   Defaults to false
-#
 # [*cinder_enable_dellemc_sc_backend*]
 #   (Optional) Whether to enable the sc backend
 #   Defaults to false
@@ -123,7 +119,6 @@
 #
 class tripleo::profile::base::cinder::volume (
   $cinder_enable_pure_backend                  = false,
-  $cinder_enable_dellsc_backend                = false,
   $cinder_enable_dellemc_sc_backend            = false,
   $cinder_enable_dellemc_unity_backend         = false,
   $cinder_enable_dellemc_powerflex_backend     = false,
@@ -197,13 +192,6 @@ class tripleo::profile::base::cinder::volume (
       $cinder_pure_backend_name = lookup('cinder::backend::pure::volume_backend_name', undef, undef, 'tripleo_pure')
     } else {
       $cinder_pure_backend_name = undef
-    }
-
-    if $cinder_enable_dellsc_backend {
-      include tripleo::profile::base::cinder::volume::dellsc
-      $cinder_dellsc_backend_name = lookup('cinder::backend::dellsc_iscsi::volume_backend_name', undef, undef, 'tripleo_dellsc')
-    } else {
-      $cinder_dellsc_backend_name = undef
     }
 
     if $cinder_enable_dellemc_sc_backend {
@@ -331,7 +319,6 @@ class tripleo::profile::base::cinder::volume (
                                       $cinder_rbd_backend_name,
                                       $cinder_rbd_extra_backend_names,
                                       $cinder_pure_backend_name,
-                                      $cinder_dellsc_backend_name,
                                       $cinder_dellemc_sc_backend_name,
                                       $cinder_dellemc_unity_backend_name,
                                       $cinder_dellemc_powerflex_backend_name,

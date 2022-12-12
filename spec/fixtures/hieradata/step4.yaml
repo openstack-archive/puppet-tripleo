@@ -5,4 +5,3 @@ cinder::api::default_volume_type: 'tripleo'
 tripleo::profile::base::cinder::volume::iscsi::cinder_iscsi_address: '127.0.0.1'
 tripleo::profile::base::cinder::volume::nfs::cinder_nfs_servers:
  - '127.0.0.1'
-cinder::backend::dellsc_iscsi::iscsi_ip_address: '127.0.0.1'
