@@ -55,6 +55,11 @@
 #   after the resource update.
 #   Defaults to 600 (seconds)
 #
+# [*watchdog_timeout*]
+#   Only valid if sbd watchdog fencing is enabled.
+#   Pacemaker will assume unseen nodes self-fence within this much time.
+#   Defaults to 60 (seconds)
+#
 # [*enable_instanceha*]
 #  (Optional) Boolean driving the Instance HA controlplane configuration
 #  Defaults to false
@@ -65,6 +70,7 @@ class tripleo::fencing(
   $try_sleep          = 3,
   $deep_compare       = false,
   $update_settle_secs = 600,
+  $watchdog_timeout   = 60,
   $enable_instanceha  = hiera('tripleo::instanceha', false),
 ) {
   $common_params = {
@@ -183,6 +189,34 @@ class tripleo::fencing(
           try_sleep         => $try_sleep,
         }
         Pcmk_stonith<||> -> Pcmk_stonith_level<||>
+      }
+    }
+    # we use the boostrap_node to create the watchdog resource and the stonith
+    # topology for all the nodes in the cluster, because the watchdog resource
+    # is not per-node but cluster-wide
+    $watchdog_devices = local_fence_devices('fence_watchdog', $all_devices)
+    if length($watchdog_devices) > 0 {
+      # check if this is the bootstrap node
+      if downcase($::hostname) == lookup('pacemaker_short_bootstrap_node_name') {
+        create_resources('pacemaker::stonith::fence_watchdog', $watchdog_devices, $common_params)
+        $stonith_resources = [ 'watchdog' ]
+        # if this is the boostrap node we set watchdog as levelX for all
+        # the pacemaker nodes
+        lookup('pacemaker_short_node_names').each |$node| {
+          pacemaker::stonith::level{ "stonith-${level}-watchdog-${node}":
+            level             => $level,
+            target            => $node,
+            stonith_resources => [ 'watchdog' ],
+            tries             => $tries,
+            try_sleep         => $try_sleep,
+          }
+        }
+        pacemaker::property { 'stonith-watchdog-timeout':
+          property => 'stonith-watchdog-timeout',
+          value    => $watchdog_timeout,
+          tries    => $tries,
+        }
+        Pcmk_property<||> -> Pcmk_stonith<||> -> Pcmk_stonith_level<||>
       }
     }
   }
