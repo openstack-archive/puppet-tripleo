@@ -78,6 +78,7 @@ class tripleo::profile::base::ironic::conductor (
       include ironic::drivers::inspector
       include ironic::glance
       include ironic::neutron
+      include ironic::nova
       include ironic::service_catalog
       include ironic::swift
   }
