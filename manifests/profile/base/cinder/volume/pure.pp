@@ -50,6 +50,9 @@ class tripleo::profile::base::cinder::volume::pure (
       'CinderPureIscsiCidr'          => lookup('cinder::backend::pure::pure_iscsi_cidr', undef, undef, undef),
       'CinderPureHostPersonality'    => lookup('cinder::backend::pure::pure_host_personality', undef, undef, undef),
       'CinderPureEradicateOnDelete'  => lookup('cinder::backend::pure::pure_eradicate_on_delete', undef, undef, undef),
+      'CinderPureNvmeTransport'      => lookup('cinder::backend::pure::pure_nvme_transport', undef, undef, undef),
+      'CinderPureNvmeCidr'           => lookup('cinder::backend::pure::pure_nvme_cidr', undef, undef, undef),
+      'CinderPureNvmeCidrList'       => lookup('cinder::backend::pure::pure_nvme_cidr_list', undef, undef, undef),
     }
 
     $backend_name.each |String $backend| {
@@ -66,6 +69,9 @@ class tripleo::profile::base::cinder::volume::pure (
         'pure_iscsi_cidr'              => $backend_config['CinderPureIscsiCidr'],
         'pure_host_personality'        => $backend_config['CinderPureHostPersonality'],
         'pure_eradicate_on_delete'     => $backend_config['CinderPureEradicateOnDelete'],
+        'pure_nvme_transport'          => $backend_config['CinderPureNvmeTransport'],
+        'pure_nvme_cidr'               => $backend_config['CinderPureNvmeCidr'],
+        'pure_nvme_cidr_list'          => $backend_config['CinderPureNvmeCidrList'],
       })})
     }
   }
