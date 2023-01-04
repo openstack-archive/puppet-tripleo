@@ -1434,6 +1434,7 @@ class tripleo::haproxy (
       backend_options   => merge($default_backend_options, $designate_backend_opts),
       public_ssl_port   => $ports[designate_api_ssl_port],
       service_network   => $designate_network,
+      member_options    => union($haproxy_member_options, $internal_tls_member_options),
     }
 
     # Create a reverse proxy for each miniDNS server running on the internal network so
