@@ -207,17 +207,17 @@ describe 'tripleo::profile::base::metrics::qdr' do
         ])
         is_expected.to contain_file('/tmp/certs').with(
           :ensure => 'directory',
-          :mode => '0700'
+          :mode => '0755'
         )
         is_expected.to contain_file('/tmp/certs/CA_wubba.pem').with(
           :ensure => 'present',
           :content => 'ca_wubba',
-          :mode => '0600'
+          :mode => '0644'
         )
         is_expected.to contain_file('/tmp/certs/CA_lubba.pem').with(
           :ensure => 'present',
           :content => 'ca_lubba',
-          :mode => '0600'
+          :mode => '0644'
         )
       end
     end
