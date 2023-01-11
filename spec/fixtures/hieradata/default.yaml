@@ -16,6 +16,7 @@ barbican::api::rabbit_password: 'password'
 barbican::db::mysql::password: 'password'
 barbican::keystone::authtoken::password: 'password'
 # ceilometer related items
+ceilometer_redis_password: 'password'
 ceilometer::rabbit_password: 'password'
 ceilometer::agent::service_credentials::password: 'password'
 # cinder related items
