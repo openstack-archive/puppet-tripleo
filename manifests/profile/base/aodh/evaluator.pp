@@ -24,11 +24,11 @@
 #
 # [*aodh_redis_password*]
 #   (Optional) redis password to configure coordination url
-#   Defaults to lookup('aodh_redis_password', undef, undef, undef)
+#   Defaults to lookup('aodh_redis_password')
 #
 # [*redis_vip*]
 #   (Optional) redis vip to configure coordination url
-#   Defaults to lookup('redis_vip', undef, undef, undef)
+#   Defaults to lookup('redis_vip')
 #
 # [*step*]
 #   (Optional) The current step in deployment. See tripleo-heat-templates
@@ -37,8 +37,8 @@
 #
 class tripleo::profile::base::aodh::evaluator (
   $enable_internal_tls = lookup('enable_internal_tls', undef, undef, false),
-  $aodh_redis_password = lookup('aodh_redis_password', undef, undef, undef),
-  $redis_vip           = lookup('redis_vip', undef, undef, undef),
+  $aodh_redis_password = lookup('aodh_redis_password'),
+  $redis_vip           = lookup('redis_vip'),
   $step                = Integer(lookup('step')),
 ) {
 
