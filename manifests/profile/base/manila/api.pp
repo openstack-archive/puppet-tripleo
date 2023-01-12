@@ -30,10 +30,6 @@
 #   (Optional) Whether or not the netapp backend is enabled
 #   Defaults to lookup('manila_backend_netapp_enabled', undef, undef, false)
 #
-# [*backend_vmax_enabled*]
-#   (Optional) Whether or not the vmax backend is enabled
-#   Defaults to lookup('manila_backend_vmax_enabled', undef, undef, false)
-#
 # [*backend_powermax_enabled*]
 #   (Optional) Whether or not the powermax backend is enabled
 #   Defaults to lookup('manila_backend_powermax_enabled', undef, undef, false)
@@ -100,7 +96,6 @@ class tripleo::profile::base::manila::api (
   $enabled_share_protocols    = lookup('manila_enabled_share_protocols', undef, undef, undef),
   $backend_generic_enabled    = lookup('manila_backend_generic_enabled', undef, undef, false),
   $backend_netapp_enabled     = lookup('manila_backend_netapp_enabled', undef, undef, false),
-  $backend_vmax_enabled       = lookup('manila_backend_vmax_enabled', undef, undef, false),
   $backend_powermax_enabled   = lookup('manila_backend_powermax_enabled', undef, undef, false),
   $backend_isilon_enabled     = lookup('manila_backend_isilon_enabled', undef, undef, false),
   $backend_unity_enabled      = lookup('manila_backend_unity_enabled', undef, undef, false),
@@ -144,9 +139,9 @@ class tripleo::profile::base::manila::api (
       $enabled_share_protocols_real = join(any2array($enabled_share_protocols), ',')
     } else {
       if $backend_generic_enabled or $backend_netapp_enabled
-        or $backend_vmax_enabled or $backend_powermax_enabled
-        or $backend_isilon_enabled or $backend_unity_enabled
-        or $backend_vnx_enabled or $backend_flashblade_enabled{
+        or $backend_powermax_enabled or $backend_isilon_enabled
+        or $backend_unity_enabled or $backend_vnx_enabled
+        or $backend_flashblade_enabled{
           $nfs_protocol = 'NFS'
           $cifs_protocol = 'CIFS'
       } else {
