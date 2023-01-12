@@ -264,25 +264,6 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
       end
 
-      context 'with only dellsc' do
-        before :each do
-          params.merge!({
-            :cinder_enable_dellsc_backend => true,
-            :cinder_enable_iscsi_backend  => false,
-          })
-        end
-        it 'should configure only dellsc' do
-          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellsc')
-          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::iscsi')
-          is_expected.to contain_class('tripleo::profile::base::cinder::volume')
-          is_expected.to contain_class('tripleo::profile::base::cinder')
-          is_expected.to contain_class('cinder::volume')
-          is_expected.to contain_class('cinder::backends').with(
-            :enabled_backends => ['tripleo_dellsc']
-          )
-        end
-      end
-
      context 'with only powerflex' do
         before :each do
           params.merge!({
@@ -425,7 +406,6 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
         it 'should configure only user backend' do
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::pure')
-          is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_sc')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_powerflex')
           is_expected.to_not contain_class('tripleo::profile::base::cinder::volume::dellemc_powermax')
@@ -449,7 +429,6 @@ describe 'tripleo::profile::base::cinder::volume' do
         before :each do
           params.merge!({
             :cinder_enable_pure_backend               => true,
-            :cinder_enable_dellsc_backend             => true,
             :cinder_enable_dellemc_sc_backend         => true,
             :cinder_enable_dellemc_powerflex_backend  => true,
             :cinder_enable_dellemc_powermax_backend   => true,
@@ -464,7 +443,6 @@ describe 'tripleo::profile::base::cinder::volume' do
         end
         it 'should configure all backends' do
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::pure')
-          is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellsc')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_sc')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_powerflex')
           is_expected.to contain_class('tripleo::profile::base::cinder::volume::dellemc_powermax')
@@ -483,7 +461,6 @@ describe 'tripleo::profile::base::cinder::volume' do
               'tripleo_iscsi',
               'tripleo_ceph',
               'tripleo_pure',
-              'tripleo_dellsc',
               'tripleo_dellemc_sc',
               'tripleo_dellemc_powerflex',
               'tripleo_dellemc_powermax',
