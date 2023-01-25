@@ -202,7 +202,7 @@ class tripleo::haproxy::horizon_endpoint (
     $non_colon_ip = regsubst($ip, ':', '-', 'G')
     haproxy::balancermember { "horizon_${non_colon_ip}_${server}":
       listening_service => 'horizon_be',
-      ports             => $backend_port,
+      ports             => "${backend_port}",
       ipaddresses       => $ip,
       server_names      => $server,
       options           => union($member_options, ["cookie ${server}"]),

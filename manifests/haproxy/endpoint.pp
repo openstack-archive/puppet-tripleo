@@ -303,7 +303,7 @@ define tripleo::haproxy::endpoint (
       $non_colon_ip = regsubst($ip, ':', '-', 'G')
       haproxy::balancermember { "${name}_${non_colon_ip}_${server}":
         listening_service => $listening_service,
-        ports             => $service_port_real,
+        ports             => "${service_port_real}",
         ipaddresses       => $ip,
         server_names      => $server,
         options           => union($member_options, ["cookie ${server}"]),
@@ -312,7 +312,7 @@ define tripleo::haproxy::endpoint (
   } else {
     haproxy::balancermember { "${name}":
       listening_service => $listening_service,
-      ports             => $service_port_real,
+      ports             => "${service_port_real}",
       ipaddresses       => $ip_addresses_real,
       server_names      => $server_names_real,
       options           => $member_options,
