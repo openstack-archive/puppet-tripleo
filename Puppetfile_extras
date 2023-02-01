@@ -3,15 +3,15 @@
 
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
-  :ref => 'main'
+  :ref => 'a797b8ccc7441199e22f151d439e85f03f3fa6ce'
 
 mod 'etcd',
   :git => 'https://github.com/puppet-etcd/puppet-etcd',
-  :ref => 'master'
+  :ref => 'e143c2d90a1154a958576af8930e3d10e1b25e54'
 
 mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
-  :ref => 'master'
+  :ref => '6fd1c8e407eb57bcb42198975dd1fdb1c0de1013'
 
 # NOTE(aschultz): Pinned due to LP#1755211
 mod 'systemd',
@@ -26,7 +26,7 @@ mod 'rsyslog',
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
-  :ref => 'v3.0.1'
+  :ref => '6e0f430034cf349c8b613d16cf9e3a52f63183e0'
 
 # NOTE(aschultz): Pine due to LP#1800944
 mod 'snmp',
@@ -44,4 +44,4 @@ mod 'collectd',
 # NOTE(tkajinam): Pinnned due to LP#1941772
 mod 'redis',
   :git => 'https://github.com/voxpupuli/puppet-redis',
-  :ref => 'v8.0.0'
+  :ref => '547105ef0756abb82642232c09ebd3f092ed8ab6'
