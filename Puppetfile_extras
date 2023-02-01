@@ -3,31 +3,31 @@
 
 mod 'haproxy',
   :git => 'https://github.com/puppetlabs/puppetlabs-haproxy',
-  :ref => 'main'
+  :ref => '04e0ffae432e6f772f19b192b3992ff4987b1182'
 
 mod 'etcd',
   :git => 'https://github.com/puppet-etcd/puppet-etcd',
-  :ref => 'master'
+  :ref => 'e143c2d90a1154a958576af8930e3d10e1b25e54'
 
 mod 'fdio',
   :git => 'https://git.fd.io/puppet-fdio',
-  :ref => 'master'
+  :ref => '6fd1c8e407eb57bcb42198975dd1fdb1c0de1013'
 
 mod 'systemd',
   :git => 'https://github.com/camptocamp/puppet-systemd',
-  :ref => 'master'
+  :ref => 'ae5dfe59ed14b814011b18959bdf526b49577d39'
 
 mod 'rsyslog',
   :git => 'https://github.com/voxpupuli/puppet-rsyslog',
-  :ref => 'master'
+  :ref => '7c7c37d4904c4038492558f48351e86ec07abf45'
 
 mod 'ssh',
   :git => 'https://github.com/saz/puppet-ssh',
-  :ref => 'v3.0.1'
+  :ref => 'ec47d72407a608c56743cf5a7e7b09056062ed7b'
 
 mod 'snmp',
   :git => 'https://github.com/razorsedge/puppet-snmp',
-  :ref => 'master'
+  :ref => '15556044befdfd351c62ab55c61f2308d56315d6'
 
 mod 'pacemaker',
   :git => 'https://github.com/openstack/puppet-pacemaker',
@@ -35,4 +35,4 @@ mod 'pacemaker',
 
 mod 'collectd',
   :git => 'https://github.com/voxpupuli/puppet-collectd',
-  :ref => '20494e44a90073273a18fce71f4a602d5b5d0690'
+  :ref => '4aab38cc923b852a1c96a2a42904168440fc9047'
