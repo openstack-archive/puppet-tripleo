@@ -585,7 +585,7 @@ MYSQL_HOST=localhost\n",
         },
         container_options => 'network=host',
         # lint:ignore:140chars
-        options           => "--user=${bundle_user}${pids_limit_real} --log-driver=${log_driver_real}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
+        options           => "--user=${bundle_user}${pids_limit_real} --log-driver=${log_driver}${log_file_real} -e KOLLA_CONFIG_STRATEGY=COPY_ALWAYS${tls_priorities_real}",
         # lint:endignore
         run_command       => '/bin/bash /usr/local/bin/kolla_start',
         network           => "control-port=${control_port}",
