@@ -69,9 +69,8 @@ class tripleo::profile::base::neutron::agents::ovn (
     }
     $sb_conn = $db_hosts.map |$h| { join([$protocol, normalize_ip_for_uri($h), "${ovn_sbdb_port}"], ':') }
     class { '::ovn::controller':
-      ovn_remote              => join(any2array($sb_conn), ','),
-      enable_ovn_match_northd => true,
-      ovn_chassis_mac_map     => $ovn_chassis_mac_map,
+      ovn_remote          => join(any2array($sb_conn), ','),
+      ovn_chassis_mac_map => $ovn_chassis_mac_map,
     }
   }
 }
