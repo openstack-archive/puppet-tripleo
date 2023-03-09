@@ -25,3 +25,9 @@
               - ^manifests/profile/(base|pacemaker)/neutron/plugins/ml2/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/agents/ovn.*$
               - ^manifests/profile/(base|pacemaker)/neutron/ovn.*$
+        - puppet-openstack-lint-ubuntu-jammy:
+            voting: false
+    gate:
+      jobs:
+        - puppet-openstack-lint-ubuntu-jammy:
+            voting: false
