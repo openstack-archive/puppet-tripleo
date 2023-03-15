@@ -37,7 +37,7 @@ class tripleo::profile::base::time::ptp (
   $ptp4l_conf_network_transport   = 'UDPv4',
 ) {
 
-  $interface_mapping = generate('/bin/os-net-config', '-i', $ptp4l_interface)
+  $interface_mapping = parsejson(generate('/bin/os-net-config', '-i', $ptp4l_interface))
   $ptp4l_interface_name = $interface_mapping[$ptp4l_interface]
 
   ptp::instance_ptp4l { "ptp4l-${title}-${ptp4l_interface_name}":
