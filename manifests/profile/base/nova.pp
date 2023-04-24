@@ -171,6 +171,7 @@ class tripleo::profile::base::nova (
         'password'  => $oslomsg_notify_password,
         'ssl'       => $oslomsg_notify_use_ssl_real,
       }),
+      dhcp_domain                => hiera('nova::metadata::dhcp_domain', hiera('nova::dhcp_domain', '')),
     }
     include ::nova::placement
     include ::nova::keystone::service_user
