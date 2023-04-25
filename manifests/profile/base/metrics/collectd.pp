@@ -129,13 +129,15 @@
 #  (Optional) List of strings. List of third party python packages to install.
 #  Defaults to [].
 #
-# [*enable_sensubility*]
-#  (Optional) Boolean. Set to true if sensubility should be executed by exec plugin.
-#  Defaults to false.
-#
 # [*enable_libpodstats*]
 #  (Optional) Boolean. Set to true if the collectd libpodstats plugin should be
 #  loaded
+#  Defaults to false.
+#
+# DEPRECATED PARAMETERS
+#
+# [*enable_sensubility*]
+#  (Optional) Boolean. Set to true if sensubility should be executed by exec plugin.
 #  Defaults to false.
 #
 class tripleo::profile::base::metrics::collectd (
@@ -256,6 +258,7 @@ class tripleo::profile::base::metrics::collectd (
       }
     }
     if $enable_sensubility {
+      warning("The functionality provided by collectd-sensubility is being deprecated and won't be available in next OpenStack release.")
       include tripleo::profile::base::metrics::collectd::sensubility
     }
   }
