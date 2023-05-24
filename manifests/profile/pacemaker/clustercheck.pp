@@ -34,12 +34,20 @@
 #   (Optional) The password for the clustercheck user.
 #   Defaults to hiera('mysql_clustercheck_password')
 #
+# [*post_status_wait*]
+#   (Optional) Number of seconds to wait after status is returned.
+#   This is only useful for slow environments where haproxy may report
+#   a "socket error" after clustercheck status is returned if it cannot
+#   poll and close its side of the connection before socat does.
+#   Defaults to 0
+#
 #
 class tripleo::profile::pacemaker::clustercheck (
   $step                  = Integer(hiera('step')),
   $clustercheck_user     = 'clustercheck',
   $clustercheck_password = hiera('mysql_clustercheck_password'),
   $bind_address          = hiera('mysql_bind_host'),
+  $post_status_wait      = 0,
 ) {
 
   if $step >= 1 {
@@ -59,7 +67,8 @@ class tripleo::profile::pacemaker::clustercheck (
       content => "MYSQL_USERNAME=${clustercheck_user}\n
 MYSQL_PASSWORD='${clustercheck_password}'\n
 MYSQL_HOST=localhost\n
-TRIPLEO_SOCAT_BIND='${socat_listen_type}:9200,bind=\"${bind_address}\",reuseaddr,fork'\n",
+TRIPLEO_SOCAT_BIND='${socat_listen_type}:9200,bind=\"${bind_address}\",reuseaddr,fork'\n
+TRIPLEO_POST_STATUS_WAIT=${post_status_wait}\n",
     }
 
     # configuration used when clustercheck is run via xinet
