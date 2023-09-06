@@ -65,6 +65,38 @@ describe 'tripleo::profile::base::cinder::volume::netapp' do
           is_expected.to contain_cinder_config('tripleo_netapp_2/nfs_shares_config').with_value('/etc/cinder/shares_2.conf')
         end
       end
+
+      context 'with nfs_shares supplied as an array' do
+        let(:params) { {
+          :multi_config => { 'tripleo_netapp' => {
+                               'CinderNetappNfsShares' => ['host_1:share_1', 'host_2:share_2'],
+                             },
+                           },
+          :step         => 4,
+        } }
+
+        it 'should treat it as an array' do
+          is_expected.to contain_cinder__backend__netapp('tripleo_netapp').with(
+            :nfs_shares => ['host_1:share_1', 'host_2:share_2'],
+          )
+        end
+      end
+
+      context 'with nfs_shares supplied as a comma delimited string' do
+        let(:params) { {
+          :multi_config => { 'tripleo_netapp' => {
+                               'CinderNetappNfsShares' => 'host_1:share_1, host_2:share_2',
+                             },
+                           },
+          :step         => 4,
+        } }
+
+        it 'should convert it to an array' do
+          is_expected.to contain_cinder__backend__netapp('tripleo_netapp').with(
+            :nfs_shares => ['host_1:share_1', 'host_2:share_2'],
+          )
+        end
+      end
     end
   end
 

@@ -68,6 +68,14 @@ class tripleo::profile::base::cinder::volume::netapp (
     any2array($backend_name).each |String $backend| {
       $backend_config = merge($backend_defaults, pick($multi_config[$backend], {}))
 
+      # cinder::backend::netapp::nfs_shares expects an array, so if CinderNetappNfsShares
+      # is a string then it needs to be split.
+      $nfs_shares = $backend_config['CinderNetappNfsShares']
+      $nfs_shares_real = $nfs_shares ? {
+        String  => strip(split($nfs_shares, ',')),
+        default => $nfs_shares,
+      }
+
       cinder::backend::netapp { $backend :
         backend_availability_zone       => $backend_config['CinderNetappAvailabilityZone'],
         netapp_login                    => $backend_config['CinderNetappLogin'],
@@ -81,7 +89,7 @@ class tripleo::profile::base::cinder::volume::netapp (
         netapp_vfiler                   => $backend_config['CinderNetappVfiler'],
         netapp_vserver                  => $backend_config['CinderNetappVserver'],
         netapp_partner_backend_name     => $backend_config['CinderNetappPartnerBackendName'],
-        nfs_shares                      => any2array($backend_config['CinderNetappNfsShares']),
+        nfs_shares                      => $nfs_shares_real,
         nfs_shares_config               => $backend_config['CinderNetappNfsSharesConfig'],
         nfs_mount_options               => $backend_config['CinderNetappNfsMountOptions'],
         netapp_copyoffload_tool_path    => $backend_config['CinderNetappCopyOffloadToolPath'],
