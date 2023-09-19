@@ -59,6 +59,14 @@ class tripleo::profile::base::ironic::conductor (
       include ironic::drivers::pxe
       if $manage_pxe {
           include ironic::pxe
+          file { "${::ironic::pxe::http_root_real}/healthcheck":
+            ensure  => file,
+            seltype => 'httpd_sys_content_t',
+            owner   => $::apache::params::user,
+            group   => $::apache::params::group,
+            mode    => '0644',
+            before  => Anchor['ironic::config::end'],
+          }
       }
 
       # Configure a few popular drivers
