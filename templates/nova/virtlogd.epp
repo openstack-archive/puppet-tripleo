@@ -21,7 +21,7 @@ case ${CONTAINER_STATUS_SHORT} in
     Exited| exited| EXITED| Created| created| CREATED)
         echo "Removing orphaned ${NAME} container ${CONTAINER_ID}"
         $CLI stop ${CONTAINER_ID} || true
-        $CLI rm -f ${CONTAINER_ID} || true
+        $CLI rm -f -v ${CONTAINER_ID} || true
         ;&
     *)
         echo "Starting a new child container ${NAME}"
