@@ -1,4 +1,0 @@
----
-upgrade:
-  - |
-    Remove ntp profile and puppet-ntp usage.

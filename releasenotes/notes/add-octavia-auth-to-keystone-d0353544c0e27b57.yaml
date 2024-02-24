@@ -1,3 +1,0 @@
----
-fixes:
-  - Octavia is now properly registered with keystone when deployed.

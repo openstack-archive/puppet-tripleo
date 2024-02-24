@@ -1,4 +1,0 @@
----
-features:
-  - |
-    Added support to IPV6 and SSL parameters for Dell EMC Unity manila backend.

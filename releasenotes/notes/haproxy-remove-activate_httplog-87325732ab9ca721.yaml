@@ -1,6 +1,0 @@
----
-deprecations:
-  - |
-    activate_httplog parameter of haproxy.pp is deprecated because
-    httplog is always enabled for all http endpoints regardless of
-    this parameter.

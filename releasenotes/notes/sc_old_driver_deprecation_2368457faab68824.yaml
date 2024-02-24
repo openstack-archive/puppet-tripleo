@@ -1,4 +1,0 @@
----
-deprecations:
-  - Resource tripleo::profile::base::cinder::volume::dellsc
-    will be removed in V-Release. 

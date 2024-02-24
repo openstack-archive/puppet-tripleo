@@ -1,4 +1,0 @@
----
-deprecations:
-  - Resource tripleo::profile::base::cinder::volume::dellemc_vmax_iscsi
-    is no longer supported. 

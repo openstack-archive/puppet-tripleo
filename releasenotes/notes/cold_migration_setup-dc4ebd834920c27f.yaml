@@ -1,4 +1,0 @@
----
-features:
-  - Configure ssh tunneling for nova cold-migration. Re-use the tunnel for
-    libvirt live-migration unless TLS is enabled.

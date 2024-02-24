@@ -1,5 +1,0 @@
-features:
-  - |
-    Support setting values for ``cephfs_volume_mode`` parameter which controls
-    the rwx mode of the cephfs volumes, snapshots, and groups of these
-    that back manila shares.

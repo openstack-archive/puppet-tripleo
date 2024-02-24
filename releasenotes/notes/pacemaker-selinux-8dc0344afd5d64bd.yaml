@@ -1,5 +1,0 @@
----
-upgrade:
-  - |
-    Services managed by Pacemaker will be restarted when this change is applied
-    as an Update or Upgrade process.

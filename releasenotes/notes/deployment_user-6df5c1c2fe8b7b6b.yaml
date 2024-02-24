@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Configure the deployment_user to be part of docker group, required for
-    openstack container commands.

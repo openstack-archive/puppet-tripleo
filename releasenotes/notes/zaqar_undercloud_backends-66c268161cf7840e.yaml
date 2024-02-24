@@ -1,6 +1,0 @@
----
-features:
-  - |
-    Support configurable backends Zaqar backends.
-    Updates the Zaqar profile so that we have support for configuring
-    alternate versions of the messaging and management backends.

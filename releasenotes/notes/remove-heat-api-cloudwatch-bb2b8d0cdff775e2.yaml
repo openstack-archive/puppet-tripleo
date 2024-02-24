@@ -1,5 +1,0 @@
----
-upgrade:
-  - |
-    Remove support for heat-api-cloudwatch service. It's been
-    removed from heat since Queens release.

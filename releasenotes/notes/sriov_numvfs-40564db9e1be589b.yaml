@@ -1,4 +1,0 @@
----
-features:
-  - Added a provider to configure VFs for SR-IOV interface.
-  - Added a define for persistence of the VFs configuration.

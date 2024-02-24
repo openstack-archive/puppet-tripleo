@@ -1,5 +1,0 @@
----
-upgrade:
-  - |
-    Management of login.defs file has been removed because now the file is
-    managed by ansible.

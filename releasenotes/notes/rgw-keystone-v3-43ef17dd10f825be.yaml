@@ -1,5 +1,0 @@
----
-features:
-  - Add support for configuring Ceph RGW to use
-    keystone V3 service authentication instead
-    of admin token authentication

@@ -1,6 +1,0 @@
----
-features:
-  - |
-    Added support for host personality, iSCSI CIDR and
-    eradicate on delete parameters for Pure Storage
-    FlashArray Cinder backend.

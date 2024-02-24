@@ -1,5 +1,0 @@
----
-other:
-  - |
-    Add the compress option for the containerized logrotate service to
-    compress rotated logs by default.

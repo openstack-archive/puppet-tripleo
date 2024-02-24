@@ -1,4 +1,0 @@
----
-fixes:
-  - |
-    Added missing haproxy endpoint for the Octavia API.

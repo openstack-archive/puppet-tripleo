@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Adds a new option "audit_enabled" to add the pycadf audit middleware to
-    the Swift proxy server pipeline.

@@ -1,5 +1,0 @@
----
-fixes:
-  - |
-    Adds neutron key/certificate generation for using with Neutron agents for
-    communication with OVS.

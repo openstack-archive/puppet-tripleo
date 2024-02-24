@@ -1,4 +1,0 @@
----
-upgrade:
-  - Use of the class manila::backend::cephfsnative is no longer supported.
-    manila::backend::cephfs can be used to achieve the same functionality.

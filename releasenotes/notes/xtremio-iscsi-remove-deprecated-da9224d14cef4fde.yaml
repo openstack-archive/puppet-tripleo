@@ -1,6 +1,0 @@
----
-upgrade:
-  - |
-    Remove deprecated
-    tripleo::profile::base::cinder::volume::dellemc_xtremio_iscsi. Use
-    tripleo::profile::base::cinder::volume::dellemc_xtremio instead.

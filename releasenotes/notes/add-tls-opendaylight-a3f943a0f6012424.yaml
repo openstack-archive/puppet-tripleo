@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Adds support for deploying OpenDaylight with TLS.  Open vSwitch is also
-    configured with TLS in this deployment.

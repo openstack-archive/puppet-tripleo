@@ -1,4 +1,0 @@
-
-LoadPlugin libpodstats
-<Plugin "libpodstats">
-</Plugin>

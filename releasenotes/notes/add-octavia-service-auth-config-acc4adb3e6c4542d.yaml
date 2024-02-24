@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Configuration of Octavia 'service_auth' section is now enabled for configuring
-    service-to-service communication.

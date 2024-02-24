@@ -1,3 +1,0 @@
----
-features:
-  - Added TLS support for ELasticsearch output plugin in rsyslog service.

@@ -1,4 +1,0 @@
----
-upgrade:
-  - |
-    The unused ``stack_action`` hiera parameter has now been removed.

@@ -1,7 +1,0 @@
----
-features:
-  - |
-    Add support for NVME transport protocol for Pure Storage
-    FlashArray Cinder Backend.
-    Add support for NVMe CIDR and NVMe CIDR list parameters
-    for Pure Storage FlashArray Cinder Backend.

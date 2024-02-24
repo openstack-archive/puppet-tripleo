@@ -1,4 +1,0 @@
----
-features:
-  - |
-    Add the ability to deploy an NFS backend for the Cinder Backup service.

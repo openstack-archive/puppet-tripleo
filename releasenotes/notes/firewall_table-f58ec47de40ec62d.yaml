@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Add support for specifying a table name when creating IPtables rules
-    with the firewall class.

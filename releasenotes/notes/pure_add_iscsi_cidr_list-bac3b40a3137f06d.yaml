@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Added support for iSCSI CIDR list parameter for Pure Storage
-    FlashArray Cinder backend.

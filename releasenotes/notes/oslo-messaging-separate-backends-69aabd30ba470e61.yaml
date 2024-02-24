@@ -1,4 +1,0 @@
----
-features:
-  - Support separate oslo.messaging services for RPC and Notifications.
-    Enable separate messaging backend servers.

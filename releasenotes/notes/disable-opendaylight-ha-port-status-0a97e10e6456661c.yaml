@@ -1,5 +1,0 @@
----
-fixes:
-  - |
-    Disables port status feature with OpenDaylight when deployed as HA until
-    it can be properly supported in an HA environment.

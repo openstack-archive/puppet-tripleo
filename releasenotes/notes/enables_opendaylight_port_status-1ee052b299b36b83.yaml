@@ -1,5 +1,0 @@
----
-fixes:
-  - |
-    Fixes OpenDaylight port status to now work correctly via websocket
-    connection.

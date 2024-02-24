@@ -1,3 +1,0 @@
----
-fixes:
-  - Fixes missing neutron base class in sriov

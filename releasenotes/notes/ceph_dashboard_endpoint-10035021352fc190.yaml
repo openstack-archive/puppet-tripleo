@@ -1,6 +1,0 @@
-
----
-features:
-  - |
-    Adds ceph_dashboard endpoint and ceph_dashboard_port to properly
-    expose the ceph-dashboard frontend service

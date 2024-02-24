@@ -1,4 +1,0 @@
----
-features:
-  - Add support for configuring service function
-    chaining with neutron networking-sfc project
